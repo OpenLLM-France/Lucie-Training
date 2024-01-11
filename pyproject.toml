@@ -5,6 +5,10 @@ description = ""
 authors = ["Julien Tourille <julien.tourille@cea.fr>"]
 license = "GPL-3.0"
 readme = "README.md"
+packages = [
+    { include = "bloomng", from = "src"},
+]
+
 
 [tool.poetry.dependencies]
 python = ">=3.9"
