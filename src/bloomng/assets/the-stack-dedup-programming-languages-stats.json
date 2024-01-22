@@ -1,0 +1,1464 @@
+{
+  "JSON": {
+    "num_parquet_files": 704,
+    "name": "json"
+  },
+  "CSV": {
+    "num_parquet_files": 630,
+    "name": "csv"
+  },
+  "Text": {
+    "num_parquet_files": 535,
+    "name": "text"
+  },
+  "Jupyter Notebook": {
+    "num_parquet_files": 312,
+    "name": "jupyter-notebook"
+  },
+  "JavaScript": {
+    "num_parquet_files": 310,
+    "num_docs": 21108587,
+    "num_words": 8526481238,
+    "num_chars": 141646905342,
+    "name": "javascript"
+  },
+  "HTML": {
+    "num_parquet_files": 308,
+    "name": "html"
+  },
+  "XML": {
+    "num_parquet_files": 239,
+    "name": "xml"
+  },
+  "Java": {
+    "num_parquet_files": 208,
+    "num_docs": 20151565,
+    "num_words": 7421094319,
+    "num_chars": 89297025050,
+    "name": "java"
+  },
+  "Markdown": {
+    "num_parquet_files": 186,
+    "name": "markdown"
+  },
+  "SVG": {
+    "num_parquet_files": 155,
+    "name": "svg"
+  },
+  "PHP": {
+    "num_parquet_files": 153,
+    "name": "php",
+    "num_docs": 15904518,
+    "num_words": 4865413066,
+    "num_chars": 66844317623
+  },
+  "Python": {
+    "num_parquet_files": 144,
+    "num_docs": 12962249,
+    "num_words": 5434283210,
+    "num_chars": 64304133602,
+    "name": "python"
+  },
+  "C": {
+    "num_parquet_files": 126,
+    "name": "c",
+    "num_docs": 8625559,
+    "num_words": 5915525675,
+    "num_chars": 57428274786
+  },
+  "C++": {
+    "num_parquet_files": 110,
+    "name": "cpp",
+    "num_docs": 6377914,
+    "num_words": 4583951458,
+    "num_chars": 50891569637
+  },
+  "C#": {
+    "num_parquet_files": 107,
+    "name": "c-sharp",
+    "num_docs": 10839399,
+    "num_words": 3574049078,
+    "num_chars": 46285805585
+  },
+  "TypeScript": {
+    "num_parquet_files": 71,
+    "name": "typescript",
+    "num_docs": 10637070,
+    "num_words": 2616733601,
+    "num_chars": 28815312118
+  },
+  "YAML": {
+    "num_parquet_files": 64,
+    "name": "yaml"
+  },
+  "Go": {
+    "num_parquet_files": 57,
+    "name": "go"
+  },
+  "CSS": {
+    "num_parquet_files": 49,
+    "name": "css"
+  },
+  "SQL": {
+    "num_parquet_files": 27,
+    "name": "sql"
+  },
+  "Rust": {
+    "num_parquet_files": 21,
+    "name": "rust"
+  },
+  "Ruby": {
+    "num_parquet_files": 19,
+    "name": "ruby",
+    "num_docs": 3405374,
+    "num_words": 646038604,
+    "num_chars": 7138982989
+  },
+  "Vue": {
+    "num_parquet_files": 17,
+    "name": "vue"
+  },
+  "Unity3D Asset": {
+    "num_parquet_files": 16,
+    "name": "unity3d-asset"
+  },
+  "Swift": {
+    "num_parquet_files": 15,
+    "name": "swift",
+    "num_docs": 1756144,
+    "num_words": 553236205,
+    "num_chars": 6133895664
+  },
+  "Kotlin": {
+    "num_parquet_files": 15,
+    "name": "kotlin"
+  },
+  "Scala": {
+    "num_parquet_files": 12,
+    "name": "scala"
+  },
+  "SCSS": {
+    "num_parquet_files": 12,
+    "name": "scss"
+  },
+  "TeX": {
+    "num_parquet_files": 12,
+    "name": "tex"
+  },
+  "Gettext Catalog": {
+    "num_parquet_files": 10,
+    "name": "gettext-catalog"
+  },
+  "Shell": {
+    "num_parquet_files": 10,
+    "name": "shell"
+  },
+  "Dart": {
+    "num_parquet_files": 9,
+    "name": "dart"
+  },
+  "reStructuredText": {
+    "num_parquet_files": 9,
+    "name": "restructuredtext"
+  },
+  "Lua": {
+    "num_parquet_files": 8,
+    "name": "lua"
+  },
+  "INI": {
+    "num_parquet_files": 8,
+    "name": "ini"
+  },
+  "JSX": {
+    "num_parquet_files": 7,
+    "name": "jsx"
+  },
+  "Haskell": {
+    "num_parquet_files": 6,
+    "name": "haskell"
+  },
+  "Perl": {
+    "num_parquet_files": 6,
+    "name": "perl"
+  },
+  "Eagle": {
+    "num_parquet_files": 6,
+    "name": "eagle"
+  },
+  "Gnuplot": {
+    "num_parquet_files": 6,
+    "name": "gnuplot"
+  },
+  "Groff": {
+    "num_parquet_files": 6,
+    "name": "groff"
+  },
+  "KiCad": {
+    "num_parquet_files": 6,
+    "name": "kicad"
+  },
+  "Smali": {
+    "num_parquet_files": 6,
+    "name": "smali"
+  },
+  "Turtle": {
+    "num_parquet_files": 6,
+    "name": "turtle"
+  },
+  "Diff": {
+    "num_parquet_files": 5,
+    "name": "diff"
+  },
+  "Julia": {
+    "num_parquet_files": 4,
+    "name": "julia"
+  },
+  "FORTRAN": {
+    "num_parquet_files": 4,
+    "name": "fortran"
+  },
+  "Assembly": {
+    "num_parquet_files": 4,
+    "name": "assembly"
+  },
+  "Common Lisp": {
+    "num_parquet_files": 4,
+    "name": "common-lisp"
+  },
+  "Makefile": {
+    "num_parquet_files": 4,
+    "name": "makefile"
+  },
+  "Mathematica": {
+    "num_parquet_files": 4,
+    "name": "mathematica"
+  },
+  "Pascal": {
+    "num_parquet_files": 4,
+    "name": "pascal"
+  },
+  "PostScript": {
+    "num_parquet_files": 4,
+    "name": "postscript"
+  },
+  "Visual Basic": {
+    "num_parquet_files": 4,
+    "name": "visual-basic"
+  },
+  "OCaml": {
+    "num_parquet_files": 3,
+    "name": "ocaml"
+  },
+  "PowerShell": {
+    "num_parquet_files": 3,
+    "name": "powershell"
+  },
+  "Groovy": {
+    "num_parquet_files": 3,
+    "name": "groovy"
+  },
+  "AsciiDoc": {
+    "num_parquet_files": 3,
+    "name": "asciidoc"
+  },
+  "edn": {
+    "num_parquet_files": 3,
+    "name": "edn"
+  },
+  "GAS": {
+    "num_parquet_files": 3,
+    "name": "gas"
+  },
+  "Graphviz (DOT)": {
+    "num_parquet_files": 3,
+    "name": "graphviz_dot"
+  },
+  "HTML+ERB": {
+    "num_parquet_files": 3,
+    "name": "html_erb"
+  },
+  "Java Server Pages": {
+    "num_parquet_files": 3,
+    "name": "java-server-pages"
+  },
+  "Less": {
+    "num_parquet_files": 3,
+    "name": "less"
+  },
+  "Smalltalk": {
+    "num_parquet_files": 3,
+    "name": "smalltalk"
+  },
+  "Solidity": {
+    "num_parquet_files": 3,
+    "name": "solidity"
+  },
+  "Twig": {
+    "num_parquet_files": 3,
+    "name": "twig"
+  },
+  "VHDL": {
+    "num_parquet_files": 3,
+    "name": "vhdl"
+  },
+  "Elixir": {
+    "num_parquet_files": 2,
+    "name": "elixir"
+  },
+  "Clojure": {
+    "num_parquet_files": 2,
+    "name": "clojure"
+  },
+  "Erlang": {
+    "num_parquet_files": 2,
+    "name": "erlang"
+  },
+  "F#": {
+    "num_parquet_files": 2,
+    "name": "f-sharp"
+  },
+  "ActionScript": {
+    "num_parquet_files": 2,
+    "name": "actionscript"
+  },
+  "Arduino": {
+    "num_parquet_files": 2,
+    "name": "arduino"
+  },
+  "ASP": {
+    "num_parquet_files": 2,
+    "name": "asp"
+  },
+  "CMake": {
+    "num_parquet_files": 2,
+    "name": "cmake"
+  },
+  "CoffeeScript": {
+    "num_parquet_files": 2,
+    "name": "coffeescript"
+  },
+  "Cuda": {
+    "num_parquet_files": 2,
+    "name": "cuda"
+  },
+  "Dockerfile": {
+    "num_parquet_files": 2,
+    "name": "dockerfile"
+  },
+  "G-code": {
+    "num_parquet_files": 2,
+    "name": "g-code"
+  },
+  "GLSL": {
+    "num_parquet_files": 2,
+    "name": "glsl"
+  },
+  "Handlebars": {
+    "num_parquet_files": 2,
+    "name": "handlebars"
+  },
+  "Haxe": {
+    "num_parquet_files": 2,
+    "name": "haxe"
+  },
+  "HCL": {
+    "num_parquet_files": 2,
+    "name": "hcl"
+  },
+  "LLVM": {
+    "num_parquet_files": 2,
+    "name": "llvm"
+  },
+  "Max": {
+    "num_parquet_files": 2,
+    "name": "max"
+  },
+  "Objective-C++": {
+    "num_parquet_files": 2,
+    "name": "objective-cpp"
+  },
+  "Smarty": {
+    "num_parquet_files": 2,
+    "name": "smarty"
+  },
+  "Standard ML": {
+    "num_parquet_files": 2,
+    "name": "standard-ml"
+  },
+  "TOML": {
+    "num_parquet_files": 2,
+    "name": "toml"
+  },
+  "Web Ontology Language": {
+    "num_parquet_files": 2,
+    "name": "web-ontology-language"
+  },
+  "XSLT": {
+    "num_parquet_files": 2,
+    "name": "xslt"
+  },
+  "R": {
+    "num_parquet_files": 1,
+    "name": "r"
+  },
+  "Matlab": {
+    "num_parquet_files": 1,
+    "name": "matlab"
+  },
+  "Racket": {
+    "num_parquet_files": 1,
+    "name": "racket"
+  },
+  "ABAP": {
+    "num_parquet_files": 1,
+    "name": "abap"
+  },
+  "COBOL": {
+    "num_parquet_files": 1,
+    "name": "cobol"
+  },
+  "Elm": {
+    "num_parquet_files": 1,
+    "name": "elm"
+  },
+  "Ada": {
+    "num_parquet_files": 1,
+    "name": "ada"
+  },
+  "Agda": {
+    "num_parquet_files": 1,
+    "name": "agda"
+  },
+  "AGS Script": {
+    "num_parquet_files": 1,
+    "name": "ags-script"
+  },
+  "Alloy": {
+    "num_parquet_files": 1,
+    "name": "alloy"
+  },
+  "AMPL": {
+    "num_parquet_files": 1,
+    "name": "ampl"
+  },
+  "ANTLR": {
+    "num_parquet_files": 1,
+    "name": "antlr"
+  },
+  "ApacheConf": {
+    "num_parquet_files": 1,
+    "name": "apacheconf"
+  },
+  "API Blueprint": {
+    "num_parquet_files": 1,
+    "name": "api-blueprint"
+  },
+  "APL": {
+    "num_parquet_files": 1,
+    "name": "apl"
+  },
+  "AppleScript": {
+    "num_parquet_files": 1,
+    "name": "applescript"
+  },
+  "Arc": {
+    "num_parquet_files": 1,
+    "name": "arc"
+  },
+  "AspectJ": {
+    "num_parquet_files": 1,
+    "name": "aspectj"
+  },
+  "ATS": {
+    "num_parquet_files": 1,
+    "name": "ats"
+  },
+  "Augeas": {
+    "num_parquet_files": 1,
+    "name": "augeas"
+  },
+  "AutoHotkey": {
+    "num_parquet_files": 1,
+    "name": "autohotkey"
+  },
+  "AutoIt": {
+    "num_parquet_files": 1,
+    "name": "autoit"
+  },
+  "Awk": {
+    "num_parquet_files": 1,
+    "name": "awk"
+  },
+  "Batchfile": {
+    "num_parquet_files": 1,
+    "name": "batchfile"
+  },
+  "Befunge": {
+    "num_parquet_files": 1,
+    "name": "befunge"
+  },
+  "Bison": {
+    "num_parquet_files": 1,
+    "name": "bison"
+  },
+  "BitBake": {
+    "num_parquet_files": 1,
+    "name": "bitbake"
+  },
+  "BlitzBasic": {
+    "num_parquet_files": 1,
+    "name": "blitzbasic"
+  },
+  "BlitzMax": {
+    "num_parquet_files": 1,
+    "name": "blitzmax"
+  },
+  "Bluespec": {
+    "num_parquet_files": 1,
+    "name": "bluespec"
+  },
+  "Boo": {
+    "num_parquet_files": 1,
+    "name": "boo"
+  },
+  "Brainfuck": {
+    "num_parquet_files": 1,
+    "name": "brainfuck"
+  },
+  "Brightscript": {
+    "num_parquet_files": 1,
+    "name": "brightscript"
+  },
+  "Bro": {
+    "num_parquet_files": 1,
+    "name": "bro"
+  },
+  "C2hs Haskell": {
+    "num_parquet_files": 1,
+    "name": "c2hs-haskell"
+  },
+  "Cap'n Proto": {
+    "num_parquet_files": 1,
+    "name": "capn-proto"
+  },
+  "CartoCSS": {
+    "num_parquet_files": 1,
+    "name": "cartocss"
+  },
+  "Ceylon": {
+    "num_parquet_files": 1,
+    "name": "ceylon"
+  },
+  "Chapel": {
+    "num_parquet_files": 1,
+    "name": "chapel"
+  },
+  "ChucK": {
+    "num_parquet_files": 1,
+    "name": "chuck"
+  },
+  "Cirru": {
+    "num_parquet_files": 1,
+    "name": "cirru"
+  },
+  "Clarion": {
+    "num_parquet_files": 1,
+    "name": "clarion"
+  },
+  "Clean": {
+    "num_parquet_files": 1,
+    "name": "clean"
+  },
+  "Click": {
+    "num_parquet_files": 1,
+    "name": "click"
+  },
+  "CLIPS": {
+    "num_parquet_files": 1,
+    "name": "clips"
+  },
+  "ColdFusion": {
+    "num_parquet_files": 1,
+    "name": "coldfusion"
+  },
+  "ColdFusion CFC": {
+    "num_parquet_files": 1,
+    "name": "coldfusion-cfc"
+  },
+  "Component Pascal": {
+    "num_parquet_files": 1,
+    "name": "component-pascal"
+  },
+  "Coq": {
+    "num_parquet_files": 1,
+    "name": "coq"
+  },
+  "Creole": {
+    "num_parquet_files": 1,
+    "name": "creole"
+  },
+  "Crystal": {
+    "num_parquet_files": 1,
+    "name": "crystal"
+  },
+  "Csound": {
+    "num_parquet_files": 1,
+    "name": "csound"
+  },
+  "Cucumber": {
+    "num_parquet_files": 1,
+    "name": "cucumber"
+  },
+  "Cycript": {
+    "num_parquet_files": 1,
+    "name": "cycript"
+  },
+  "Cython": {
+    "num_parquet_files": 1,
+    "name": "cython"
+  },
+  "D": {
+    "num_parquet_files": 1,
+    "name": "d"
+  },
+  "Darcs Patch": {
+    "num_parquet_files": 1,
+    "name": "darcs-patch"
+  },
+  "desktop": {
+    "num_parquet_files": 1,
+    "name": "desktop"
+  },
+  "DIGITAL Command Language": {
+    "num_parquet_files": 1,
+    "name": "digital-command-language"
+  },
+  "DM": {
+    "num_parquet_files": 1,
+    "name": "dm"
+  },
+  "DNS Zone": {
+    "num_parquet_files": 1,
+    "name": "dns-zone"
+  },
+  "Dogescript": {
+    "num_parquet_files": 1,
+    "name": "dogescript"
+  },
+  "Dylan": {
+    "num_parquet_files": 1,
+    "name": "dylan"
+  },
+  "eC": {
+    "num_parquet_files": 1,
+    "name": "ec"
+  },
+  "Ecere Projects": {
+    "num_parquet_files": 1,
+    "name": "ecere-projects"
+  },
+  "ECL": {
+    "num_parquet_files": 1,
+    "name": "ecl"
+  },
+  "Eiffel": {
+    "num_parquet_files": 1,
+    "name": "eiffel"
+  },
+  "Emacs Lisp": {
+    "num_parquet_files": 1,
+    "name": "emacs-lisp"
+  },
+  "EmberScript": {
+    "num_parquet_files": 1,
+    "name": "emberscript"
+  },
+  "Factor": {
+    "num_parquet_files": 1,
+    "name": "factor"
+  },
+  "Fancy": {
+    "num_parquet_files": 1,
+    "name": "fancy"
+  },
+  "Fantom": {
+    "num_parquet_files": 1,
+    "name": "fantom"
+  },
+  "fish": {
+    "num_parquet_files": 1,
+    "name": "fish"
+  },
+  "FLUX": {
+    "num_parquet_files": 1,
+    "name": "flux"
+  },
+  "Forth": {
+    "num_parquet_files": 1,
+    "name": "forth"
+  },
+  "FreeMarker": {
+    "num_parquet_files": 1,
+    "name": "freemarker"
+  },
+  "GAMS": {
+    "num_parquet_files": 1,
+    "name": "gams"
+  },
+  "GAP": {
+    "num_parquet_files": 1,
+    "name": "gap"
+  },
+  "GDScript": {
+    "num_parquet_files": 1,
+    "name": "gdscript"
+  },
+  "Genshi": {
+    "num_parquet_files": 1,
+    "name": "genshi"
+  },
+  "Gentoo Ebuild": {
+    "num_parquet_files": 1,
+    "name": "gentoo-ebuild"
+  },
+  "Gentoo Eclass": {
+    "num_parquet_files": 1,
+    "name": "gentoo-eclass"
+  },
+  "Glyph": {
+    "num_parquet_files": 1,
+    "name": "glyph"
+  },
+  "Golo": {
+    "num_parquet_files": 1,
+    "name": "golo"
+  },
+  "Gosu": {
+    "num_parquet_files": 1,
+    "name": "gosu"
+  },
+  "Grace": {
+    "num_parquet_files": 1,
+    "name": "grace"
+  },
+  "Grammatical Framework": {
+    "num_parquet_files": 1,
+    "name": "grammatical-framework"
+  },
+  "GraphQL": {
+    "num_parquet_files": 1,
+    "name": "graphql"
+  },
+  "Groovy Server Pages": {
+    "num_parquet_files": 1,
+    "name": "groovy-server-pages"
+  },
+  "Haml": {
+    "num_parquet_files": 1,
+    "name": "haml"
+  },
+  "Harbour": {
+    "num_parquet_files": 1,
+    "name": "harbour"
+  },
+  "HLSL": {
+    "num_parquet_files": 1,
+    "name": "hlsl"
+  },
+  "HTML+Django": {
+    "num_parquet_files": 1,
+    "name": "html_django"
+  },
+  "HTML+EEX": {
+    "num_parquet_files": 1,
+    "name": "html_eex"
+  },
+  "HTML+PHP": {
+    "num_parquet_files": 1,
+    "name": "html_php"
+  },
+  "HTTP": {
+    "num_parquet_files": 1,
+    "name": "http"
+  },
+  "Hy": {
+    "num_parquet_files": 1,
+    "name": "hy"
+  },
+  "IDL": {
+    "num_parquet_files": 1,
+    "name": "idl"
+  },
+  "Idris": {
+    "num_parquet_files": 1,
+    "name": "idris"
+  },
+  "IGOR Pro": {
+    "num_parquet_files": 1,
+    "name": "igor-pro"
+  },
+  "Inform 7": {
+    "num_parquet_files": 1,
+    "name": "inform-7"
+  },
+  "Inno Setup": {
+    "num_parquet_files": 1,
+    "name": "inno-setup"
+  },
+  "Io": {
+    "num_parquet_files": 1,
+    "name": "io"
+  },
+  "Ioke": {
+    "num_parquet_files": 1,
+    "name": "ioke"
+  },
+  "IRC log": {
+    "num_parquet_files": 1,
+    "name": "irc-log"
+  },
+  "Isabelle": {
+    "num_parquet_files": 1,
+    "name": "isabelle"
+  },
+  "J": {
+    "num_parquet_files": 1,
+    "name": "j"
+  },
+  "Jade": {
+    "num_parquet_files": 1,
+    "name": "jade"
+  },
+  "Jasmin": {
+    "num_parquet_files": 1,
+    "name": "jasmin"
+  },
+  "JFlex": {
+    "num_parquet_files": 1,
+    "name": "jflex"
+  },
+  "JSON5": {
+    "num_parquet_files": 1,
+    "name": "json5"
+  },
+  "JSONiq": {
+    "num_parquet_files": 1,
+    "name": "jsoniq"
+  },
+  "JSONLD": {
+    "num_parquet_files": 1,
+    "name": "jsonld"
+  },
+  "Kit": {
+    "num_parquet_files": 1,
+    "name": "kit"
+  },
+  "KRL": {
+    "num_parquet_files": 1,
+    "name": "krl"
+  },
+  "LabVIEW": {
+    "num_parquet_files": 1,
+    "name": "labview"
+  },
+  "Lasso": {
+    "num_parquet_files": 1,
+    "name": "lasso"
+  },
+  "Latte": {
+    "num_parquet_files": 1,
+    "name": "latte"
+  },
+  "Lean": {
+    "num_parquet_files": 1,
+    "name": "lean"
+  },
+  "Lex": {
+    "num_parquet_files": 1,
+    "name": "lex"
+  },
+  "LFE": {
+    "num_parquet_files": 1,
+    "name": "lfe"
+  },
+  "LilyPond": {
+    "num_parquet_files": 1,
+    "name": "lilypond"
+  },
+  "Linker Script": {
+    "num_parquet_files": 1,
+    "name": "linker-script"
+  },
+  "Liquid": {
+    "num_parquet_files": 1,
+    "name": "liquid"
+  },
+  "Literate Agda": {
+    "num_parquet_files": 1,
+    "name": "literate-agda"
+  },
+  "Literate CoffeeScript": {
+    "num_parquet_files": 1,
+    "name": "literate-coffeescript"
+  },
+  "Literate Haskell": {
+    "num_parquet_files": 1,
+    "name": "literate-haskell"
+  },
+  "LiveScript": {
+    "num_parquet_files": 1,
+    "name": "livescript"
+  },
+  "Logos": {
+    "num_parquet_files": 1,
+    "name": "logos"
+  },
+  "Logtalk": {
+    "num_parquet_files": 1,
+    "name": "logtalk"
+  },
+  "LOLCODE": {
+    "num_parquet_files": 1,
+    "name": "lolcode"
+  },
+  "LookML": {
+    "num_parquet_files": 1,
+    "name": "lookml"
+  },
+  "LSL": {
+    "num_parquet_files": 1,
+    "name": "lsl"
+  },
+  "M": {
+    "num_parquet_files": 1,
+    "name": "m"
+  },
+  "M4": {
+    "num_parquet_files": 1,
+    "name": "m4"
+  },
+  "Mako": {
+    "num_parquet_files": 1,
+    "name": "mako"
+  },
+  "Maple": {
+    "num_parquet_files": 1,
+    "name": "maple"
+  },
+  "Mask": {
+    "num_parquet_files": 1,
+    "name": "mask"
+  },
+  "MAXScript": {
+    "num_parquet_files": 1,
+    "name": "maxscript"
+  },
+  "MediaWiki": {
+    "num_parquet_files": 1,
+    "name": "mediawiki"
+  },
+  "Metal": {
+    "num_parquet_files": 1,
+    "name": "metal"
+  },
+  "Mirah": {
+    "num_parquet_files": 1,
+    "name": "mirah"
+  },
+  "Modelica": {
+    "num_parquet_files": 1,
+    "name": "modelica"
+  },
+  "Module Management System": {
+    "num_parquet_files": 1,
+    "name": "module-management-system"
+  },
+  "Monkey": {
+    "num_parquet_files": 1,
+    "name": "monkey"
+  },
+  "MoonScript": {
+    "num_parquet_files": 1,
+    "name": "moonscript"
+  },
+  "MTML": {
+    "num_parquet_files": 1,
+    "name": "mtml"
+  },
+  "MUF": {
+    "num_parquet_files": 1,
+    "name": "muf"
+  },
+  "mupad": {
+    "num_parquet_files": 1,
+    "name": "mupad"
+  },
+  "Myghty": {
+    "num_parquet_files": 1,
+    "name": "myghty"
+  },
+  "nesC": {
+    "num_parquet_files": 1,
+    "name": "nesc"
+  },
+  "NetLinx": {
+    "num_parquet_files": 1,
+    "name": "netlinx"
+  },
+  "NetLogo": {
+    "num_parquet_files": 1,
+    "name": "netlogo"
+  },
+  "Nginx": {
+    "num_parquet_files": 1,
+    "name": "nginx"
+  },
+  "Nimrod": {
+    "num_parquet_files": 1,
+    "name": "nimrod"
+  },
+  "Ninja": {
+    "num_parquet_files": 1,
+    "name": "ninja"
+  },
+  "Nit": {
+    "num_parquet_files": 1,
+    "name": "nit"
+  },
+  "Nix": {
+    "num_parquet_files": 1,
+    "name": "nix"
+  },
+  "NSIS": {
+    "num_parquet_files": 1,
+    "name": "nsis"
+  },
+  "Nu": {
+    "num_parquet_files": 1,
+    "name": "nu"
+  },
+  "NumPy": {
+    "num_parquet_files": 1,
+    "name": "numpy"
+  },
+  "ObjDump": {
+    "num_parquet_files": 1,
+    "name": "objdump"
+  },
+  "Objective-J": {
+    "num_parquet_files": 1,
+    "name": "objective-j"
+  },
+  "Octave": {
+    "num_parquet_files": 1,
+    "name": "octave"
+  },
+  "Omgrofl": {
+    "num_parquet_files": 1,
+    "name": "omgrofl"
+  },
+  "ooc": {
+    "num_parquet_files": 1,
+    "name": "ooc"
+  },
+  "Opa": {
+    "num_parquet_files": 1,
+    "name": "opa"
+  },
+  "Opal": {
+    "num_parquet_files": 1,
+    "name": "opal"
+  },
+  "OpenCL": {
+    "num_parquet_files": 1,
+    "name": "opencl"
+  },
+  "OpenSCAD": {
+    "num_parquet_files": 1,
+    "name": "openscad"
+  },
+  "Org": {
+    "num_parquet_files": 1,
+    "name": "org"
+  },
+  "Ox": {
+    "num_parquet_files": 1,
+    "name": "ox"
+  },
+  "Oxygene": {
+    "num_parquet_files": 1,
+    "name": "oxygene"
+  },
+  "Oz": {
+    "num_parquet_files": 1,
+    "name": "oz"
+  },
+  "Pan": {
+    "num_parquet_files": 1,
+    "name": "pan"
+  },
+  "Papyrus": {
+    "num_parquet_files": 1,
+    "name": "papyrus"
+  },
+  "Parrot": {
+    "num_parquet_files": 1,
+    "name": "parrot"
+  },
+  "Parrot Assembly": {
+    "num_parquet_files": 1,
+    "name": "parrot-assembly"
+  },
+  "Parrot Internal Representation": {
+    "num_parquet_files": 1,
+    "name": "parrot-internal-representation"
+  },
+  "PAWN": {
+    "num_parquet_files": 1,
+    "name": "pawn"
+  },
+  "Perl6": {
+    "num_parquet_files": 1,
+    "name": "perl6"
+  },
+  "PigLatin": {
+    "num_parquet_files": 1,
+    "name": "piglatin"
+  },
+  "Pike": {
+    "num_parquet_files": 1,
+    "name": "pike"
+  },
+  "Pod": {
+    "num_parquet_files": 1,
+    "name": "pod"
+  },
+  "PogoScript": {
+    "num_parquet_files": 1,
+    "name": "pogoscript"
+  },
+  "Pony": {
+    "num_parquet_files": 1,
+    "name": "pony"
+  },
+  "POV-Ray SDL": {
+    "num_parquet_files": 1,
+    "name": "pov-ray-sdl"
+  },
+  "Processing": {
+    "num_parquet_files": 1,
+    "name": "processing"
+  },
+  "Prolog": {
+    "num_parquet_files": 1,
+    "name": "prolog"
+  },
+  "Propeller Spin": {
+    "num_parquet_files": 1,
+    "name": "propeller-spin"
+  },
+  "Protocol Buffer": {
+    "num_parquet_files": 1,
+    "name": "protocol-buffer"
+  },
+  "Pure Data": {
+    "num_parquet_files": 1,
+    "name": "pure-data"
+  },
+  "PureBasic": {
+    "num_parquet_files": 1,
+    "name": "purebasic"
+  },
+  "PureScript": {
+    "num_parquet_files": 1,
+    "name": "purescript"
+  },
+  "Python traceback": {
+    "num_parquet_files": 1,
+    "name": "python-traceback"
+  },
+  "QMake": {
+    "num_parquet_files": 1,
+    "name": "qmake"
+  },
+  "QML": {
+    "num_parquet_files": 1,
+    "name": "qml"
+  },
+  "Ragel in Ruby Host": {
+    "num_parquet_files": 1,
+    "name": "ragel-in-ruby-host"
+  },
+  "RAML": {
+    "num_parquet_files": 1,
+    "name": "raml"
+  },
+  "RDoc": {
+    "num_parquet_files": 1,
+    "name": "rdoc"
+  },
+  "REALbasic": {
+    "num_parquet_files": 1,
+    "name": "realbasic"
+  },
+  "Rebol": {
+    "num_parquet_files": 1,
+    "name": "rebol"
+  },
+  "Red": {
+    "num_parquet_files": 1,
+    "name": "red"
+  },
+  "Redcode": {
+    "num_parquet_files": 1,
+    "name": "redcode"
+  },
+  "Ren'Py": {
+    "num_parquet_files": 1,
+    "name": "renpy"
+  },
+  "RenderScript": {
+    "num_parquet_files": 1,
+    "name": "renderscript"
+  },
+  "RHTML": {
+    "num_parquet_files": 1,
+    "name": "rhtml"
+  },
+  "RMarkdown": {
+    "num_parquet_files": 1,
+    "name": "rmarkdown"
+  },
+  "RobotFramework": {
+    "num_parquet_files": 1,
+    "name": "robotframework"
+  },
+  "Rouge": {
+    "num_parquet_files": 1,
+    "name": "rouge"
+  },
+  "Sage": {
+    "num_parquet_files": 1,
+    "name": "sage"
+  },
+  "SaltStack": {
+    "num_parquet_files": 1,
+    "name": "saltstack"
+  },
+  "SAS": {
+    "num_parquet_files": 1,
+    "name": "sas"
+  },
+  "Sass": {
+    "num_parquet_files": 1,
+    "name": "sass"
+  },
+  "Scaml": {
+    "num_parquet_files": 1,
+    "name": "scaml"
+  },
+  "Scheme": {
+    "num_parquet_files": 1,
+    "name": "scheme"
+  },
+  "Scilab": {
+    "num_parquet_files": 1,
+    "name": "scilab"
+  },
+  "Self": {
+    "num_parquet_files": 1,
+    "name": "self"
+  },
+  "ShellSession": {
+    "num_parquet_files": 1,
+    "name": "shellsession"
+  },
+  "Shen": {
+    "num_parquet_files": 1,
+    "name": "shen"
+  },
+  "Slash": {
+    "num_parquet_files": 1,
+    "name": "slash"
+  },
+  "Slim": {
+    "num_parquet_files": 1,
+    "name": "slim"
+  },
+  "SMT": {
+    "num_parquet_files": 1,
+    "name": "smt"
+  },
+  "SourcePawn": {
+    "num_parquet_files": 1,
+    "name": "sourcepawn"
+  },
+  "SPARQL": {
+    "num_parquet_files": 1,
+    "name": "sparql"
+  },
+  "SQF": {
+    "num_parquet_files": 1,
+    "name": "sqf"
+  },
+  "Squirrel": {
+    "num_parquet_files": 1,
+    "name": "squirrel"
+  },
+  "Stan": {
+    "num_parquet_files": 1,
+    "name": "stan"
+  },
+  "Stata": {
+    "num_parquet_files": 1,
+    "name": "stata"
+  },
+  "STON": {
+    "num_parquet_files": 1,
+    "name": "ston"
+  },
+  "Stylus": {
+    "num_parquet_files": 1,
+    "name": "stylus"
+  },
+  "SuperCollider": {
+    "num_parquet_files": 1,
+    "name": "supercollider"
+  },
+  "SystemVerilog": {
+    "num_parquet_files": 1,
+    "name": "systemverilog"
+  },
+  "Tcl": {
+    "num_parquet_files": 1,
+    "name": "tcl"
+  },
+  "Tcsh": {
+    "num_parquet_files": 1,
+    "name": "tcsh"
+  },
+  "Tea": {
+    "num_parquet_files": 1,
+    "name": "tea"
+  },
+  "Textile": {
+    "num_parquet_files": 1,
+    "name": "textile"
+  },
+  "Thrift": {
+    "num_parquet_files": 1,
+    "name": "thrift"
+  },
+  "Turing": {
+    "num_parquet_files": 1,
+    "name": "turing"
+  },
+  "TXL": {
+    "num_parquet_files": 1,
+    "name": "txl"
+  },
+  "Unified Parallel C": {
+    "num_parquet_files": 1,
+    "name": "unified-parallel-c"
+  },
+  "Uno": {
+    "num_parquet_files": 1,
+    "name": "uno"
+  },
+  "UnrealScript": {
+    "num_parquet_files": 1,
+    "name": "unrealscript"
+  },
+  "UrWeb": {
+    "num_parquet_files": 1,
+    "name": "urweb"
+  },
+  "Vala": {
+    "num_parquet_files": 1,
+    "name": "vala"
+  },
+  "VCL": {
+    "num_parquet_files": 1,
+    "name": "vcl"
+  },
+  "Verilog": {
+    "num_parquet_files": 1,
+    "name": "verilog"
+  },
+  "VimL": {
+    "num_parquet_files": 1,
+    "name": "viml"
+  },
+  "Volt": {
+    "num_parquet_files": 1,
+    "name": "volt"
+  },
+  "WebAssembly": {
+    "num_parquet_files": 1,
+    "name": "webassembly"
+  },
+  "WebIDL": {
+    "num_parquet_files": 1,
+    "name": "webidl"
+  },
+  "wisp": {
+    "num_parquet_files": 1,
+    "name": "wisp"
+  },
+  "X10": {
+    "num_parquet_files": 1,
+    "name": "x10"
+  },
+  "xBase": {
+    "num_parquet_files": 1,
+    "name": "xbase"
+  },
+  "XC": {
+    "num_parquet_files": 1,
+    "name": "xc"
+  },
+  "Xojo": {
+    "num_parquet_files": 1,
+    "name": "xojo"
+  },
+  "XPages": {
+    "num_parquet_files": 1,
+    "name": "xpages"
+  },
+  "XProc": {
+    "num_parquet_files": 1,
+    "name": "xproc"
+  },
+  "XQuery": {
+    "num_parquet_files": 1,
+    "name": "xquery"
+  },
+  "XS": {
+    "num_parquet_files": 1,
+    "name": "xs"
+  },
+  "Xtend": {
+    "num_parquet_files": 1,
+    "name": "xtend"
+  },
+  "Yacc": {
+    "num_parquet_files": 1,
+    "name": "yacc"
+  },
+  "YANG": {
+    "num_parquet_files": 1,
+    "name": "yang"
+  },
+  "Zephir": {
+    "num_parquet_files": 1,
+    "name": "zephir"
+  },
+  "Zig": {
+    "num_parquet_files": 1,
+    "name": "zig"
+  },
+  "Zimpl": {
+    "num_parquet_files": 1,
+    "name": "zimpl"
+  }
+}
