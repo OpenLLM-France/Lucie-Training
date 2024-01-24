@@ -221,6 +221,8 @@ class DataIterator:
                 text = data[self.key]
             except KeyError:
                 raise KeyError(f"Key {self.key} not found in {data.keys()}.")
+            except TypeError as err:
+                raise TypeError(f"Problem with to process data of type {type(data)} with key {type(self.key)}.") from err
 
             # Split around paragraphs
             if self.split_around_paragraphs:
@@ -301,8 +303,9 @@ class DataIteratorConcat:
 
 class DataIteratorParquet(DataIterator):
     def __init__(self, data_path, streaming=True, max_parquet_files=None, force_raw=False, **kwargs):
-        if not force_raw and os.path.exists(str(data_path) + "_cleaned"):
+        if not force_raw and os.path.exists(str(data_path) + "_cleaned") and kwargs.get("postprocess", None) is not None:
             data_path = data_path + "_cleaned"
+            print(f"Using pre-cleaned in {data_path}")
             kwargs.pop("postprocess", None)
         parquet_files = glob.glob(data_path + "/*parquet")
         if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
@@ -545,21 +548,48 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
 
 
 class DataIteratorAmericanStories(DataIteratorConcat):
-    def __init__(self, streaming=True, **kwargs):
-        self.name = "AmericanStories"
+    def __init__(self, streaming=True, from_huggingface=None, **kwargs):
 
-        datas = datasets.load_dataset(
-            "dell-research-harvard/AmericanStories",
-            "all_years",
-            streaming=streaming,
-        )
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(f"{DATA_PATH}/americanstories")
+            print(f"Using home version: {not from_huggingface}")
+
+        key="article"
+
+        if not from_huggingface:
+            data_files = sorted(glob.glob(f"{DATA_PATH}/americanstories/*.parquet"))
+            assert len(data_files), f"Missing parquet files for {DATA_PATH}/americanstories/*.parquet"
+
+            key="text"
+
+            datas = dict([
+                (
+                    os.path.splitext(os.path.basename(data_file))[0], # year
+                    datasets.load_dataset(
+                        "parquet",
+                        data_files=data_file,
+                        streaming=streaming,
+                        split="train",
+                    )
+                )
+                for data_file in data_files   
+            ])
+            
+        else:
+            datas = datasets.load_dataset(
+                "dell-research-harvard/AmericanStories",
+                "all_years",
+                streaming=streaming,
+            )
+
+        self.name = "AmericanStories"
 
         DataIteratorConcat.__init__(
             self,
             [
                 DataIterator(
                     datas[year],
-                    key="article",
+                    key=key,
                     subsample_criteria="article_id",
                     name=f"AmericanStories:{year}",
                     postprocess=remove_useless_lines,
