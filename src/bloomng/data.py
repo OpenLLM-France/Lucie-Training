@@ -99,26 +99,31 @@ def get_datasets(name, **kwargs):
         datas.append(tokenizer_dataset(train=True))
         if name == "tok_all":
             datas.append(tokenizer_dataset(train=True))
-    elif name in ["tok_test"]:
+    elif name == "tok_test":
         datas.append(tokenizer_dataset(train=False))
 
-    elif name in ["code"]:
+    elif name == "code":
         datas.append(("TheStack", DataIteratorCode(**kwargs)))
 
-    elif name in ["wikipedia"]:
-        datas.append(("WikipediaFr", DataIteratorWikipedia(language="fr", **kwargs)))
-        datas.append(("WikipediaEn", DataIteratorWikipedia(language="en", **kwargs)))
-    elif name in ["claire"]:
+    elif name == "wikipedia":
+        for language in "fr", "en", "de", :
+            datas.append((f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs)))
+    elif name.startswith("wikipedia_"):
+        language = name.split("_")[1].lower()
+        datas.append((f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs)))
+    elif name == "claire":
         datas.append(("ClaireFr", DataIteratorClaire(language="fr", **kwargs)))
         datas.append(("ClaireEn", DataIteratorClaire(language="en", **kwargs)))
+    elif name.startswith("claire_"):
+        language = name.split("_")[1].lower()
+        datas.append((f"Claire{language.capitalize()}", DataIteratorClaire(language=language, **kwargs)))
 
     # elif name in ["gallica_mono"]:
-    #     datas.append(("GallicaMonographies", DataIteratorGallicaMono()))
+    #     datas.append(("GallicaMono", DataIteratorGallicaMono()))
     # elif name in ["gallica_press"]:
     #     datas.append(("GallicaPress", DataIteratorGallicaPress()))
     # elif name in ["discours"]:
     #     datas.append(("DiscoursPublics", DataIteratorDiscoursPublics()))
-
     # elif name in ["american_stories"]:
     #     datas.append(("AmericanStories", DataIteratorAmericanStories()))
 
@@ -300,7 +305,7 @@ class DataIteratorParquet(DataIterator):
             data_path = data_path + "_cleaned"
             kwargs.pop("postprocess", None)
         parquet_files = glob.glob(data_path + "/*parquet")
-        if parquet_files and re.match(r"_\d+\.parquet$", parquet_files[0]):
+        if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
             parquet_files = sorted(
                 parquet_files, key=lambda x: int(x.split(".")[-2].split("_")[-1])
             )
@@ -358,25 +363,33 @@ class DataIteratorParquetSplitted(DataIteratorConcat):
 
 
 class DataIteratorWikipedia(DataIterator):
-    def __init__(self, language="fr", use_latex_version=True, streaming=True, **kwargs):
-        if language == "fr":
-            # 1.7B words
-            if use_latex_version:
-                repo, version = ("OpenLLM-France/wikipedia_latex.fr", "20240101")
-            else:
-                repo, version = ("OpenLLM-France/wikipedia.fr", "20231220")
-        else:  # if language == "en":
-            # 4.7B words
-            repo = (
-                f"OpenLLM-France/wikipedia_latex.{language}"
-                if use_latex_version
-                else f"OpenLLM-France/wikipedia.{language}"
-            )
-            version = "20240101"
+    def __init__(self, language="fr", use_latex_version=True, streaming=True, from_huggingface=None, **kwargs):
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(f"{DATA_PATH}/wikipedia/{language}")
+            print(f"Using home version: {not from_huggingface}")
+
+        version = "20240101"
+        repo = (
+            f"OpenLLM-France/wikipedia_latex.{language}"
+            if use_latex_version
+            else f"OpenLLM-France/wikipedia.{language}"
+        )
         name = f"{repo}/{version}"
+
+        if from_huggingface:
+            if language == "fr" and not use_latex_version:
+                version = "20231220"
+            kwargs_dataset = dict(name=version)
+        else:
+            assert use_latex_version, "Only latex version is available for now"
+            repo = "parquet"
+            data_files = sorted(glob.glob(f"{DATA_PATH}/wikipedia/{language}/{version}/*.parquet"))
+            assert len(data_files), f"Missing parquet files for {DATA_PATH}/wikipedia/{language}/{version}/*.parquet"
+            kwargs_dataset = dict(data_files=data_files)
+
         DataIterator.__init__(
             self,
-            datasets.load_dataset(repo, version, streaming=streaming, split="train"),
+            datasets.load_dataset(repo, streaming=streaming, split="train", **kwargs_dataset),
             subsample_criteria="id",
             name=name,
             **kwargs,
@@ -445,16 +458,19 @@ class DataIteratorGallicaMono(DataIteratorParquet):
         )
 
 
-class DataIteratorGallicaPress(DataIteratorParquet):
+class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, **kwargs):
-        DataIteratorParquet.__init__(
-            self,
-            DATA_PATH + "/gallica_presse_parquet",
-            key="complete_text",
-            name="GallicaMonographies",
-            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
-            **kwargs,
-        )
+
+        self.name = "GallicaPresse"
+        DataIteratorConcat.__init__(self, [
+            DataIteratorParquet(
+                DATA_PATH + f"/gallica_presse_{source}_parquet",
+                key="complete_text",
+                name=f"GallicaPresse:{source}",
+                # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+                **kwargs,
+            ) for source in ("html", "txt")
+        ])
 
 
 class DataIteratorDiscoursPublics(DataIteratorParquet):
@@ -485,6 +501,7 @@ class DataIteratorPersee(DataIteratorParquet):
             self,
             DATA_PATH + "/persee_parquet",
             name="Persee",
+            key="complete_text",
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
             **kwargs,
         )
@@ -590,7 +607,11 @@ _programming_languages = [
 ]
 
 class DataIteratorCode(DataIteratorConcat):
-    def __init__(self, streaming=True, max_chars_per_language=None, **kwargs):
+    def __init__(self, streaming=True, max_chars_per_language=None, from_huggingface=None, **kwargs):
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(f"{DATA_PATH}/the-stack-dedup")
+            print(f"Using home version: {not from_huggingface}")
+
         metadata = json.load(open(_the_stack_metadata_file, "r", encoding="utf8"))
         # Lower case all keys
         metadata = {k.lower(): v for k, v in metadata.items()}
@@ -601,15 +622,25 @@ class DataIteratorCode(DataIteratorConcat):
                 lan in metadata.keys()
             ), f"Missing language {lan} in metadata file {list(metadata.keys())}"
 
+        dataset_name = "bigcode/the-stack-dedup" if from_huggingface else "parquet"
+
         iterators = []
         for lan in _programming_languages:
             data_dir = f"data/{metadata[lan]['name']}"
+
+            if from_huggingface:
+                kwargs_dataset = dict(data_dir=data_dir)
+            else:
+                data_files = sorted(glob.glob(f"{DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"))
+                assert len(data_files), f"Missing parquet files for {DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"
+                kwargs_dataset = dict(data_files=data_files)
+
             it = DataIterator(
                 datasets.load_dataset(
-                    "bigcode/the-stack-dedup",
-                    data_dir=data_dir,
+                    dataset_name,
                     streaming=streaming,
                     split="train",
+                    **kwargs_dataset
                 ),
                 key="content",
                 subsample_criteria="hexsha",
@@ -719,3 +750,11 @@ if __name__ == "__main__":
         if global_stats is not None:
             print(f"* {name}")
             print(json.dumps(global_stats, indent=4))
+            if args.folder:
+                name_slug = re.sub(r"[ :/]", "--", name)
+                json.dump(
+                    global_stats,
+                    open(os.path.join(args.folder, f"stats_{name_slug}.json"), "w", encoding="utf8"),
+                    indent=2,
+                    ensure_ascii=False,
+                )
