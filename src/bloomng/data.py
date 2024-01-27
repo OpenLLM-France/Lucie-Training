@@ -1,13 +1,12 @@
-import datasets
-
-import random
 import glob
-import socket
-import os
-import hashlib, pickle
+import hashlib
 import json
-import regex as re
+import os
+import pickle
+import random
 
+import datasets
+import regex as re
 from text import *
 
 _folder = os.path.dirname(os.path.realpath(__file__))
@@ -572,9 +571,9 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                         split="train",
                     )
                 )
-                for data_file in data_files   
+                for data_file in data_files
             ])
-            
+
         else:
             datas = datasets.load_dataset(
                 "dell-research-harvard/AmericanStories",
@@ -642,7 +641,7 @@ class DataIteratorCode(DataIteratorConcat):
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/the-stack-dedup")
             print(f"Using home version: {not from_huggingface}")
 
-        metadata = json.load(open(_the_stack_metadata_file, "r", encoding="utf8"))
+        metadata = json.load(open(_the_stack_metadata_file, encoding="utf8"))
         # Lower case all keys
         metadata = {k.lower(): v for k, v in metadata.items()}
 
@@ -689,10 +688,11 @@ class DataIteratorCode(DataIteratorConcat):
 # Quick test
 
 if __name__ == "__main__":
-    import tqdm
-    import time
-    import json
     import argparse
+    import json
+    import time
+
+    import tqdm
 
     parser = argparse.ArgumentParser(
         description="Test the data iterators and print statistics about datasets.",

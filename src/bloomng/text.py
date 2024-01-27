@@ -1,5 +1,6 @@
-import regex as re
 import html
+
+import regex as re
 
 
 def clean_pdf_extraction(text, html_escape=False):
@@ -34,8 +35,8 @@ def remove_double_spaces(text):
 def clean_discours(text):
     text = re.sub(r"-? ?\d+ VUES?$", "", text).rstrip()
     text = re.sub(r"[Ss]ource [^\n]$", "", text).rstrip()
-    text = re.sub("([Ss]ource [:a-z0-9_\-, ]+)", " ", text)
-    text = re.sub("[Ss]ource http[:a-z0-9_\-]+", " ", text)
+    text = re.sub(r"([Ss]ource [:a-z0-9_\-, ]+)", " ", text)
+    text = re.sub(r"[Ss]ource http[:a-z0-9_\-]+", " ", text)
     text = remove_double_spaces(text)
     return text
 
@@ -166,12 +167,13 @@ def _pattern_with_number(pattern, n):
 
 
 if __name__ == "__main__":
-    
-    from data import DataIteratorConcat, DataIteratorParquet, get_datasets
-    import pandas as pd
-    import os
-    import tqdm
+
     import argparse
+    import os
+
+    import pandas as pd
+    import tqdm
+    from data import DataIteratorConcat, DataIteratorParquet, get_datasets
 
     parser = argparse.ArgumentParser(
         description="Clean raw text data.",
@@ -208,7 +210,7 @@ if __name__ == "__main__":
                 for d in get_parquet_datasets(data):
                     yield d
         if isinstance(it, DataIteratorParquet):
-            yield it 
+            yield it
 
     datas = get_datasets(args.dataset, force_raw=True)
 
@@ -221,7 +223,7 @@ if __name__ == "__main__":
         name = data.name
         name_slug = re.sub(r"[ :/]", "--", name)
         if postprocess is not None:
-                
+
             for filein in tqdm.tqdm(parquet_files):
                 dirname, basename = os.path.split(filein)
                 fileout = os.path.join(dirname + "_cleaned", basename)
