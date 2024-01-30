@@ -1,13 +1,13 @@
-import datasets
-
-import random
 import glob
-import os
-import hashlib, pickle
+import hashlib
 import json
-import regex as re
+import os
+import pickle
+import random
 import logging
 
+import datasets
+import regex as re
 from text import *
 
 logger = logging.getLogger(__name__)
@@ -627,9 +627,9 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                         split="train",
                     )
                 )
-                for data_file in data_files   
+                for data_file in data_files
             ])
-            
+
         else:
             datas = datasets.load_dataset(
                 "dell-research-harvard/AmericanStories",
@@ -698,7 +698,7 @@ class DataIteratorCode(DataIteratorConcat):
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/the-stack-dedup")
             logger.info(f"Using HuggingFace version for {self.name}" if from_huggingface else f"Using local version for {self.name}")
 
-        metadata = json.load(open(_the_stack_metadata_file, "r", encoding="utf8"))
+        metadata = json.load(open(_the_stack_metadata_file, encoding="utf8"))
         # Lower case all keys
         metadata = {k.lower(): v for k, v in metadata.items()}
 
@@ -747,7 +747,6 @@ class DataIteratorCode(DataIteratorConcat):
 # Quick test
 
 if __name__ == "__main__":
-
     import tqdm
     import time
     import json
