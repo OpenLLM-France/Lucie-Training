@@ -166,9 +166,11 @@ def _pattern_with_number(pattern, n):
 
 
 if __name__ == "__main__":
-    
+
     from data import DataIteratorConcat, DataIteratorParquet, get_datasets
     import pandas as pd
+    import numpy as np
+    import multiprocessing
     import os
     import tqdm
     import argparse
@@ -190,10 +192,25 @@ if __name__ == "__main__":
         default=None,
         help="Folder to dump some example data (before/after)",
     )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=min(60, multiprocessing.cpu_count()),
+        help="Number of threads to use",
+    )
     args = parser.parse_args()
     args.num_samples = 20
     args.ignore_if_exists = True
 
+    def df_parallelize(data, func, threads):
+        print(f"Parallelizing {len(data)} items on {threads} cores")
+        data_split = np.array_split(data, threads)
+        pool = multiprocessing.Pool(threads)
+        data = pd.concat(pool.map(func, data_split))
+        pool.close()
+        pool.join()
+        return data
+    
     def get_parquet_datasets(it):
         if isinstance(it, tuple) and len(it) == 2:
             _, data = it
@@ -210,7 +227,7 @@ if __name__ == "__main__":
         if isinstance(it, DataIteratorParquet):
             yield it 
 
-    datas = get_datasets(args.dataset, force_raw=True)
+    datas = list(get_datasets(args.dataset, force_raw=True))
 
     tqdm.tqdm.pandas()
 
@@ -232,7 +249,15 @@ if __name__ == "__main__":
                 df = pd.read_parquet(filein)
                 if args.folder:
                     examples_before = list(df.iloc[:args.num_samples][key])
-                df[key] = df[key].progress_map(postprocess)
+
+                if args.threads == 1:
+                    df[key] = df[key].progress_map(postprocess)
+                else:
+                    def postprocess(d):
+                        d[key] = d[key].progress_map(data.postprocess)
+                        return d
+                    df = df_parallelize(df, postprocess, args.threads)
+
                 if args.folder:
                     examples_after = list(df.iloc[:args.num_samples][key])
                     folder = os.path.join(args.folder, "cleaning", os.path.basename(dirname))
