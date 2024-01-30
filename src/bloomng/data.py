@@ -2,13 +2,16 @@ import datasets
 
 import random
 import glob
-import socket
 import os
 import hashlib, pickle
 import json
 import regex as re
+import logging
 
 from text import *
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 _folder = os.path.dirname(os.path.realpath(__file__))
 _the_stack_metadata_file = os.path.join(
@@ -94,49 +97,85 @@ def tokenizer_dataset(
 
 
 def get_datasets(name, **kwargs):
-    datas = []
-    if name in ["tok_all", "tok_train"]:
-        datas.append(tokenizer_dataset(train=True))
+    """
+    Iterator that yields one or sevaral datasets
+
+    Args:
+        name: the name of the dataset(s)
+            examples:
+            - "all": all datasets used to train the LLM
+            - "tok_train": all datasets used to train the tokenizer
+            - "wikipedia": all Wikipedia datasets
+            - "wikipedia_fr": French Wikipedia
+            - "american_stories": American Stories
+        **kwargs: additional arguments to pass to all dataset iterators
+    """
+
+    name = name.lower()
+    if name == "all":
+        for name in [
+            # Multi-lingual
+            "wikipedia",
+
+            # French
+            "gallica_press",
+            "gallica_mono",
+            "theses",
+            "hal",
+            "persee",
+            "open_edition",
+            "discours_publics",
+            "other_fr",
+
+            # English
+            "american_stories",
+
+            # Code
+            "code",
+        ]:
+            for ds in get_datasets(name, **kwargs):
+                yield ds
+
+    elif name in ["tok_all", "tok_train"]:
+        yield tokenizer_dataset(train=True)
         if name == "tok_all":
-            datas.append(tokenizer_dataset(train=True))
+            yield tokenizer_dataset(train=True)
     elif name == "tok_test":
-        datas.append(tokenizer_dataset(train=False))
+        yield tokenizer_dataset(train=False)
 
     elif name == "code":
-        datas.append(("TheStack", DataIteratorCode(**kwargs)))
+        yield ("TheStack", DataIteratorCode(**kwargs))
 
     elif name == "wikipedia":
         for language in "fr", "en", "de", :
-            datas.append((f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs)))
+            yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
     elif name.startswith("wikipedia_"):
         language = name.split("_")[1].lower()
-        datas.append((f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs)))
+        yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
     elif name == "claire":
-        datas.append(("ClaireFr", DataIteratorClaire(language="fr", **kwargs)))
-        datas.append(("ClaireEn", DataIteratorClaire(language="en", **kwargs)))
+        yield ("ClaireFr", DataIteratorClaire(language="fr", **kwargs))
+        yield ("ClaireEn", DataIteratorClaire(language="en", **kwargs))
     elif name.startswith("claire_"):
         language = name.split("_")[1].lower()
-        datas.append((f"Claire{language.capitalize()}", DataIteratorClaire(language=language, **kwargs)))
+        yield (f"Claire{language.capitalize()}", DataIteratorClaire(language=language, **kwargs))
 
     # elif name in ["gallica_mono"]:
-    #     datas.append(("GallicaMono", DataIteratorGallicaMono()))
+    #     yield ("GallicaMono", DataIteratorGallicaMono())
     # elif name in ["gallica_press"]:
-    #     datas.append(("GallicaPress", DataIteratorGallicaPress()))
+    #     yield ("GallicaPress", DataIteratorGallicaPress())
     # elif name in ["discours"]:
-    #     datas.append(("DiscoursPublics", DataIteratorDiscoursPublics()))
+    #     yield ("DiscoursPublics", DataIteratorDiscoursPublics())
     # elif name in ["american_stories"]:
-    #     datas.append(("AmericanStories", DataIteratorAmericanStories()))
+    #     yield ("AmericanStories", DataIteratorAmericanStories())
+    # etc.
 
     else:
         camel_name = "".join([w.capitalize() for w in name.split("_")])
         python_class = globals().get(f"DataIterator{camel_name}", None)
         if python_class:
-            datas.append((camel_name, python_class(**kwargs)))
-
-    if not datas:
-        raise RuntimeError(f"No dataset selected for {name}")
-
-    return datas
+            yield (camel_name, python_class(**kwargs))
+        else:
+            raise RuntimeError(f"Unknown dataset {name}")
 
 
 ########################################
@@ -156,6 +195,7 @@ class DataIterator:
         subsample_invert=False,
         split_around_paragraphs=False,
         postprocess=None,
+        filter_fn=None,
         name="",
     ):
         """
@@ -163,7 +203,7 @@ class DataIterator:
             dataset: a dataset object
             key: the key of the text in the dataset
             max_docs: the maximum number of pages to return
-            split_around_paragraphs: if True, split the text around paragraphs
+            split_around_paragraphs: if True, split th7e text around paragraphs
         """
         self.dataset = dataset
         self.dataset_iter = dataset.__iter__()
@@ -176,6 +216,7 @@ class DataIterator:
         self.subsample_invert = subsample_invert
         self.split_around_paragraphs = split_around_paragraphs
         self.postprocess = postprocess
+        self.filter_fn = filter_fn
 
         self.random_generator = random.Random(42)
         self.idx = 0
@@ -200,6 +241,12 @@ class DataIterator:
             text = self.texts.pop(0)
         else:
             data = next(self.dataset_iter)
+
+            if self.filter_fn:
+                if not self.filter_fn(data):
+                    # Skip this example
+                    self.idx -= 1
+                    return self.__next__()
 
             # Subsampling
             if self.subsample_rate and self.subsample_rate < 1:
@@ -284,6 +331,8 @@ class DataIteratorConcat:
         return self
 
     def __len__(self):
+        if not isinstance(self.datasets, list):
+            return 0
         s = 0
         for d in self.datasets:
             if len(d) in [None, 0]:
@@ -305,7 +354,7 @@ class DataIteratorParquet(DataIterator):
     def __init__(self, data_path, streaming=True, max_parquet_files=None, force_raw=False, **kwargs):
         if not force_raw and os.path.exists(str(data_path) + "_cleaned") and kwargs.get("postprocess", None) is not None:
             data_path = data_path + "_cleaned"
-            print(f"Using pre-cleaned in {data_path}")
+            logger.info(f"Using pre-cleaned in {data_path}")
             kwargs.pop("postprocess", None)
         parquet_files = glob.glob(data_path + "/*parquet")
         if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
@@ -367,10 +416,6 @@ class DataIteratorParquetSplitted(DataIteratorConcat):
 
 class DataIteratorWikipedia(DataIterator):
     def __init__(self, language="fr", use_latex_version=True, streaming=True, from_huggingface=None, **kwargs):
-        if from_huggingface is None:
-            from_huggingface = not os.path.isdir(f"{DATA_PATH}/wikipedia/{language}")
-            print(f"Using home version: {not from_huggingface}")
-
         version = "20240101"
         repo = (
             f"OpenLLM-France/wikipedia_latex.{language}"
@@ -378,6 +423,10 @@ class DataIteratorWikipedia(DataIterator):
             else f"OpenLLM-France/wikipedia.{language}"
         )
         name = f"{repo}/{version}"
+
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(f"{DATA_PATH}/wikipedia/{language}")
+            logger.info(f"Using HuggingFace version for {name}" if from_huggingface else f"Using local version for {name}")
 
         if from_huggingface:
             if language == "fr" and not use_latex_version:
@@ -456,20 +505,23 @@ class DataIteratorGallicaMono(DataIteratorParquet):
             DATA_PATH + "/gallica_mono_parquet",
             key="complete_text",
             name="GallicaMonographies",
-            postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+            # postprocess=clean_pdf_extraction_and_html, # TODO?
             **kwargs,
         )
+
+def clean_pdf_extraction_and_html(text):
+    return clean_pdf_extraction(text, html_escape=True)
 
 
 class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, **kwargs):
 
-        self.name = "GallicaPresse"
+        self.name = "GallicaPress"
         DataIteratorConcat.__init__(self, [
             DataIteratorParquet(
                 DATA_PATH + f"/gallica_presse_{source}_parquet",
                 key="complete_text",
-                name=f"GallicaPresse:{source}",
+                name=f"GallicaPress:{source}",
                 # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
                 **kwargs,
             ) for source in ("html", "txt")
@@ -517,6 +569,7 @@ class DataIteratorTheses(DataIteratorParquet):
             DATA_PATH + "/theses_parquet",
             name="Theses",
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+            key="complete_text",
             **kwargs,
         )
 
@@ -537,7 +590,7 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
         DataIteratorParquetSplitted.__init__(
             self,
             DATA_PATH + "/other_fr_parquet",
-            name="Other",
+            name="OtherFr",
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
             **kwargs,
         )
@@ -550,9 +603,11 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
 class DataIteratorAmericanStories(DataIteratorConcat):
     def __init__(self, streaming=True, from_huggingface=None, **kwargs):
 
-        if from_huggingface is None:
+        self.name = "AmericanStories"
+
+        if from_huggingface is None:    
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/americanstories")
-            print(f"Using home version: {not from_huggingface}")
+            logger.info(f"Using HuggingFace version for {self.name}" if from_huggingface else f"Using local version for {self.name}")
 
         key="article"
 
@@ -582,8 +637,6 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                 streaming=streaming,
             )
 
-        self.name = "AmericanStories"
-
         DataIteratorConcat.__init__(
             self,
             [
@@ -605,6 +658,7 @@ class DataIteratorAmericanStories(DataIteratorConcat):
 
 
 _programming_languages = [
+    "tex",
     "python",
     "javascript",
     "java",
@@ -638,9 +692,11 @@ _programming_languages = [
 
 class DataIteratorCode(DataIteratorConcat):
     def __init__(self, streaming=True, max_chars_per_language=None, from_huggingface=None, **kwargs):
+        self.name = "TheStack"
+
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/the-stack-dedup")
-            print(f"Using home version: {not from_huggingface}")
+            logger.info(f"Using HuggingFace version for {self.name}" if from_huggingface else f"Using local version for {self.name}")
 
         metadata = json.load(open(_the_stack_metadata_file, "r", encoding="utf8"))
         # Lower case all keys
@@ -654,7 +710,12 @@ class DataIteratorCode(DataIteratorConcat):
 
         dataset_name = "bigcode/the-stack-dedup" if from_huggingface else "parquet"
 
-        iterators = []
+        DataIteratorConcat.__init__(
+            self,
+            list(self.yield_datasets(metadata, from_huggingface, dataset_name, streaming, max_chars_per_language, **kwargs))
+        )
+
+    def yield_datasets(self, metadata, from_huggingface, dataset_name, streaming, max_chars_per_language, **kwargs):
         for lan in _programming_languages:
             data_dir = f"data/{metadata[lan]['name']}"
 
@@ -665,7 +726,7 @@ class DataIteratorCode(DataIteratorConcat):
                 assert len(data_files), f"Missing parquet files for {DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"
                 kwargs_dataset = dict(data_files=data_files)
 
-            it = DataIterator(
+            yield DataIterator(
                 datasets.load_dataset(
                     dataset_name,
                     streaming=streaming,
@@ -675,24 +736,24 @@ class DataIteratorCode(DataIteratorConcat):
                 key="content",
                 subsample_criteria="hexsha",
                 max_chars=max_chars_per_language,
+                filter_fn=(lambda x: x["ext"].lower() == "tex") if lan == "tex" else None, # Exclude bbl, bib, ... from LaTeX
                 name=f"TheStack:{lan}",
                 **kwargs,
             )
-            iterators.append(it)
 
-        self.name = "TheStack"
-
-        DataIteratorConcat.__init__(self, iterators)
 
 
 ########################################
 # Quick test
 
 if __name__ == "__main__":
+
     import tqdm
     import time
     import json
     import argparse
+    import random
+    random.seed(1234)
 
     parser = argparse.ArgumentParser(
         description="Test the data iterators and print statistics about datasets.",
@@ -711,10 +772,48 @@ if __name__ == "__main__":
         default=None,
         help="Folder to dump some example data into",
     )
+    parser.add_argument(
+        "--ignore_if_exists",
+        action="store_true", default=False,
+        help="Skip if stat is already computed",
+    )
+    parser.add_argument(
+        "--max_num_examples",
+        type=int,
+        default=10,
+        help="Maximum number of pages to dump as examples (when --folder is specified)",
+    )
+    parser.add_argument(
+        "--only_dump_examples",
+        action="store_true", default=False,
+        help="To only dump some examples",
+    )
     args = parser.parse_args()
 
-    def test_iterator(it, folder=None, name=""):
-        name_slug = re.sub(r"[ :/]", "--", name)
+    def simple_slugify(name):
+        return re.sub(r"[ :/]", "--", name).strip("_-")
+    
+    def remove_common_prefix(main, sub):
+        common_prefix = os.path.commonprefix([main, sub])
+        return sub[len(common_prefix):]
+
+    def test_iterator(it, folder=None, name="", ignore_if_exists=False, max_num_examples=0, only_dump_examples=False, prefix_example_files=None):
+        name_slug = simple_slugify(name)
+        if prefix_example_files is None:
+            prefix_example_files = name_slug
+        stats = None
+        if folder:
+            stat_filename = os.path.join(folder, f"stats_{name_slug}.json")
+            if os.path.isfile(stat_filename):
+                stats = json.load(open(stat_filename, "r", encoding="utf8"))
+                if ignore_if_exists and not only_dump_examples:
+                    return stats
+                num_billion_words = stats['num words'] / 1_000_000_000
+                to_insert = f"{num_billion_words:06.3f}B"
+                if "--" in prefix_example_files:
+                    prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
+                else:
+                    prefix_example_files += "--" + to_insert
         tic = time.time()
         i_page = 0
         num_words = 0
@@ -722,15 +821,19 @@ if __name__ == "__main__":
         for i_page, text in enumerate(tqdm.tqdm(it, total=len(it))):
             num_words += len(text.split())
             num_chars += len(text)
-            if i_page < 10 and folder:
+            if i_page < max_num_examples and folder:
                 example_folder = os.path.join(folder, "examples")
                 os.makedirs(example_folder, exist_ok=True)
-                with open(
-                    os.path.join(example_folder, f"{name_slug}_{i_page}.txt"),
-                    "w",
-                    encoding="utf8",
-                ) as f:
+                filename = os.path.join(example_folder, f"{prefix_example_files}")
+                if max_num_examples > 1:
+                    filename += f"_{i_page:02d}"
+                filename += ".txt"
+                with open(filename, "w", encoding="utf8") as f:
                     f.write(text)
+            elif only_dump_examples:
+                break
+        if only_dump_examples:
+            return {}
         toc = time.time()
         stats = {
             "time to iterate (sec)": toc - tic,
@@ -741,11 +844,7 @@ if __name__ == "__main__":
         if folder:
             json.dump(
                 stats,
-                open(
-                    os.path.join(folder, f"stats_{name_slug}.json"),
-                    "w",
-                    encoding="utf8",
-                ),
+                open(stat_filename, "w", encoding="utf8"),
                 indent=2,
                 ensure_ascii=False,
             )
@@ -757,9 +856,18 @@ if __name__ == "__main__":
                 global_stats[k] = 0
             global_stats[k] += v
 
-    datas = get_datasets(args.dataset)
-
-    for name, it in datas:
+    for name, it in get_datasets(args.dataset):
+        max_num_examples = args.max_num_examples
+        name_slug = simple_slugify(name)
+        main_prefix_example_files = None
+        main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
+        if main_stat_filename and os.path.isfile(main_stat_filename):
+            stats = json.load(open(main_stat_filename, "r", encoding="utf8"))
+            num_billion_words = stats['num words'] / 1_000_000_000
+            main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
+        # elif args.only_dump_examples:
+        #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
+        
         if isinstance(it, DataIteratorConcat):
             its = it.datasets
             global_stats = {}
@@ -768,23 +876,47 @@ if __name__ == "__main__":
             its = [it]
             global_stats = None
 
+        max_num_examples_per_subset = max_num_examples / len(its)
         for subset in its:
             subname = subset.name
+            max_num_examples = int(max_num_examples_per_subset) + (1 if random.random() < ( max_num_examples_per_subset % 1 ) else 0)
+            if max_num_examples == 0 and any([s in subname for s in ( "tex", "python")]):
+                max_num_examples = 2
+            if "other" in name.lower():
+                max_num_examples = args.max_num_examples
+            if max_num_examples == 0 and args.only_dump_examples:
+                continue
             print(f"* {subname}")
-            stats = test_iterator(subset, folder=args.folder, name=subname)
+            if main_stat_filename:
+                prefix_example_files = f"{main_prefix_example_files}{remove_common_prefix(name_slug, simple_slugify(subname))}"
+            else:
+                prefix_example_files = None
+            stats = test_iterator(
+                subset,
+                folder=args.folder,
+                name=subname,
+                ignore_if_exists=args.ignore_if_exists,
+                max_num_examples=max_num_examples,
+                only_dump_examples=args.only_dump_examples,
+                prefix_example_files=prefix_example_files,
+            )
+            if args.only_dump_examples:
+                continue
             print(json.dumps(stats, indent=4))
 
             if global_stats is not None:
                 update_stats(global_stats, stats)
 
+        if args.only_dump_examples:
+            continue
+
         if global_stats is not None:
             print(f"* {name}")
             print(json.dumps(global_stats, indent=4))
             if args.folder:
-                name_slug = re.sub(r"[ :/]", "--", name)
                 json.dump(
                     global_stats,
-                    open(os.path.join(args.folder, f"stats_{name_slug}.json"), "w", encoding="utf8"),
+                    open(main_stat_filename, "w", encoding="utf8"),
                     indent=2,
                     ensure_ascii=False,
                 )
