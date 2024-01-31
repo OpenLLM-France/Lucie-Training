@@ -252,10 +252,9 @@ class DataIterator:
             data = next(self.dataset_iter)
 
             if self.filter_fn:
-                if not self.filter_fn(data):
+                while not self.filter_fn(data):
                     # Skip this example
-                    self.idx -= 1
-                    return self.__next__()
+                    data = next(self.dataset_iter)
 
             # Subsampling
             if self.subsample_rate and self.subsample_rate < 1:
@@ -264,14 +263,17 @@ class DataIterator:
                 else:
                     criterion = data[self.subsample_criteria]
                     r = string_to_random01(criterion)
-                if (
+                while (
                     (r <= self.subsample_rate)
                     if self.subsample_invert
                     else (r > self.subsample_rate)
                 ):
                     # Skip this example
-                    self.idx -= 1
-                    return self.__next__()
+                    data = next(self.dataset_iter)
+                    if self.filter_fn:
+                        while not self.filter_fn(data):
+                            # Skip this example
+                            data = next(self.dataset_iter)
 
             try:
                 text = data[self.key]
@@ -483,8 +485,8 @@ class DataIteratorEuroparl(DataIterator):
         )
 
 
-class DataIteratorClaire(DataIterator):
-    def __init__(self, language="fr", streaming=True, split=None, **kwargs):
+class DataIteratorClaire(DataIteratorConcat):
+    def __init__(self, language="fr", streaming=True, split=None, only_open=True, **kwargs):
         path = DATA_PATH + f"/claire_{language}"
         full_files = glob.glob(path + "/*/full.txt")
         train_files = glob.glob(path + "/*/train.txt")
@@ -514,19 +516,30 @@ class DataIteratorClaire(DataIterator):
         elif split == "test":
             files = test_files
 
-        DataIterator.__init__(
-            self,
-            datasets.load_dataset(
-                "text",
-                data_files={"train": files},
-                streaming=streaming,
-                sample_by="paragraph",
-                split="train",
-            ),
-            key="text",
-            name=f"Claire{language.capitalize()}",
-            **kwargs,
-        )
+        dataset_to_filenames = {}
+        for filename in files:
+            name = os.path.basename(os.path.dirname(filename))
+            if name.startswith("ASR-"): name = name[4:]
+            name = re.split(r"[\-_]", name)[0]
+            if name.startswith("Theatre"): name = "Theatre"
+            if only_open and language == "fr" and name not in ["Theatre", "AssembleeNationale", "Senat"]:
+                continue
+            dataset_to_filenames.setdefault(name, []).append(filename)
+
+        self.name = name=f"Claire{language.capitalize()}"
+        DataIteratorConcat.__init__(self, [
+            DataIterator(
+                datasets.load_dataset(
+                    "text",
+                    data_files={"train": filenames},
+                    streaming=streaming,
+                    sample_by="paragraph",
+                    split="train",
+                ),
+                name=f"Claire{language.capitalize()}:{name}" + (f":{split}" if split else ""),
+                **kwargs,
+            ) for name, filenames in dataset_to_filenames.items()
+        ])
 
 
 ########################################
@@ -696,7 +709,7 @@ class DataIteratorPes2o(DataIteratorConcat):
         if train is not None:
             splits = ["train"] if train else ["validation"]
         else:
-            splits = ["train", "validation"]
+            splits = ["validation", "train"]
 
         if split_by_type:
             filter_fns = {
