@@ -20,7 +20,8 @@
     "num_docs": 21108587,
     "num_words": 8526481238,
     "num_chars": 141646905342,
-    "name": "javascript"
+    "name": "javascript",
+    "time_to_iterate_(sec)": 19282.200391054153
   },
   "HTML": {
     "num_parquet_files": 308,
@@ -35,7 +36,8 @@
     "num_docs": 20151565,
     "num_words": 7421094319,
     "num_chars": 89297025050,
-    "name": "java"
+    "name": "java",
+    "time_to_iterate_(sec)": 19433.919128894806
   },
   "Markdown": {
     "num_parquet_files": 186,
@@ -50,42 +52,48 @@
     "name": "php",
     "num_docs": 15904518,
     "num_words": 4865413066,
-    "num_chars": 66844317623
+    "num_chars": 66844317623,
+    "time_to_iterate_(sec)": 14709.171256780624
   },
   "Python": {
     "num_parquet_files": 144,
     "num_docs": 12962249,
     "num_words": 5434283210,
     "num_chars": 64304133602,
-    "name": "python"
+    "name": "python",
+    "time_to_iterate_(sec)": 21866.03513598442
   },
   "C": {
     "num_parquet_files": 126,
     "name": "c",
     "num_docs": 8625559,
     "num_words": 5915525675,
-    "num_chars": 57428274786
+    "num_chars": 57428274786,
+    "time_to_iterate_(sec)": 8448.187523841858
   },
   "C++": {
     "num_parquet_files": 110,
     "name": "cpp",
     "num_docs": 6377914,
     "num_words": 4583951458,
-    "num_chars": 50891569637
+    "num_chars": 50891569637,
+    "time_to_iterate_(sec)": 7786.496809959412
   },
   "C#": {
     "num_parquet_files": 107,
     "name": "c-sharp",
     "num_docs": 10839399,
     "num_words": 3574049078,
-    "num_chars": 46285805585
+    "num_chars": 46285805585,
+    "time_to_iterate_(sec)": 10103.044500350952
   },
   "TypeScript": {
     "num_parquet_files": 71,
     "name": "typescript",
     "num_docs": 10637070,
     "num_words": 2616733601,
-    "num_chars": 28815312118
+    "num_chars": 28815312118,
+    "time_to_iterate_(sec)": 9306.022695541382
   },
   "YAML": {
     "num_parquet_files": 64,
@@ -93,7 +101,11 @@
   },
   "Go": {
     "num_parquet_files": 57,
-    "name": "go"
+    "name": "go",
+    "time_to_iterate_(sec)": 4713.7373678684235,
+    "num_docs": 4730461,
+    "num_words": 2734680471,
+    "num_chars": 25738366488
   },
   "CSS": {
     "num_parquet_files": 49,
@@ -105,14 +117,19 @@
   },
   "Rust": {
     "num_parquet_files": 21,
-    "name": "rust"
+    "name": "rust",
+    "time_to_iterate_(sec)": 1270.3053834438324,
+    "num_docs": 1386585,
+    "num_words": 871790999,
+    "num_chars": 9528801527
   },
   "Ruby": {
     "num_parquet_files": 19,
     "name": "ruby",
     "num_docs": 3405374,
     "num_words": 646038604,
-    "num_chars": 7138982989
+    "num_chars": 7138982989,
+    "time_to_iterate_(sec)": 2974.8207473754883
   },
   "Vue": {
     "num_parquet_files": 17,
@@ -127,15 +144,24 @@
     "name": "swift",
     "num_docs": 1756144,
     "num_words": 553236205,
-    "num_chars": 6133895664
+    "num_chars": 6133895664,
+    "time_to_iterate_(sec)": 1583.553148508072
   },
   "Kotlin": {
     "num_parquet_files": 15,
-    "name": "kotlin"
+    "name": "kotlin",
+    "time_to_iterate_(sec)": 1964.7137303352356,
+    "num_docs": 2242771,
+    "num_words": 453747286,
+    "num_chars": 5769239921
   },
   "Scala": {
     "num_parquet_files": 12,
-    "name": "scala"
+    "name": "scala",
+    "time_to_iterate_(sec)": 1218.4471817016602,
+    "num_docs": 1362426,
+    "num_words": 456777996,
+    "num_chars": 4861937377
   },
   "SCSS": {
     "num_parquet_files": 12,
@@ -143,7 +169,11 @@
   },
   "TeX": {
     "num_parquet_files": 12,
-    "name": "tex"
+    "name": "tex",
+    "time_to_iterate_(sec)": 1514.9524269104004,
+    "num_docs": 547888,
+    "num_words": 573047812,
+    "num_chars": 5444493601
   },
   "Gettext Catalog": {
     "num_parquet_files": 10,
@@ -155,7 +185,11 @@
   },
   "Dart": {
     "num_parquet_files": 9,
-    "name": "dart"
+    "name": "dart",
+    "time_to_iterate_(sec)": 851.5106656551361,
+    "num_docs": 932583,
+    "num_words": 308370803,
+    "num_chars": 3863824957
   },
   "reStructuredText": {
     "num_parquet_files": 9,
@@ -163,7 +197,11 @@
   },
   "Lua": {
     "num_parquet_files": 8,
-    "name": "lua"
+    "name": "lua",
+    "time_to_iterate_(sec)": 507.5413808822632,
+    "num_docs": 558861,
+    "num_words": 318418587,
+    "num_chars": 3279278780
   },
   "INI": {
     "num_parquet_files": 8,
@@ -175,11 +213,19 @@
   },
   "Haskell": {
     "num_parquet_files": 6,
-    "name": "haskell"
+    "name": "haskell",
+    "time_to_iterate_(sec)": 528.2238962650299,
+    "num_docs": 544969,
+    "num_words": 307009935,
+    "num_chars": 2363568767
   },
   "Perl": {
     "num_parquet_files": 6,
-    "name": "perl"
+    "name": "perl",
+    "time_to_iterate_(sec)": 361.18111777305603,
+    "num_docs": 392108,
+    "num_words": 296883654,
+    "num_chars": 2633881479
   },
   "Eagle": {
     "num_parquet_files": 6,
@@ -211,15 +257,27 @@
   },
   "Julia": {
     "num_parquet_files": 4,
-    "name": "julia"
+    "name": "julia",
+    "time_to_iterate_(sec)": 269.9572014808655,
+    "num_docs": 298672,
+    "num_words": 152189014,
+    "num_chars": 1539367715
   },
   "FORTRAN": {
     "num_parquet_files": 4,
-    "name": "fortran"
+    "name": "fortran",
+    "time_to_iterate_(sec)": 159.36851572990417,
+    "num_docs": 165446,
+    "num_words": 191609175,
+    "num_chars": 1843039389
   },
   "Assembly": {
     "num_parquet_files": 4,
-    "name": "assembly"
+    "name": "assembly",
+    "time_to_iterate_(sec)": 225.78552746772766,
+    "num_docs": 248396,
+    "num_words": 208753384,
+    "num_chars": 1575336771
   },
   "Common Lisp": {
     "num_parquet_files": 4,
@@ -231,7 +289,11 @@
   },
   "Mathematica": {
     "num_parquet_files": 4,
-    "name": "mathematica"
+    "name": "mathematica",
+    "time_to_iterate_(sec)": 39.46096205711365,
+    "num_docs": 26895,
+    "num_words": 119784446,
+    "num_chars": 1719960404
   },
   "Pascal": {
     "num_parquet_files": 4,
@@ -247,7 +309,11 @@
   },
   "OCaml": {
     "num_parquet_files": 3,
-    "name": "ocaml"
+    "name": "ocaml",
+    "time_to_iterate_(sec)": 147.434406042099,
+    "num_docs": 159734,
+    "num_words": 129666344,
+    "num_chars": 1107387442
   },
   "PowerShell": {
     "num_parquet_files": 3,
@@ -303,15 +369,27 @@
   },
   "Elixir": {
     "num_parquet_files": 2,
-    "name": "elixir"
+    "name": "elixir",
+    "time_to_iterate_(sec)": 247.1149938106537,
+    "num_docs": 282110,
+    "num_words": 73132004,
+    "num_chars": 736879113
   },
   "Clojure": {
     "num_parquet_files": 2,
-    "name": "clojure"
+    "name": "clojure",
+    "time_to_iterate_(sec)": 112.38523697853088,
+    "num_docs": 126191,
+    "num_words": 44848096,
+    "num_chars": 491593795
   },
   "Erlang": {
     "num_parquet_files": 2,
-    "name": "erlang"
+    "name": "erlang",
+    "time_to_iterate_(sec)": 91.09598112106323,
+    "num_docs": 99368,
+    "num_words": 65714013,
+    "num_chars": 725989976
   },
   "F#": {
     "num_parquet_files": 2,
@@ -399,15 +477,27 @@
   },
   "R": {
     "num_parquet_files": 1,
-    "name": "r"
+    "name": "r",
+    "time_to_iterate_(sec)": 36.66789722442627,
+    "num_docs": 39194,
+    "num_words": 27847993,
+    "num_chars": 304631275
   },
   "Matlab": {
     "num_parquet_files": 1,
-    "name": "matlab"
+    "name": "matlab",
+    "time_to_iterate_(sec)": 1.371417760848999,
+    "num_docs": 967,
+    "num_words": 8645429,
+    "num_chars": 37215167
   },
   "Racket": {
     "num_parquet_files": 1,
-    "name": "racket"
+    "name": "racket",
+    "time_to_iterate_(sec)": 4.132821798324585,
+    "num_docs": 4201,
+    "num_words": 4793637,
+    "num_chars": 37767420
   },
   "ABAP": {
     "num_parquet_files": 1,
