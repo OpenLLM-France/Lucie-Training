@@ -116,6 +116,7 @@ def get_datasets(name, **kwargs):
         for name in [
             # Multi-lingual
             "wikipedia",
+            "europarl",
 
             # French
             "gallica_press",
@@ -152,6 +153,14 @@ def get_datasets(name, **kwargs):
     elif name.startswith("wikipedia_"):
         language = name.split("_")[1].lower()
         yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
+
+    elif name == "europarl":
+        for language in "fr", "en", "de", "es",:
+            yield (f"Europarl{language.capitalize()}", DataIteratorEuroparl(language=language, **kwargs))
+    elif name.startswith("wikipedia_"):
+        language = name.split("_")[1].lower()
+        yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
+
     elif name == "claire":
         yield ("ClaireFr", DataIteratorClaire(language="fr", **kwargs))
         yield ("ClaireEn", DataIteratorClaire(language="en", **kwargs))
@@ -448,6 +457,32 @@ class DataIteratorWikipedia(DataIterator):
         )
 
 
+class DataIteratorEuroparl(DataIterator):
+    def __init__(self, language="fr", streaming=True, from_roots=False, **kwargs):
+
+        if from_roots:
+            repo = f"bigscience-data/roots_{language}_the_pile_europarl"
+            kwargs_dataset = {}
+        else:
+            repo = "text"
+            kwargs_dataset = dict(
+                data_files=f"{DATA_PATH}/europarl/europarl_{language}_v10.txt",
+                sample_by="paragraph",
+            )
+
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                repo,
+                streaming=streaming,
+                split="train",
+                **kwargs_dataset
+            ),
+            name=f"Europarl{language.capitalize()}",
+            **kwargs,
+        )
+
+
 class DataIteratorClaire(DataIterator):
     def __init__(self, language="fr", streaming=True, split=None, **kwargs):
         path = DATA_PATH + f"/claire_{language}"
@@ -489,7 +524,7 @@ class DataIteratorClaire(DataIterator):
                 split="train",
             ),
             key="text",
-            name=f"Claire_{language}",
+            name=f"Claire{language.capitalize()}",
             **kwargs,
         )
 
@@ -651,6 +686,42 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                 for year in datas.keys()
             ],
         )
+
+
+class DataIteratorPes2o(DataIteratorConcat):
+    def __init__(self, streaming=True, train=None, split_by_type=True, **kwargs):
+
+        repo = "allenai/peS2o"
+
+        if train is not None:
+            splits = ["train"] if train else ["validation"]
+        else:
+            splits = ["train", "validation"]
+
+        if split_by_type:
+            filter_fns = {
+                "s2ag": lambda x: x["source"].startswith("s2ag"),
+                "s2orc": lambda x: not x["source"].startswith("s2ag"),
+            }
+        else:
+            filter_fns = {"": None}
+
+        self.name = "Pes2o"
+        DataIteratorConcat.__init__(self, [
+            DataIterator(
+                datasets.load_dataset(
+                    repo,
+                    streaming=streaming,
+                    split=split,
+                ),
+                filter_fn=filter_fn,
+                subsample_criteria="id",
+                name=f"{self.name}:{subset_name+':' if subset_name else ''}{split}",
+                **kwargs,
+            )
+            for split in splits
+            for subset_name, filter_fn in filter_fns.items()
+        ])
 
 
 ########################################
@@ -857,10 +928,12 @@ if __name__ == "__main__":
 
     for name, it in get_datasets(args.dataset):
         max_num_examples = args.max_num_examples
+        if hasattr(it, "name"):
+            name = it.name
         name_slug = simple_slugify(name)
         main_prefix_example_files = None
         main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
-        if main_stat_filename and os.path.isfile(main_stat_filename):
+        if main_stat_filename and os.path.isfile(main_stat_filename) and args.only_dump_examples:
             stats = json.load(open(main_stat_filename, "r", encoding="utf8"))
             num_billion_words = stats['num words'] / 1_000_000_000
             main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
@@ -886,7 +959,7 @@ if __name__ == "__main__":
             if max_num_examples == 0 and args.only_dump_examples:
                 continue
             print(f"* {subname}")
-            if main_stat_filename:
+            if main_prefix_example_files:
                 prefix_example_files = f"{main_prefix_example_files}{remove_common_prefix(name_slug, simple_slugify(subname))}"
             else:
                 prefix_example_files = None
