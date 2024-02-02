@@ -10,7 +10,10 @@ import datasets
 import regex as re
 from text import *
 
+import warnings
+
 logger = logging.getLogger(__name__)
+logging.basicConfig()
 logger.setLevel(logging.INFO)
 
 _folder = os.path.dirname(os.path.realpath(__file__))
@@ -45,6 +48,18 @@ def tokenizer_dataset(
     """
     Iterator that yields texts to train / test a tokenizer
     """
+
+    if debug:
+        sentences = [
+            "<a> Mais en Français, comment est-ce que ça se passera?",
+            "1999 2000 1999 2000",
+            "<s> zzzzzAAAA",
+        ]
+        def simple_text_iterator():
+            for s in sentences:
+                yield s
+        return ("dummy", simple_text_iterator())
+
 
     if download_only:
         streaming = False
@@ -212,7 +227,7 @@ class DataIterator:
             dataset: a dataset object
             key: the key of the text in the dataset
             max_docs: the maximum number of pages to return
-            split_around_paragraphs: if True, split th7e text around paragraphs
+            split_around_paragraphs: if True, split the text around paragraphs
         """
         self.dataset = dataset
         self.dataset_iter = dataset.__iter__()
@@ -274,6 +289,11 @@ class DataIterator:
                         while not self.filter_fn(data):
                             # Skip this example
                             data = next(self.dataset_iter)
+                    if self.subsample_criteria == None:
+                        r = self.random_generator.random()
+                    else:
+                        criterion = data[self.subsample_criteria]
+                        r = string_to_random01(criterion)
 
             try:
                 text = data[self.key]
@@ -374,6 +394,7 @@ class DataIteratorParquet(DataIterator):
             )
         if max_parquet_files and max_parquet_files < len(parquet_files):
             parquet_files = parquet_files[:max_parquet_files]
+        logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
         assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
 
         self.parquet_files = parquet_files
@@ -448,6 +469,7 @@ class DataIteratorWikipedia(DataIterator):
             repo = "parquet"
             data_files = sorted(glob.glob(f"{DATA_PATH}/wikipedia/{language}/{version}/*.parquet"))
             assert len(data_files), f"Missing parquet files for {DATA_PATH}/wikipedia/{language}/{version}/*.parquet"
+            logger.info(f"Using {len(data_files)} parquet files in {DATA_PATH}/wikipedia/{language}/{version}")
             kwargs_dataset = dict(data_files=data_files)
 
         DataIterator.__init__(
@@ -662,6 +684,7 @@ class DataIteratorAmericanStories(DataIteratorConcat):
         if not from_huggingface:
             data_files = sorted(glob.glob(f"{DATA_PATH}/americanstories/*.parquet"))
             assert len(data_files), f"Missing parquet files for {DATA_PATH}/americanstories/*.parquet"
+            logger.info(f"Using {len(data_files)} parquet files in {DATA_PATH}/americanstories")
 
             key="text"
 
@@ -807,7 +830,10 @@ class DataIteratorCode(DataIteratorConcat):
                 kwargs_dataset = dict(data_dir=data_dir)
             else:
                 data_files = sorted(glob.glob(f"{DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"))
-                assert len(data_files), f"Missing parquet files for {DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"
+                if not len(data_files):
+                    warnings.warn(f"Missing parquet files for {DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet")
+                    continue
+                logger.info(f"Using {len(data_files)} parquet files in {DATA_PATH}/the-stack-dedup/{data_dir}")
                 kwargs_dataset = dict(data_files=data_files)
 
             yield DataIterator(
@@ -850,6 +876,12 @@ if __name__ == "__main__":
         help="Which dataset to test",
     )
     parser.add_argument(
+        "--max_examples",
+        type=int,
+        default=None,
+        help="Maximum number of samples to iterate on",
+    )
+    parser.add_argument(
         "--folder",
         type=str,
         default=None,
@@ -861,10 +893,10 @@ if __name__ == "__main__":
         help="Skip if stat is already computed",
     )
     parser.add_argument(
-        "--max_num_examples",
+        "--num_examples",
         type=int,
         default=10,
-        help="Maximum number of pages to dump as examples (when --folder is specified)",
+        help="Number of pages to dump as examples (when --folder is specified)",
     )
     parser.add_argument(
         "--only_dump_examples",
@@ -880,7 +912,7 @@ if __name__ == "__main__":
         common_prefix = os.path.commonprefix([main, sub])
         return sub[len(common_prefix):]
 
-    def test_iterator(it, folder=None, name="", ignore_if_exists=False, max_num_examples=0, only_dump_examples=False, prefix_example_files=None):
+    def test_iterator(it, folder=None, name="", ignore_if_exists=False, num_examples=0, only_dump_examples=False, prefix_example_files=None):
         name_slug = simple_slugify(name)
         if prefix_example_files is None:
             prefix_example_files = name_slug
@@ -898,17 +930,20 @@ if __name__ == "__main__":
                 else:
                     prefix_example_files += "--" + to_insert
         tic = time.time()
-        i_page = 0
+        i_page = -1
         num_words = 0
         num_chars = 0
         for i_page, text in enumerate(tqdm.tqdm(it, total=len(it))):
+            if args.max_examples and i_page >= args.max_examples:
+                i_page -= 1
+                break
             num_words += len(text.split())
             num_chars += len(text)
-            if i_page < max_num_examples and folder:
+            if i_page < num_examples and folder:
                 example_folder = os.path.join(folder, "examples")
                 os.makedirs(example_folder, exist_ok=True)
                 filename = os.path.join(example_folder, f"{prefix_example_files}")
-                if max_num_examples > 1:
+                if num_examples > 1:
                     filename += f"_{i_page:02d}"
                 filename += ".txt"
                 with open(filename, "w", encoding="utf8") as f:
@@ -940,7 +975,7 @@ if __name__ == "__main__":
             global_stats[k] += v
 
     for name, it in get_datasets(args.dataset):
-        max_num_examples = args.max_num_examples
+        num_examples = args.num_examples
         if hasattr(it, "name"):
             name = it.name
         name_slug = simple_slugify(name)
@@ -961,15 +996,15 @@ if __name__ == "__main__":
             its = [it]
             global_stats = None
 
-        max_num_examples_per_subset = max_num_examples / len(its)
+        max_num_examples_per_subset = num_examples / len(its)
         for subset in its:
             subname = subset.name
-            max_num_examples = int(max_num_examples_per_subset) + (1 if random.random() < ( max_num_examples_per_subset % 1 ) else 0)
-            if max_num_examples == 0 and any([s in subname for s in ( "tex", "python")]):
-                max_num_examples = 2
+            num_examples = int(max_num_examples_per_subset) + (1 if random.random() < ( max_num_examples_per_subset % 1 ) else 0)
+            if num_examples == 0 and any([s in subname for s in ( "tex", "python")]):
+                num_examples = 2
             if "other" in name.lower():
-                max_num_examples = args.max_num_examples
-            if max_num_examples == 0 and args.only_dump_examples:
+                num_examples = args.num_examples
+            if num_examples == 0 and args.only_dump_examples:
                 continue
             print(f"* {subname}")
             if main_prefix_example_files:
@@ -981,7 +1016,7 @@ if __name__ == "__main__":
                 folder=args.folder,
                 name=subname,
                 ignore_if_exists=args.ignore_if_exists,
-                max_num_examples=max_num_examples,
+                num_examples=num_examples,
                 only_dump_examples=args.only_dump_examples,
                 prefix_example_files=prefix_example_files,
             )
