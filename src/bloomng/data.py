@@ -131,6 +131,7 @@ def get_datasets(name, **kwargs):
         for name in [
             # Multi-lingual
             "wikipedia",
+            "gutenberg",
             "europarl",
 
             # French
@@ -163,11 +164,20 @@ def get_datasets(name, **kwargs):
         yield ("TheStack", DataIteratorCode(**kwargs))
 
     elif name == "wikipedia":
-        for language in "fr", "en", "de", :
-            yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
+        for language in "fr", "en", "de", "es":
+            for ds in get_datasets(f"wikipedia_{language}", **kwargs):
+                yield ds
     elif name.startswith("wikipedia_"):
         language = name.split("_")[1].lower()
         yield (f"Wikipedia{language.capitalize()}", DataIteratorWikipedia(language=language, **kwargs))
+
+    elif name == "gutenberg":
+        for language in "fr", "en", "de", "es":
+            for ds in get_datasets(f"gutenberg_{language}", **kwargs):
+                yield ds
+    elif name.startswith("gutenberg_"):
+        language = name.split("_")[1].lower()
+        yield (f"Gutenberg{language.capitalize()}Legal", DataIteratorGutenberg(language=language, **kwargs))
 
     elif name == "europarl":
         for language in "fr", "en", "de", "es",:
@@ -447,25 +457,18 @@ class DataIteratorParquetSplitted(DataIteratorConcat):
 
 
 class DataIteratorWikipedia(DataIterator):
-    def __init__(self, language="fr", use_latex_version=True, streaming=True, from_huggingface=None, **kwargs):
-        version = "20240101"
-        repo = (
-            f"OpenLLM-France/wikipedia_latex.{language}"
-            if use_latex_version
-            else f"OpenLLM-France/wikipedia.{language}"
-        )
-        name = f"{repo}/{version}"
+    def __init__(self, language="fr", streaming=True, from_huggingface=None, **kwargs):
+        version = "20240201"
+        repo = f"OpenLLM-France/wikipedia.{language}"
+        name = f"{os.path.basename(repo)}/{version}"
 
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/wikipedia/{language}")
             logger.info(f"Using HuggingFace version for {name}" if from_huggingface else f"Using local version for {name}")
 
         if from_huggingface:
-            if language == "fr" and not use_latex_version:
-                version = "20231220"
             kwargs_dataset = dict(name=version)
         else:
-            assert use_latex_version, "Only latex version is available for now"
             repo = "parquet"
             data_files = sorted(glob.glob(f"{DATA_PATH}/wikipedia/{language}/{version}/*.parquet"))
             assert len(data_files), f"Missing parquet files for {DATA_PATH}/wikipedia/{language}/{version}/*.parquet"
@@ -477,8 +480,37 @@ class DataIteratorWikipedia(DataIterator):
             datasets.load_dataset(repo, streaming=streaming, split="train", **kwargs_dataset),
             subsample_criteria="id",
             name=name,
+            postprocess=clean_wikipedia,
             **kwargs,
         )
+
+
+class DataIteratorGutenberg(DataIterator):
+    def __init__(self, language="fr", streaming=True, filter_by_age=True, current_year=2024, **kwargs):
+        name = f"Gutenberg.{language}"
+        thr = 80 if language == "fr" else 70
+        if filter_by_age:
+            name += f".{thr}"
+
+        data_files = sorted(glob.glob(f"{DATA_PATH}/gutenberg_parquet/{language}/*.parquet"))
+        assert len(data_files), f"Missing parquet files for {DATA_PATH}/gutenberg_parquet/{language}/*.parquet"
+
+        dataset = datasets.load_dataset("parquet", data_files=data_files, streaming=streaming, split="train")
+
+        def get_age(field):
+            if not field:
+                return current_year
+            return int(field)
+
+        DataIterator.__init__(
+            self,
+            dataset,
+            subsample_criteria="id",
+            filter_fn=(lambda x: get_age(x["authoryearofdeath"]) <= current_year-thr) if filter_by_age else None,
+            name=name,
+            **kwargs,
+        )
+
 
 
 class DataIteratorEuroparl(DataIterator):
@@ -579,8 +611,6 @@ class DataIteratorGallicaMono(DataIteratorParquet):
             **kwargs,
         )
 
-def clean_pdf_extraction_and_html(text):
-    return clean_pdf_extraction(text, html_escape=True)
 
 
 class DataIteratorGallicaPress(DataIteratorConcat):
@@ -946,6 +976,7 @@ if __name__ == "__main__":
                 if num_examples > 1:
                     filename += f"_{i_page:02d}"
                 filename += ".txt"
+                print(f"Dumping {filename}")
                 with open(filename, "w", encoding="utf8") as f:
                     f.write(text)
             elif only_dump_examples:
