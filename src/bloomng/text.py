@@ -1,5 +1,6 @@
 import html
-
+import urllib
+import random
 import regex as re
 
 
@@ -11,6 +12,10 @@ def clean_pdf_extraction(text, html_escape=False):
     text = text.replace(" \n", "\n")
     text = text.strip()
     return text
+
+
+def clean_pdf_extraction_and_html(text):
+    return clean_pdf_extraction(text, html_escape=True)
 
 
 def html_unescape(text):
@@ -41,7 +46,6 @@ def clean_discours(text):
     return text
 
 
-
 def remove_page_numbers(text, verbose=False, pattern=None):
     """
     Try to remove page numbers from a plain text version of a PDF.
@@ -70,8 +74,13 @@ def remove_page_numbers(text, verbose=False, pattern=None):
         current_page_string = str(current_page_number)
         if set(current_page_string) > {"1"}:
             current_page_string = current_page_string.replace("1", "[1lIij]")
-        current_pattern = _pattern_with_number(pattern, current_page_string) if pattern else None
-        for match in re.finditer(rf"(\n[^\n]*\b{current_page_string}(/\d{{2,5}})?\b[^\n\w]*\n)|(\n[^\n\w]*\b{current_page_string}(/\d{{2,5}})?\b[^\n]*\n)", text):
+        current_pattern = (
+            _pattern_with_number(pattern, current_page_string) if pattern else None
+        )
+        for match in re.finditer(
+            rf"(\n[^\n]*\b{current_page_string}(/\d{{2,5}})?\b[^\n\w]*\n)|(\n[^\n\w]*\b{current_page_string}(/\d{{2,5}})?\b[^\n]*\n)",
+            text,
+        ):
             start = match.start()
             end = match.end()
             content = match.group()
@@ -90,9 +99,7 @@ def remove_page_numbers(text, verbose=False, pattern=None):
                 if not len(candidates):
                     if use_page_length:
                         # print(f"{current_page_number=} | {avg_length=} | {min_char_index=} | {start-min_char_index=}")
-                        min_char_index = min(
-                            start, min_char_index + avg_length / 10
-                        )
+                        min_char_index = min(start, min_char_index + avg_length / 10)
                     else:
                         min_char_index = start
                     last_page_number = current_page_number
@@ -140,9 +147,7 @@ def remove_page_numbers(text, verbose=False, pattern=None):
             new_content = "\n" + new_content + "\n"
         else:
             new_content = "\n"
-        text = (
-            text[: start].rstrip() + new_content + text[end :].lstrip()
-        )
+        text = text[:start].rstrip() + new_content + text[end:].lstrip()
     return text
 
 
@@ -164,6 +169,202 @@ _page_patterns = (
 
 def _pattern_with_number(pattern, n):
     return pattern.replace("\\d{1,5}", str(n))
+
+
+def clean_wikipedia(text):
+    text = plaintext_to_markdown(text)
+    text = re.sub(r"(([^\s\$]*)(\$[_|\^]([^\$]|\{[^\$\}]+\})\$))+([^\s\$]*)", process_supersubscript, text)
+    return text
+
+def process_supersubscript(match):
+    s = "$" + match.group().replace("$","") + "$"
+    if s == "$M^{me}$": return "Mme"
+    return s
+
+def plaintext_to_markdown(
+    text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False
+):
+    """
+    Convert plaintext (extracted by dump_wiki_htmp.py) to markdown.
+
+    Args:
+        text (str): Plaintext
+        website_main (str): Website name (e.g. "wikipedia", "wikisource", "wiktionary") to use as links for headers. Or None if no link is needed.
+        add_toc (bool): Add a Table Of Content section at the beginning of the markdown text.
+    Returns:
+        (str, str): (Markdown text, url)
+    """
+    lines = text.split("\n")
+
+    assert linebreaks in [
+        0,
+        1,
+        2,
+        "0",
+        "1",
+        "2",
+        "random",
+    ], f"Invalid linebreaks: {linebreaks}"
+    if linebreaks == "random":
+        linebreaks = random.choice([0, 1, 2])
+    else:
+        linebreaks = int(linebreaks)
+
+    linebreak_after_list = linebreaks > 0
+    linebreak_after_table = linebreaks > 0
+
+    linebreak_between_lines = linebreaks > 1
+    linebreak_before_list = linebreaks > 1
+    linebreak_before_header = linebreaks > 0
+    linebreak_after_header = linebreaks > 1
+
+    # Add :
+    # - table headers
+    # - new lines after table
+    # - new lines after list
+    # - new lines after lines
+    new_lines = []
+    was_list = False
+    was_table = False
+    was_header = True
+    headers = []
+    url = None
+    toc = []
+    markdown_subsections = []
+    section_urls = []
+
+    for line in lines:
+        if not line:
+            continue
+        line = line + "\n"
+        line_before = ""
+        line_after = ""
+
+        # Process lists
+        if re.match(r"[\*> ]+ ", line):
+
+            if re.match(r" + ", line):
+                if new_lines and new_lines[-1].lstrip().startswith("*"):
+                    if linebreak_before_list:
+                        line_before = "\n"
+            was_list = True
+            if re.match(r"\*+ ", line):
+                last_bullet = re.match(r"\*+", line).end()
+                bullet = line[:last_bullet]
+                line = line[last_bullet:]
+                line = f"{' '*(len(bullet)-1)*3}*{line}"
+            elif re.match(r"\*+>+ ", line):
+                last_bullet = re.match(r"\*+", line).end()
+                bullet = line[:last_bullet]
+                line = line[last_bullet:]
+                line = f"{' '*(len(bullet))*3}{line}"
+            if was_table:
+                if linebreak_after_table:
+                    line_before = "\n"
+                was_table = False
+            was_header = False
+
+        # Process tables
+        elif re.match("^\|.*\|\n", line):
+            if not was_table:
+                # Add header separator
+                num_columns = len(line.split("|")) - 2
+                line_after = "|" + " - |" * num_columns + "\n"
+            was_table = True
+            if was_list:
+                if linebreak_after_list:
+                    line_before = "\n"
+                was_list = False
+            was_header = False
+
+        else:
+
+            # Process headers
+            if re.match(r"^\#+ ", line):
+                hashtags, line = line.split(" ", 1)
+                title = line.strip()
+                markdown_subsection = re.sub(
+                    r" +", "-", re.sub(r"[^\w ]", "", title.lower())
+                )
+                url_subsection = urllib.parse.quote(title.replace(" ", "_"))
+                level = len(hashtags)
+                if level > 3:
+                    line = f"**{title}**\n"
+                else:
+
+                    if level > 1:
+                        section_url = f"{url}#{url_subsection}"
+                    else:
+                        if not url:
+                            url = f"https://fr.{website_main}.org/wiki/{url_subsection}"
+                        section_url = url
+
+                    header_line = f"{hashtags}"
+                    if add_urls:
+                        header_line += f" [{line.strip()}]({section_url})\n"
+                    else:
+                        header_line += f" {line.strip()}\n"
+
+                    ilevel = level - 1
+                    do_print = False
+                    while ilevel >= len(headers):
+                        headers.append(None)
+                    do_print = headers[ilevel] != header_line
+                    headers[ilevel] = header_line
+
+                    if do_print:
+                        if markdown_subsection in markdown_subsections:
+                            i = 1
+                            while markdown_subsection + f"-{i}" in markdown_subsections:
+                                i += 1
+                            markdown_subsection += f"-{i}"
+                        if section_url in section_urls:
+                            # No way to link to the second subsection with the same title in Wikipedia (?)
+                            header_line = f"{hashtags} {line.strip()}\n"
+                        markdown_subsections.append(markdown_subsection)
+                        section_urls.append(section_url)
+                        headers = headers[: ilevel + 1]
+                        line = header_line
+                        toc_line = f"[{title}](#{markdown_subsection})"
+                        if level > 1:
+                            toc_line = f"{' '*(level-2)*3}* " + toc_line
+                        toc.append(toc_line)
+                    else:
+                        continue
+
+                if linebreak_after_header:
+                    line_after = "\n"
+                if (
+                    linebreak_before_header
+                    and not was_header
+                    and not linebreak_between_lines
+                ):
+                    line_before = "\n"
+                was_header = True
+
+            else:
+
+                # Add new lines after simple lines
+                if linebreak_between_lines:
+                    line_after = "\n"
+                was_header = False
+
+            # Add new lines after lists and tables
+            if was_list:
+                if linebreak_after_list:
+                    line_before = "\n"
+                was_list = False
+            if was_table:
+                if linebreak_after_table:
+                    line_before = "\n"
+                was_table = False
+
+        new_lines.append(line_before + line + line_after)
+
+    toc = "\n".join(toc)
+    prefix = f"{toc}\n---\n" if add_toc else ""
+
+    return prefix + "".join(new_lines)
 
 
 if __name__ == "__main__":
@@ -215,7 +416,7 @@ if __name__ == "__main__":
         pool.close()
         pool.join()
         return data
-    
+
     def get_parquet_datasets(it):
         if isinstance(it, tuple) and len(it) == 2:
             _, data = it
@@ -253,22 +454,38 @@ if __name__ == "__main__":
                 print(f"Postprocessing {filein} -> {fileout}")
                 df = pd.read_parquet(filein)
                 if args.folder:
-                    examples_before = list(df.iloc[:args.num_samples][key])
+                    examples_before = list(df.iloc[: args.num_samples][key])
 
                 if args.threads == 1:
                     df[key] = df[key].progress_map(postprocess)
                 else:
+
                     def postprocess(d):
                         d[key] = d[key].progress_map(data.postprocess)
                         return d
+
                     df = df_parallelize(df, postprocess, args.threads)
 
                 if args.folder:
-                    examples_after = list(df.iloc[:args.num_samples][key])
-                    folder = os.path.join(args.folder, "cleaning", os.path.basename(dirname))
+                    examples_after = list(df.iloc[: args.num_samples][key])
+                    folder = os.path.join(
+                        args.folder, "cleaning", os.path.basename(dirname)
+                    )
                     os.makedirs(folder, exist_ok=True)
-                    for i, (before, after) in enumerate(zip(examples_before, examples_after)):
-                        print(before, file=open(os.path.join(folder, f"{name_slug}_{i}_A.txt"), "w"))
-                        print(after, file=open(os.path.join(folder, f"{name_slug}_{i}_B.txt"), "w"))
+                    for i, (before, after) in enumerate(
+                        zip(examples_before, examples_after)
+                    ):
+                        print(
+                            before,
+                            file=open(
+                                os.path.join(folder, f"{name_slug}_{i}_A.txt"), "w"
+                            ),
+                        )
+                        print(
+                            after,
+                            file=open(
+                                os.path.join(folder, f"{name_slug}_{i}_B.txt"), "w"
+                            ),
+                        )
                 os.makedirs(dirname + "_cleaned", exist_ok=True)
                 df.to_parquet(fileout)
