@@ -49,18 +49,6 @@ def tokenizer_dataset(
     Iterator that yields texts to train / test a tokenizer
     """
 
-    if debug:
-        sentences = [
-            "<a> Mais en Français, comment est-ce que ça se passera?",
-            "1999 2000 1999 2000",
-            "<s> zzzzzAAAA",
-        ]
-        def simple_text_iterator():
-            for s in sentences:
-                yield s
-        return ("dummy", simple_text_iterator())
-
-
     if download_only:
         streaming = False
 
@@ -486,10 +474,10 @@ class DataIteratorWikipedia(DataIterator):
 
 
 class DataIteratorGutenberg(DataIterator):
-    def __init__(self, language="fr", streaming=True, filter_by_age=True, current_year=2024, **kwargs):
+    def __init__(self, language="fr", streaming=True, filter_legal=True, current_year=2024, **kwargs):
         name = f"Gutenberg.{language}"
         thr = 80 if language == "fr" else 70
-        if filter_by_age:
+        if filter_legal:
             name += f".{thr}"
 
         data_files = sorted(glob.glob(f"{DATA_PATH}/gutenberg_parquet/{language}/*.parquet"))
@@ -497,20 +485,77 @@ class DataIteratorGutenberg(DataIterator):
 
         dataset = datasets.load_dataset("parquet", data_files=data_files, streaming=streaming, split="train")
 
-        def get_age(field):
+        def get_age(field, default=None):
             if not field:
-                return current_year
+                return default
             return int(field)
+        
+        def filter_gutenberg(x, collect_stat=False):
+            global _stats_gutenberg
+            death = get_age(x["authoryearofdeath"])
+            birth = get_age(x["authoryearofbirth"])
+            author = x["author"]
+            if author not in _authors_info:
+                _authors_info[author] = (birth, death)
+            else:
+                if _authors_info[author] != (birth, death):
+                    print(f"Author {author} has multiple birth/death dates: {(_authors_info[author], (birth, death))}")
+                    if not death and not birth:
+                        birth, death = _authors_info[author]
+            if not death and not birth:
+                # print(f"Unknown birth/dead date for {author}")
+                age_ok = True
+                age_ok_for_stats = "?"
+            else:
+                age_ok = bool((death and death <= current_year-thr) or (not death and birth and birth <= current_year-thr-80))
+                age_ok_for_stats = age_ok
+            copyright_ok = "copyright" not in x["usagerights"]
+            if collect_stat:
+                key = (language, age_ok_for_stats, x["usagerights"])
+                pages, words, chars = _stats_gutenberg.setdefault(key, [0, 0, 0])
+                pages += 1
+                words += len(x["text"].split())
+                chars += len(x["text"])
+                _stats_gutenberg[key] = [pages, words, chars]
+                key = (language, "TOTAL", "TOTAL")
+                pages, words, chars = _stats_gutenberg.setdefault(key, [0, 0, 0])
+                pages += 1
+                words += len(x["text"].split())
+                chars += len(x["text"])
+                _stats_gutenberg[key] = [pages, words, chars]
+            return age_ok and copyright_ok
 
         DataIterator.__init__(
             self,
             dataset,
             subsample_criteria="id",
-            filter_fn=(lambda x: get_age(x["authoryearofdeath"]) <= current_year-thr) if filter_by_age else None,
+            filter_fn=filter_gutenberg if filter_legal else None,
             name=name,
             **kwargs,
         )
 
+_authors_info = {}
+_stats_gutenberg = {}
+
+def print_gutenberg_stats():
+    if not _stats_gutenberg:
+        return
+    print("Gutenberg stats:")
+    print(f"| {'language':8} | {'death<70/80':11} | {'usage rights':25} | {'books':>8} | {'words':>14} | {'chars':>14} |")
+    def language_order(lan):
+        return {"en":0, "fr":1, "de":2, "es":3}[lan]
+    def openness_order(rights):
+        return {True: 0, "?":0.5, False: 1, "TOTAL": -1, "open": 0, "open_restricted": 1, "unknown": 2, "copyright_open":3, "copyright_open_restricted":4, "copyright":5}[rights]
+    for k in sorted(_stats_gutenberg.keys(), key=lambda k: [language_order(k[0]), openness_order(k[1]), openness_order(k[2])]):
+        language, age_ok, rights = k
+        pages, words, chars = _stats_gutenberg[k]
+        age_ok = {True:"OK", False:"no"}.get(age_ok, age_ok)
+        print(f"| {language:8} | {age_ok:11} | {rights:25} | {formatnum(pages):>8} | {formatnum(words):>14} | {formatnum(chars):>14} |")
+
+def formatnum(num):
+    # Add non breakable space each 3 digits
+    num = str(num)
+    return "\u00A0".join(num[::-1][i:i+3] for i in range(0, len(num), 3))[::-1]
 
 
 class DataIteratorEuroparl(DataIterator):
@@ -900,7 +945,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "dataset",
-        nargs="?",
+        nargs="*",
         default="all",
         # choices=[ "tok_all", "tok_train", "tok_test", "code", "wikipedia", "claire", "gallica_mono", "gallica_press", "discours", "american_stories", ],
         help="Which dataset to test",
@@ -1005,69 +1050,72 @@ if __name__ == "__main__":
                 global_stats[k] = 0
             global_stats[k] += v
 
-    for name, it in get_datasets(args.dataset):
-        num_examples = args.num_examples
-        if hasattr(it, "name"):
-            name = it.name
-        name_slug = simple_slugify(name)
-        main_prefix_example_files = None
-        main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
-        if main_stat_filename and os.path.isfile(main_stat_filename) and args.only_dump_examples:
-            stats = json.load(open(main_stat_filename, "r", encoding="utf8"))
-            num_billion_words = stats['num words'] / 1_000_000_000
-            main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
-        # elif args.only_dump_examples:
-        #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
-        
-        if isinstance(it, DataIteratorConcat):
-            its = it.datasets
-            global_stats = {}
-        else:
-            it.name = name
-            its = [it]
-            global_stats = None
-
-        max_num_examples_per_subset = num_examples / len(its)
-        for subset in its:
-            subname = subset.name
-            num_examples = int(max_num_examples_per_subset) + (1 if random.random() < ( max_num_examples_per_subset % 1 ) else 0)
-            if num_examples == 0 and any([s in subname for s in ( "tex", "python")]):
-                num_examples = 2
-            if "other" in name.lower():
-                num_examples = args.num_examples
-            if num_examples == 0 and args.only_dump_examples:
-                continue
-            print(f"* {subname}")
-            if main_prefix_example_files:
-                prefix_example_files = f"{main_prefix_example_files}{remove_common_prefix(name_slug, simple_slugify(subname))}"
+    for dataset in args.dataset:
+        for name, it in get_datasets(dataset):
+            num_examples = args.num_examples
+            if hasattr(it, "name"):
+                name = it.name
+            name_slug = simple_slugify(name)
+            main_prefix_example_files = None
+            main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
+            if main_stat_filename and os.path.isfile(main_stat_filename) and args.only_dump_examples:
+                stats = json.load(open(main_stat_filename, "r", encoding="utf8"))
+                num_billion_words = stats['num words'] / 1_000_000_000
+                main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
+            # elif args.only_dump_examples:
+            #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
+            
+            if isinstance(it, DataIteratorConcat):
+                its = it.datasets
+                global_stats = {}
             else:
-                prefix_example_files = None
-            stats = test_iterator(
-                subset,
-                folder=args.folder,
-                name=subname,
-                ignore_if_exists=args.ignore_if_exists,
-                num_examples=num_examples,
-                only_dump_examples=args.only_dump_examples,
-                prefix_example_files=prefix_example_files,
-            )
+                it.name = name
+                its = [it]
+                global_stats = None
+
+            max_num_examples_per_subset = num_examples / len(its)
+            for subset in its:
+                subname = subset.name
+                num_examples = int(max_num_examples_per_subset) + (1 if random.random() < ( max_num_examples_per_subset % 1 ) else 0)
+                if num_examples == 0 and any([s in subname for s in ( "tex", "python")]):
+                    num_examples = 2
+                if "other" in name.lower():
+                    num_examples = args.num_examples
+                if num_examples == 0 and args.only_dump_examples:
+                    continue
+                print(f"* {subname}")
+                if main_prefix_example_files:
+                    prefix_example_files = f"{main_prefix_example_files}{remove_common_prefix(name_slug, simple_slugify(subname))}"
+                else:
+                    prefix_example_files = None
+                stats = test_iterator(
+                    subset,
+                    folder=args.folder,
+                    name=subname,
+                    ignore_if_exists=args.ignore_if_exists,
+                    num_examples=num_examples,
+                    only_dump_examples=args.only_dump_examples,
+                    prefix_example_files=prefix_example_files,
+                )
+                if args.only_dump_examples:
+                    continue
+                print(json.dumps(stats, indent=4))
+
+                if global_stats is not None:
+                    update_stats(global_stats, stats)
+
             if args.only_dump_examples:
                 continue
-            print(json.dumps(stats, indent=4))
 
             if global_stats is not None:
-                update_stats(global_stats, stats)
+                print(f"* {name}")
+                print(json.dumps(global_stats, indent=4))
+                if args.folder:
+                    json.dump(
+                        global_stats,
+                        open(main_stat_filename, "w", encoding="utf8"),
+                        indent=2,
+                        ensure_ascii=False,
+                    )
 
-        if args.only_dump_examples:
-            continue
-
-        if global_stats is not None:
-            print(f"* {name}")
-            print(json.dumps(global_stats, indent=4))
-            if args.folder:
-                json.dump(
-                    global_stats,
-                    open(main_stat_filename, "w", encoding="utf8"),
-                    indent=2,
-                    ensure_ascii=False,
-                )
+    print_gutenberg_stats()
