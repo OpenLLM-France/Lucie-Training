@@ -3,12 +3,13 @@
 
 # https://github.com/huggingface/tokenizers/issues/1407#issue-2028070675
 
+import sys
 import re
 
 import tokenizers
 import transformers
 from data import tokenizer_dataset
-
+import tempfile
 
 def make_tokenizer(
     byte_fallback=False,
@@ -24,8 +25,9 @@ def make_tokenizer(
     else:
         # name = "tiiuae/falcon-7b"
         name = "gpt2"
+        # name = "meta-llama/Llama-2-7b-hf"
         base_tokenizer = transformers.AutoTokenizer.from_pretrained(name)
-        base_tokenizer.add_special_tokens({"bos_token": "<startoftext>"})
+        base_tokenizer.add_special_tokens({"bos_token": "<|startoftext|>"})
 
     # EOS / BOS
     bos_token = base_tokenizer.bos_token
@@ -94,6 +96,12 @@ if __name__ == "__main__":
     # """
     #     )
     parser.add_argument(
+        "--use_sentence_piece",
+        default=False,
+        action="store_true",
+        help="To use sentence piece (spm_train)",
+    )
+    parser.add_argument(
         "--vocab_size",
         type=int,
         default=32000,
@@ -131,30 +139,53 @@ if __name__ == "__main__":
     if args.verbose:
         print("Configure base tokenizer")
 
-    name_tokenizer, base_tokenizer = make_tokenizer(args.byte_fallback)
+    if args.use_sentence_piece:
+        name_tokenizer = f"smp{'_bytefallback' if args.byte_fallback else ''}_{args.vocab_size}"
+        base_tokenizer = None
+        eos_piece = "</s>"
+    else:
+        name_tokenizer, base_tokenizer = make_tokenizer(args.byte_fallback)
+        name_tokenizer += f"_{args.vocab_size}"
+        eos_piece = base_tokenizer.eos_token
 
     example_sentence = (
-        f"   [INST] Coucou [/INST] Hello {base_tokenizer.eos_token} [INST] "
-        f"Mais en Français, comment est-ce que ça se passera ? "
-        f"[/INST] Eh bien ␣ alors あ゙"
+        f"   [INST] Coucou [/INST] Hello {eos_piece} [INST] "
+         "Mais en Français, comment est-ce que ça se passera ? 1999, 2000, 2002.2, 1 000 000, 1\u00A0000\u00A0000"
+         "[/INST] Eh bien ␣ alors あ゙"
     )
 
-    info = {
-        "example_before": {
-            example_sentence: test_tokenizer(base_tokenizer, example_sentence)
-        }
-    }
-    print(json.dumps(info, indent=2, ensure_ascii=False))
+    info = {}
+    if base_tokenizer is not None:
+        info.update({
+            "example_before": {
+                example_sentence: test_tokenizer(base_tokenizer, example_sentence)
+            }
+        })
+        print(json.dumps(info, indent=2, ensure_ascii=False))
 
-    name_dataset, trainset = tokenizer_dataset(
-        train=True, streaming=True, debug=args.debug
-    )
+    if args.debug:
+        name_dataset = "dummy"
+        sentences = [
+            "<a> Mais en Français, comment est-ce que ça se passera?",
+            "1999 2000 1999 2000 199 200 en François en Français",
+            "<s> zzzzzAAAA",
+        ]
+        def debug_texts_iterator():
+            for s in sentences:
+                yield s
+        trainset = debug_texts_iterator()
+    else:
+        name_dataset, trainset = tokenizer_dataset(
+            train=True, streaming=True
+        )
 
     if not args.output:
         # args.output = f"trained_tokenizer_{args.tokenizer.replace('/', '--')}"
         args.output = f"trained_tokenizer_{name_tokenizer}_{name_dataset}"
         if args.debug:
             args.output = "DEBUG_" + args.output
+
+    if args.debug: args.overwrite = True
 
     if os.path.exists(args.output):
         if args.overwrite:
@@ -168,18 +199,73 @@ if __name__ == "__main__":
     if args.verbose:
         print("Train tokenizer")
 
-    training_kwargs = {
-        "vocab_size": args.vocab_size,
-        "min_frequency": 0,
-        "show_progress": True,
-        # initial_alphabet=["▁[", "]"],
-    }
 
     tic = time.time()
-    tokenizer = base_tokenizer.train_new_from_iterator(trainset, **training_kwargs)
+    if args.use_sentence_piece:
+
+        convert_script = "thirdparty_tokenizers/bindings/python/scripts/sentencepiece_extractor.py"
+        assert os.path.isfile(convert_script), f"File {convert_script} does not exist"
+
+        with tempfile.NamedTemporaryFile(suffix='.txt') as f:
+            print(f"Writing to {f.name}")
+            
+            cmd_line = f"""\
+spm_train \
+    {f.name} \
+    --model_prefix "{args.output}/tokenizer" \
+    --input tmp.txt \
+    --input_format text \
+    --model_type bpe \
+    --vocab_size {args.vocab_size} \
+    --split_digits true \
+    --allow_whitespace_only_pieces true \
+    --byte_fallback false \
+    --max_sentence_length 10000000 \
+"""
+            for text in trainset:
+                f.write((text+"\n").encode("utf-8"))
+            f.flush()
+            print(cmd_line)
+            code = os.system(cmd_line)
+            assert code == 0, f"Error code {code} for command {cmd_line}"
+            vocab_file = f"{args.output}/tokenizer.vocab"
+            model_file = f"{args.output}/tokenizer.model"
+            assert os.path.exists(vocab_file), f"File {vocab_file} does not exist"
+            assert os.path.exists(model_file), f"File {model_file} does not exist"
+
+            vocab_file2 = f"{args.output}/tokenizer_vocab.json"
+            merge_file = f"{args.output}/merges.txt"
+
+            cmd_line = f"{sys.executable} {convert_script} --provider sentencepiece --model {model_file} --vocab-output-path {vocab_file2} --merges-output-path {merge_file}"
+            print(cmd_line)
+            code = os.system(cmd_line)
+            assert code == 0, f"Error code {code} for command {cmd_line}"
+
+            tokenizer = tokenizers.ByteLevelBPETokenizer.from_file(vocab_file2, merge_file)
+            tokenizer.save_model(args.output)
+
+            from transformers import PreTrainedTokenizerFast
+            tokenizer = PreTrainedTokenizerFast(tokenizer_object=tokenizer)
+            tokenizer.save_pretrained(args.output)
+
+
+            # from transformers.convert_slow_tokenizer import GPT2Converter
+            # converted = GPT2Converter(tokenizer).converted()
+
+    else:
+        training_kwargs = {
+            "vocab_size": args.vocab_size,
+            "min_frequency": 0,
+            "show_progress": True,
+            # initial_alphabet=["▁[", "]"],
+        }
+        tokenizer = base_tokenizer.train_new_from_iterator(trainset, **training_kwargs)
+        tokenizer.save_pretrained(args.output)
+        
     training_time = time.time() - tic
 
-    tokenizer.save_pretrained(args.output)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
+    
 
     # EVALUATION
 
@@ -228,7 +314,11 @@ if __name__ == "__main__":
         total_num_tokens = 0
         total_num_tokens_single_byte = 0
         tic = time.time()
-        _, dataset = tokenizer_dataset(train=train, streaming=True, debug=args.debug)
+        if args.debug:
+            dataset = debug_texts_iterator()
+            if train is False: break
+        else:
+            _, dataset = tokenizer_dataset(train=train, streaming=True, debug=args.debug)
         for text in dataset:
             total_num_pages += 1
             total_num_paragraph += len(text.split("\n\n"))
