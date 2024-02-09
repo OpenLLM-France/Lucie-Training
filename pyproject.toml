@@ -24,6 +24,7 @@ ruff = "^0.1.11"
 pre-commit = "^3.6.0"
 
 [tool.ruff]
+line-length = 120 # Allow lines to be as long as 120.
 target-version = "py39"
 select = [
     "E",  # pycodestyle errors
@@ -34,6 +35,7 @@ select = [
     "B",  # flake8-bugbear
     "UP",  # pyupgrade
 ]
+ignore = ["C408", "C901", "B023"]
 
 [build-system]
 requires = ["poetry-core"]

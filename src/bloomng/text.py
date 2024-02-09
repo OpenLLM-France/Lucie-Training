@@ -1,6 +1,7 @@
 import html
-import urllib
 import random
+import urllib
+
 import regex as re
 
 
@@ -52,11 +53,15 @@ def remove_page_numbers(text, verbose=False, pattern=None):
 
     Assumptions:
     - Page numbers increase monotonically
-    - Some page numbers may be missing (or undetected with a simple regex on OCR output). Maximum 7 consecutive missing page numbers.
+    - Some page numbers may be missing
+        (or undetected with a simple regex on OCR output).
+        Maximum 7 consecutive missing page numbers.
     - Starts at page 2
-    - Page numbers occurs at the beginning or at the end of a line (modulo some non-word characters)
-    - Limited number of patterns supported : — 2 —, (2), [2], {2}, 2, ... and the same with a total like — 2/10 —, (2/10)
-
+    - Page numbers occurs at the beginning or at the end of a line
+        (modulo some non-word characters)
+    - Limited number of patterns supported :
+        — 2 —, (2), [2], {2}, 2, ...
+        and the same with a total like — 2/10 —, (2/10)
     """
     max_hole_length = 7
     beam = 5
@@ -74,9 +79,7 @@ def remove_page_numbers(text, verbose=False, pattern=None):
         current_page_string = str(current_page_number)
         if set(current_page_string) > {"1"}:
             current_page_string = current_page_string.replace("1", "[1lIij]")
-        current_pattern = (
-            _pattern_with_number(pattern, current_page_string) if pattern else None
-        )
+        current_pattern = _pattern_with_number(pattern, current_page_string) if pattern else None
         for match in re.finditer(
             rf"(\n[^\n]*\b{current_page_string}(/\d{{2,5}})?\b[^\n\w]*\n)|(\n[^\n\w]*\b{current_page_string}(/\d{{2,5}})?\b[^\n]*\n)",
             text,
@@ -91,14 +94,10 @@ def remove_page_numbers(text, verbose=False, pattern=None):
                 end = start + match.end()
                 start += match.start()
             is_after = min_char_index < start
-            is_not_too_far = start - min_char_index < max_page_length * (
-                current_page_number - last_page_number
-            )
-            # print(start, match.group().strip(), is_after, is_not_too_far)
+            is_not_too_far = start - min_char_index < max_page_length * (current_page_number - last_page_number)
             if pattern is not None or (is_after and is_not_too_far):
                 if not len(candidates):
                     if use_page_length:
-                        # print(f"{current_page_number=} | {avg_length=} | {min_char_index=} | {start-min_char_index=}")
                         min_char_index = min(start, min_char_index + avg_length / 10)
                     else:
                         min_char_index = start
@@ -134,7 +133,6 @@ def remove_page_numbers(text, verbose=False, pattern=None):
     min_char_index = 0
     for matches in all_matches:
         for start, content, end in matches:
-            # print(f"Match {match.group()} at {match.start()} -> {match.start() > min_char_index}")
             if start > min_char_index:
                 min_char_index = end
                 selected_matches.append((start, content, end))
@@ -152,10 +150,7 @@ def remove_page_numbers(text, verbose=False, pattern=None):
 
 
 _page_patterns = (
-    [
-        rf"{re.escape(delimiter)}\s*\d{{1,5}}(/\d{{2,5}})?\s*{re.escape(delimiter)}"
-        for delimiter in ["_", "-", "—"]
-    ]
+    [rf"{re.escape(delimiter)}\s*\d{{1,5}}(/\d{{2,5}})?\s*{re.escape(delimiter)}" for delimiter in ["_", "-", "—"]]
     + [
         rf"{re.escape(delimiter_before)}\s*\d{{1,5}}(/\d{{2,5}})?\s*{re.escape(delimiter_after)}"
         for delimiter_before, delimiter_after in [("(", ")"), ("[", "]"), ("{", "}")]
@@ -173,23 +168,29 @@ def _pattern_with_number(pattern, n):
 
 def clean_wikipedia(text):
     text = plaintext_to_markdown(text)
-    text = re.sub(r"(([^\s\$]*)(\$[_|\^]([^\$]|\{[^\$\}]+\})\$))+([^\s\$]*)", process_supersubscript, text)
+    text = re.sub(
+        r"(([^\s\$]*)(\$[_|\^]([^\$]|\{[^\$\}]+\})\$))+([^\s\$]*)",
+        process_supersubscript,
+        text,
+    )
     return text
 
+
 def process_supersubscript(match):
-    s = "$" + match.group().replace("$","") + "$"
-    if s == "$M^{me}$": return "Mme"
+    s = "$" + match.group().replace("$", "") + "$"
+    if s == "$M^{me}$":
+        return "Mme"
     return s
 
-def plaintext_to_markdown(
-    text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False
-):
+
+def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False):
     """
     Convert plaintext (extracted by dump_wiki_htmp.py) to markdown.
 
     Args:
         text (str): Plaintext
-        website_main (str): Website name (e.g. "wikipedia", "wikisource", "wiktionary") to use as links for headers. Or None if no link is needed.
+        website_main (str): Website name (e.g. "wikipedia", "wikisource", "wiktionary")
+            to use as links for headers. Or None if no link is needed.
         add_toc (bool): Add a Table Of Content section at the beginning of the markdown text.
     Returns:
         (str, str): (Markdown text, url)
@@ -242,7 +243,6 @@ def plaintext_to_markdown(
 
         # Process lists
         if re.match(r"[\*> ]+ ", line):
-
             if re.match(r" + ", line):
                 if new_lines and new_lines[-1].lstrip().startswith("*"):
                     if linebreak_before_list:
@@ -265,7 +265,7 @@ def plaintext_to_markdown(
             was_header = False
 
         # Process tables
-        elif re.match("^\|.*\|\n", line):
+        elif re.match("^\\|.*\\|\n", line):
             if not was_table:
                 # Add header separator
                 num_columns = len(line.split("|")) - 2
@@ -278,20 +278,16 @@ def plaintext_to_markdown(
             was_header = False
 
         else:
-
             # Process headers
             if re.match(r"^\#+ ", line):
                 hashtags, line = line.split(" ", 1)
                 title = line.strip()
-                markdown_subsection = re.sub(
-                    r" +", "-", re.sub(r"[^\w ]", "", title.lower())
-                )
+                markdown_subsection = re.sub(r" +", "-", re.sub(r"[^\w ]", "", title.lower()))
                 url_subsection = urllib.parse.quote(title.replace(" ", "_"))
                 level = len(hashtags)
                 if level > 3:
                     line = f"**{title}**\n"
                 else:
-
                     if level > 1:
                         section_url = f"{url}#{url_subsection}"
                     else:
@@ -334,16 +330,11 @@ def plaintext_to_markdown(
 
                 if linebreak_after_header:
                     line_after = "\n"
-                if (
-                    linebreak_before_header
-                    and not was_header
-                    and not linebreak_between_lines
-                ):
+                if linebreak_before_header and not was_header and not linebreak_between_lines:
                     line_before = "\n"
                 was_header = True
 
             else:
-
                 # Add new lines after simple lines
                 if linebreak_between_lines:
                     line_after = "\n"
@@ -368,18 +359,20 @@ def plaintext_to_markdown(
 
 
 if __name__ == "__main__":
-
-    from data import DataIteratorConcat, DataIteratorParquet, get_datasets
-    import pandas as pd
-    import numpy as np
-    import multiprocessing
-    import tqdm
     import argparse
+    import multiprocessing
     import os
 
+    import numpy as np
     import pandas as pd
     import tqdm
-    from data import DataIteratorConcat, DataIteratorParquet, get_datasets
+
+    from data import (
+        DataIteratorConcat,
+        DataIteratorParquet,
+        DataIteratorWikipedia,
+        get_datasets,
+    )
 
     parser = argparse.ArgumentParser(
         description="Clean raw text data.",
@@ -389,7 +382,6 @@ if __name__ == "__main__":
         "dataset",
         nargs="?",
         default="all",
-        # choices=[ "tok_all", "tok_train", "tok_test", "code", "wikipedia", "claire", "gallica_mono", "gallica_press", "discours", "american_stories", ],
         help="Which dataset to test",
     )
     parser.add_argument(
@@ -422,16 +414,18 @@ if __name__ == "__main__":
             _, data = it
             for d in get_parquet_datasets(data):
                 yield d
-        if isinstance(it, list):
+        elif isinstance(it, list):
             for data in it:
                 for d in get_parquet_datasets(data):
                     yield d
-        if isinstance(it, DataIteratorConcat):
+        elif isinstance(it, DataIteratorConcat):
             for data in it.datasets:
                 for d in get_parquet_datasets(data):
                     yield d
-        if isinstance(it, DataIteratorParquet):
+        elif isinstance(it, (DataIteratorParquet, DataIteratorWikipedia)):
             yield it
+        else:
+            raise NotImplementedError(f"Cannot get parquet files for {type(it)}")
 
     datas = list(get_datasets(args.dataset, force_raw=True))
 
@@ -444,7 +438,6 @@ if __name__ == "__main__":
         name = data.name
         name_slug = re.sub(r"[ :/]", "--", name)
         if postprocess is not None:
-
             for filein in tqdm.tqdm(parquet_files):
                 dirname, basename = os.path.split(filein)
                 fileout = os.path.join(dirname + "_cleaned", basename)
@@ -460,32 +453,24 @@ if __name__ == "__main__":
                     df[key] = df[key].progress_map(postprocess)
                 else:
 
-                    def postprocess(d):
-                        d[key] = d[key].progress_map(data.postprocess)
+                    def do_postprocess(d):
+                        d[key] = d[key].progress_map(postprocess)
                         return d
 
-                    df = df_parallelize(df, postprocess, args.threads)
+                    df = df_parallelize(df, do_postprocess, args.threads)
 
                 if args.folder:
                     examples_after = list(df.iloc[: args.num_samples][key])
-                    folder = os.path.join(
-                        args.folder, "cleaning", os.path.basename(dirname)
-                    )
+                    folder = os.path.join(args.folder, "cleaning", os.path.basename(dirname))
                     os.makedirs(folder, exist_ok=True)
-                    for i, (before, after) in enumerate(
-                        zip(examples_before, examples_after)
-                    ):
+                    for i, (before, after) in enumerate(zip(examples_before, examples_after)):
                         print(
                             before,
-                            file=open(
-                                os.path.join(folder, f"{name_slug}_{i}_A.txt"), "w"
-                            ),
+                            file=open(os.path.join(folder, f"{name_slug}_{i}_A.txt"), "w"),
                         )
                         print(
                             after,
-                            file=open(
-                                os.path.join(folder, f"{name_slug}_{i}_B.txt"), "w"
-                            ),
+                            file=open(os.path.join(folder, f"{name_slug}_{i}_B.txt"), "w"),
                         )
                 os.makedirs(dirname + "_cleaned", exist_ok=True)
                 df.to_parquet(fileout)

@@ -3,13 +3,15 @@
 
 # https://github.com/huggingface/tokenizers/issues/1407#issue-2028070675
 
-import sys
 import re
+import sys
+import tempfile
 
 import tokenizers
 import transformers
+
 from data import tokenizer_dataset
-import tempfile
+
 
 def make_tokenizer(
     byte_fallback=False,
@@ -125,9 +127,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Remove output folder if it already exists",
     )
-    parser.add_argument(
-        "--debug", default=False, action="store_true", help="Debug mode"
-    )
+    parser.add_argument("--debug", default=False, action="store_true", help="Debug mode")
     parser.add_argument(
         "--no_verbose",
         dest="verbose",
@@ -150,17 +150,13 @@ if __name__ == "__main__":
 
     example_sentence = (
         f"   [INST] Coucou [/INST] Hello {eos_piece} [INST] "
-         "Mais en Français, comment est-ce que ça se passera ? 1999, 2000, 2002.2, 1 000 000, 1\u00A0000\u00A0000"
-         "[/INST] Eh bien ␣ alors あ゙"
+        "Mais en Français, comment est-ce que ça se passera ? 1999, 2000, 2002.2, 1 000 000, 1\u00A0000\u00A0000"
+        "[/INST] Eh bien ␣ alors あ゙"
     )
 
     info = {}
     if base_tokenizer is not None:
-        info.update({
-            "example_before": {
-                example_sentence: test_tokenizer(base_tokenizer, example_sentence)
-            }
-        })
+        info.update({"example_before": {example_sentence: test_tokenizer(base_tokenizer, example_sentence)}})
         print(json.dumps(info, indent=2, ensure_ascii=False))
 
     if args.debug:
@@ -170,14 +166,13 @@ if __name__ == "__main__":
             "1999 2000 1999 2000 199 200 en François en Français",
             "<s> zzzzzAAAA",
         ]
+
         def debug_texts_iterator():
-            for s in sentences:
-                yield s
+            yield from sentences
+
         trainset = debug_texts_iterator()
     else:
-        name_dataset, trainset = tokenizer_dataset(
-            train=True, streaming=True
-        )
+        name_dataset, trainset = tokenizer_dataset(train=True, streaming=True)
 
     if not args.output:
         # args.output = f"trained_tokenizer_{args.tokenizer.replace('/', '--')}"
@@ -185,7 +180,8 @@ if __name__ == "__main__":
         if args.debug:
             args.output = "DEBUG_" + args.output
 
-    if args.debug: args.overwrite = True
+    if args.debug:
+        args.overwrite = True
 
     if os.path.exists(args.output):
         if args.overwrite:
@@ -199,16 +195,14 @@ if __name__ == "__main__":
     if args.verbose:
         print("Train tokenizer")
 
-
     tic = time.time()
     if args.use_sentence_piece:
-
         convert_script = "thirdparty_tokenizers/bindings/python/scripts/sentencepiece_extractor.py"
         assert os.path.isfile(convert_script), f"File {convert_script} does not exist"
 
-        with tempfile.NamedTemporaryFile(suffix='.txt') as f:
+        with tempfile.NamedTemporaryFile(suffix=".txt") as f:
             print(f"Writing to {f.name}")
-            
+
             cmd_line = f"""\
 spm_train \
     {f.name} \
@@ -223,7 +217,7 @@ spm_train \
     --max_sentence_length 10000000 \
 """
             for text in trainset:
-                f.write((text+"\n").encode("utf-8"))
+                f.write((text + "\n").encode("utf-8"))
             f.flush()
             print(cmd_line)
             code = os.system(cmd_line)
@@ -236,7 +230,10 @@ spm_train \
             vocab_file2 = f"{args.output}/tokenizer_vocab.json"
             merge_file = f"{args.output}/merges.txt"
 
-            cmd_line = f"{sys.executable} {convert_script} --provider sentencepiece --model {model_file} --vocab-output-path {vocab_file2} --merges-output-path {merge_file}"
+            cmd_line = f"""{sys.executable} {convert_script} \
+                --provider sentencepiece --model {model_file} \
+                --vocab-output-path {vocab_file2} \
+                --merges-output-path {merge_file}"""
             print(cmd_line)
             code = os.system(cmd_line)
             assert code == 0, f"Error code {code} for command {cmd_line}"
@@ -245,9 +242,9 @@ spm_train \
             tokenizer.save_model(args.output)
 
             from transformers import PreTrainedTokenizerFast
+
             tokenizer = PreTrainedTokenizerFast(tokenizer_object=tokenizer)
             tokenizer.save_pretrained(args.output)
-
 
             # from transformers.convert_slow_tokenizer import GPT2Converter
             # converted = GPT2Converter(tokenizer).converted()
@@ -261,11 +258,10 @@ spm_train \
         }
         tokenizer = base_tokenizer.train_new_from_iterator(trainset, **training_kwargs)
         tokenizer.save_pretrained(args.output)
-        
+
     training_time = time.time() - tic
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
-    
 
     # EVALUATION
 
@@ -279,13 +275,7 @@ spm_train \
         }
     )
 
-    info.update(
-        {
-            "example_after": {
-                example_sentence: test_tokenizer(tokenizer, example_sentence)
-            }
-        }
-    )
+    info.update({"example_after": {example_sentence: test_tokenizer(tokenizer, example_sentence)}})
 
     json.dump(
         info,
@@ -300,9 +290,7 @@ spm_train \
     ):
         all_byte_tokens = [
             i
-            for i, t in enumerate(
-                tokenizer.convert_ids_to_tokens(range(tokenizer.vocab_size))
-            )
+            for i, t in enumerate(tokenizer.convert_ids_to_tokens(range(tokenizer.vocab_size)))
             if re.match(r"<0x.*>$", t)
         ]
         total_num_pages = 0
@@ -316,7 +304,8 @@ spm_train \
         tic = time.time()
         if args.debug:
             dataset = debug_texts_iterator()
-            if train is False: break
+            if train is False:
+                break
         else:
             _, dataset = tokenizer_dataset(train=train, streaming=True, debug=args.debug)
         for text in dataset:
@@ -346,8 +335,7 @@ spm_train \
                 f"{subset}_num_tokens_single_byte": total_num_tokens_single_byte,
                 f"{subset}_avg_length_token_char": total_num_chars / total_num_tokens,
                 f"{subset}_avg_length_token_byte": total_num_bytes / total_num_tokens,
-                f"{subset}_avg_byte_kept": total_num_tokens_single_byte
-                / total_num_bytes,
+                f"{subset}_avg_byte_kept": total_num_tokens_single_byte / total_num_bytes,
             }
         )
 
