@@ -96,7 +96,7 @@ def tokenizer_dataset(train=True, streaming=True, debug=False, download_only=Fal
     )
 
 
-def get_datasets(name, **kwargs):
+def get_datasets(name, **kwargs):  # noqa # C901 `...` is too complex
     """
     Iterator that yields one or sevaral datasets
 
@@ -213,7 +213,7 @@ class DataIterator:
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self):  # noqa # C901 `...` is too complex
         self.idx += 1
         if self.max_docs and self.idx > self.max_docs:
             raise StopIteration
@@ -1030,7 +1030,7 @@ if __name__ == "__main__":
         common_prefix = os.path.commonprefix([main, sub])
         return sub[len(common_prefix) :]
 
-    def test_iterator(
+    def test_iterator(  # noqa # C901 `...` is too complex
         it,
         folder=None,
         name="",
