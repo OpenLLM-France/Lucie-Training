@@ -38,6 +38,20 @@ def remove_double_spaces(text):
     return re.sub(r" {2,}", r" ", text)
 
 
+def fix_legi(text):
+    text = text.replace("/n", "\n")
+    text = re.sub(r" *\n *", "\n", text)
+    return remove_double_spaces(text)
+
+
+def fix_legi_and_remove_title(text):
+    text = fix_legi(text)
+    lines = text.split("\n")
+    if len(lines) > 1:
+        return "\n".join(lines[1:])
+    return text
+
+
 def clean_discours(text):
     text = re.sub(r"-? ?\d+ VUES?$", "", text).rstrip()
     text = re.sub(r"[Ss]ource [^\n]$", "", text).rstrip()
@@ -47,7 +61,7 @@ def clean_discours(text):
     return text
 
 
-def remove_page_numbers(text, verbose=False, pattern=None):
+def remove_page_numbers(text, verbose=False, pattern=None):  # noqa # C901 `...` is too complex
     """
     Try to remove page numbers from a plain text version of a PDF.
 
@@ -183,7 +197,7 @@ def process_supersubscript(match):
     return s
 
 
-def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False):
+def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False):  # noqa # C901 `...` is too complex
     """
     Convert plaintext (extracted by dump_wiki_htmp.py) to markdown.
 

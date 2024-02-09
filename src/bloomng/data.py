@@ -12,6 +12,9 @@ import regex as re
 from text import (
     clean_discours,
     clean_wikipedia,
+    fix_legi,
+    fix_legi_and_remove_title,
+    html_unescape,
     remove_useless_lines,
 )
 
@@ -41,13 +44,10 @@ if not DATA_PATH:
 # Custom Iterators
 
 
-def tokenizer_dataset(train=True, streaming=True, debug=False, download_only=False, factor=3):
+def tokenizer_dataset(train=True, streaming=True, debug=False, factor=3):
     """
     Iterator that yields texts to train / test a tokenizer
     """
-
-    if download_only:
-        streaming = False
 
     kwargs = dict(
         streaming=streaming,
@@ -60,43 +60,38 @@ def tokenizer_dataset(train=True, streaming=True, debug=False, download_only=Fal
     )
     kwargs_code = kwargs | dict(
         max_chars_per_language=10 if debug else 25000000,
+        programming_languages=["tex", "python", "c++", "javascript"],
     )
     kwargs_gallica = kwargs | dict(
         max_parquet_files=2,
         max_docs=10 if debug else None,
     )
+    kwargs_persee = kwargs | dict(
+        max_parquet_files=1,
+    )
 
-    wikipedia_fr = DataIteratorWikipedia(language="fr", **kwargs_wikipedia)
-    if download_only:
-        del wikipedia_fr
+    all_data = []
 
-    wikipedia_en = DataIteratorWikipedia(language="en", **kwargs_wikipedia)
-    if download_only:
-        del wikipedia_en
+    all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
 
-    if download_only:
-        return
+    if train:
+        all_data += list(get_datasets("persee", **kwargs_persee))
 
-    code = DataIteratorCode(**kwargs_code)
+        all_data += list(get_datasets("legi", postprocess=fix_legi_and_remove_title, **kwargs))
 
-    gallica = DataIteratorGallicaMono(**kwargs_gallica)
+        all_data += list(get_datasets("europarl", **kwargs))
 
-    if download_only:
-        return
+        all_data += list(get_datasets("gallica_mono", **kwargs_gallica))
+
+        all_data += list(get_datasets("code", **kwargs_code))
+
     return (
-        f"WikipediaFrEn{factor * 500}kpages-Gallica1G-TheStack{25}Mchars",
-        DataIteratorConcat(
-            [
-                gallica,
-                wikipedia_fr,
-                wikipedia_en,
-                code,
-            ]
-        ),
+        f"Wikipedia{factor * 500}kpages-Europarl-Gallica1G-LEGI-Persee-TheStackSelec{25}Mchars",
+        DataIteratorConcat([ds for _, ds in all_data]),
     )
 
 
-def get_datasets(name, **kwargs):  # noqa # C901 `...` is too complex
+def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too complex
     """
     Iterator that yields one or sevaral datasets
 
@@ -108,28 +103,44 @@ def get_datasets(name, **kwargs):  # noqa # C901 `...` is too complex
             - "wikipedia": all Wikipedia datasets
             - "wikipedia_fr": French Wikipedia
             - "american_stories": American Stories
+        use_nc: Use non-commercial datasets
         **kwargs: additional arguments to pass to all dataset iterators
     """
+
+    if isinstance(name, list):
+        for n in name:
+            for ds in get_datasets(n, **kwargs):
+                yield ds
+        return
 
     multilang_corpora = ["wikipedia", "gutenberg", "europarl", "claire"]
 
     name = name.lower()
+
+    if name.startswith("claire"):
+        kwargs["use_nc"] = use_nc
+
     if name == "all":
-        for name in multilang_corpora + [
-            # French
-            "gallica_press",
-            "gallica_mono",
-            "theses",
-            "hal",
-            "persee",  # Non Commercial
-            "open_edition",
-            "discours_publics",
-            "other_fr",
-            # English
-            "american_stories",
-            # Code
-            "code",
-        ]:
+        for name in (
+            multilang_corpora
+            + [
+                # French
+                "gallica_press",
+                "gallica_mono",
+                "theses",
+                "hal",
+                "open_edition",
+                "discours_publics",
+                "other_fr",
+            ]
+            + (["persee"] if use_nc else [])
+            + [
+                # English
+                "american_stories",
+                # Code
+                "code",
+            ]
+        ):
             for ds in get_datasets(name, **kwargs):
                 yield ds
 
@@ -138,6 +149,9 @@ def get_datasets(name, **kwargs):  # noqa # C901 `...` is too complex
             yield tokenizer_dataset(train=True)
         if "train" not in name:
             yield tokenizer_dataset(train=False)
+
+    elif name == "legi":
+        yield ("LEGI", DataIteratorOtherFr(regex_parquet="legi", **kwargs))
 
     elif name in multilang_corpora:
         languages = ["fr", "en"] if (name == "claire") else ["fr", "en", "de", "es"]
@@ -151,7 +165,7 @@ def get_datasets(name, **kwargs):  # noqa # C901 `...` is too complex
             name, language = name.split("_", 1)
             kwargs["language"] = language
         camel_name = "".join([w.capitalize() for w in name.split("_")])
-        class_name = f"DataIterator{camel_name.capitalize()}"
+        class_name = f"DataIterator{camel_name}"
         python_class = globals().get(f"DataIterator{camel_name}", None)
         if not python_class:
             raise RuntimeError(f"Cannot find python class {class_name}")
@@ -263,6 +277,11 @@ class DataIterator:
         if self.max_words:
             self.num_words += len(text.split())
 
+        if not text:
+            # Empty text
+            self.idx -= 1
+            return self.__next__()
+
         return text
 
     def __len__(self):
@@ -346,7 +365,6 @@ class DataIteratorParquet(DataIterator):
             parquet_files = parquet_files[:max_parquet_files]
         logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
         assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
-
         self.parquet_files = parquet_files
 
         DataIterator.__init__(
@@ -362,13 +380,18 @@ class DataIteratorParquet(DataIterator):
 
 
 class DataIteratorParquetSplitted(DataIteratorConcat):
-    def __init__(self, data_path, streaming=True, max_parquet_files=None, **kwargs):
+    def __init__(self, data_path, regex_parquet=None, streaming=True, max_parquet_files=None, **kwargs):
         parquet_files = glob.glob(data_path + "/*parquet")
         if parquet_files and re.match(r"_\d+\.parquet$", parquet_files[0]):
             parquet_files = sorted(parquet_files, key=lambda x: int(x.split(".")[-2].split("_")[-1]))
         if max_parquet_files and max_parquet_files < len(parquet_files):
             parquet_files = parquet_files[:max_parquet_files]
+        if regex_parquet:
+            parquet_files = [f for f in parquet_files if re.search(regex_parquet, f, re.IGNORECASE)]
         assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
+        logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
+        assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
+        self.parquet_files = parquet_files
 
         self.name = kwargs.pop("name", "")
 
@@ -588,7 +611,7 @@ class DataIteratorEuroparl(DataIterator):
 
 
 class DataIteratorClaire(DataIteratorConcat):
-    def __init__(self, language="fr", streaming=True, split=None, only_open=True, **kwargs):
+    def __init__(self, language="fr", streaming=True, split=None, use_nc=False, **kwargs):
         path = DATA_PATH + f"/claire_{language}"
         full_files = glob.glob(path + "/*/full.txt")
         train_files = glob.glob(path + "/*/train.txt")
@@ -622,8 +645,13 @@ class DataIteratorClaire(DataIteratorConcat):
             name = re.split(r"[\-_]", name)[0]
             if name.startswith("Theatre"):
                 name = "Theatre"
-            if only_open and language == "fr" and name not in ["Theatre", "AssembleeNationale", "Senat"]:
-                continue
+            if not use_nc:
+                if language == "fr" and name not in ["Theatre", "AssembleeNationale", "Senat"]:
+                    continue
+                elif language == "en" and not any(
+                    s in name for s in ["AMI", "ICSI", "Charlotte", "Switchboard", "DialogStudio"]
+                ):
+                    continue
             dataset_to_filenames.setdefault(name, []).append(filename)
 
         self.name = name = f"Claire{language.capitalize()}"
@@ -650,34 +678,81 @@ class DataIteratorClaire(DataIteratorConcat):
 # Datasets: French
 
 
+def filter_by_perplexity_func(threshold):
+    return lambda x: len(x["ccnet_perplexity"]) and x["ccnet_perplexity"][0] <= threshold
+
+
 class DataIteratorGallicaMono(DataIteratorParquet):
-    def __init__(self, **kwargs):
+    def __init__(self, filter_by_perplexity=True, **kwargs):
+        folder = os.path.join(
+            DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "gallica_mono_parquet"
+        )
         DataIteratorParquet.__init__(
             self,
-            DATA_PATH + "/gallica_mono_parquet",
+            folder,
             key="complete_text",
             name="GallicaMonographies",
-            # postprocess=clean_pdf_extraction_and_html, # TODO?
+            postprocess=html_unescape,  # clean_pdf_extraction_and_html
+            filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
             **kwargs,
         )
 
 
 class DataIteratorGallicaPress(DataIteratorConcat):
-    def __init__(self, **kwargs):
+    def __init__(self, filter_by_perplexity=True, **kwargs):
         self.name = "GallicaPress"
+        folder = os.path.join(
+            DATA_PATH,
+            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+        )
         DataIteratorConcat.__init__(
             self,
             [
                 DataIteratorParquet(
-                    DATA_PATH + f"/gallica_presse_{source}_parquet",
+                    os.path.join(folder, f"gallica_presse_{source}_parquet"),
                     key="complete_text",
                     name=f"GallicaPress:{source}",
-                    # postprocess=
-                    #     lambda text: clean_pdf_extraction(text, html_escape=True),
+                    postprocess=html_unescape,  # clean_pdf_extraction
+                    filter_fn=filter_by_perplexity_func(690) if filter_by_perplexity else None,
                     **kwargs,
                 )
                 for source in ("html", "txt")
             ],
+        )
+
+
+class DataIteratorHal(DataIteratorParquet):
+    def __init__(self, filter_by_perplexity=True, **kwargs):
+        folder = os.path.join(
+            DATA_PATH,
+            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+            "hal_parquet",
+        )
+        DataIteratorParquet.__init__(
+            self,
+            folder,
+            name="HAL",
+            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+            filter_fn=filter_by_perplexity_func(930) if filter_by_perplexity else None,
+            **kwargs,
+        )
+
+
+class DataIteratorTheses(DataIteratorParquet):
+    def __init__(self, filter_by_perplexity=True, **kwargs):
+        folder = os.path.join(
+            DATA_PATH,
+            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+            "theses_parquet",
+        )
+        DataIteratorParquet.__init__(
+            self,
+            folder,
+            name="Theses",
+            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+            filter_fn=filter_by_perplexity_func(2535) if filter_by_perplexity else None,
+            key="complete_text",
+            **kwargs,
         )
 
 
@@ -692,17 +767,6 @@ class DataIteratorDiscoursPublics(DataIteratorParquet):
         )
 
 
-class DataIteratorHal(DataIteratorParquet):
-    def __init__(self, **kwargs):
-        DataIteratorParquet.__init__(
-            self,
-            DATA_PATH + "/hal_parquet",
-            name="HAL",
-            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
-            **kwargs,
-        )
-
-
 class DataIteratorPersee(DataIteratorParquet):
     def __init__(self, **kwargs):
         DataIteratorParquet.__init__(
@@ -710,19 +774,8 @@ class DataIteratorPersee(DataIteratorParquet):
             DATA_PATH + "/persee_parquet",
             name="Persee",
             key="complete_text",
+            subsample_criteria="file_id",
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
-            **kwargs,
-        )
-
-
-class DataIteratorTheses(DataIteratorParquet):
-    def __init__(self, **kwargs):
-        DataIteratorParquet.__init__(
-            self,
-            DATA_PATH + "/theses_parquet",
-            name="Theses",
-            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
-            key="complete_text",
             **kwargs,
         )
 
@@ -744,7 +797,7 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
             self,
             DATA_PATH + "/other_fr_parquet",
             name="OtherFr",
-            # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
+            postprocess=kwargs.pop("postprocess", fix_legi),
             **kwargs,
         )
 
@@ -848,7 +901,6 @@ class DataIteratorPes2o(DataIteratorConcat):
 ########################################
 # Datasets: Code
 
-
 _programming_languages = [
     "tex",
     "python",
@@ -887,6 +939,7 @@ class DataIteratorCode(DataIteratorConcat):
     def __init__(
         self,
         streaming=True,
+        programming_languages=None,
         max_chars_per_language=None,
         from_huggingface=None,
         **kwargs,
@@ -906,7 +959,9 @@ class DataIteratorCode(DataIteratorConcat):
         metadata = {k.lower(): v for k, v in metadata.items()}
 
         # Check we are not missing one language
-        for lan in _programming_languages:
+        if programming_languages is None:
+            programming_languages = _programming_languages
+        for lan in programming_languages:
             assert lan in metadata.keys(), f"Missing language {lan} in metadata file {list(metadata.keys())}"
 
         dataset_name = "bigcode/the-stack-dedup" if from_huggingface else "parquet"
@@ -915,11 +970,12 @@ class DataIteratorCode(DataIteratorConcat):
             self,
             list(
                 self.yield_datasets(
-                    metadata,
-                    from_huggingface,
-                    dataset_name,
-                    streaming,
-                    max_chars_per_language,
+                    programming_languages,
+                    metadata=metadata,
+                    from_huggingface=from_huggingface,
+                    dataset_name=dataset_name,
+                    streaming=streaming,
+                    max_chars_per_language=max_chars_per_language,
                     **kwargs,
                 )
             ),
@@ -927,9 +983,10 @@ class DataIteratorCode(DataIteratorConcat):
 
     def yield_datasets(
         self,
+        programming_languages,
         **kwargs,
     ):
-        for lan in _programming_languages:
+        for lan in programming_languages:
             ds = self._get_subset(lan, **kwargs)
             if ds is not None:
                 yield ds
@@ -1019,7 +1076,7 @@ if __name__ == "__main__":
         "--only_dump_examples",
         action="store_true",
         default=False,
-        help="To only dump some examples",
+        help="Only dump some examples",
     )
     args = parser.parse_args()
 
