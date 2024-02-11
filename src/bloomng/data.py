@@ -44,7 +44,15 @@ if not DATA_PATH:
 # Custom Iterators
 
 
-def tokenizer_dataset(train=True, streaming=True, debug=False, factor=3):
+def tokenizer_dataset(
+    train=True,
+    use_persee=True,
+    use_legi=True,
+    use_europarl=True,
+    streaming=True,
+    debug=False,
+    factor=3,
+):
     """
     Iterator that yields texts to train / test a tokenizer
     """
@@ -68,27 +76,38 @@ def tokenizer_dataset(train=True, streaming=True, debug=False, factor=3):
     )
     kwargs_persee = kwargs | dict(
         max_parquet_files=1,
+        offset_parquet_files=0 if train else 1,
     )
 
     all_data = []
+    nickname = ""
 
     all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
+    nickname += f"Wikipedia{factor * 500}kpages"
 
-    if train:
+    if use_persee:
         all_data += list(get_datasets("persee", **kwargs_persee))
+        nickname += "-Persee"
 
+    if use_legi:
         all_data += list(get_datasets("legi", postprocess=fix_legi_and_remove_title, **kwargs))
+        nickname += "-LEGI"
 
+    if use_europarl:
         all_data += list(get_datasets("europarl", **kwargs))
+        nickname += "-Europarl"
 
-        all_data += list(get_datasets("gallica_mono", **kwargs_gallica))
+    all_data += list(get_datasets("gallica_mono", **kwargs_gallica))
+    nickname += "-GallicaMono"
 
-        all_data += list(get_datasets("code", **kwargs_code))
+    all_data += list(get_datasets("code", **kwargs_code))
+    nickname += "-Code"
 
-    return (
-        f"Wikipedia{factor * 500}kpages-Europarl-Gallica1G-LEGI-Persee-TheStackSelec{25}Mchars",
-        DataIteratorConcat([ds for _, ds in all_data]),
-    )
+    dataset = DataIteratorConcat(all_data)
+    print(f"{'Train' if train else 'Evaluate'} on: {dataset.name}")
+    dataset.name = nickname
+
+    return dataset
 
 
 def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too complex
@@ -151,13 +170,17 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             yield tokenizer_dataset(train=False)
 
     elif name == "legi":
-        yield ("LEGI", DataIteratorOtherFr(regex_parquet="legi", **kwargs))
+        DataIteratorOtherFr(regex_parquet="legi", **kwargs)
 
     elif name in multilang_corpora:
         languages = ["fr", "en"] if (name == "claire") else ["fr", "en", "de", "es"]
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
                 yield ds
+            # yield DataIteratorConcat(
+            #     list(get_datasets(f"{name}_{language}", **kwargs)),
+            #     name=name.capitalize(),
+            # )
 
     else:
         has_language = any(name.startswith(c + "_") for c in multilang_corpora)
@@ -169,14 +192,46 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         python_class = globals().get(f"DataIterator{camel_name}", None)
         if not python_class:
             raise RuntimeError(f"Cannot find python class {class_name}")
-        yield (camel_name, python_class(**kwargs))
+        yield python_class(**kwargs)
+
+
+def decompose_datasets(datasets, parquet_level=False):
+    if isinstance(datasets, list):
+        for d in datasets:
+            for ds in decompose_datasets(d, parquet_level):
+                yield ds
+    elif isinstance(datasets, DataIteratorConcat):
+        for d in datasets.datasets:
+            for ds in decompose_datasets(d, parquet_level):
+                yield ds
+    elif isinstance(datasets, DataIterator):
+        if parquet_level:
+            raise NotImplementedError("Parquet level not implemented")
+        yield datasets
+    else:
+        raise ValueError(f"Unknown type {type(datasets)}")
 
 
 ########################################
 # Base dataset iterator classes
 
 
-class DataIterator:
+class DataIteratorBase:
+    def __init__(self, name):
+        assert name, "Name cannot be empty"
+        self.name = name
+
+    def __iter__(self):
+        return self
+
+    def __len__(self):
+        raise NotImplementedError
+
+    def __next__(self):
+        raise NotImplementedError
+
+
+class DataIterator(DataIteratorBase):
     def __init__(
         self,
         dataset,
@@ -214,15 +269,33 @@ class DataIterator:
         self.max_words = max_words
         self.subsample_rate = subsample_rate
         self.subsample_criteria = subsample_criteria
+        if not self.subsample_criteria:
+            # Fallback to text
+            self.subsample_criteria = key
         self.subsample_invert = subsample_invert
         self.postprocess = postprocess
         self.filter_fn = filter_fn
 
         self.random_generator = random.Random(42)
         self.idx = 0
-        self.name = name
         self.num_chars = 0
         self.num_words = 0
+
+        suffix = ""
+        if max_docs:
+            suffix += f"-{max_docs}docs"
+        if max_words:
+            suffix += f"-{max_words}words"
+        if max_chars:
+            suffix += f"-{max_chars}chars"
+        if subsample_rate and subsample_rate < 1:
+            suffix += f"-ssample{subsample_rate}"
+            if subsample_invert:
+                suffix += "inv"
+        if suffix:
+            name += ":" + suffix.strip("-")
+
+        DataIteratorBase.__init__(self, name)
 
     def __iter__(self):
         return self
@@ -313,10 +386,13 @@ def string_to_random01(x):
     return normalized_value
 
 
-class DataIteratorConcat:
-    def __init__(self, datasets):
+class DataIteratorConcat(DataIteratorBase):
+    def __init__(self, datasets, name=None):
         self.datasets = datasets
         self.idx = 0
+        if name is None:
+            name = "+".join(d.name for d in datasets)
+        DataIteratorBase.__init__(self, name)
 
     def __iter__(self):
         return self
@@ -346,6 +422,7 @@ class DataIteratorParquet(DataIterator):
         self,
         data_path,
         streaming=True,
+        offset_parquet_files=0,
         max_parquet_files=None,
         force_raw=False,
         **kwargs,
@@ -362,10 +439,18 @@ class DataIteratorParquet(DataIterator):
         if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
             parquet_files = sorted(parquet_files, key=lambda x: int(x.split(".")[-2].split("_")[-1]))
         if max_parquet_files and max_parquet_files < len(parquet_files):
-            parquet_files = parquet_files[:max_parquet_files]
+            parquet_files = parquet_files[offset_parquet_files : max_parquet_files + offset_parquet_files]
+        elif offset_parquet_files:
+            parquet_files = parquet_files[offset_parquet_files:]
         logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
         assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
         self.parquet_files = parquet_files
+
+        name = kwargs.pop("name", "")
+        if offset_parquet_files or max_parquet_files:
+            if not max_parquet_files:
+                max_parquet_files = len(parquet_files) - offset_parquet_files
+            name += f":{offset_parquet_files}-{max_parquet_files+offset_parquet_files}parquet"
 
         DataIterator.__init__(
             self,
@@ -375,6 +460,7 @@ class DataIteratorParquet(DataIterator):
                 streaming=streaming,
                 split="train",
             ),
+            name=name,
             **kwargs,
         )
 
@@ -393,8 +479,7 @@ class DataIteratorParquetSplitted(DataIteratorConcat):
         assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
         self.parquet_files = parquet_files
 
-        self.name = kwargs.pop("name", "")
-
+        name = kwargs.pop("name", "")
         DataIteratorConcat.__init__(
             self,
             [
@@ -405,11 +490,12 @@ class DataIteratorParquetSplitted(DataIteratorConcat):
                         streaming=streaming,
                         split="train",
                     ),
-                    name=f"{self.name}:{os.path.splitext(os.path.basename(parquet_file))[0]}",
+                    name=f"{name}:{os.path.splitext(os.path.basename(parquet_file))[0]}",
                     **kwargs,
                 )
                 for parquet_file in parquet_files
             ],
+            name=name,
         )
 
 
@@ -421,7 +507,7 @@ class DataIteratorWikipedia(DataIterator):
     def __init__(self, language="fr", streaming=True, from_huggingface=None, force_raw=False, **kwargs):
         version = "20240201"
         repo = f"OpenLLM-France/wikipedia.{language}"
-        name = f"{os.path.basename(repo)}/{version}"
+        name = f"Wikipedia:{language}"
 
         if force_raw:
             from_huggingface = False
@@ -468,7 +554,7 @@ class DataIteratorGutenberg(DataIteratorParquet):
         current_year=2024,
         **kwargs,
     ):
-        name = f"Gutenberg.{language}"
+        name = f"Gutenberg:{language}"
         thr = 80 if language == "fr" else 70
         if filter_legal:
             name += f".{thr}"
@@ -602,10 +688,11 @@ class DataIteratorEuroparl(DataIterator):
                 sample_by="paragraph",
             )
 
+        name = f"Europarl:{language}"
         DataIterator.__init__(
             self,
             datasets.load_dataset(repo, streaming=streaming, split="train", **kwargs_dataset),
-            name=f"Europarl{language.capitalize()}",
+            name=name,
             **kwargs,
         )
 
@@ -654,7 +741,7 @@ class DataIteratorClaire(DataIteratorConcat):
                     continue
             dataset_to_filenames.setdefault(name, []).append(filename)
 
-        self.name = name = f"Claire{language.capitalize()}"
+        name = f"Claire:{language.lower()}"
         DataIteratorConcat.__init__(
             self,
             [
@@ -666,11 +753,12 @@ class DataIteratorClaire(DataIteratorConcat):
                         sample_by="paragraph",
                         split="train",
                     ),
-                    name=f"Claire{language.capitalize()}:{name}" + (f":{split}" if split else ""),
+                    name=f"{name}:{subname}" + (f":{split}" if split else ""),
                     **kwargs,
                 )
-                for name, filenames in dataset_to_filenames.items()
+                for subname, filenames in dataset_to_filenames.items()
             ],
+            name=name,
         )
 
 
@@ -700,7 +788,6 @@ class DataIteratorGallicaMono(DataIteratorParquet):
 
 class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, filter_by_perplexity=True, **kwargs):
-        self.name = "GallicaPress"
         folder = os.path.join(
             DATA_PATH,
             "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
@@ -718,6 +805,7 @@ class DataIteratorGallicaPress(DataIteratorConcat):
                 )
                 for source in ("html", "txt")
             ],
+            name="GallicaPress",
         )
 
 
@@ -792,11 +880,11 @@ class DataIteratorOpenEdition(DataIteratorParquet):
 
 
 class DataIteratorOtherFr(DataIteratorParquetSplitted):
-    def __init__(self, **kwargs):
+    def __init__(self, regex_parquet=None, **kwargs):
         DataIteratorParquetSplitted.__init__(
             self,
             DATA_PATH + "/other_fr_parquet",
-            name="OtherFr",
+            name="OtherFr" if not regex_parquet else regex_parquet,
             postprocess=kwargs.pop("postprocess", fix_legi),
             **kwargs,
         )
@@ -808,14 +896,12 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
 
 class DataIteratorAmericanStories(DataIteratorConcat):
     def __init__(self, streaming=True, from_huggingface=None, **kwargs):
-        self.name = "AmericanStories"
-
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/americanstories")
             logger.info(
-                f"Using HuggingFace version for {self.name}"
+                "Using HuggingFace version for AmericanStories"
                 if from_huggingface
-                else f"Using local version for {self.name}"
+                else "Using local version for AmericanStories"
             )
 
         key = "article"
@@ -857,6 +943,7 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                 )
                 for year in datas.keys()
             ],
+            name="AmericanStories",
         )
 
 
@@ -877,7 +964,6 @@ class DataIteratorPes2o(DataIteratorConcat):
         else:
             filter_fns = {"": None}
 
-        self.name = "Pes2o"
         DataIteratorConcat.__init__(
             self,
             [
@@ -895,6 +981,7 @@ class DataIteratorPes2o(DataIteratorConcat):
                 for split in splits
                 for subset_name, filter_fn in filter_fns.items()
             ],
+            name="Pes2o",
         )
 
 
@@ -944,14 +1031,12 @@ class DataIteratorCode(DataIteratorConcat):
         from_huggingface=None,
         **kwargs,
     ):
-        self.name = "TheStack"
-
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/the-stack-dedup")
             logger.info(
-                f"Using HuggingFace version for {self.name}"
+                "Using HuggingFace version for the-stack-dedup"
                 if from_huggingface
-                else f"Using local version for {self.name}"
+                else "Using local version for the-stack-dedup"
             )
 
         metadata = json.load(open(_the_stack_metadata_file, encoding="utf8"))
@@ -979,6 +1064,7 @@ class DataIteratorCode(DataIteratorConcat):
                     **kwargs,
                 )
             ),
+            name="TheStack",
         )
 
     def yield_datasets(
@@ -1158,75 +1244,81 @@ if __name__ == "__main__":
                 global_stats[k] = 0
             global_stats[k] += v
 
-    for dataset in args.dataset:
-        for name, it in get_datasets(dataset):
-            num_examples = args.num_examples
-            if hasattr(it, "name"):
-                name = it.name
-            name_slug = simple_slugify(name)
-            main_prefix_example_files = None
-            main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
-            if main_stat_filename and os.path.isfile(main_stat_filename) and args.only_dump_examples:
-                stats = json.load(open(main_stat_filename, encoding="utf8"))
-                num_billion_words = stats["num words"] / 1_000_000_000
-                main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
-            # elif args.only_dump_examples:
-            #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
+    all_datasets = [get_datasets(name) for name in args.dataset]
+    all_datasets = [it for sublist in all_datasets for it in sublist]
 
-            if isinstance(it, DataIteratorConcat):
-                its = it.datasets
-                global_stats = {}
+    # Early checks to avoid failure in the middle
+    for it in all_datasets:
+        assert isinstance(it, DataIteratorBase), f"Invalid iterator {it}"
+        assert it.name, f"Missing name for {it}"
+
+    for it in all_datasets:
+        num_examples = args.num_examples
+        name = it.name
+        name_slug = simple_slugify(name)
+        main_prefix_example_files = None
+        main_stat_filename = os.path.join(args.folder, f"stats_{name_slug}.json") if args.folder else None
+        if main_stat_filename and os.path.isfile(main_stat_filename) and args.only_dump_examples:
+            stats = json.load(open(main_stat_filename, encoding="utf8"))
+            num_billion_words = stats["num words"] / 1_000_000_000
+            main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
+        # elif args.only_dump_examples:
+        #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
+
+        if isinstance(it, DataIteratorConcat):
+            its = it.datasets
+            global_stats = {}
+        else:
+            it.name = name
+            its = [it]
+            global_stats = None
+
+        max_num_examples_per_subset = num_examples  # / len(its)
+        for subset in its:
+            subname = subset.name
+            num_examples = int(max_num_examples_per_subset) + (
+                1 if random.random() < (max_num_examples_per_subset % 1) else 0
+            )
+            if num_examples == 0 and any(s in subname for s in ("tex", "python")):
+                num_examples = 2
+            if "other" in name.lower():
+                num_examples = args.num_examples
+            if num_examples == 0 and args.only_dump_examples:
+                continue
+            print(f"* {subname}")
+            if main_prefix_example_files:
+                suffix = remove_common_prefix(name_slug, simple_slugify(subname))
+                prefix_example_files = f"{main_prefix_example_files}{suffix}"
             else:
-                it.name = name
-                its = [it]
-                global_stats = None
-
-            max_num_examples_per_subset = num_examples / len(its)
-            for subset in its:
-                subname = subset.name
-                num_examples = int(max_num_examples_per_subset) + (
-                    1 if random.random() < (max_num_examples_per_subset % 1) else 0
-                )
-                if num_examples == 0 and any(s in subname for s in ("tex", "python")):
-                    num_examples = 2
-                if "other" in name.lower():
-                    num_examples = args.num_examples
-                if num_examples == 0 and args.only_dump_examples:
-                    continue
-                print(f"* {subname}")
-                if main_prefix_example_files:
-                    suffix = remove_common_prefix(name_slug, simple_slugify(subname))
-                    prefix_example_files = f"{main_prefix_example_files}{suffix}"
-                else:
-                    prefix_example_files = None
-                stats = test_iterator(
-                    subset,
-                    folder=args.folder,
-                    name=subname,
-                    ignore_if_exists=args.ignore_if_exists,
-                    num_examples=num_examples,
-                    only_dump_examples=args.only_dump_examples,
-                    prefix_example_files=prefix_example_files,
-                )
-                if args.only_dump_examples:
-                    continue
-                print(json.dumps(stats, indent=4))
-
-                if global_stats is not None:
-                    update_stats(global_stats, stats)
-
+                prefix_example_files = None
+            stats = test_iterator(
+                subset,
+                folder=args.folder,
+                name=subname,
+                ignore_if_exists=args.ignore_if_exists,
+                num_examples=num_examples,
+                only_dump_examples=args.only_dump_examples,
+                prefix_example_files=prefix_example_files,
+            )
             if args.only_dump_examples:
                 continue
+            print(json.dumps(stats, indent=4))
 
             if global_stats is not None:
-                print(f"* {name}")
-                print(json.dumps(global_stats, indent=4))
-                if args.folder:
-                    json.dump(
-                        global_stats,
-                        open(main_stat_filename, "w", encoding="utf8"),
-                        indent=2,
-                        ensure_ascii=False,
-                    )
+                update_stats(global_stats, stats)
+
+        if args.only_dump_examples:
+            continue
+
+        if global_stats is not None:
+            print(f"* {name}")
+            print(json.dumps(global_stats, indent=4))
+            if args.folder:
+                json.dump(
+                    global_stats,
+                    open(main_stat_filename, "w", encoding="utf8"),
+                    indent=2,
+                    ensure_ascii=False,
+                )
 
     print_gutenberg_stats()

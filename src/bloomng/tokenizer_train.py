@@ -3,7 +3,6 @@
 
 # https://github.com/huggingface/tokenizers/issues/1407#issue-2028070675
 
-import re
 import sys
 import tempfile
 
@@ -26,9 +25,9 @@ def make_tokenizer(
 
     else:
         # name = "tiiuae/falcon-7b"
-        name = "gpt2"
+        name = "gpt2"  # same as "allenai/OLMo-1B" without <|padding|> token
         # name = "meta-llama/Llama-2-7b-hf"
-        base_tokenizer = transformers.AutoTokenizer.from_pretrained(name)
+        base_tokenizer = transformers.AutoTokenizer.from_pretrained(name, trust_remote_code=True)
         base_tokenizer.add_special_tokens({"bos_token": "<|startoftext|>"})
 
     # EOS / BOS
@@ -58,7 +57,22 @@ def make_tokenizer(
 
     assert hasattr(base_tokenizer._tokenizer, "post_processor")
 
+    base_tokenizer = set_infinite_length(base_tokenizer)
+
     return name.replace("/", "--"), base_tokenizer
+
+
+def set_infinite_length(tokenizer):
+    tokenizer.model_max_length = 10**30
+    tokenizer.max_model_input_sizes = {}
+    tokenizer.set_truncation_and_padding(
+        transformers.tokenization_utils_fast.PaddingStrategy.DO_NOT_PAD,
+        transformers.tokenization_utils_fast.TruncationStrategy.DO_NOT_TRUNCATE,
+        10**30,
+        1,
+        1,
+    )
+    return tokenizer
 
 
 def test_tokenizer(tokenizer, sentence):
@@ -98,16 +112,19 @@ if __name__ == "__main__":
     # """
     #     )
     parser.add_argument(
-        "--use_sentence_piece",
-        default=False,
-        action="store_true",
-        help="To use sentence piece (spm_train)",
-    )
-    parser.add_argument(
         "--vocab_size",
         type=int,
         default=32000,
         help="Size of output vocabulary",
+    )
+    parser.add_argument("--no_persee", dest="persee", action="store_false", default=True, help="Don't use Persee")
+    parser.add_argument("--no_legi", dest="legi", action="store_false", default=True, help="Don't use LEGI")
+    parser.add_argument("--no_europarl", dest="europarl", action="store_false", default=True, help="Don't use Europarl")
+    parser.add_argument(
+        "--use_sentence_piece",
+        default=False,
+        action="store_true",
+        help="To use sentence piece (spm_train)",
     )
     parser.add_argument(
         "--byte_fallback",
@@ -172,7 +189,14 @@ if __name__ == "__main__":
 
         trainset = debug_texts_iterator()
     else:
-        name_dataset, trainset = tokenizer_dataset(train=True, streaming=True)
+        trainset = tokenizer_dataset(
+            train=True,
+            streaming=True,
+            use_persee=args.persee,
+            use_legi=args.legi,
+            use_europarl=args.europarl,
+        )
+        name_dataset = trainset.name
 
     if not args.output:
         # args.output = f"trained_tokenizer_{args.tokenizer.replace('/', '--')}"
@@ -183,14 +207,23 @@ if __name__ == "__main__":
     if args.debug:
         args.overwrite = True
 
+    print("Output folder:", args.output)
     if os.path.exists(args.output):
         if args.overwrite:
             shutil.rmtree(args.output)
         else:
-            print(f"WARNING: Output folder already exists, aborting: {args.output}")
+            print("WARNING: Output folder already exists, aborting")
             exit(1)
-
     os.makedirs(args.output)
+
+    # Compute and dump training stats in parallel
+    os.system(
+        f"""\
+{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/data.py \
+    tok_train \
+    --folder {args.output}/stats_training >/dev/null 2>/dev/null &
+"""
+    )
 
     if args.verbose:
         print("Train tokenizer")
@@ -254,9 +287,25 @@ spm_train \
             "vocab_size": args.vocab_size,
             "min_frequency": 0,
             "show_progress": True,
+            # "max_token_length": 10**19,
             # initial_alphabet=["▁[", "]"],
         }
+
+        print("Adding individual digits preproc")
+
+        def set_individual_digits(tokenizer):
+            tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(
+                [
+                    tokenizers.pre_tokenizers.Digits(individual_digits=True),
+                    tokenizer.pre_tokenizer,
+                ]
+            )
+            return tokenizer
+
+        training_kwargs["configure_tokenizer"] = set_individual_digits
+
         tokenizer = base_tokenizer.train_new_from_iterator(trainset, **training_kwargs)
+        tokenizer = set_infinite_length(tokenizer)
         tokenizer.save_pretrained(args.output)
 
     training_time = time.time() - tic
@@ -284,64 +333,9 @@ spm_train \
         ensure_ascii=False,
     )
 
-    for train in (
-        True,
-        False,
-    ):
-        all_byte_tokens = [
-            i
-            for i, t in enumerate(tokenizer.convert_ids_to_tokens(range(tokenizer.vocab_size)))
-            if re.match(r"<0x.*>$", t)
-        ]
-        total_num_pages = 0
-        total_num_paragraph = 0
-        total_num_lines = 0
-        total_num_words = 0
-        total_num_chars = 0
-        total_num_bytes = 0
-        total_num_tokens = 0
-        total_num_tokens_single_byte = 0
-        tic = time.time()
-        if args.debug:
-            dataset = debug_texts_iterator()
-            if train is False:
-                break
-        else:
-            _, dataset = tokenizer_dataset(train=train, streaming=True, debug=args.debug)
-        for text in dataset:
-            total_num_pages += 1
-            total_num_paragraph += len(text.split("\n\n"))
-            total_num_lines += len(text.split("\n"))
-            total_num_words += len(text.split())
-            total_num_chars += len(text)
-            total_num_bytes += len(bytes(text, "utf-8"))
-            tokens = tokenizer.encode(text)
-            byte_tokens = [t for t in tokens if t in all_byte_tokens]
-            total_num_tokens += len(tokens)
-            total_num_tokens_single_byte += len(byte_tokens)
-        toc = time.time()
-
-        subset = "train" if train else "eval"
-        info.update(
-            {
-                f"{subset}_tokenization_time": toc - tic,
-                f"{subset}_num_pages": total_num_pages,
-                f"{subset}_num_paragraph": total_num_paragraph,
-                f"{subset}_num_lines": total_num_lines,
-                f"{subset}_num_words": total_num_words,
-                f"{subset}_num_chars": total_num_chars,
-                f"{subset}_num_bytes": total_num_bytes,
-                f"{subset}_num_tokens": total_num_tokens,
-                f"{subset}_num_tokens_single_byte": total_num_tokens_single_byte,
-                f"{subset}_avg_length_token_char": total_num_chars / total_num_tokens,
-                f"{subset}_avg_length_token_byte": total_num_bytes / total_num_tokens,
-                f"{subset}_avg_byte_kept": total_num_tokens_single_byte / total_num_bytes,
-            }
-        )
-
-        json.dump(
-            info,
-            open(f"{args.output}/training_info.json", "w", encoding="utf8"),
-            indent=2,
-            ensure_ascii=False,
-        )
+    json.dump(
+        info,
+        open(f"{args.output}/training_info.json", "w", encoding="utf8"),
+        indent=2,
+        ensure_ascii=False,
+    )

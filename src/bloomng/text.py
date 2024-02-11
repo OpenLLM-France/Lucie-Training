@@ -424,11 +424,7 @@ if __name__ == "__main__":
         return data
 
     def get_parquet_datasets(it):
-        if isinstance(it, tuple) and len(it) == 2:
-            _, data = it
-            for d in get_parquet_datasets(data):
-                yield d
-        elif isinstance(it, list):
+        if isinstance(it, list):
             for data in it:
                 for d in get_parquet_datasets(data):
                     yield d
