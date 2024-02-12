@@ -61,6 +61,7 @@ def tokenizer_dataset(
         streaming=streaming,
         subsample_rate=0.5,
         subsample_invert=not train,
+        max_docs=10 if debug else None,
     )
 
     kwargs_wikipedia = kwargs | dict(
@@ -72,11 +73,13 @@ def tokenizer_dataset(
     )
     kwargs_gallica = kwargs | dict(
         max_parquet_files=2,
-        max_docs=10 if debug else None,
     )
     kwargs_persee = kwargs | dict(
         max_parquet_files=1,
         offset_parquet_files=0 if train else 1,
+    )
+    kwargs_gutenberg = kwargs | dict(
+        max_parquet_files=4,
     )
 
     all_data = []
@@ -84,6 +87,11 @@ def tokenizer_dataset(
 
     all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
     nickname += f"Wikipedia{factor * 500}kpages"
+
+    if not train:
+        all_data += list(get_datasets("gutenberg", **kwargs_gutenberg))
+        nickname += "-Gutenberg"
+        nickname = "TEST-" + nickname
 
     if use_persee:
         all_data += list(get_datasets("persee", **kwargs_persee))
@@ -300,6 +308,15 @@ class DataIterator(DataIteratorBase):
     def __iter__(self):
         return self
 
+    def _get_next(self):
+        try:
+            return next(self.dataset_iter)
+        except TypeError as err:
+            # Sometimes this can occur because of empty transcription:
+            # TypeError: Couldn't cast array of type binary to null
+            warnings.warn(f"Got an exception {err}", stacklevel=2)
+            return self._get_next()
+
     def __next__(self):  # noqa # C901 `...` is too complex
         self.idx += 1
         if self.max_docs and self.idx > self.max_docs:
@@ -309,12 +326,12 @@ class DataIterator(DataIteratorBase):
         if self.max_words and self.num_words >= self.max_words:
             raise StopIteration
 
-        data = next(self.dataset_iter)
+        data = self._get_next()
 
         if self.filter_fn:
             while not self.filter_fn(data):
                 # Skip this example
-                data = next(self.dataset_iter)
+                data = self._get_next()
 
         # Subsampling
         if self.subsample_rate and self.subsample_rate < 1:
@@ -325,11 +342,11 @@ class DataIterator(DataIteratorBase):
                 r = string_to_random01(criterion)
             while (r <= self.subsample_rate) if self.subsample_invert else (r > self.subsample_rate):
                 # Skip this example
-                data = next(self.dataset_iter)
+                data = self._get_next()
                 if self.filter_fn:
                     while not self.filter_fn(data):
                         # Skip this example
-                        data = next(self.dataset_iter)
+                        data = self._get_next()
                 if self.subsample_criteria is None:
                     r = self.random_generator.random()
                 else:
@@ -886,6 +903,7 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
             DATA_PATH + "/other_fr_parquet",
             name="OtherFr" if not regex_parquet else regex_parquet,
             postprocess=kwargs.pop("postprocess", fix_legi),
+            regex_parquet=regex_parquet,
             **kwargs,
         )
 
@@ -1191,6 +1209,7 @@ if __name__ == "__main__":
             if os.path.isfile(stat_filename):
                 stats = json.load(open(stat_filename, encoding="utf8"))
                 if ignore_if_exists and not only_dump_examples:
+                    print(f"Skipping {name_slug} (already computed)")
                     return stats
                 num_billion_words = stats["num words"] / 1_000_000_000
                 to_insert = f"{num_billion_words:06.3f}B"
@@ -1198,6 +1217,7 @@ if __name__ == "__main__":
                     prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
                 else:
                     prefix_example_files += "--" + to_insert
+        print(f"Computing stats for {name_slug}...")
         tic = time.time()
         i_page = -1
         num_words = 0

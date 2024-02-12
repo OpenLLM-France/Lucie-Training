@@ -41,7 +41,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--batch_size",
-        default=None,
+        default=1,
         type=int,
         help="Batch size",
     )
@@ -67,6 +67,10 @@ if __name__ == "__main__":
             offset = len(tokenizer.all_special_tokens)
             all_byte_tokens = list(range(offset, offset + 256))
 
+        if not os.path.exists(args.tokenizer):
+            os.makedirs(args.tokenizer, exist_ok=True)
+            tokenizer.save_pretrained(args.tokenizer)
+
     else:
         raise NotImplementedError("Only transformers backend is supported for now.")
 
@@ -89,7 +93,9 @@ if __name__ == "__main__":
     ):
         name = dataset.name
         if name in already_computed:
+            print(f"Skipping eval of {args.tokenizer} on {name} (already computed)")
             continue
+        print(f"Evaluate {args.tokenizer} on {name}...")
         total_num_pages = 0
         total_num_paragraph = 0
         total_num_lines = 0
