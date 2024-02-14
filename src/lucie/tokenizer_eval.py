@@ -7,9 +7,8 @@ import re
 
 import pandas as pd
 import transformers
-from tokenizer_train import set_infinite_length
-
 from data import decompose_datasets, tokenizer_dataset
+from tokenizer_train import set_infinite_length
 
 if __name__ == "__main__":
     import argparse

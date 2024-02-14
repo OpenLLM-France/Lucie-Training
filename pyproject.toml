@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "bloom-ng-training"
+name = "lucie-training"
 version = "0.1.0"
 description = ""
 authors = ["Julien Tourille <julien.tourille@cea.fr>"]
 license = "GPL-3.0"
 readme = "README.md"
 packages = [
-    { include = "bloomng", from = "src"},
+    { include = "lucie", from = "src"},
 ]
 
 
