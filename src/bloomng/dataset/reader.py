@@ -87,6 +87,8 @@ class LucieDataloader:
         Length of the DataLoader (used by Lightning)
     batch_size: int, default=1
         Batch size
+    pad_token_id: int, default=0
+        Padding token ID
 
     The dataset config file is a json file formatted as follows:
 
