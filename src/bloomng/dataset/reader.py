@@ -5,6 +5,7 @@ import random
 import h5py
 import numpy as np
 import torch
+from loguru import logger
 
 
 class DomainDataset:
@@ -54,6 +55,7 @@ class DomainDataset:
         self.dataset = h5py.File(self.filenames[self.dataset_idx % len(self.filenames)], "r")
         self.dataset_len = len(self.dataset["input_ids"])
         self.dataset_idx += 1
+        self.dataset_offset = 0
 
     def get_batch(self, batch_size: int = 1) -> torch.Tensor:
         """
@@ -63,16 +65,41 @@ class DomainDataset:
             Size of the batch
         """
         if self.dataset is None:
+            logger.debug("No dataset file is open, opening one")
             self.open_dataset_file()
 
         if self.dataset_offset + batch_size > self.dataset_len:
+            logger.debug("Current file has not enough data to fill the batch")
+            logger.debug("Taking remaining data and opening next file")
+
+            remaining_batch = torch.from_numpy(
+                self.dataset["input_ids"][self.dataset_offset : self.dataset_len].astype(np.int64)
+            )
+
+            logger.debug(f"Remaining batch size: {remaining_batch.size(0)}")
+
             self.open_dataset_file()
 
-        batch = torch.from_numpy(
-            self.dataset["input_ids"][self.dataset_offset : self.dataset_offset + batch_size].astype(np.int64)
-        )
+            current_batch_size = remaining_batch.size(0)
+            next_batch_size = batch_size - current_batch_size
 
-        self.dataset_offset += batch_size
+            new_batch = torch.from_numpy(
+                self.dataset["input_ids"][self.dataset_offset : next_batch_size].astype(np.int64)
+            )
+
+            logger.debug(f"Next file batch size: {new_batch.size(0)}")
+
+            self.dataset_offset += next_batch_size
+
+            batch = torch.cat([remaining_batch, new_batch], dim=0)
+            logger.debug(f"Final batch size: {batch.size(0)}")
+
+        else:
+            batch = torch.from_numpy(
+                self.dataset["input_ids"][self.dataset_offset : self.dataset_offset + batch_size].astype(np.int64)
+            )
+
+            self.dataset_offset += batch_size
 
         return batch
 
@@ -169,4 +196,5 @@ class LucieDataloader:
         Return an iterator over the DataLoader
         """
 
-        yield self._get_batch(batch_size=self.batch_size)
+        for _ in range(self.length):
+            yield self._get_batch(batch_size=self.batch_size)
