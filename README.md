@@ -1,6 +1,22 @@
 # Lucie Training
 
-## 1. Training Dataset Storage and Organization
+## 1. Requirements
+
+**Step 1** - Create a Python (>=3.9) environment and install PyTorch according to your hardware configuration.
+
+```shell
+$ conda create -n lucie-training python=3.9
+$ conda activate lucie-training
+$ # Install PyTorch
+```
+
+**Step 2** - Install the library.
+
+```shell
+$ pip install -e .
+```
+
+## 2. Training Dataset Storage and Organization
 
 Training dataset is stored in [HDF5](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) files. This format is designed to store and manage large amounts of data efficiently.
 
