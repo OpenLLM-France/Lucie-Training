@@ -107,10 +107,14 @@ class LucieDataloader:
 
     """
 
-    def __init__(self, dataset_config_file: str = None, length: int = 10_000, batch_size: int = 1) -> None:
+    def __init__(
+        self, dataset_config_file: str = None, length: int = 10_000, batch_size: int = 1, pad_token_id: int = 0
+    ) -> None:
         self.dataset_config_file = dataset_config_file
         self.length = length
         self.batch_size = batch_size
+
+        self._pad_token_id = pad_token_id
 
         with open(dataset_config_file, encoding="UTF-8") as input_file:
             self.dataset_config = json.load(input_file)
@@ -143,7 +147,13 @@ class LucieDataloader:
 
         chosen_dataset = random.choices(self.dataset_names, weights=self.dataset_probs)[0]
 
-        return chosen_dataset, self.datasets[chosen_dataset].get_batch(batch_size=batch_size)
+        input_ids = self.datasets[chosen_dataset].get_batch(batch_size=batch_size)
+        attention_mask = torch.ones_like(input_ids)
+        attention_mask.masked_fill_(input_ids == self._pad_token_id, 0)
+
+        out = {"input_ids": input_ids, "attention_mask": attention_mask}
+
+        return chosen_dataset, out
 
     def __len__(self) -> int:
         """
