@@ -17,6 +17,7 @@ transformers = "^4.36.2"
 datasets = "^2.16.1"
 click = "^8.1.7"
 loguru = "^0.7.2"
+h5py = "^3.10.0"
 
 
 [tool.poetry.group.dev.dependencies]
