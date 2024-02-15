@@ -564,7 +564,7 @@ class DataIteratorWikipedia(DataIterator):
 
 
 class DataIteratorGutenberg(DataIteratorParquet):
-    def __init__(
+    def __init__(  # noqa # C901 `...` is too complex
         self,
         language="fr",
         filter_legal=True,
@@ -604,7 +604,7 @@ class DataIteratorGutenberg(DataIteratorParquet):
                     or (not death and birth and birth <= current_year - thr - 80)
                 )
                 age_ok_for_stats = age_ok
-            copyright_ok = "copyright" not in x["usagerights"]
+            copyright_ok = "copyright" != x["usagerights"]
             if collect_stat:
                 key = (language, age_ok_for_stats, x["usagerights"])
                 pages, words, chars = _stats_gutenberg.setdefault(key, [0, 0, 0])
@@ -618,6 +618,8 @@ class DataIteratorGutenberg(DataIteratorParquet):
                 words += len(x["text"].split())
                 chars += len(x["text"])
                 _stats_gutenberg[key] = [pages, words, chars]
+            if language == "en":
+                return copyright_ok
             return age_ok and copyright_ok
 
         DataIteratorParquet.__init__(
