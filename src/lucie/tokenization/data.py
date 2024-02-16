@@ -23,7 +23,9 @@ logging.basicConfig()
 logger.setLevel(logging.INFO)
 
 _folder = os.path.dirname(os.path.realpath(__file__))
-_the_stack_metadata_file = os.path.join(_folder, "assets", "the-stack-dedup-programming-languages-stats.json")
+_the_stack_metadata_file = os.path.join(
+    os.path.dirname(_folder), "assets", "the-stack-dedup-programming-languages-stats.json"
+)
 assert os.path.isfile(_the_stack_metadata_file)
 
 DATA_PATH = os.environ.get("DATA_PATH")
