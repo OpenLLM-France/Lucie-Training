@@ -33,7 +33,7 @@ if not DATA_PATH:
     for possible_data_path in [
         "/gpfswork/rech/qgz/commun/data/corpus_openllm",  # Jean-Zay
         "/media/storage0/corpus_openllm",  # koios
-        "/data-storage/corpus_openllm",  # biggerboi
+        "/data-storage/storage0/corpus_openllm",  # biggerboi
     ]:
         if os.path.isdir(possible_data_path):
             DATA_PATH = possible_data_path
@@ -66,12 +66,25 @@ def tokenizer_dataset(
         max_docs=10 if debug else None,
     )
 
-    kwargs_wikipedia = kwargs | dict(
-        max_docs=10 if debug else 500000 * factor,
+    kwargs_wikipedia = kwargs | (
+        dict(
+            max_chars=10 if debug else 2000000000 * factor,
+        )
+        if train
+        else dict(
+            max_docs=10 if debug else 500000 * factor,
+        )
     )
-    kwargs_code = kwargs | dict(
-        max_chars_per_language=10 if debug else 25000000,
-        programming_languages=["tex", "python", "c++", "javascript"],
+    kwargs_code = kwargs | (
+        dict(
+            max_chars_per_language=10 if debug else 200000000,
+            programming_languages=["tex", "python", "c++", "javascript"],
+        )
+        if train
+        else dict(
+            max_chars_per_language=10 if debug else 25000000,
+            programming_languages=["tex", "python", "c++", "javascript"],
+        )
     )
     kwargs_gallica = kwargs | dict(
         max_parquet_files=2,
@@ -88,7 +101,7 @@ def tokenizer_dataset(
     nickname = ""
 
     all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
-    nickname += f"Wikipedia{factor * 500}kpages"
+    nickname += f"Wikipedia{factor * 2}Bchars"
 
     if not train:
         all_data += list(get_datasets("gutenberg", **kwargs_gutenberg))
@@ -111,7 +124,7 @@ def tokenizer_dataset(
     nickname += "-GallicaMono"
 
     all_data += list(get_datasets("code", **kwargs_code))
-    nickname += "-Code"
+    nickname += "-CodePlus200m"
 
     dataset = DataIteratorConcat(all_data)
     print(f"{'Train' if train else 'Evaluate'} on: {dataset.name}")
