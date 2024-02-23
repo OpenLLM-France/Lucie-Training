@@ -6,9 +6,11 @@
 import re
 
 import pandas as pd
+import tiktoken
 import transformers
-from data import decompose_datasets, tokenizer_dataset
 from tokenizer_train import set_infinite_length
+
+from data import decompose_datasets, tokenizer_dataset
 
 if __name__ == "__main__":
     import argparse
@@ -17,7 +19,7 @@ if __name__ == "__main__":
 
     import tqdm
 
-    parser = argparse.ArgumentParser(description="Train a tokenizer.")
+    parser = argparse.ArgumentParser(description="Evaluate a tokenizer.")
     #     parser.add_argument(
     #         "--tokenizer",
     #         type=str,
@@ -34,6 +36,12 @@ if __name__ == "__main__":
         help="Tokenizer to evaluate",
     )
     parser.add_argument(
+        "--regex",
+        default=None,
+        type=str,
+        help="only evaluate datasets matching this regex",
+    )
+    parser.add_argument(
         "--output",
         default=None,
         help="Output directory",
@@ -44,17 +52,15 @@ if __name__ == "__main__":
         type=int,
         help="Batch size",
     )
-    parser.add_argument(
-        "--backend",
-        default="transformers",
-        choices=["transformers", "tokenizers"],
-        help="Backend to use",
-    )
     args = parser.parse_args()
 
-    if args.backend == "transformers":
+    if args.tokenizer in ["gpt-4"]:
+        tokenizer = tiktoken.encoding_for_model("gpt-4")
+        all_byte_tokens = []
+
+    else:
         tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer)
-        set_infinite_length = set_infinite_length(tokenizer)
+        tokenizer = set_infinite_length(tokenizer)
 
         all_byte_tokens = [
             i
@@ -70,14 +76,11 @@ if __name__ == "__main__":
             os.makedirs(args.tokenizer, exist_ok=True)
             tokenizer.save_pretrained(args.tokenizer)
 
-    else:
-        raise NotImplementedError("Only transformers backend is supported for now.")
-
     if args.output is None:
         args.output = args.tokenizer
     os.makedirs(args.output, exist_ok=True)
 
-    output_file = f"{args.output}/eval_{args.backend}_{args.batch_size}.csv"
+    output_file = f"{args.output}/eval_transformers_{args.batch_size}.csv"
 
     already_computed = []
     eval_data = []
@@ -91,6 +94,9 @@ if __name__ == "__main__":
         list(decompose_datasets(tokenizer_dataset(train=False, factor=1))), desc="Evaluating datasets"
     ):
         name = dataset.name
+        if args.regex is not None and not re.match(re.escape(args.regex), name, re.IGNORECASE):
+            print(f"Skipping eval of {args.tokenizer} on {name} (regex mismatch)")
+            continue
         if name in already_computed:
             print(f"Skipping eval of {args.tokenizer} on {name} (already computed)")
             continue
@@ -132,6 +138,11 @@ if __name__ == "__main__":
                     total_num_tokens_single_byte += sum(len(t) for t in byte_tokens)
                     batch = []
         toc = time.time()
+
+        if os.path.exists(output_file):
+            df = pd.read_csv(output_file)
+            eval_data = df.values.tolist()
+            already_computed = [d[0] for d in eval_data]
 
         eval_data.append(
             [

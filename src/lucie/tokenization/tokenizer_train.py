@@ -80,8 +80,13 @@ def test_tokenizer(tokenizer, sentence):
         return [test_tokenizer(tokenizer, s) for s in sentence]
 
     if "encode_batch" in dir(tokenizer):
-        tokens = tokenizer.encode_batch([sentence])[0].ids
-        tokens_strings = [tokenizer.id_to_token(t) for t in tokens]
+        tokens = tokenizer.encode_batch([sentence])[0]
+        if hasattr(tokens, "ids"):
+            tokens = tokens.ids
+        if hasattr(tokenizer, "id_to_token"):
+            tokens_strings = [tokenizer.id_to_token(t) for t in tokens]
+        else:
+            tokens_strings = [tokenizer.decode([t]) for t in tokens]
     else:
         # Fast tokenizer
         # tokens = tokenizer([sentence], padding=False,
@@ -117,9 +122,27 @@ if __name__ == "__main__":
         default=32000,
         help="Size of output vocabulary",
     )
-    parser.add_argument("--no_persee", dest="persee", action="store_false", default=True, help="Don't use Persee")
-    parser.add_argument("--no_legi", dest="legi", action="store_false", default=True, help="Don't use LEGI")
-    parser.add_argument("--no_europarl", dest="europarl", action="store_false", default=True, help="Don't use Europarl")
+    parser.add_argument(
+        "--no_persee",
+        dest="persee",
+        action="store_false",
+        default=True,
+        help="Don't use Persee",
+    )
+    parser.add_argument(
+        "--no_legi",
+        dest="legi",
+        action="store_false",
+        default=True,
+        help="Don't use LEGI",
+    )
+    parser.add_argument(
+        "--no_europarl",
+        dest="europarl",
+        action="store_false",
+        default=True,
+        help="Don't use Europarl",
+    )
     parser.add_argument(
         "--use_sentence_piece",
         default=False,
@@ -325,13 +348,6 @@ spm_train \
     )
 
     info.update({"example_after": {example_sentence: test_tokenizer(tokenizer, example_sentence)}})
-
-    json.dump(
-        info,
-        open(f"{args.output}/training_info.json", "w", encoding="utf8"),
-        indent=2,
-        ensure_ascii=False,
-    )
 
     json.dump(
         info,
