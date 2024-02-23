@@ -155,7 +155,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 yield ds
         return
 
-    multilang_corpora = ["wikipedia", "gutenberg", "europarl", "claire"]
+    multilang_corpora = ["wikipedia", "wikiother", "gutenberg", "europarl", "claire"]
 
     name = name.lower()
 
@@ -196,7 +196,11 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         DataIteratorOtherFr(regex_parquet="legi", **kwargs)
 
     elif name in multilang_corpora:
-        languages = ["fr", "en"] if (name == "claire") else ["fr", "en", "de", "es"]
+        languages = {
+            "claire": ["fr", "en"],
+            "wikiother": ["fr"],
+            "gutenberg": ["fr", "en", "de", "es", "it"],
+        }.get(name, ["fr", "en", "de", "es"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
                 yield ds
@@ -575,6 +579,47 @@ class DataIteratorWikipedia(DataIterator):
             name=name,
             postprocess=postprocess,
             **kwargs,
+        )
+
+
+class DataIteratorWikiother(DataIteratorConcat):
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        name = f"Wikiother:{language}"
+
+        folder = f"{DATA_PATH}/wikiother/{language}"
+        if not os.path.isdir(folder):
+            raise RuntimeError(f"Folder {folder} does not exist")
+
+        parquet_per_subfolder = {}
+
+        for subfolder in os.listdir(folder):
+            if not os.path.isdir(f"{folder}/{subfolder}"):
+                continue
+            for root, _, files in os.walk(f"{folder}/{subfolder}"):
+                for file in files:
+                    if file.endswith(".parquet"):
+                        parquet_per_subfolder.setdefault(subfolder, []).append(f"{root}/{file}")
+
+        postprocess = clean_wikipedia
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "parquet",
+                        data_files={"train": filenames},
+                        streaming=streaming,
+                        split="train",
+                    ),
+                    name=f"{name}:{subname}",
+                    postprocess=postprocess,
+                    subsample_criteria="id",
+                    **kwargs,
+                )
+                for subname, filenames in parquet_per_subfolder.items()
+            ],
+            name=name,
         )
 
 
