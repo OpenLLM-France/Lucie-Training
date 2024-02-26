@@ -5,6 +5,7 @@ import logging
 import os
 import pickle
 import random
+import types
 import warnings
 
 import datasets
@@ -15,7 +16,7 @@ from text import (
     fix_legi,
     fix_legi_and_remove_title,
     html_unescape,
-    remove_useless_lines,
+    remove_simple_lines,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ def tokenizer_dataset(
     use_persee=True,
     use_legi=True,
     use_europarl=True,
+    less_minority_languages=True,
     streaming=True,
     debug=False,
     factor=3,
@@ -75,6 +77,9 @@ def tokenizer_dataset(
             max_docs=10 if debug else 500000 * factor,
         )
     )
+    kwargs_wikipedia_minority = kwargs_wikipedia.copy()
+    if train and less_minority_languages:
+        kwargs_wikipedia_minority["max_chars"] = 10 if debug else 200000000 * factor
     kwargs_code = kwargs | (
         dict(
             max_chars_per_language=10 if debug else 200000000,
@@ -100,8 +105,16 @@ def tokenizer_dataset(
     all_data = []
     nickname = ""
 
-    all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
-    nickname += f"Wikipedia{factor * 2}Bchars"
+    if less_minority_languages:
+        all_data += list(get_datasets("wikipedia_fr", **kwargs_wikipedia))
+        all_data += list(get_datasets("wikipedia_de", **kwargs_wikipedia_minority))
+        all_data += list(get_datasets("wikipedia_en", **kwargs_wikipedia))
+        all_data += list(get_datasets("wikipedia_es", **kwargs_wikipedia_minority))
+        all_data += list(get_datasets("wikipedia_it", **kwargs_wikipedia_minority))
+        nickname += f"Wikipedia{factor * 2}BcharsLessMinorityWithIt"
+    else:
+        all_data += list(get_datasets("wikipedia", **kwargs_wikipedia))
+        nickname += f"Wikipedia{factor * 2}Bchars"
 
     if not train:
         all_data += list(get_datasets("gutenberg", **kwargs_gutenberg))
@@ -174,6 +187,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 "open_edition",
                 "discours_publics",
                 "other_fr",
+                "open_data_fr",
             ]
             + (["persee"] if use_nc else [])
             + [
@@ -200,6 +214,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             "claire": ["fr", "en"],
             "wikiother": ["fr"],
             "gutenberg": ["fr", "en", "de", "es", "it"],
+            "wikipedia": ["fr", "en", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
@@ -222,21 +237,39 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         yield python_class(**kwargs)
 
 
-def decompose_datasets(datasets, parquet_level=False):
-    if isinstance(datasets, list):
-        for d in datasets:
+def decompose_datasets(dataset, parquet_level=False):
+    if isinstance(dataset, (list, types.GeneratorType)):
+        for d in dataset:
             for ds in decompose_datasets(d, parquet_level):
                 yield ds
-    elif isinstance(datasets, DataIteratorConcat):
-        for d in datasets.datasets:
+    elif isinstance(dataset, DataIteratorConcat):
+        for d in dataset.datasets:
             for ds in decompose_datasets(d, parquet_level):
                 yield ds
-    elif isinstance(datasets, DataIterator):
-        if parquet_level:
-            raise NotImplementedError("Parquet level not implemented")
-        yield datasets
+    elif isinstance(dataset, DataIterator):
+        if parquet_level and hasattr(dataset, "parquet_files"):
+            for i, parquet_file in enumerate(sorted(dataset.parquet_files)):
+                assert not dataset.max_docs
+                assert not dataset.max_words
+                assert not dataset.max_chars
+                assert dataset.subsample_rate == 1
+                assert not dataset.subsample_invert
+                yield DataIterator(
+                    datasets.load_dataset(
+                        "parquet",
+                        data_files=[parquet_file],
+                        streaming=True,
+                        split="train",
+                    ),
+                    name=f"{dataset.name}:{i:03d}",
+                    key=dataset.key,
+                    postprocess=dataset.postprocess,
+                    filter_fn=dataset.filter_fn,
+                )
+        else:
+            yield dataset
     else:
-        raise ValueError(f"Unknown type {type(datasets)}")
+        raise ValueError(f"Unknown type {type(dataset)}")
 
 
 ########################################
@@ -970,12 +1003,24 @@ class DataIteratorOtherFr(DataIteratorParquetSplitted):
         )
 
 
+class DataIteratorOpenDataFr(DataIteratorParquetSplitted):
+    def __init__(self, regex_parquet=None, **kwargs):
+        DataIteratorParquetSplitted.__init__(
+            self,
+            DATA_PATH + "/open_data_fr",
+            name="OpenData" if not regex_parquet else regex_parquet,
+            postprocess=kwargs.pop("postprocess", fix_legi),
+            regex_parquet=regex_parquet,
+            **kwargs,
+        )
+
+
 ########################################
 # Datasets: English
 
 
 class DataIteratorAmericanStories(DataIteratorConcat):
-    def __init__(self, streaming=True, from_huggingface=None, **kwargs):
+    def __init__(self, streaming=True, from_huggingface=False, filter_by_perplexity=True, **kwargs):
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(f"{DATA_PATH}/americanstories")
             logger.info(
@@ -987,21 +1032,30 @@ class DataIteratorAmericanStories(DataIteratorConcat):
         key = "article"
 
         if not from_huggingface:
-            data_files = sorted(glob.glob(f"{DATA_PATH}/americanstories/*.parquet"))
-            assert len(data_files), f"Missing parquet files for {DATA_PATH}/americanstories/*.parquet"
-            logger.info(f"Using {len(data_files)} parquet files in {DATA_PATH}/americanstories")
+            data_path = os.path.join(
+                DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "americanstories", "*.parquet"
+            )
+            data_files = sorted(glob.glob(data_path))
+            assert len(data_files), f"Missing parquet files for {data_path}"
+            logger.info(f"Using {len(data_files)} parquet files in {data_path}")
 
             key = "text"
 
+            def load_parquet(data_file):
+                try:
+                    return datasets.load_dataset(
+                        "parquet",
+                        data_files=data_file,
+                        streaming=streaming,
+                        split="train",
+                    )
+                except Exception as err:
+                    raise RuntimeError(f"Error loading {data_file}") from err
+
             datas = {
-                os.path.splitext(os.path.basename(data_file))[0]: datasets.load_dataset(
-                    "parquet",
-                    data_files=data_file,
-                    streaming=streaming,
-                    split="train",
-                )
-                for data_file in data_files
+                os.path.splitext(os.path.basename(data_file))[0]: load_parquet(data_file) for data_file in data_files
             }
+            self.parquet_files = data_files
 
         else:
             datas = datasets.load_dataset(
@@ -1018,7 +1072,8 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                     key=key,
                     subsample_criteria="article_id",
                     name=f"AmericanStories:{year}",
-                    postprocess=remove_useless_lines,
+                    postprocess=remove_simple_lines,
+                    filter_fn=filter_by_perplexity_func(2310) if filter_by_perplexity else None,
                     **kwargs,
                 )
                 for year in datas.keys()
