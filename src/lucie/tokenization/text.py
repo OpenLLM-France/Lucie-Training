@@ -34,6 +34,14 @@ def remove_useless_lines(text):
     return text
 
 
+def remove_simple_lines(text):
+    # Remove cesures
+    text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)
+    # Remove simple line breaks
+    text = re.sub("(?<!\n)\n(?!\n)", " ", text)
+    return text
+
+
 def remove_double_spaces(text):
     return re.sub(r" {2,}", r" ", text)
 
