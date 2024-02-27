@@ -54,7 +54,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.tokenizer in ["gpt-4"]:
+    if args.tokenizer.lower() in ["gpt-4"]:
         tokenizer = tiktoken.encoding_for_model("gpt-4")
         all_byte_tokens = []
 
