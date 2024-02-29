@@ -1,6 +1,8 @@
 # This script is inspired from the original script of the Croissant team :
 # https://github.com/ManuelFay/llm-data-hub/blob/ea9c84708f00f61320ea352998e6af999aa71c24/dataset_construction/fit_tokenizer.py
 
+import itertools
+import json
 from typing import Optional
 
 import tokenizers
@@ -43,11 +45,14 @@ _special_tokens = [
     s["content"] for s in [_special_tokens_map[k] for k in ["unk_token", "bos_token", "eos_token", "pad_token"]]
 ]
 
+_space_internal = "▁"
+
 
 def build_tokenizer(
     dropout: Optional[float] = None,
     fuse_unk: Optional[float] = True,
-    same_as_croissant_llm: Optional[bool] = True,
+    consecutive_spaces_internal: Optional[bool] = False,
+    individual_digits: Optional[bool] = True,
 ):
     """
     Build a tokenizer.
@@ -61,50 +66,74 @@ def build_tokenizer(
             byte_fallback=True,
         )
     )
-    if same_as_croissant_llm:
-        add_prefix_space = True
-        replacement = "▁"
-
+    add_prefix_space = True
+    if not consecutive_spaces_internal:
         tokenizer.normalizer = tokenizers.normalizers.NFKC()
 
         tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(
             [
-                tokenizers.pre_tokenizers.Metaspace(replacement=replacement, add_prefix_space=add_prefix_space),
-                tokenizers.pre_tokenizers.Digits(individual_digits=True),
+                tokenizers.pre_tokenizers.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
+                tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits),
             ]
         )
 
-        tokenizer.decoder = tokenizers.decoders.Sequence(
-            [
-                tokenizers.decoders.ByteFallback(),
-                tokenizers.decoders.Metaspace(replacement=replacement, add_prefix_space=add_prefix_space),
-                tokenizers.decoders.Fuse(),
-                tokenizers.decoders.Strip(content=" ", left=1, right=0),
-            ]
-        )
     else:  # Mistral + digits
         tokenizer.normalizer = tokenizers.normalizers.Sequence(
             [
-                tokenizers.normalizers.NFKC(),
-                tokenizers.normalizers.Prepend("▁"),
-                tokenizers.normalizers.Replace(" ", "▁"),
+                tokenizers.normalizers.NFKC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
+                tokenizers.normalizers.Replace(" ", _space_internal),
+                tokenizers.normalizers.Prepend(_space_internal),
             ]
         )
 
-        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Digits(individual_digits=True)
+        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits)
 
-        tokenizer.decoder = tokenizers.decoders.Sequence(
-            [
-                # tokenizers.decoders.Replace("▁", " "),
-                # tokenizers.decoders.ByteFallback(),
-                tokenizers.decoders.ByteFallback(),
-                tokenizers.decoders.Metaspace(replacement="▁", add_prefix_space=True),
-                tokenizers.decoders.Fuse(),
-                tokenizers.decoders.Strip(content=" ", left=1, right=0),
-            ]
-        )
+    tokenizer.decoder = tokenizers.decoders.Sequence(
+        [
+            # tokenizers.decoders.Replace("▁", " "),
+            # tokenizers.decoders.ByteFallback(),
+            tokenizers.decoders.ByteFallback(),
+            tokenizers.decoders.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
+            tokenizers.decoders.Fuse(),
+            # tokenizers.decoders.Strip(content=" ", left=1, right=0),
+        ]
+    )
 
     return tokenizer
+
+
+def get_special_tokens(
+    num_unused=40,
+    consecutive_spaces=10,
+    special_tokens_map=None,
+):
+    if special_tokens_map is None:
+        special_tokens_map = {}
+    new_special_tokens = []
+    for key, value in _special_tokens_map.items():
+        expected_content = value["content"]
+        if key in special_tokens_map:
+            content = special_tokens_map[key]
+            if special_tokens_map[key] != expected_content:
+                raise NotImplementedError(
+                    f"Changing special tokens is not supported yet. {key} is {content} and should be {expected_content}"
+                )
+        else:
+            new_special_tokens.append(expected_content)
+
+    # For byte fallback
+    new_special_tokens += [f"<0x{i:02X}>" for i in range(256)]
+
+    new_special_tokens += [f"<unused{i}>" for i in range(num_unused)]
+    for char in (
+        _space_internal,
+        "\n",
+        "\t",
+    ):
+        for i in range(1, consecutive_spaces + 1):
+            new_special_tokens.append(char * i)
+
+    return new_special_tokens
 
 
 def fit_tokenizer(
@@ -113,6 +142,8 @@ def fit_tokenizer(
     len_it=None,
     vocab_size=32000,
     batch_size=1000,
+    num_unused=40,
+    consecutive_spaces=10,
 ):
     """
     Fit a tokenizer on a dataset.
@@ -124,12 +155,10 @@ def fit_tokenizer(
     :return: The fitted tokenizer.
     """
 
-    special_tokens = _special_tokens.copy()
-
-    special_tokens += [f"<unused{i}>" for i in range(10)]
-
-    # For byte fallback
-    special_tokens += [f"<0x{i:02X}>" for i in range(256)]
+    special_tokens = get_special_tokens(
+        num_unused=num_unused,
+        consecutive_spaces=consecutive_spaces,
+    )
 
     # special_tokens += [f"<extra_id_{i}>" for i in range(100)]
     bpe_trainer = tokenizers.trainers.BpeTrainer(
@@ -150,6 +179,8 @@ def refit_tokenizer(
     len_it=None,
     vocab_size=32000,
     batch_size=1000,
+    num_unused=40,
+    consecutive_spaces=10,
 ):
     """
     Fit a tokenizer on a dataset.
@@ -161,24 +192,11 @@ def refit_tokenizer(
     :return: The fitted tokenizer.
     """
 
-    # is this slowing down everything ?
-
-    new_special_tokens = []
-    for key, value in _special_tokens_map.items():
-        expected_content = value["content"]
-        if key in tokenizer.special_tokens_map:
-            content = tokenizer.special_tokens_map[key]
-            if tokenizer.special_tokens_map[key] != expected_content:
-                raise NotImplementedError(
-                    f"Changing special tokens is not supported yet. {key} is {content} and should be {expected_content}"
-                )
-        else:
-            new_special_tokens.append(expected_content)
-
-    new_special_tokens += [f"<unused{i}>" for i in range(10)]
-
-    # For byte fallback
-    new_special_tokens += [f"<0x{i:02X}>" for i in range(256)]
+    new_special_tokens = get_special_tokens(
+        special_tokens_map=tokenizer.special_tokens_map,
+        num_unused=num_unused,
+        consecutive_spaces=consecutive_spaces,
+    )
 
     tokenizer._tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Digits(individual_digits=True)
 
@@ -244,9 +262,87 @@ def set_infinite_length(tokenizer):
     return tokenizer
 
 
+def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` is too complex
+    tokenizer = json.load(open(tokenizer_file, encoding="utf8"))
+    tokens = tokenizer["model"]["vocab"]
+    n = 2
+    assert n <= max_length
+    # Add consecutive spaces in the vocabulary
+    for token, val in tokens.copy().items():
+        if token.startswith("<unused"):
+            while "▁" * n in tokens.keys():
+                n += 1
+            if n > max_length:
+                break
+            tokens.pop(token)
+            tokens["▁" * n] = val
+            n += 1
+        elif n > 2:
+            break
+    # Re-sort tokens
+    tokenizer["model"]["vocab"] = dict(sorted(tokens.items(), key=lambda x: x[1]))
+
+    # Add consecutive spaces in the merges
+    for char in (
+        "\t",
+        "\n",
+        _space_internal,
+    ):
+        # Make all the possible combinations
+        all_spaces = [char * i for i in range(1, n)]
+        all_spaces = [s for s in all_spaces if s in tokens]
+        if len(all_spaces) < 2:
+            continue
+        all_pairs = list(itertools.product(all_spaces, repeat=2))
+        new_merges = sorted([f"{a} {b}" for a, b in all_pairs], key=len)
+        # new_merges = [m for m in new_merges if len(m) <= 11]
+        new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
+        merges = tokenizer["model"]["merges"]
+        tokenizer["model"]["merges"] = new_merges + [m for m in merges if m not in new_merges]
+
+    # Replace "Metaspace" pre_tokenizer by "Replace" normalizer
+    pre_tokenizer = tokenizer["pre_tokenizer"]
+    isseq_pre_tokenizer = pre_tokenizer["type"] == "Sequence"
+    has_metaspace = (
+        ("Metaspace" in [p["type"] for p in pre_tokenizer["pretokenizers"]])
+        if isseq_pre_tokenizer
+        else (pre_tokenizer["type"] == "Metaspace")
+    )
+    if has_metaspace:
+        # Add Replace in the normalizer
+        normalizer = tokenizer["normalizer"]
+        isseq_normalizer = normalizer["type"] == "Sequence"
+        new_normalizers = [
+            {"type": "Prepend", "prepend": _space_internal},
+            {"type": "Replace", "pattern": {"String": " "}, "content": _space_internal},
+        ]
+        if isseq_normalizer:
+            normalizer["normalizers"] += new_normalizers
+        else:
+            normalizer = {
+                "type": "Sequence",
+                "normalizers": [normalizer] + new_normalizers,
+            }
+        tokenizer["normalizer"] = normalizer
+        # Remove Metaspace from the pre_tokenizer
+        if isseq_pre_tokenizer:
+            tokenizer["pre_tokenizer"] = None
+        else:
+            tokenizer["pre_tokenizer"] = {
+                "type": "Sequence",
+                "pretokenizers": [p for p in pre_tokenizer["pretokenizers"] if p["type"] != "Metaspace"],
+            }
+
+    json.dump(
+        tokenizer,
+        open(tokenizer_file, "w", encoding="utf8"),
+        indent=2,
+        ensure_ascii=False,
+    )
+
+
 if __name__ == "__main__":
     import argparse
-    import json
     import os
     import shutil
     import sys
@@ -266,6 +362,12 @@ if __name__ == "__main__":
         "--base",
         default=None,
         help="Base tokenizer (ex: mistralai/Mistral-7B-v0.1)",
+    )
+    parser.add_argument(
+        "--consecutive_spaces",
+        default=10,
+        type=int,
+        help="Maximum number of consecutive spaces to model",
     )
     parser.add_argument(
         "--output",
@@ -314,6 +416,8 @@ if __name__ == "__main__":
         print("Configure base tokenizer")
 
     name_tokenizer = os.path.basename(args.base) if args.base else "Croissant"
+    name_tokenizer += f"-v{args.vocab_size}"
+    name_tokenizer += f"-s{args.consecutive_spaces}"
 
     example_sentence = (
         "   [INST] Coucou [/INST] Hello [INST] "
@@ -326,8 +430,8 @@ if __name__ == "__main__":
     if args.debug:
         name_dataset = "dummy"
         sentences = [
-            "<a> Mais en Français, comment est-ce que ça se passera?",
-            "1999 2000 1999 2000 199 200 en François en Français",
+            "   Mais en Français, comment   est-ce que ça se passera?",
+            "1999 2000 1999   2000 199 200 en François en Français",
             "<s> zzzzzAAAA",
         ]
 
@@ -364,13 +468,14 @@ if __name__ == "__main__":
     os.makedirs(args.output)
 
     # Compute and dump training stats in parallel
-    os.system(
-        f"""\
+    if not args.debug:
+        os.system(
+            f"""\
 {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/data.py \
     tok_train \
     --folder {args.output}/stats_training >/dev/null 2>/dev/null &
 """
-    )
+        )
 
     if args.verbose:
         print("Train tokenizer")
@@ -380,13 +485,13 @@ if __name__ == "__main__":
     if args.base:
         # Refit from pretrained
         tok2 = transformers.AutoTokenizer.from_pretrained(args.base)
-        tok2 = refit_tokenizer(tok2, trainset)
+        tok2 = refit_tokenizer(tok2, trainset, consecutive_spaces=args.consecutive_spaces)
         tok2.save_pretrained(args.output)
 
     else:
         # From scratch
-        tok = build_tokenizer()
-        tok = fit_tokenizer(tok, trainset)
+        tok = build_tokenizer(consecutive_spaces_internal=False)
+        tok = fit_tokenizer(tok, trainset, consecutive_spaces=args.consecutive_spaces)
         tok.save(os.path.join(args.output, "tokenizer.json"))
         tok = transformers.PreTrainedTokenizerFast(tokenizer_file=os.path.join(args.output, "tokenizer.json"))
         tok.save_pretrained(args.output)
@@ -475,9 +580,22 @@ if __name__ == "__main__":
 
     tokenizer.save_pretrained(args.output)
 
+    if args.consecutive_spaces > 1:
+        add_consecutive_spaces(
+            os.path.join(args.output, "tokenizer.json"),
+            max_length=args.consecutive_spaces,
+        )
+
     # Launch evaluation
-    os.system(
-        f"""\
+    if not args.debug:
+        os.system(
+            f"""\
 {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} &
 """
-    )
+        )
+    else:
+        os.system(
+            f"""\
+{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}
+"""
+        )
