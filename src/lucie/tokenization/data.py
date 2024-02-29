@@ -193,6 +193,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             + [
                 # English
                 "american_stories",
+                "pes2o",
                 # Code
                 "code",
             ]
@@ -1099,6 +1100,7 @@ class DataIteratorPes2o(DataIteratorConcat):
         else:
             filter_fns = {"": None}
 
+        name = "Pes2o"
         DataIteratorConcat.__init__(
             self,
             [
@@ -1110,13 +1112,13 @@ class DataIteratorPes2o(DataIteratorConcat):
                     ),
                     filter_fn=filter_fn,
                     subsample_criteria="id",
-                    name=f"{self.name}:{subset_name+':' if subset_name else ''}{split}",
+                    name=f"{name}:{subset_name+':' if subset_name else ''}{split}",
                     **kwargs,
                 )
                 for split in splits
                 for subset_name, filter_fn in filter_fns.items()
             ],
-            name="Pes2o",
+            name=name,
         )
 
 
