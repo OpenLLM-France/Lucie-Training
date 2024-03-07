@@ -50,9 +50,11 @@ _space_internal = "▁"
 
 def build_tokenizer(
     dropout: Optional[float] = None,
-    fuse_unk: Optional[float] = True,
-    consecutive_spaces_internal: Optional[bool] = False,
     individual_digits: Optional[bool] = True,
+    separate_spaces_and_punctuations: Optional[bool] = True,
+    prefix_space_general: Optional[bool] = True,
+    fuse_unk: Optional[float] = True,
+    do_not_split_spaces: Optional[bool] = False,
 ):
     """
     Build a tokenizer.
@@ -66,27 +68,54 @@ def build_tokenizer(
             byte_fallback=True,
         )
     )
+
     add_prefix_space = True
-    if not consecutive_spaces_internal:
-        tokenizer.normalizer = tokenizers.normalizers.NFKC()
+
+    normalizers = [
+        tokenizers.normalizers.NFKC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
+        tokenizers.normalizers.Replace("\r", ""),
+    ] + (
+        [
+            # Note: placeholders cannot be handled (using tokenizers.Regex(r"[\t\n]"))
+            tokenizers.normalizers.Replace(tokenizers.Regex(r"\n(?=[^\n\t])"), "\n "),
+            tokenizers.normalizers.Replace(tokenizers.Regex(r"\t(?=[^\n\t])"), "\t "),
+        ]
+        if prefix_space_general
+        else []
+    )
+
+    pretokenizers = (
+        [
+            tokenizers.pre_tokenizers.Split(
+                tokenizers.Regex(rf"{_space_internal}?([\n\t\p{{P}}])\1*"), behavior="isolated"
+            )
+        ]
+        if separate_spaces_and_punctuations
+        else []
+    ) + [
+        tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits),
+    ]
+
+    if not do_not_split_spaces:
+        tokenizer.normalizer = tokenizers.normalizers.Sequence(normalizers)
 
         tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(
             [
                 tokenizers.pre_tokenizers.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
-                tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits),
             ]
+            + pretokenizers
         )
 
     else:  # Mistral + digits
         tokenizer.normalizer = tokenizers.normalizers.Sequence(
-            [
-                tokenizers.normalizers.NFKC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
+            normalizers
+            + [
                 tokenizers.normalizers.Replace(" ", _space_internal),
                 tokenizers.normalizers.Prepend(_space_internal),
             ]
         )
 
-        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits)
+        tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(pretokenizers)
 
     tokenizer.decoder = tokenizers.decoders.Sequence(
         [
@@ -95,6 +124,16 @@ def build_tokenizer(
             tokenizers.decoders.ByteFallback(),
             tokenizers.decoders.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
             tokenizers.decoders.Fuse(),
+        ]
+        + (
+            [
+                tokenizers.decoders.Replace("\n ", "\n"),
+                tokenizers.decoders.Replace("\t ", "\t"),
+            ]
+            if prefix_space_general
+            else []
+        )
+        + [
             # tokenizers.decoders.Strip(content=" ", left=1, right=0),
         ]
     )
@@ -133,6 +172,9 @@ def get_special_tokens(
         for i in range(1, consecutive_spaces + 1):
             new_special_tokens.append(char * i)
 
+    for i in range(10):
+        new_special_tokens.append(f"{i}")
+
     return new_special_tokens
 
 
@@ -160,7 +202,6 @@ def fit_tokenizer(
         consecutive_spaces=consecutive_spaces,
     )
 
-    # special_tokens += [f"<extra_id_{i}>" for i in range(100)]
     bpe_trainer = tokenizers.trainers.BpeTrainer(
         vocab_size=vocab_size,
         min_frequency=2,
@@ -309,11 +350,16 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
         else (pre_tokenizer["type"] == "Metaspace")
     )
     if has_metaspace:
+        add_prefix_space = (
+            [p["add_prefix_space"] for p in pre_tokenizer["pretokenizers"] if p["type"] == "Metaspace"][0]
+            if isseq_pre_tokenizer
+            else pre_tokenizer["add_prefix_space"]
+        )
+
         # Add Replace in the normalizer
         normalizer = tokenizer["normalizer"]
         isseq_normalizer = normalizer["type"] == "Sequence"
-        new_normalizers = [
-            {"type": "Prepend", "prepend": _space_internal},
+        new_normalizers = ([{"type": "Prepend", "prepend": _space_internal}] if add_prefix_space else []) + [
             {"type": "Replace", "pattern": {"String": " "}, "content": _space_internal},
         ]
         if isseq_normalizer:
@@ -326,12 +372,35 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
         tokenizer["normalizer"] = normalizer
         # Remove Metaspace from the pre_tokenizer
         if isseq_pre_tokenizer:
-            tokenizer["pre_tokenizer"] = None
-        else:
-            tokenizer["pre_tokenizer"] = {
+            pre_tokenizer = {
                 "type": "Sequence",
                 "pretokenizers": [p for p in pre_tokenizer["pretokenizers"] if p["type"] != "Metaspace"],
             }
+        else:
+            pre_tokenizer = None
+
+    # Remove pre_tokenizer that will be useless afterwards
+    for type in ("Digits",):  # "Split",:
+        has_pretokenizer = (
+            (type in [p["type"] for p in pre_tokenizer["pretokenizers"]])
+            if isseq_pre_tokenizer
+            else (pre_tokenizer["type"] == type)
+        )
+        if has_pretokenizer:
+            # Remove Split from the pre_tokenizer
+            if isseq_pre_tokenizer:
+                pre_tokenizer = {
+                    "type": "Sequence",
+                    "pretokenizers": [p for p in pre_tokenizer["pretokenizers"] if p["type"] != type],
+                }
+            else:
+                pre_tokenizer = None
+    if isseq_pre_tokenizer:
+        if pre_tokenizer["pretokenizers"] == []:
+            pre_tokenizer = None
+        elif len(pre_tokenizer["pretokenizers"]) == 1:
+            pre_tokenizer = pre_tokenizer["pretokenizers"][0]
+    tokenizer["pre_tokenizer"] = pre_tokenizer
 
     json.dump(
         tokenizer,
@@ -347,6 +416,11 @@ if __name__ == "__main__":
     import shutil
     import sys
     import time
+
+    def str2bool(s):
+        s = s.lower()
+        assert s in {"true", "false", "1", "0"}
+        return s.lower() in {"true", "1"}
 
     parser = argparse.ArgumentParser(
         description="Train a tokenizer.",
@@ -368,6 +442,24 @@ if __name__ == "__main__":
         default=10,
         type=int,
         help="Maximum number of consecutive spaces to model",
+    )
+    parser.add_argument(
+        "--individual_digits",
+        default=True,
+        type=str2bool,
+        help="Split digits individually (ex: 1999 -> 1 9 9 9)",
+    )
+    parser.add_argument(
+        "--separate_spaces_and_punctuations",
+        default=True,
+        type=str2bool,
+        help="Make sure not to mix spaces and punctuations with alphanumeric characters",
+    )
+    parser.add_argument(
+        "--prefix_space_general",
+        default=True,
+        type=str2bool,
+        help="Add a prefix space after each linebreaks and tabulations (not just after the start)",
     )
     parser.add_argument(
         "--output",
@@ -415,9 +507,16 @@ if __name__ == "__main__":
     if args.verbose:
         print("Configure base tokenizer")
 
-    name_tokenizer = os.path.basename(args.base) if args.base else "Croissant"
-    name_tokenizer += f"-v{args.vocab_size}"
-    name_tokenizer += f"-s{args.consecutive_spaces}"
+    name_tokenizer = os.path.basename(args.base) if args.base else "Lucie"
+    name_tokenizer += f"-{args.vocab_size}"
+    name_tokenizer += f"-spaces{args.consecutive_spaces}"
+    if not args.base:
+        if args.individual_digits:
+            name_tokenizer += "-digits"
+        if args.separate_spaces_and_punctuations:
+            name_tokenizer += "-puncts"
+        if args.prefix_space_general:
+            name_tokenizer += "-prefix"
 
     example_sentence = (
         "   [INST] Coucou [/INST] Hello [INST] "
@@ -429,14 +528,14 @@ if __name__ == "__main__":
 
     if args.debug:
         name_dataset = "dummy"
-        sentences = [
-            "   Mais en Français, comment   est-ce que ça se passera?",
-            "1999 2000 1999   2000 199 200 en François en Français",
-            "<s> zzzzzAAAA",
+        example_training_sentences = [
+            "   Mais en Français, comment   est-ce que ça se passera?\n\ns hey... ow ...?",
+            "1999 2000 1999   2000 199 200 en François en Français\n\ns ra? ow...? hey...",
+            "sans oublier (les a) (les b) (les c) (les d) (les e)",
         ]
 
         def debug_texts_iterator():
-            yield from sentences
+            yield from example_training_sentences
 
         trainset = debug_texts_iterator()
     else:
@@ -465,7 +564,10 @@ if __name__ == "__main__":
         else:
             print("WARNING: Output folder already exists, aborting")
             exit(1)
+
     os.makedirs(args.output)
+    # Self-copy the script
+    shutil.copy2(__file__, os.path.join(args.output, os.path.basename(__file__)))
 
     # Compute and dump training stats in parallel
     if not args.debug:
@@ -490,7 +592,11 @@ if __name__ == "__main__":
 
     else:
         # From scratch
-        tok = build_tokenizer(consecutive_spaces_internal=False)
+        tok = build_tokenizer(
+            individual_digits=args.individual_digits,
+            separate_spaces_and_punctuations=args.separate_spaces_and_punctuations,
+            prefix_space_general=args.prefix_space_general,
+        )
         tok = fit_tokenizer(tok, trainset, consecutive_spaces=args.consecutive_spaces)
         tok.save(os.path.join(args.output, "tokenizer.json"))
         tok = transformers.PreTrainedTokenizerFast(tokenizer_file=os.path.join(args.output, "tokenizer.json"))
@@ -586,14 +692,36 @@ if __name__ == "__main__":
             max_length=args.consecutive_spaces,
         )
 
+    tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
+
     # Launch evaluation
     if not args.debug:
-        os.system(
-            f"""\
-{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} &
+        for dataset in [
+            "Wikipedia:fr",
+            "Wikipedia:en",
+            "Wikipedia:de",
+            "Wikipedia:es",
+            "Wikipedia:it",
+            "Europarl",
+            "Gutenberg",
+            "TheStack",
+            "Persee",
+            "Gallica",
+        ]:
+            os.system(
+                f"""\
+{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} --regex {dataset} &
 """
-        )
+            )
+
     else:
+        for sentence in example_training_sentences:
+            tokens, decoded = test_tokenizer(tokenizer, sentence)
+            print("* Input:  ", sentence.replace("\n", "\\n"))
+            print("* Tokens: ", tokens)
+            print("* Decoded:", decoded.replace("\n", "\\n"))
+            print()
+
         os.system(
             f"""\
 {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}

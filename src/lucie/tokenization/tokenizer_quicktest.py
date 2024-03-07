@@ -2,6 +2,15 @@ import tiktoken
 import transformers
 from tokenizer_train import test_tokenizer
 
+
+def norm_for_display(s):
+    return s.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r")
+
+
+def norm_spaces(s):
+    return s.replace("\u00A0", " ").replace("\r", "")
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -13,8 +22,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     example_sentences = [
-        "Mais? Mais?",
-        "en? en?",
+        "Mais? Mais?\nMais?\tMais?   Mais?\n|Mais? (Mais?)",
+        "en ? en ?\r\nen ?\ten ?   en ? (en ?)\n(en ?)",
         (
             "   [INST] Coucou [/INST] Hello. Hello . [INST]      \n"
             "Mais en Français, comment est-ce que ça se passera ?"
@@ -31,8 +40,9 @@ if __name__ == "__main__":
     for example_sentence in example_sentences:
         tokens, decoded = test_tokenizer(tokenizer, example_sentence)
 
-        print("* Tokens:", tokens)
-        print("* Decoded:", decoded)
+        print("-" * 50)
+        print("* Tokens: ", tokens)
+        print("* Decoded:", norm_for_display(decoded))
 
         if decoded.startswith("<"):
             decoded = decoded[decoded.index(">") + 1 :]
@@ -40,14 +50,15 @@ if __name__ == "__main__":
             while decoded[-1] != "<":
                 decoded = decoded[:-1]
             decoded = decoded[:-1]
-        print("* Decoded no BOS/EOS:", decoded.replace("\n", "\\n"))
-        print("* Reference.........:", example_sentence.replace("\n", "\\n"))
+        print("* Decoded no BOS/EOS:", norm_for_display(decoded))
+        print("* Reference.........:", norm_for_display(example_sentence))
 
         decoded = decoded.lstrip()
         example_sentence = example_sentence.lstrip()
-        print("* OK 100%:", example_sentence == decoded)
-        example_sentence = example_sentence.replace("\u00A0", " ")
-        print("* OK up to space:", example_sentence == decoded)
+        print("* OK 100%.....................:", example_sentence == decoded)
+        example_sentence = norm_spaces(example_sentence)
+        decoded = norm_spaces(decoded)
+        print("* OK up to space normalization:", example_sentence == decoded)
         if example_sentence != decoded:
             for i, (a, b) in enumerate(zip(example_sentence, decoded)):
                 if a != b:
