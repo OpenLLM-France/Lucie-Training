@@ -80,7 +80,7 @@ if __name__ == "__main__":
         args.output = args.tokenizer
     os.makedirs(args.output, exist_ok=True)
 
-    output_file = f"{args.output}/eval_transformers_{args.batch_size}.csv"
+    output_file = f"{args.output}/eval_transformers_2.csv"
 
     already_computed = []
     eval_data = []
@@ -101,6 +101,7 @@ if __name__ == "__main__":
             print(f"Skipping eval of {args.tokenizer} on {name} (already computed)")
             continue
         print(f"Evaluate {args.tokenizer} on {name}...")
+
         total_num_pages = 0
         total_num_paragraph = 0
         total_num_lines = 0
@@ -108,37 +109,83 @@ if __name__ == "__main__":
         total_num_chars = 0
         total_num_bytes = 0
         total_num_tokens = 0
+        total_num_spaces = 0
+        total_num_linebreaks = 0
+        total_num_tabs = 0
+        total_num_digits = 0
+        total_num_tokens_space = 0
+        total_num_tokens_linebreak = 0
+        total_num_tokens_tab = 0
+        total_num_tokens_digit = 0
         total_num_tokens_single_byte = 0
-        tic = time.time()
+
+        def update_stats(text, tokens):
+            global tokenizer
+            global total_num_pages
+            global total_num_paragraph
+            global total_num_lines
+            global total_num_words
+            global total_num_chars
+            global total_num_bytes
+            global total_num_tokens
+            global total_num_spaces
+            global total_num_linebreaks
+            global total_num_tabs
+            global total_num_digits
+            global total_num_tokens_space
+            global total_num_tokens_linebreak
+            global total_num_tokens_tab
+            global total_num_tokens_digit
+            global total_num_tokens_single_byte
+            total_num_pages += 1
+            total_num_paragraph += len(text.split("\n\n"))
+            total_num_lines += len(text.split("\n"))
+            total_num_words += len(text.split())
+            total_num_chars += len(text)
+            total_num_bytes += len(bytes(text, "utf-8"))
+            total_num_spaces += text.count(" ")
+            total_num_linebreaks += text.count("\n")
+            total_num_tabs += text.count("\t")
+            total_num_digits += sum(c.isdigit() for c in text)
+            total_num_tokens += len(tokens)
+            if hasattr(tokenizer, "convert_ids_to_tokens"):
+                token_str = tokenizer.convert_ids_to_tokens(tokens)
+            else:
+                token_str = tokenizer.decode_batch([[t] for t in tokens])
+            total_num_tokens_space += sum(not t.strip(" ▁") for t in token_str)
+            total_num_tokens_linebreak += sum(not t.strip("\n") for t in token_str)
+            total_num_tokens_tab += sum(not t.strip("\t") for t in token_str)
+            total_num_tokens_digit += sum(not re.sub(r"[0-9]", "", t) for t in token_str)
+            total_num_tokens_single_byte += sum(t in all_byte_tokens for t in tokens)
+
+        use_batch = args.batch_size > 1
+        update_each = args.batch_size if use_batch else 32
+
+        def process_batch(batch, use_batch=use_batch):
+            global tokenizer
+            global processing_time
+            tic = time.time()
+            if use_batch:
+                tokens = tokenizer.batch_encode_plus(batch).input_ids
+            else:
+                tokens = [tokenizer.encode(t) for t in batch]
+            processing_time += time.time() - tic
+            assert len(tokens) == len(batch)
+            for t, b in zip(tokens, batch):
+                update_stats(b, t)
+
+        processing_time = 0
         batch = []
         for text in tqdm.tqdm(dataset, total=len(dataset), desc=f"Evaluating {name}"):
-            if args.batch_size == 1:
-                total_num_pages += 1
-                total_num_paragraph += len(text.split("\n\n"))
-                total_num_lines += len(text.split("\n"))
-                total_num_words += len(text.split())
-                total_num_chars += len(text)
-                total_num_bytes += len(bytes(text, "utf-8"))
-                tokens = tokenizer.encode(text)
-                total_num_tokens += len(tokens)
-                byte_tokens = [t for t in tokens if t in all_byte_tokens]
-                total_num_tokens_single_byte += len(byte_tokens)
-            else:
-                batch.append(text)
-                if len(batch) == args.batch_size:
-                    total_num_pages += len(batch)
-                    total_num_paragraph += sum(len(text.split("\n\n")) for text in batch)
-                    total_num_lines += sum(len(text.split("\n")) for text in batch)
-                    total_num_words += sum(len(text.split()) for text in batch)
-                    total_num_chars += sum(len(text) for text in batch)
-                    total_num_bytes += sum(len(bytes(text, "utf-8")) for text in batch)
-                    tokens = tokenizer.batch_encode_plus(batch).input_ids
-                    total_num_tokens += sum(len(t) for t in tokens)
-                    byte_tokens = [[t for t in tok if t in all_byte_tokens] for tok in tokens]
-                    total_num_tokens_single_byte += sum(len(t) for t in byte_tokens)
-                    batch = []
-        toc = time.time()
+            batch.append(text)
+            if len(batch) == update_each:
+                process_batch(batch)
+                batch = []
 
+        if len(batch):
+            process_batch(batch)
+
+        print(f"Adding {name} in {output_file}...")
         if os.path.exists(output_file):
             df = pd.read_csv(output_file)
             eval_data = df.values.tolist()
@@ -153,12 +200,18 @@ if __name__ == "__main__":
                 total_num_words,
                 total_num_chars,
                 total_num_bytes,
+                total_num_spaces,
+                total_num_linebreaks,
+                total_num_tabs,
+                total_num_digits,
                 total_num_tokens,
+                total_num_tokens_space,
+                total_num_tokens_linebreak,
+                total_num_tokens_tab,
+                total_num_tokens_digit,
                 total_num_tokens_single_byte,
-                total_num_chars / total_num_tokens,
-                total_num_bytes / total_num_tokens,
-                total_num_tokens_single_byte / total_num_bytes,
-                toc - tic,
+                args.batch_size,
+                processing_time,
             ]
         )
 
@@ -172,14 +225,19 @@ if __name__ == "__main__":
                 "num_words",
                 "num_chars",
                 "num_bytes",
+                "num_spaces",
+                "num_linebreaks",
+                "num_tabs",
+                "num_digits",
                 "num_tokens",
+                "num_tokens_space",
+                "num_tokens_linebreak",
+                "num_tokens_tab",
+                "num_tokens_digit",
                 "num_tokens_single_byte",
-                "avg_length_token_char",
-                "avg_length_token_byte",
-                "avg_byte_kept",
-                "tokenization_time",
+                "batch_size",
+                "processing_time",
             ],
         )
 
-        print(df)
         df.to_csv(output_file, index=False)

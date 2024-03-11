@@ -52,14 +52,27 @@ def build_tokenizer(
     dropout: Optional[float] = None,
     individual_digits: Optional[bool] = True,
     separate_spaces_and_punctuations: Optional[bool] = True,
-    prefix_space_general: Optional[bool] = True,
+    space_behaviour: Optional[str] = "prefix_all",
     fuse_unk: Optional[float] = True,
     do_not_split_spaces: Optional[bool] = False,
 ):
     """
     Build a tokenizer.
     :return: The tokenizer.
+
+    :param dropout: Dropout rate for BPE
+    :param individual_digits: Split digits individually
+    :param separate_spaces_and_punctuations: Make sure not to mix spaces and punctuations with alphanumeric characters
+    :param space_behaviour:
+        - "prefix_sos": Add a prefix space at the start of the text
+        - "prefix_all": Add a prefix space after each linebreaks and tabulations (not just after the start)
+        - "split": Do not mix space with other characters
+    :param fuse_unk: Fuse unknown tokens
+    :param do_not_split_spaces: Experimental (not working)
     """
+
+    assert space_behaviour in {"prefix_sos", "prefix_all", "split"}
+
     tokenizer = tokenizers.Tokenizer(
         tokenizers.models.BPE(
             dropout=dropout,
@@ -69,7 +82,7 @@ def build_tokenizer(
         )
     )
 
-    add_prefix_space = True
+    add_prefix_space = space_behaviour != "split"
 
     normalizers = [
         tokenizers.normalizers.NFKC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
@@ -80,18 +93,35 @@ def build_tokenizer(
             tokenizers.normalizers.Replace(tokenizers.Regex(r"\n(?=[^\n\t])"), "\n "),
             tokenizers.normalizers.Replace(tokenizers.Regex(r"\t(?=[^\n\t])"), "\t "),
         ]
-        if prefix_space_general
-        else []
+        if (space_behaviour == "prefix_all")
+        else ([tokenizers.normalizers.Replace(" ", _space_internal)] if space_behaviour == "split" else [])
     )
 
     pretokenizers = (
         [
-            tokenizers.pre_tokenizers.Split(
-                tokenizers.Regex(rf"{_space_internal}?([\n\t\p{{P}}])\1*"), behavior="isolated"
-            )
+            # V1
+            # tokenizers.pre_tokenizers.Split(
+            #     tokenizers.Regex(rf"{_space_internal}?([\n\t\p{{P}}])\1*"), behavior="isolated"
+            # ),
+            # V2
+            tokenizers.pre_tokenizers.Split(tokenizers.Regex(rf"{_space_internal}?\p{{P}}+"), behavior="isolated"),
+            tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"[\n\t]"), behavior="isolated"),
         ]
-        if separate_spaces_and_punctuations
-        else []
+        if (separate_spaces_and_punctuations and space_behaviour != "split")
+        else (
+            (
+                [
+                    tokenizers.pre_tokenizers.Split(tokenizers.Regex(rf"[{_space_internal}\n\t]"), behavior="isolated"),
+                ]
+                + (
+                    [tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"\p{P}+"), behavior="isolated")]
+                    if separate_spaces_and_punctuations
+                    else []
+                )
+            )
+            if space_behaviour == "split"
+            else []
+        )
     ) + [
         tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits),
     ]
@@ -100,10 +130,13 @@ def build_tokenizer(
         tokenizer.normalizer = tokenizers.normalizers.Sequence(normalizers)
 
         tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(
-            [
-                tokenizers.pre_tokenizers.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
-            ]
-            + pretokenizers
+            (
+                [
+                    tokenizers.pre_tokenizers.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
+                ]
+            )
+            if space_behaviour != "split"
+            else [] + pretokenizers
         )
 
     else:  # Mistral + digits
@@ -130,7 +163,7 @@ def build_tokenizer(
                 tokenizers.decoders.Replace("\n ", "\n"),
                 tokenizers.decoders.Replace("\t ", "\t"),
             ]
-            if prefix_space_general
+            if (space_behaviour == "prefix_all")
             else []
         )
         + [
@@ -339,7 +372,7 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
         # new_merges = [m for m in new_merges if len(m) <= 11]
         new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
         merges = tokenizer["model"]["merges"]
-        tokenizer["model"]["merges"] = new_merges + [m for m in merges if m not in new_merges]
+        tokenizer["model"]["merges"] = [m for m in merges if m not in new_merges] + new_merges
 
     # Replace "Metaspace" pre_tokenizer by "Replace" normalizer
     pre_tokenizer = tokenizer["pre_tokenizer"]
@@ -380,7 +413,10 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
             pre_tokenizer = None
 
     # Remove pre_tokenizer that will be useless afterwards
-    for type in ("Digits",):  # "Split",:
+    for type in (
+        "Digits",
+        "Split",
+    ):
         has_pretokenizer = (
             (type in [p["type"] for p in pre_tokenizer["pretokenizers"]])
             if isseq_pre_tokenizer
@@ -456,10 +492,10 @@ if __name__ == "__main__":
         help="Make sure not to mix spaces and punctuations with alphanumeric characters",
     )
     parser.add_argument(
-        "--prefix_space_general",
-        default=True,
-        type=str2bool,
-        help="Add a prefix space after each linebreaks and tabulations (not just after the start)",
+        "--space_behaviour",
+        default="prefix_all",
+        choices=["prefix_sos", "prefix_all", "split"],
+        help="How to deal with whitespaces",
     )
     parser.add_argument(
         "--output",
@@ -514,9 +550,8 @@ if __name__ == "__main__":
         if args.individual_digits:
             name_tokenizer += "-digits"
         if args.separate_spaces_and_punctuations:
-            name_tokenizer += "-puncts"
-        if args.prefix_space_general:
-            name_tokenizer += "-prefix"
+            name_tokenizer += "-punctsV2"
+        name_tokenizer += f"-{args.space_behaviour.replace('_', '')}"
 
     example_sentence = (
         "   [INST] Coucou [/INST] Hello [INST] "
@@ -595,7 +630,7 @@ if __name__ == "__main__":
         tok = build_tokenizer(
             individual_digits=args.individual_digits,
             separate_spaces_and_punctuations=args.separate_spaces_and_punctuations,
-            prefix_space_general=args.prefix_space_general,
+            space_behaviour=args.space_behaviour,
         )
         tok = fit_tokenizer(tok, trainset, consecutive_spaces=args.consecutive_spaces)
         tok.save(os.path.join(args.output, "tokenizer.json"))
