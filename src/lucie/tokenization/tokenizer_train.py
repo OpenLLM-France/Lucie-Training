@@ -3,6 +3,7 @@
 
 import itertools
 import json
+import re
 from typing import Optional
 
 import tokenizers
@@ -55,6 +56,7 @@ def build_tokenizer(
     space_behaviour: Optional[str] = "prefix_all",
     fuse_unk: Optional[float] = True,
     do_not_split_spaces: Optional[bool] = False,
+    char_to_prefix_space: Optional[str] = "\n\t(['\"«“‘‚‹—–―",
 ):
     """
     Build a tokenizer.
@@ -90,8 +92,8 @@ def build_tokenizer(
     ] + (
         [
             # Note: placeholders cannot be handled (using tokenizers.Regex(r"[\t\n]"))
-            tokenizers.normalizers.Replace(tokenizers.Regex(r"\n(?=[^\n\t])"), "\n "),
-            tokenizers.normalizers.Replace(tokenizers.Regex(r"\t(?=[^\n\t])"), "\t "),
+            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^\1])"), c + " ")
+            for c in char_to_prefix_space
         ]
         if (space_behaviour == "prefix_all")
         else ([tokenizers.normalizers.Replace(" ", _space_internal)] if space_behaviour == "split" else [])
@@ -131,12 +133,17 @@ def build_tokenizer(
 
         tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Sequence(
             (
-                [
-                    tokenizers.pre_tokenizers.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
-                ]
+                (
+                    [
+                        tokenizers.pre_tokenizers.Metaspace(
+                            replacement=_space_internal, add_prefix_space=add_prefix_space
+                        ),
+                    ]
+                )
+                if space_behaviour != "split"
+                else []
             )
-            if space_behaviour != "split"
-            else [] + pretokenizers
+            + pretokenizers
         )
 
     else:  # Mistral + digits
@@ -159,10 +166,7 @@ def build_tokenizer(
             tokenizers.decoders.Fuse(),
         ]
         + (
-            [
-                tokenizers.decoders.Replace("\n ", "\n"),
-                tokenizers.decoders.Replace("\t ", "\t"),
-            ]
+            [tokenizers.decoders.Replace(c + " ", c) for c in char_to_prefix_space]
             if (space_behaviour == "prefix_all")
             else []
         )
@@ -368,7 +372,11 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
         if len(all_spaces) < 2:
             continue
         all_pairs = list(itertools.product(all_spaces, repeat=2))
-        new_merges = sorted([f"{a} {b}" for a, b in all_pairs], key=len)
+        new_merges = sorted(
+            [f"{a} {b}" for a, b in all_pairs],
+            # key=len
+            key=lambda x: (-len(x.split(" ")[0]), -len(x.split(" ")[1])),
+        )
         # new_merges = [m for m in new_merges if len(m) <= 11]
         new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
         merges = tokenizer["model"]["merges"]
@@ -487,7 +495,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--separate_spaces_and_punctuations",
-        default=True,
+        default=False,
         type=str2bool,
         help="Make sure not to mix spaces and punctuations with alphanumeric characters",
     )
@@ -566,7 +574,7 @@ if __name__ == "__main__":
         example_training_sentences = [
             "   Mais en Français, comment   est-ce que ça se passera?\n\ns hey... ow ...?",
             "1999 2000 1999   2000 199 200 en François en Français\n\ns ra? ow...? hey...",
-            "sans oublier (les a) (les b) (les c) (les d) (les e)",
+            "sans oublier Mot (Mot) [Mot] (Mot) [Mot]",
         ]
 
         def debug_texts_iterator():
@@ -584,8 +592,7 @@ if __name__ == "__main__":
         name_dataset = trainset.name
 
     if not args.output:
-        # args.output = f"trained_tokenizer_{args.tokenizer.replace('/', '--')}"
-        args.output = f"trained_tokenizer_{name_tokenizer}_{name_dataset}"
+        args.output = f"trained/tokenizer_{name_tokenizer}_{name_dataset}"
         if args.debug:
             args.output = "DEBUG_" + args.output
 
@@ -632,6 +639,19 @@ if __name__ == "__main__":
             separate_spaces_and_punctuations=args.separate_spaces_and_punctuations,
             space_behaviour=args.space_behaviour,
         )
+
+        # Print options and stress test
+        print(json.dumps(json.loads(tok.to_str())["normalizer"], indent=2))
+        print(json.dumps(json.loads(tok.to_str())["pre_tokenizer"], indent=2))
+        for s in [
+            "123 456\u00A0789",
+            "Mot.Mot. Mot...  Mot (Mot) (Mot)   (Mot) \nMot \n Mot",
+        ]:
+            print(s.replace("\n", "\\n"))
+            tokens = tok.pre_tokenizer.pre_tokenize_str(tok.normalizer.normalize_str(s))
+            tokens = [t[0] for t in tokens]
+            print(tokens)
+
         tok = fit_tokenizer(tok, trainset, consecutive_spaces=args.consecutive_spaces)
         tok.save(os.path.join(args.output, "tokenizer.json"))
         tok = transformers.PreTrainedTokenizerFast(tokenizer_file=os.path.join(args.output, "tokenizer.json"))

@@ -35,9 +35,9 @@ if __name__ == "__main__":
         # Digits
         "$1 234\u00A0567,890€ 1.2 3/4",
         # Spaces
-        "Mot Mot\nMot\n Mot\n   Mot",
+        "Mot Mot\nMot \n Mot   \n   Mot",
         # Spaces & Brackets
-        "(Mot) (Mot)\n(Mot)\n (Mot)\n" + " " * 13 + "(Mot)",
+        "(Mot) (Mot)\n(Mot) \n (Mot)   \n" + " " * 13 + "(Mot)",
         "[INST]",
         # Punctuations
         "website.fr là. (etc...) .- -.",
@@ -62,7 +62,9 @@ if __name__ == "__main__":
             while decoded[-1] != "<":
                 decoded = decoded[:-1]
             decoded = decoded[:-1]
-        bos_eos_details = f"{' no 'if has_bos or has_eos else ''}{'BOS' if has_bos else ''}{'/EOS' if has_eos else ''}"
+        bos_eos_details = (
+            f"{' no 'if has_bos or has_eos else '....'}{'BOS' if has_bos else '...'}{'/EOS' if has_eos else '....'}"
+        )
         print(
             f"* Decoded{bos_eos_details}:",
             norm_for_display(decoded),
