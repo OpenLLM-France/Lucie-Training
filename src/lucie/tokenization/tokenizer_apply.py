@@ -218,6 +218,7 @@ def get_args():
     )
     group = parser.add_argument_group(title="output data")
     group.add_argument("--output-folder", type=str, default="tokenized_data", help="Output folder")
+    group.add_argument("--jsonl-folder", type=str, default="tmp_to_tokenize", help="Folder with jsonl files")
     group.add_argument("--dataset-impl", type=str, default="mmap", choices=["lazy", "cached", "mmap"])
 
     group = parser.add_argument_group(title="runtime")
@@ -267,6 +268,8 @@ def check_files_exist(in_ss_out_names, key, num_partitions):
 def main():  # noqa # C901 `...` is too complex
     args = get_args()
 
+    args.remove_jsonl = "tmp" in args.jsonl_folder
+
     if args.split_sentences:
         if nltk_available:
             nltk.download("punkt", quiet=True)
@@ -282,7 +285,7 @@ def main():  # noqa # C901 `...` is too complex
             print(f"Skipping {dataset_name} as {expected_file} exists.")
             continue
 
-        jsonl_file = os.path.join("tmp_to_tokenize", dataset_name + ".jsonl")
+        jsonl_file = os.path.join(args.jsonl_folder, dataset_name + ".jsonl")
         if not os.path.exists(jsonl_file):
             print(f"Writing {jsonl_file}...")
             os.makedirs(os.path.dirname(jsonl_file), exist_ok=True)
@@ -369,7 +372,8 @@ def main():  # noqa # C901 `...` is too complex
                 p.join()
 
             if args.partitions == 1:
-                os.remove(jsonl_file)
+                if args.remove_jsonl:
+                    os.remove(jsonl_file)
                 continue
 
         # encode partition files in parallel
@@ -386,7 +390,8 @@ def main():  # noqa # C901 `...` is too complex
             p.join()
 
         if args.partitions == 1:
-            os.remove(jsonl_file)
+            if args.remove_jsonl:
+                os.remove(jsonl_file)
             continue
 
         # merge bin/idx partitions
