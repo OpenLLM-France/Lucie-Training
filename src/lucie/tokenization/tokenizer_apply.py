@@ -2,41 +2,26 @@
 
 """Processing large data for pretraining."""
 import argparse
-import glob
-import gzip
 import json
 import multiprocessing
 import os
 import sys
 import time
 
-try:
-    import nltk
-
-    nltk_available = True
-except ImportError:
-    nltk_available = False
-
 from data import decompose_datasets, get_datasets
+
+nltk_available = False
+# try:
+#     import nltk
+#     nltk_available = True
+# except ImportError:
+#     nltk_available = False
 
 megatron_deepspeed_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "Megatron-DeepSpeed"))
 sys.path = [megatron_deepspeed_folder] + sys.path  # Better to prepend for "tools" module
 
 from megatron.data import indexed_dataset  # noqa # E402 Module level import not at top of file
 from megatron.tokenizer import build_tokenizer  # noqa # E402 Module level import not at top of file
-
-
-# https://stackoverflow.com/questions/33139531/preserve-empty-lines-with-nltks-punkt-tokenizer
-class CustomLanguageVars(nltk.tokenize.punkt.PunktLanguageVars):
-    _period_context_fmt = r"""
-        \S*                          # some word material
-        %(SentEndChars)s             # a potential sentence ending
-        \s*                       #  <-- THIS is what I changed
-        (?=(?P<after_tok>
-            %(NonWord)s              # either other punctuation
-            |
-            (?P<next_tok>\S+)     #  <-- Normally you would have \s+ here
-        ))"""
 
 
 class IdentitySplitter:
@@ -51,20 +36,20 @@ class Encoder:
     def initializer(self):
         # Use Encoder class as a container for global data
         Encoder.tokenizer = build_tokenizer(self.args)
-        if self.args.split_sentences:
-            if not nltk_available:
-                print("NLTK is not available to split sentences.")
-                exit()
-            library = f"tokenizers/punkt/{self.args.lang}.pickle"
-            splitter = nltk.load(library)
-            if self.args.keep_newlines:
-                # this prevents punkt from eating newlines after sentences
-                Encoder.splitter = nltk.tokenize.punkt.PunktSentenceTokenizer(
-                    train_text=splitter._params, lang_vars=CustomLanguageVars()
-                )
-            else:
-                Encoder.splitter = splitter
-
+        if False:  # self.args.split_sentences:
+            pass
+            # if not nltk_available:
+            #     print("NLTK is not available to split sentences.")
+            #     exit()
+            # library = f"tokenizers/punkt/{self.args.lang}.pickle"
+            # splitter = nltk.load(library)
+            # if self.args.keep_newlines:
+            #     # this prevents punkt from eating newlines after sentences
+            #     Encoder.splitter = nltk.tokenize.punkt.PunktSentenceTokenizer(
+            #         train_text=splitter._params, lang_vars=CustomLanguageVars()
+            #     )
+            # else:
+            #     Encoder.splitter = splitter
         else:
             Encoder.splitter = IdentitySplitter()
 
@@ -110,11 +95,11 @@ class Partition:
         self.workers = workers
 
     def print_processing_stats(self, count, proc_start, total_bytes_processed):
-        if count % self.args.log_interval == 0:
-            current = time.time()
-            elapsed = current - proc_start
-            mbs = total_bytes_processed / elapsed / 1024 / 1024
-            print(f"Processed {count} documents", f"({count/elapsed} docs/s, {mbs} MB/s).", file=sys.stderr)
+        current = time.time()
+        elapsed = current - proc_start
+        mbs = total_bytes_processed / elapsed / 1024 / 1024
+        print(f"Processed {count} documents", f"({count/elapsed} docs/s, {mbs} MB/s).", file=sys.stderr)
+        sys.stdout.flush()
 
     def split_sentences(self, file_name):
         input_file_name, output_file_name = file_name
@@ -123,7 +108,7 @@ class Partition:
         fout = open(output_file_name, "w")
 
         encoder = Encoder(self.args)
-        pool = multiprocessing.Pool(self.workers, initializer=encoder.initializer)
+        pool = multiprocessing.Pool(self.args.threads_tokenization, initializer=encoder.initializer)
         split_docs = pool.imap(encoder.split, fin, 32)
 
         proc_start = time.time()
@@ -131,25 +116,30 @@ class Partition:
         for i, (doc, bytes_processed) in enumerate(split_docs, start=1):
             total_bytes_processed += bytes_processed
             fout.write(doc + "\n")
-            self.print_processing_stats(i, proc_start, total_bytes_processed)
+            if i % self.args.log_interval == 0:
+                self.print_processing_stats(i, proc_start, total_bytes_processed)
 
         fin.close()
         fout.close()
 
-    def process_json_file(self, file_name):
-        input_file_name, output_prefix = file_name
-        print("Opening", input_file_name)
+    def process_json_file(self, input_file_name, output_prefix):
+        # print("Opening", input_file_name)
         fin = open(input_file_name, encoding="utf-8")
 
-        startup_start = time.time()
+        # startup_start = time.time()
         encoder = Encoder(self.args)
         tokenizer = build_tokenizer(self.args)
-        pool = multiprocessing.Pool(self.workers, initializer=encoder.initializer)
-        encoded_docs = pool.imap(encoder.encode, fin, 32)
+        if self.args.threads_tokenization > 1:
+            raise NotImplementedError("Multithreading is not supported for encoding.")
+            # pool = multiprocessing.Pool(self.args.threads_tokenization, initializer=encoder.initializer)
+            # encoded_docs = pool.imap(encoder.encode, fin, 32)
+        else:
+            encoder.initializer()
+            encoded_docs = map(encoder.encode, fin)
 
         level = "document"
-        if self.args.split_sentences:
-            level = "sentence"
+        # if self.args.split_sentences:
+        #     level = "sentence"
 
         output_bin_files = {}
         output_idx_files = {}
@@ -162,18 +152,102 @@ class Partition:
                 output_bin_files[key], impl=self.args.dataset_impl, vocab_size=tokenizer.vocab_size
             )
 
-        startup_end = time.time()
+        # startup_end = time.time()
         proc_start = time.time()
         total_bytes_processed = 0
-        print("Time to startup:", startup_end - startup_start)
+        # print("Time to startup:", startup_end - startup_start)
+        i = -1
         for i, (doc, sentence_lens, bytes_processed) in enumerate(encoded_docs, start=1):
             total_bytes_processed += bytes_processed
             for key in doc.keys():
                 builders[key].add_doc(doc[key], sentence_lens[key])
-            self.print_processing_stats(i, proc_start, total_bytes_processed)
+            if i % self.args.log_interval == 0:
+                pass
+                # self.print_processing_stats(i, proc_start, total_bytes_processed)
+        assert i >= 0, f"Error: {input_file_name} is empty."
+        self.print_processing_stats(i, proc_start, total_bytes_processed)
 
         fin.close()
         builders[key].finalize(output_idx_files[key])
+
+    def process_dataset(self, dataset_name):  # noqa # C901 `...` is too complex
+        global error_flag, num_processes
+
+        remove_jsonl = self.args.remove_jsonl
+        has_increased_num_processes = False
+
+        try:
+            global all_datas
+            dataset = all_datas[dataset_name]
+
+            expected_file = os.path.join(self.args.output_folder, dataset_name + "_text_document.idx")
+            if isinstance(dataset, str):
+                jsonl_file = dataset
+                assert os.path.exists(jsonl_file), f"Error: {jsonl_file} does not exist."
+                remove_jsonl = False
+            else:
+                jsonl_file = os.path.join(self.args.jsonl_folder, dataset_name + ".jsonl")
+
+            if os.path.exists(expected_file) and self.args.remove_jsonl:
+                # print(f"Skipping {jsonl_file} as {expected_file} exists.")
+                sys.stdout.flush()
+                return
+
+            if not os.path.exists(jsonl_file):
+                print(f"Writing {jsonl_file}...")
+                os.makedirs(os.path.dirname(jsonl_file), exist_ok=True)
+                tic = time.time()
+                try:
+                    with open(jsonl_file, "w", encoding="utf-8") as f:
+                        for doc in dataset:
+                            f.write(json.dumps({self.args.json_keys[0]: doc}) + "\n")
+                except (Exception, KeyboardInterrupt) as err:
+                    if os.path.exists(jsonl_file):
+                        os.remove(jsonl_file)
+                    raise err
+                print(f"Wrote {jsonl_file} in {time.time() - tic:.2f}s")
+                sys.stdout.flush()
+
+            all_datas.pop(dataset_name)
+            del dataset
+
+            if os.path.exists(expected_file):
+                # print(f"Skipping {jsonl_file} as {expected_file} exists.")
+                sys.stdout.flush()
+                return
+
+            num_processes.value += 1
+            has_increased_num_processes = True
+
+            print(f"Processing {jsonl_file} ({num_processes.value} processes)")
+            sys.stdout.flush()
+
+            os.makedirs(self.args.output_folder, exist_ok=True)
+            output_prefix = os.path.join(self.args.output_folder, dataset_name)
+
+            self.process_json_file(jsonl_file, output_prefix)
+            print(f"Processed {jsonl_file}...")
+            sys.stdout.flush()
+
+            if remove_jsonl:
+                os.remove(jsonl_file)
+
+        except (Exception, KeyboardInterrupt) as err:
+            print(f"Error processing {dataset_name}: {err}")
+            sys.stdout.flush()
+            if error_flag is not None:
+                error_flag.value = True
+            if has_increased_num_processes:
+                num_processes.value -= 1
+
+        if has_increased_num_processes:
+            num_processes.value -= 1
+
+
+global error_flag
+error_flag = multiprocessing.Value("b", False)
+global num_processes
+num_processes = multiprocessing.Value("i", 0)
 
 
 def get_args():
@@ -183,7 +257,7 @@ def get_args():
     group.add_argument(
         "--json-keys", nargs="+", default=["text"], help="space separate listed of keys to extract from json"
     )
-    group.add_argument("--split-sentences", action="store_true", help="Split documents into sentences.")
+    # group.add_argument("--split-sentences", action="store_true", help="Split documents into sentences.")
     group.add_argument("--keep-newlines", action="store_true", help="Keep newlines between sentences when splitting.")
 
     group = parser.add_argument_group(title="tokenizer")
@@ -225,20 +299,21 @@ def get_args():
     group.add_argument(
         "--workers",
         type=int,
-        default=10,
+        default=9,
         help=(
             "Number of worker processes to launch."
             "A good default for fast pre-processing "
             "is: (workers * partitions) = available CPU cores."
         ),
     )
+    group.add_argument(
+        "--threads_tokenization", type=int, default=1, help="Number of sub-threads for tokenizing each subset part"
+    )
     group.add_argument("--partitions", type=int, default=1, help="Number of file partitions")
     group.add_argument("--log-interval", type=int, default=1000, help="Interval between progress updates")
     args = parser.parse_args()
-    args.keep_empty = False
 
-    if args.tokenizer_type.lower().startswith("bert") and not args.split_sentences:
-        print("Are you sure you don't want to split sentences?")
+    args.keep_empty = False
 
     # some default/dummy values for the tokenizer
     args.rank = 1
@@ -265,156 +340,50 @@ def check_files_exist(in_ss_out_names, key, num_partitions):
     return True
 
 
-def main():  # noqa # C901 `...` is too complex
+def dataset_to_key_value(dataset):
+    if isinstance(dataset, tuple) and len(dataset) == 2:
+        return dataset
+    else:
+        return (dataset.name.replace(":", "--"), dataset)
+
+
+def main():
     args = get_args()
 
     args.remove_jsonl = "tmp" in args.jsonl_folder
 
-    if args.split_sentences:
-        if nltk_available:
-            nltk.download("punkt", quiet=True)
-        else:
-            raise Exception("nltk library required for sentence splitting is not available.")
-
+    global all_datas
     all_datas = get_datasets(args.datasets)
-    for dataset in decompose_datasets(all_datas, parquet_level=True):
-        dataset_name = dataset.name.replace(":", "--")
+    all_datas = dict(
+        dataset_to_key_value(dataset)
+        for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
+    )
 
-        expected_file = os.path.join(args.output_folder, dataset_name + "_text_document.bin")
-        if os.path.exists(expected_file):
-            print(f"Skipping {dataset_name} as {expected_file} exists.")
-            continue
+    partition = Partition(args, args.workers)
 
-        jsonl_file = os.path.join(args.jsonl_folder, dataset_name + ".jsonl")
-        if not os.path.exists(jsonl_file):
-            print(f"Writing {jsonl_file}...")
-            os.makedirs(os.path.dirname(jsonl_file), exist_ok=True)
-            tic = time.time()
-            try:
-                with open(jsonl_file, "w") as f:
-                    for doc in dataset:
-                        f.write(json.dumps({args.json_keys[0]: doc}) + "\n")
-            except (Exception, KeyboardInterrupt) as err:
-                if os.path.exists(jsonl_file):
-                    os.remove(jsonl_file)
-                raise err
-            print(f"Done in {time.time() - tic:.2f}s")
-        print(f"Processing {jsonl_file}...")
-        args.input = jsonl_file
-        os.makedirs(args.output_folder, exist_ok=True)
-        args.output_prefix = os.path.join(args.output_folder, dataset_name)
+    print("=" * 20)
+    print(f"Processing {len(all_datas)} datasets with {args.workers} workers.")
 
-        in_ss_out_names = []
-        if args.partitions == 1:
-            file_name, extension = os.path.splitext(args.input)
-            sentence_split_file = file_name + "_ss" + extension
-            file_names = {
-                "partition": args.input,
-                "sentence_split": sentence_split_file,
-                "output_prefix": args.output_prefix,
-            }
-            in_ss_out_names.append(file_names)
-        else:
-            in_file_names = glob.glob(args.input)
+    # # Shared flag to indicate if an error occurred in any process
+    # error_flag = multiprocessing.Value('b', False)
 
-            # create .jsonl parition files
-            for idx in range(args.partitions):
-                in_ss_out_name = get_file_name(args, idx)
-                in_ss_out_names.append(in_ss_out_name)
+    with multiprocessing.Pool(processes=args.workers) as pool:
+        # Partially apply the process function with error_flag argument
+        # import functools
+        # process_dataset = functools.partial(partition.process_dataset, error_flag=error_flag)
 
-            # check to see if paritions were already created
-            partitions_present = check_files_exist(in_ss_out_names, "partition", args.partitions)
+        chunk_size = 1  # args.workers # len(all_datas) // args.workers
+        for _ in pool.imap_unordered(partition.process_dataset, sorted(all_datas.keys()), chunk_size):
+            # Check if any error occurred
+            if error_flag.value:
+                # If an error occurred, terminate all processes in the pool
+                print("An error occurred in one of the processes. Terminating all processes.")
+                sys.stdout.flush()
+                pool.terminate()
+                break
 
-            # check to see if paritions with split sentences already created
-            split_sentences_present = check_files_exist(in_ss_out_names, "sentence_split", args.partitions)
-
-            if not partitions_present and not split_sentences_present:
-                # populate .jsonl partition files from parent files
-                partitioned_input_files = []
-                for idx in range(args.partitions):
-                    partitioned_input_file = open(in_ss_out_names[idx]["partition"], "w")
-                    partitioned_input_files.append(partitioned_input_file)
-
-                index = 0
-                for in_file_name in in_file_names:
-                    # support for gzip files
-                    if in_file_name.endswith(".gz"):
-                        fin = gzip.open(in_file_name, "rt")
-                    else:
-                        fin = open(in_file_name, encoding="utf-8")
-
-                    for line in fin:
-                        partitioned_input_files[index].write(line)
-                        index = (index + 1) % args.partitions
-
-                    fin.close()
-
-                for idx in range(args.partitions):
-                    partitioned_input_files[idx].close()
-
-        assert args.workers % args.partitions == 0
-        partition = Partition(args, args.workers // args.partitions)
-
-        # check to see if paritions with split sentences already created
-        split_sentences_present = check_files_exist(in_ss_out_names, "sentence_split", args.partitions)
-
-        # split sentences in partition files
-        if args.split_sentences and not split_sentences_present:
-            processes = []
-            for name in in_ss_out_names:
-                p = multiprocessing.Process(
-                    target=partition.split_sentences, args=((name["partition"], name["sentence_split"]),)
-                )
-                p.start()
-                processes.append(p)
-
-            for p in processes:
-                p.join()
-
-            if args.partitions == 1:
-                if args.remove_jsonl:
-                    os.remove(jsonl_file)
-                continue
-
-        # encode partition files in parallel
-        processes = []
-        input_key = "sentence_split" if args.split_sentences else "partition"
-        for name in in_ss_out_names:
-            p = multiprocessing.Process(
-                target=partition.process_json_file, args=((name[input_key], name["output_prefix"]),)
-            )
-            p.start()
-            processes.append(p)
-
-        for p in processes:
-            p.join()
-
-        if args.partitions == 1:
-            if args.remove_jsonl:
-                os.remove(jsonl_file)
-            continue
-
-        # merge bin/idx partitions
-        level = "document"
-        if args.split_sentences:
-            level = "sentence"
-
-        output_bin_files = {}
-        output_idx_files = {}
-        builders = {}
-        tokenizer = build_tokenizer(args)
-
-        for key in args.json_keys:
-            output_bin_files[key] = f"{args.output_prefix}_{key}_{level}.bin"
-            output_idx_files[key] = f"{args.output_prefix}_{key}_{level}.idx"
-            builders[key] = indexed_dataset.make_builder(
-                output_bin_files[key], impl=args.dataset_impl, vocab_size=tokenizer.vocab_size
-            )
-            for name in in_ss_out_names:
-                parition_output_prefix = name["output_prefix"]
-                full_partition_output_prefix = f"{parition_output_prefix}_{key}_{level}"
-                builders[key].merge_file_(full_partition_output_prefix)
-            builders[key].finalize(output_idx_files[key])
+        # pool.close()
+        # pool.join()
 
 
 if __name__ == "__main__":

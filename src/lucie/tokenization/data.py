@@ -238,15 +238,26 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         yield python_class(**kwargs)
 
 
-def decompose_datasets(dataset, parquet_level=False):
-    if isinstance(dataset, (list, types.GeneratorType)):
+def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possible=False):  # noqa # C901 `...` is too complex
+    # For recursive calls
+    kwargs = dict(
+        parquet_level=parquet_level,
+        return_json_file_if_possible=return_json_file_if_possible,
+    )
+    if return_json_file_if_possible and hasattr(dataset, "json_files"):
+        for i, jsonl_file in enumerate(sorted(dataset.json_files)):
+            yield (f"{dataset.name}--{i:04d}", jsonl_file)
+
+    elif isinstance(dataset, (list, types.GeneratorType)):
         for d in dataset:
-            for ds in decompose_datasets(d, parquet_level):
+            for ds in decompose_datasets(d, **kwargs):
                 yield ds
+
     elif isinstance(dataset, DataIteratorConcat):
         for d in dataset.datasets:
-            for ds in decompose_datasets(d, parquet_level):
+            for ds in decompose_datasets(d, **kwargs):
                 yield ds
+
     elif isinstance(dataset, DataIterator):
         if parquet_level and hasattr(dataset, "parquet_files"):
             for i, parquet_file in enumerate(sorted(dataset.parquet_files)):
@@ -1022,8 +1033,12 @@ class DataIteratorOpenDataFr(DataIteratorParquetSplitted):
 
 class DataIteratorAmericanStories(DataIteratorConcat):
     def __init__(self, streaming=True, from_huggingface=False, filter_by_perplexity=True, **kwargs):
+        data_path = os.path.join(
+            DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "americanstories", "*.parquet"
+        )
+
         if from_huggingface is None:
-            from_huggingface = not os.path.isdir(f"{DATA_PATH}/americanstories")
+            from_huggingface = not os.path.isdir(data_path)
             logger.info(
                 "Using HuggingFace version for AmericanStories"
                 if from_huggingface
@@ -1033,9 +1048,6 @@ class DataIteratorAmericanStories(DataIteratorConcat):
         key = "article"
 
         if not from_huggingface:
-            data_path = os.path.join(
-                DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "americanstories", "*.parquet"
-            )
             data_files = sorted(glob.glob(data_path))
             assert len(data_files), f"Missing parquet files for {data_path}"
             logger.info(f"Using {len(data_files)} parquet files in {data_path}")
@@ -1059,6 +1071,7 @@ class DataIteratorAmericanStories(DataIteratorConcat):
             self.parquet_files = data_files
 
         else:
+            assert not filter_by_perplexity
             datas = datasets.load_dataset(
                 "dell-research-harvard/AmericanStories",
                 "all_years",
@@ -1084,42 +1097,76 @@ class DataIteratorAmericanStories(DataIteratorConcat):
 
 
 class DataIteratorPes2o(DataIteratorConcat):
-    def __init__(self, streaming=True, train=None, split_by_type=True, **kwargs):
-        repo = "allenai/peS2o"
+    def __init__(self, streaming=True, from_huggingface=False, train=None, split_by_type=True, **kwargs):
+        name = "PeS2o"
+
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(f"{DATA_PATH}/peS2o_train_jsonl")
+            logger.info(
+                "Using HuggingFace version for AmericanStories"
+                if from_huggingface
+                else "Using local version for AmericanStories"
+            )
 
         if train is not None:
             splits = ["train"] if train else ["validation"]
         else:
             splits = ["validation", "train"]
 
-        if split_by_type:
-            filter_fns = {
-                "s2ag": lambda x: x["source"].startswith("s2ag"),
-                "s2orc": lambda x: not x["source"].startswith("s2ag"),
-            }
-        else:
-            filter_fns = {"": None}
+        if from_huggingface:
+            repo = "allenai/peS2o"
 
-        name = "Pes2o"
-        DataIteratorConcat.__init__(
-            self,
-            [
-                DataIterator(
-                    datasets.load_dataset(
-                        repo,
-                        streaming=streaming,
-                        split=split,
-                    ),
-                    filter_fn=filter_fn,
-                    subsample_criteria="id",
-                    name=f"{name}:{subset_name+':' if subset_name else ''}{split}",
-                    **kwargs,
+            if split_by_type:
+                filter_fns = {
+                    "s2ag": lambda x: x["source"].startswith("s2ag"),
+                    "s2orc": lambda x: not x["source"].startswith("s2ag"),
+                }
+            else:
+                filter_fns = {"": None}
+
+            DataIteratorConcat.__init__(
+                self,
+                [
+                    DataIterator(
+                        datasets.load_dataset(
+                            repo,
+                            streaming=streaming,
+                            split=split,
+                        ),
+                        filter_fn=filter_fn,
+                        subsample_criteria="id",
+                        name=f"{name}:{subset_name+':' if subset_name else ''}{split}",
+                        **kwargs,
+                    )
+                    for split in splits
+                    for subset_name, filter_fn in filter_fns.items()
+                ],
+                name=name,
+            )
+
+        else:
+            self.json_files = []
+            iterators = []
+            for split in splits:
+                files_regex = f"{DATA_PATH}/peS2o_{split}_jsonl/*.json"
+                json_files = glob.glob(files_regex)
+                if not len(json_files):
+                    raise RuntimeError(f"No json files in {files_regex}")
+                self.json_files.extend(json_files)
+                iterators.append(
+                    DataIterator(
+                        datasets.load_dataset(
+                            "json",
+                            streaming=streaming,
+                            data_files=json_files,
+                            split="train",
+                        ),
+                        name=f"{name}:{split}",
+                        **kwargs,
+                    )
                 )
-                for split in splits
-                for subset_name, filter_fn in filter_fns.items()
-            ],
-            name=name,
-        )
+
+            DataIteratorConcat.__init__(self, iterators, name=name)
 
 
 ########################################
