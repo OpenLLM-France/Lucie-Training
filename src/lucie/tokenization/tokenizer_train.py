@@ -180,7 +180,9 @@ def build_tokenizer(
 
 def get_special_tokens(
     num_unused=40,
-    consecutive_spaces=10,
+    consecutive_spaces=8,
+    consecutive_tabs=4,
+    consecutive_linebreaks=2,
     special_tokens_map=None,
 ):
     if special_tokens_map is None:
@@ -201,12 +203,12 @@ def get_special_tokens(
     new_special_tokens += [f"<0x{i:02X}>" for i in range(256)]
 
     new_special_tokens += [f"<unused{i}>" for i in range(num_unused)]
-    for char in (
-        _space_internal,
-        "\n",
-        "\t",
+    for n, char in (
+        (consecutive_spaces, _space_internal),
+        (consecutive_tabs, "\t"),
+        (consecutive_linebreaks, "\n"),
     ):
-        for i in range(1, consecutive_spaces + 1):
+        for i in range(1, n + 1):
             new_special_tokens.append(char * i)
 
     for i in range(10):
@@ -215,15 +217,7 @@ def get_special_tokens(
     return new_special_tokens
 
 
-def fit_tokenizer(
-    tokenizer,
-    it,
-    len_it=None,
-    vocab_size=32000,
-    batch_size=1000,
-    num_unused=40,
-    consecutive_spaces=10,
-):
+def fit_tokenizer(tokenizer, it, len_it=None, vocab_size=32000, batch_size=1000, **special_tokens_options):
     """
     Fit a tokenizer on a dataset.
     :param tokenizer: The tokenizer to fit.
@@ -234,10 +228,7 @@ def fit_tokenizer(
     :return: The fitted tokenizer.
     """
 
-    special_tokens = get_special_tokens(
-        num_unused=num_unused,
-        consecutive_spaces=consecutive_spaces,
-    )
+    special_tokens = get_special_tokens(**special_tokens_options)
 
     bpe_trainer = tokenizers.trainers.BpeTrainer(
         vocab_size=vocab_size,
@@ -257,8 +248,7 @@ def refit_tokenizer(
     len_it=None,
     vocab_size=32000,
     batch_size=1000,
-    num_unused=40,
-    consecutive_spaces=10,
+    **special_tokens_options,
 ):
     """
     Fit a tokenizer on a dataset.
@@ -270,11 +260,7 @@ def refit_tokenizer(
     :return: The fitted tokenizer.
     """
 
-    new_special_tokens = get_special_tokens(
-        special_tokens_map=tokenizer.special_tokens_map,
-        num_unused=num_unused,
-        consecutive_spaces=consecutive_spaces,
-    )
+    new_special_tokens = get_special_tokens(special_tokens_map=tokenizer.special_tokens_map, **special_tokens_options)
 
     tokenizer._tokenizer.pre_tokenizer = tokenizers.pre_tokenizers.Digits(individual_digits=True)
 
@@ -340,44 +326,59 @@ def set_infinite_length(tokenizer):
     return tokenizer
 
 
-def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` is too complex
+def add_consecutive_spaces(  # noqa # C901 `...` is too complex
+    tokenizer_file,
+    consecutive_spaces=8,
+    consecutive_tabs=4,
+    consecutive_linebreaks=2,
+):
     tokenizer = json.load(open(tokenizer_file, encoding="utf8"))
     tokens = tokenizer["model"]["vocab"]
-    n = 2
-    assert n <= max_length
+
     # Add consecutive spaces in the vocabulary
-    for token, val in tokens.copy().items():
-        if token.startswith("<unused"):
-            while "▁" * n in tokens.keys():
-                n += 1
-            if n > max_length:
-                break
-            tokens.pop(token)
-            tokens["▁" * n] = val
-            n += 1
-        elif n > 2:
-            break
-    # Re-sort tokens
-    tokenizer["model"]["vocab"] = dict(sorted(tokens.items(), key=lambda x: x[1]))
+    # n = 2
+    # assert n <= max_length
+    # for token, val in tokens.copy().items():
+    #     if token.startswith("<unused"):
+    #         while "▁" * n in tokens.keys():
+    #             n += 1
+    #         if n > max_length:
+    #             break
+    #         tokens.pop(token)
+    #         tokens["▁" * n] = val
+    #         n += 1
+    #     elif n > 2:
+    #         break
+    # # Re-sort tokens
+    # tokenizer["model"]["vocab"] = dict(sorted(tokens.items(), key=lambda x: x[1]))
 
     # Add consecutive spaces in the merges
-    for char in (
-        "\t",
-        "\n",
-        _space_internal,
+    for n, char in (
+        (consecutive_spaces, _space_internal),
+        (consecutive_tabs, "\t"),
+        (consecutive_linebreaks, "\n"),
     ):
         # Make all the possible combinations
         all_spaces = [char * i for i in range(1, n)]
+
+        # Check that all the spaces are in the tokens
+        for s in all_spaces:
+            assert s in tokens, f"{s} not in tokens"
+        assert (char * n) in tokens, f"{char * n} not in tokens"
+        assert (char * (n + 1)) not in tokens, f"{char * (n+1)} in tokens"
+
+        # Safety (make sure all merges produce valid tokens)
         all_spaces = [s for s in all_spaces if s in tokens]
+
         if len(all_spaces) < 2:
             continue
+
         all_pairs = list(itertools.product(all_spaces, repeat=2))
         new_merges = sorted(
             [f"{a} {b}" for a, b in all_pairs],
             # key=len
             key=lambda x: (-len(x.split(" ")[0]), -len(x.split(" ")[1])),
         )
-        # new_merges = [m for m in new_merges if len(m) <= 11]
         new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
         merges = tokenizer["model"]["merges"]
         tokenizer["model"]["merges"] = [m for m in merges if m not in new_merges] + new_merges
@@ -439,6 +440,7 @@ def add_consecutive_spaces(tokenizer_file, max_length=10):  # noqa # C901 `...` 
                 }
             else:
                 pre_tokenizer = None
+
     if isseq_pre_tokenizer:
         if pre_tokenizer["pretokenizers"] == []:
             pre_tokenizer = None
@@ -482,28 +484,40 @@ if __name__ == "__main__":
         help="Base tokenizer (ex: mistralai/Mistral-7B-v0.1)",
     )
     parser.add_argument(
-        "--consecutive_spaces",
-        default=10,
-        type=int,
-        help="Maximum number of consecutive spaces to model",
-    )
-    parser.add_argument(
         "--individual_digits",
         default=True,
         type=str2bool,
         help="Split digits individually (ex: 1999 -> 1 9 9 9)",
     )
     parser.add_argument(
-        "--separate_spaces_and_punctuations",
-        default=False,
-        type=str2bool,
-        help="Make sure not to mix spaces and punctuations with alphanumeric characters",
+        "--consecutive_spaces",
+        default=8,
+        type=int,
+        help="Maximum number of consecutive spaces (in a same token)",
+    )
+    parser.add_argument(
+        "--consecutive_tabs",
+        default=4,
+        type=int,
+        help="Maximum number of consecutive tabs (in a same token)",
+    )
+    parser.add_argument(
+        "--consecutive_linebreaks",
+        default=2,
+        type=int,
+        help="Maximum number of consecutive linebreaks (in a same token)",
     )
     parser.add_argument(
         "--space_behaviour",
         default="prefix_all",
-        choices=["prefix_sos", "prefix_all", "split"],
+        choices=["prefix_all", "prefix_sos", "split"],
         help="How to deal with whitespaces",
+    )
+    parser.add_argument(
+        "--separate_spaces_and_punctuations",
+        default=False,
+        type=str2bool,
+        help="Make sure not to mix spaces and punctuations with alphanumeric characters",
     )
     parser.add_argument(
         "--output",
@@ -553,7 +567,7 @@ if __name__ == "__main__":
 
     name_tokenizer = os.path.basename(args.base) if args.base else "Lucie"
     name_tokenizer += f"-{args.vocab_size}"
-    name_tokenizer += f"-spaces{args.consecutive_spaces}"
+    name_tokenizer += f"-sp{args.consecutive_spaces}-{args.consecutive_tabs}-{args.consecutive_linebreaks}"
     if not args.base:
         if args.individual_digits:
             name_tokenizer += "-digits"
@@ -628,9 +642,15 @@ if __name__ == "__main__":
 
     if args.base:
         # Refit from pretrained
-        tok2 = transformers.AutoTokenizer.from_pretrained(args.base)
-        tok2 = refit_tokenizer(tok2, trainset, consecutive_spaces=args.consecutive_spaces)
-        tok2.save_pretrained(args.output)
+        tok = transformers.AutoTokenizer.from_pretrained(args.base)
+        tok = refit_tokenizer(
+            tok,
+            trainset,
+            consecutive_spaces=args.consecutive_spaces,
+            consecutive_tabs=args.consecutive_tabs,
+            consecutive_linebreaks=args.consecutive_linebreaks,
+        )
+        tok.save_pretrained(args.output)
 
     else:
         # From scratch
@@ -652,7 +672,13 @@ if __name__ == "__main__":
             tokens = [t[0] for t in tokens]
             print(tokens)
 
-        tok = fit_tokenizer(tok, trainset, consecutive_spaces=args.consecutive_spaces)
+        tok = fit_tokenizer(
+            tok,
+            trainset,
+            consecutive_spaces=args.consecutive_spaces,
+            consecutive_tabs=args.consecutive_tabs,
+            consecutive_linebreaks=args.consecutive_linebreaks,
+        )
         tok.save(os.path.join(args.output, "tokenizer.json"))
         tok = transformers.PreTrainedTokenizerFast(tokenizer_file=os.path.join(args.output, "tokenizer.json"))
         tok.save_pretrained(args.output)
@@ -741,11 +767,12 @@ if __name__ == "__main__":
 
     tokenizer.save_pretrained(args.output)
 
-    if args.consecutive_spaces > 1:
-        add_consecutive_spaces(
-            os.path.join(args.output, "tokenizer.json"),
-            max_length=args.consecutive_spaces,
-        )
+    add_consecutive_spaces(
+        os.path.join(args.output, "tokenizer.json"),
+        consecutive_spaces=args.consecutive_spaces,
+        consecutive_tabs=args.consecutive_tabs,
+        consecutive_linebreaks=args.consecutive_linebreaks,
+    )
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
 
