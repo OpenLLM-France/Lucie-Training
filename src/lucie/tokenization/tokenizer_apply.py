@@ -299,7 +299,7 @@ def get_args():
     group.add_argument(
         "--workers",
         type=int,
-        default=9,
+        default=16,
         help=(
             "Number of worker processes to launch."
             "A good default for fast pre-processing "

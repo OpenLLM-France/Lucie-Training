@@ -33,7 +33,7 @@ if __name__ == "__main__":
         # Unknown characters
         "␣ あ゙",
         # Digits
-        "$1 234\u00A0567,890€ 1.2 3/4",
+        "$1 234\u00A0567,890  00€ 1.2 3/4",
         # Spaces
         "Mot Mot\nMot \n Mot   \n   Mot",
         # Spaces & Brackets
