@@ -32,7 +32,7 @@ cd ...
 ```bash
 git clone https://github.com/deep-spin/Megatron-DeepSpeed.git  
 cd  Megatron-DeepSpeed/
-pip install -r requirements.txt
+pip install -e .
 pip install deepspeed==0.12.6
 cd ...
 ```
