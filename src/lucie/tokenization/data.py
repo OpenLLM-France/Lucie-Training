@@ -194,6 +194,8 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 # English
                 "american_stories",
                 "pes2o",
+                # Multi-language (with switching)
+                "croissant_aligned",
                 # Code
                 "code",
             ]
@@ -314,6 +316,7 @@ class DataIterator(DataIteratorBase):
         subsample_rate=1,
         subsample_criteria=None,
         subsample_invert=False,
+        preprocess=None,
         postprocess=None,
         filter_fn=None,
         name="",
@@ -328,6 +331,7 @@ class DataIterator(DataIteratorBase):
             subsample_rate: the rate of subsampling
             subsample_criteria: the key to use for subsampling
             subsample_invert: whether to invert the subsampling
+            preprocess: a function to apply to the data
             postprocess: a function to apply to the text
             filter_fn: a function to filter the examples
                     (returns True if the example is to be kept, False otherwise)
@@ -345,6 +349,7 @@ class DataIterator(DataIteratorBase):
             # Fallback to text
             self.subsample_criteria = key
         self.subsample_invert = subsample_invert
+        self.preprocess = preprocess
         self.postprocess = postprocess
         self.filter_fn = filter_fn
 
@@ -418,6 +423,8 @@ class DataIterator(DataIteratorBase):
                     r = string_to_random01(criterion)
 
         try:
+            if self.preprocess:
+                data = self.preprocess(data)
             text = data[self.key]
         except KeyError as err:
             raise KeyError(f"Key {self.key} not found in {data.keys()}.") from err
@@ -819,6 +826,98 @@ class DataIteratorEuroparl(DataIterator):
             name=name,
             **kwargs,
         )
+
+
+class DataIteratorCroissantAligned(DataIteratorConcat):
+    def __init__(self, train=True, **kwargs):
+        if train is not None:
+            splits = ["train"] if train else ["test"]
+        else:
+            splits = ["train", "test"]
+
+        name = "CroissantAligned"
+        do_augment = train
+        if do_augment:
+            name += "-augmented"
+
+        def is_augmented(split):
+            return split == "train"
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIteratorParquet(
+                    f"{DATA_PATH}/croissant_aligned/{split}",
+                    name=f"CroissantAligned:{split}" + ("-augmented" if is_augmented(split) else ""),
+                    preprocess=augment_aligned_text if is_augmented(split) else None,
+                    **kwargs,
+                )
+                for split in splits
+            ],
+            name="CroissantAligned",
+        )
+
+
+def augment_aligned_text(data):  # noqa # C901 `...` is too complex
+    text = data["text"]
+    fields = re.split(r"([ \n]{2,}|\t)", text)
+    assert len(fields) == 3, f"Got {len(fields)} in {fields}"
+    text1, separator, text2 = fields
+
+    languages = data.get("dataset_id", "")
+    if languages.startswith("Unbabel"):
+        languages = languages[len("Unbabel") :]
+    languages = re.sub(r"([A-Z])", r"_\1", "FrEn").lower().strip("_")
+    languages = languages.split("_")
+    if len(languages) != 2:
+        raise ValueError(f"Cannot find languages in {data}")
+    lan1, lan2 = languages
+
+    uselanguage_prefix = random.random() < 0.5
+
+    separator = random.choice([" ", "   ", "    ", "     ", "\t", "\t\t", "\n", "\n\n"])
+    before_lan = ""
+    after_lan = random.choice([": ", " : "])
+    if random.random() < 0.3:
+        before_lan = "["
+        after_lan = after_lan.strip() + "] "
+    how_to_write_language = random.choice(range(4))
+
+    text = text1 + separator + text2
+
+    if uselanguage_prefix:
+        if how_to_write_language == 0:
+            pass
+        elif how_to_write_language == 1:
+            lan1, lan2 = (LAN_TO_COMPLETE[x][x] for x in [lan1, lan2])
+        elif how_to_write_language == 2:
+            lan1, lan2 = (LAN_TO_COMPLETE[lan1][x] for x in [lan1, lan2])
+        elif how_to_write_language == 3:
+            lan1, lan2 = (LAN_TO_COMPLETE[lan2][x] for x in [lan1, lan2])
+
+        if random.random() < 0.5:  # Capitalize
+            lan1, lan2 = (x.capitalize() for x in [lan1, lan2])
+
+        if random.random() < 0.5:  # Invert
+            lan1, lan2 = lan2, lan1
+            text1, text2 = text2, text1
+
+        text = before_lan + lan1 + after_lan + text1 + separator + before_lan + lan2 + after_lan + text2
+
+    data["text"] = text
+    return data
+
+
+LAN_TO_COMPLETE = {
+    "fr": {
+        "fr": "français",
+        "en": "anglais",
+    },
+    "en": {
+        "en": "english",
+        "fr": "french",
+    },
+}
 
 
 class DataIteratorClaire(DataIteratorConcat):
