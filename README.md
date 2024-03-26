@@ -31,7 +31,7 @@ cd ...
 ```
 ### Install Megatron-Deepspeed
 ```bash
-git clone https://github.com/deep-spin/Megatron-DeepSpeed.git  
+git clone https://github.com/OpenLLM-France/Megatron-DeepSpeed.git
 cd  Megatron-DeepSpeed/
 pip install -e .
 pip install deepspeed==0.12.6
