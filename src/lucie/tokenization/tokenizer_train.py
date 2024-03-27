@@ -538,28 +538,6 @@ if __name__ == "__main__":
         action="store_false",
         default=True,
     )
-    data_group = parser.add_argument_group("Dataset selection")
-    data_group.add_argument(
-        "--no_persee",
-        dest="persee",
-        action="store_false",
-        default=True,
-        help="Don't use Persee",
-    )
-    data_group.add_argument(
-        "--no_legi",
-        dest="legi",
-        action="store_false",
-        default=True,
-        help="Don't use LEGI",
-    )
-    data_group.add_argument(
-        "--no_europarl",
-        dest="europarl",
-        action="store_false",
-        default=True,
-        help="Don't use Europarl",
-    )
     args = parser.parse_args()
 
     if args.verbose:
@@ -599,9 +577,6 @@ if __name__ == "__main__":
         trainset = tokenizer_dataset(
             train=True,
             streaming=True,
-            use_persee=args.persee,
-            use_legi=args.legi,
-            use_europarl=args.europarl,
         )
         name_dataset = trainset.name
 
