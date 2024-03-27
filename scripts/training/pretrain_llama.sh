@@ -1,15 +1,12 @@
 #!/bin/bash
 # This example script is contributed by external user https://github.com/nrailgun
-set -ex
+set -x
 
 ######################################
 # Change the below configurations here
-BASE_PATH=./tmp
-DS_CONFIG=${BASE_PATH}/deepspeed.json
-DATASET_1="./tmp/data/bookcorpus_train_1m_text_sentence"
-DATASET="1 ${DATASET_1}"
-CHECKPOINT_PATH=./tmp
-TOKENIZER_PATH=./tmp/tokenizer.model # offical llama tokenizer.model
+DS_CONFIG=$1/deepspeed.json
+DATASET="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document"
+TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all # offical llama tokenizer.model
 
 TP=2
 PP=2
@@ -17,19 +14,19 @@ ZERO_STAGE=0
 
 GPUS_PER_NODE=8
 MASTER_ADDR=localhost
-MASTER_PORT=6000
-NNODES=1
+MASTER_PORT=$(python src/find_free_port.py)
+NNODES=$4
 NODE_RANK=0
 
-HIDDEN_SIZE=2048 # e.g. llama-13b: 5120
-FFN_HIDDEN_SIZE=5504 # e.g. llama-13b: 13824
-NUM_LAYERS=24 # e.g. llama-13b: 40
-NUM_HEADS=16 # e.g. llama-13b: 40
+HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
+FFN_HIDDEN_SIZE=11008 # e.g. llama-13b: 13824
+NUM_LAYERS=32 # e.g. llama-13b: 40
+NUM_HEADS=32 # e.g. llama-13b: 40
 SEQ_LENGTH=2048
 NUM_KV_HEADS=4 # llama2 70B uses GQA
 
-MICRO_BATCH_SIZE=4
-GLOBAL_BATCH_SIZE=32 # e.g. llama: 4M tokens
+MICRO_BATCH_SIZE=6
+GLOBAL_BATCH_SIZE=48 # e.g. llama: 4M tokens
 TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
 LR=3e-4
 MIN_LR=3e-5
@@ -89,7 +86,8 @@ fi
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank $NODE_RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT"
 
 torchrun $DISTRIBUTED_ARGS \
-       pretrain_gpt.py \
+       $1/pretrain_gpt.py \
+       --data-cache-path $2 \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
@@ -101,13 +99,12 @@ torchrun $DISTRIBUTED_ARGS \
        --seq-length $SEQ_LENGTH \
        --max-position-embeddings $SEQ_LENGTH \
        --train-iters $TRAIN_STEPS \
-       --save $CHECKPOINT_PATH \
-       --load $CHECKPOINT_PATH \
+       --save $3 \
+       --load $3 \
        --data-path $DATASET \
        --data-impl mmap \
-       --tokenizer-type GPTSentencePieceTokenizer \
-       --tokenizer-model $TOKENIZER_PATH \
-       --split 949,50,1 \
+       --tokenizer-type PretrainedFromHF  \
+       --tokenizer-name-or-path $TOKENIZER_PATH \
        --distributed-backend nccl \
        --lr $LR \
        --lr-decay-style cosine \
@@ -118,11 +115,12 @@ torchrun $DISTRIBUTED_ARGS \
        --optimizer adam \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
-       --log-interval 1 \
+       --log-interval 100 \
        --save-interval 10000 \
        --eval-interval 1000 \
-       --eval-iters 10 \
+       --eval-iters 100 \
        --bf16 \
+       --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
        --attention-dropout 0 \
        --hidden-dropout 0 \
