@@ -1,6 +1,6 @@
 language ,name                ,subset       , M pages, B words, B chars,#words/page,#chars/word
----      ,---                 ,---          , 251.674, 224.004,1687.257,        890,  7.5
-fr       ,---                 ,---          ,  13.198, 108.991, 663.055,       8258,  6.1
+---      ,---                 ,---          , 252.843, 224.759,1691.895,        889,  7.5
+fr       ,---                 ,---          ,  14.366, 109.746, 667.692,       7639,  6.1
 fr       ,GallicaPress        ,html         ,   1.589,  42.511, 258.290,      26750,  6.1
 fr       ,GallicaPress        ,txt          ,   1.281,  25.057, 150.202,      19561,  6.0
 fr       ,GallicaMonographies ,             ,   0.262,  14.971,  89.722,      57130,  6.0
@@ -9,6 +9,12 @@ fr       ,Theses              ,             ,   0.103,   8.294,  52.048,      80
 fr       ,Persee              ,             ,   1.094,   3.250,  20.314,       2970,  6.2
 fr       ,OpenEdition         ,             ,   0.939,   2.225,  14.459,       2369,  6.5
 fr       ,Wikipedia.fr        ,             ,   2.648,   1.726,   9.879,        652,  5.7
+fr       ,OpenData            ,inca_opendata,   0.247,   0.257,   1.547,       1043,  6.0
+fr       ,OpenData            ,inca_opendata,   0.127,   0.192,   1.149,       1512,  6.0
+fr       ,OpenData            ,balo_opendata,   0.136,   0.165,   1.047,       1215,  6.4
+fr       ,OpenData            ,kali_opendata,   0.431,   0.114,   0.727,        265,  6.4
+fr       ,OpenData            ,sarde_opendat,   0.224,   0.014,   0.085,         61,  6.2
+fr       ,OpenData            ,dole_opendata,   0.004,   0.013,   0.083,       3230,  6.2
 fr       ,Wikiother.fr        ,wikisource   ,   0.186,   0.523,   3.080,       2818,  5.9
 fr       ,Wikiother.fr        ,wiktionary   ,   0.650,   0.053,   0.347,         82,  6.5
 fr       ,Parlement           ,questions_ecr,   0.189,   0.108,   0.705,        572,  6.5
@@ -38,8 +44,11 @@ fr       ,DiscoursPublics     ,             ,   0.110,   0.163,   1.025,       1
 fr       ,LEGI                ,             ,   0.621,   0.088,   0.563,        141,  6.4
 fr       ,Europarl.fr         ,             ,   0.010,   0.053,   0.339,       5129,  6.4
 en       ,---                 ,---          , 105.989,  59.393, 366.927,        560,  6.2
-en       ,Pes2o               ,s2orc        ,   8.242,  36.092, 226.904,       4379,  6.3
-en       ,Pes2o               ,s2ag         ,  30.569,   5.926,  40.273,        194,  6.8
+en       ,PeS2o               ,s2orc-train  ,   8.242,  36.092, 226.904,       4379,  6.3
+en       ,PeS2o               ,s2ag-train   ,  30.569,   5.926,  40.273,        194,  6.8
+en       ,PeS2o               ,validation   ,   0.161,   0.279,   1.785,       1734,  6.4
+en       ,PeS2o               ,s2orc-validat,   0.051,   0.255,   1.620,       4972,  6.3
+en       ,PeS2o               ,s2ag-validati,   0.110,   0.024,   0.165,        219,  6.9
 en       ,AmericanStories     ,1922         ,   2.024,   0.312,   1.796,        154,  5.8
 en       ,AmericanStories     ,1921         ,   1.972,   0.298,   1.714,        151,  5.8
 en       ,AmericanStories     ,1920         ,   1.732,   0.250,   1.438,        144,  5.8
