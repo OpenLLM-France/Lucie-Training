@@ -1,3 +1,4 @@
+import functools
 import glob
 import hashlib
 import json
@@ -11,12 +12,12 @@ import warnings
 import datasets
 import regex as re
 from text import (
+    check_language,
     clean_discours,
     clean_wikipedia,
     fix_legi,
     fix_legi_and_remove_title,
     html_unescape,
-    remove_simple_lines,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,13 +50,11 @@ if not DATA_PATH:
 
 def tokenizer_dataset(
     train=True,
-    use_persee=True,
-    use_legi=True,
-    use_europarl=True,
     less_minority_languages=True,
     streaming=True,
     debug=False,
     factor=3,
+    more_data=True,
 ):
     """
     Iterator that yields texts to train / test a tokenizer
@@ -68,9 +67,18 @@ def tokenizer_dataset(
         max_docs=10 if debug else None,
     )
 
+    programming_languages = ["tex", "python", "c++", "javascript"]
+    max_char_base = int(2e9) * factor
+    wikipedia_char_base = max_char_base
+    code_char_base = int(2e8)
+    if more_data:
+        wikipedia_char_base = int(1e20)
+        if train:
+            programming_languages += ["java", "c", "php", "c#", "go", "typescript", "perl"]
+
     kwargs_wikipedia = kwargs | (
         dict(
-            max_chars=10 if debug else 2000000000 * factor,
+            max_chars=10 if debug else wikipedia_char_base,
         )
         if train
         else dict(
@@ -82,13 +90,13 @@ def tokenizer_dataset(
         kwargs_wikipedia_minority["max_chars"] = 10 if debug else 200000000 * factor
     kwargs_code = kwargs | (
         dict(
-            max_chars_per_language=10 if debug else 200000000,
-            programming_languages=["tex", "python", "c++", "javascript"],
+            max_chars_per_language=10 if debug else code_char_base,
+            programming_languages=programming_languages,
         )
         if train
         else dict(
             max_chars_per_language=10 if debug else 25000000,
-            programming_languages=["tex", "python", "c++", "javascript"],
+            programming_languages=programming_languages,
         )
     )
     kwargs_gallica = kwargs | dict(
@@ -121,23 +129,28 @@ def tokenizer_dataset(
         nickname += "-Gutenberg"
         nickname = "TEST-" + nickname
 
-    if use_persee:
-        all_data += list(get_datasets("persee", **kwargs_persee))
-        nickname += "-Persee"
-
-    if use_legi:
-        all_data += list(get_datasets("legi", postprocess=fix_legi_and_remove_title, **kwargs))
-        nickname += "-LEGI"
-
-    if use_europarl:
-        all_data += list(get_datasets("europarl", **kwargs))
-        nickname += "-Europarl"
+    all_data += list(get_datasets("persee", **kwargs_persee))
+    nickname += "-Persee"
+    all_data += list(get_datasets("legi", postprocess=fix_legi_and_remove_title, **kwargs))
+    nickname += "-LEGI"
+    all_data += list(get_datasets("europarl", **kwargs))
+    nickname += "-Europarl"
 
     all_data += list(get_datasets("gallica_mono", **kwargs_gallica))
     nickname += "-GallicaMono"
 
     all_data += list(get_datasets("code", **kwargs_code))
     nickname += "-CodePlus200m"
+
+    if more_data and train:
+        all_data += list(get_datasets("theses", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("open_data_fr", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("claire_fr", subset_regex="theatre", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("claire_en", subset_regex="mediasum", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("american_stories", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("pes2o", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("eurovoc", max_chars=max_char_base, **kwargs))
+        nickname = "DatasetV2"
 
     dataset = DataIteratorConcat(all_data)
     print(f"{'Train' if train else 'Evaluate'} on: {dataset.name}")
@@ -168,7 +181,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 yield ds
         return
 
-    multilang_corpora = ["wikipedia", "wikiother", "gutenberg", "europarl", "claire"]
+    multilang_corpora = ["wikipedia", "wikiother", "gutenberg", "europarl", "claire", "eurovoc"]
 
     name = name.lower()
 
@@ -216,9 +229,11 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         languages = {
             "claire": ["fr", "en"],
             "wikiother": ["fr"],
-            "gutenberg": ["fr", "en", "de", "es", "it"],
-            "wikipedia": ["fr", "en", "de", "es", "it"],
-        }.get(name, ["fr", "en", "de", "es"])
+            # "wikipedia": ["fr", "en", "de", "es", "it"],
+            # "gutenberg": ["fr", "en", "de", "es", "it"],
+            "europarl": ["fr", "en", "de", "es"],
+            "eurovoc": ["en", "de", "es", "it"],
+        }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
                 yield ds
@@ -422,9 +437,9 @@ class DataIterator(DataIteratorBase):
                     criterion = data[self.subsample_criteria]
                     r = string_to_random01(criterion)
 
+        if self.preprocess:
+            data = self.preprocess(data)
         try:
-            if self.preprocess:
-                data = self.preprocess(data)
             text = data[self.key]
         except KeyError as err:
             raise KeyError(f"Key {self.key} not found in {data.keys()}.") from err
@@ -523,16 +538,24 @@ class DataIteratorParquet(DataIterator):
             data_path = data_path + "_cleaned"
             logger.info(f"Using pre-cleaned in {data_path}")
             kwargs.pop("postprocess", None)
-        parquet_files = glob.glob(data_path + "/*parquet")
-        if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
-            parquet_files = sorted(parquet_files, key=lambda x: int(x.split(".")[-2].split("_")[-1]))
-        if max_parquet_files and max_parquet_files < len(parquet_files):
-            parquet_files = parquet_files[offset_parquet_files : max_parquet_files + offset_parquet_files]
-        elif offset_parquet_files:
-            parquet_files = parquet_files[offset_parquet_files:]
-        logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
-        assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
-        self.parquet_files = parquet_files
+        if os.path.isfile(data_path):
+            parquet_files = data_path
+            self.parquet_files = [parquet_files]
+        else:
+            parquet_files = glob.glob(data_path + "/*parquet")
+            if parquet_files and re.match(r".*_\d+\.parquet$", parquet_files[0]):
+                parquet_files = sorted(parquet_files, key=lambda x: int(x.split(".")[-2].split("_")[-1]))
+            elif parquet_files and re.match(r".*\-\d+\-of\-\d+\.parquet$", parquet_files[0]):
+                parquet_files = sorted(parquet_files, key=lambda x: int(x.split("-")[-3]))
+            else:
+                parquet_files = sorted(parquet_files)
+            if max_parquet_files and max_parquet_files < len(parquet_files):
+                parquet_files = parquet_files[offset_parquet_files : max_parquet_files + offset_parquet_files]
+            elif offset_parquet_files:
+                parquet_files = parquet_files[offset_parquet_files:]
+            logger.info(f"Using {len(parquet_files)} parquet files in {data_path}")
+            assert len(parquet_files) > 0, f"No parquet files found in {data_path}"
+            self.parquet_files = parquet_files
 
         name = kwargs.pop("name", "")
         if offset_parquet_files or max_parquet_files:
@@ -840,16 +863,33 @@ class DataIteratorCroissantAligned(DataIteratorConcat):
         if do_augment:
             name += "-augmented"
 
+        precomputed_landid = True
+
         def is_augmented(split):
             return split == "train"
+
+        def get_data_path(split):
+            return os.path.join(
+                DATA_PATH,
+                "croissant_aligned",
+                f"{split}{'_preproc' if (precomputed_landid and is_augmented(split)) else ''}",
+            )
 
         DataIteratorConcat.__init__(
             self,
             [
                 DataIteratorParquet(
-                    f"{DATA_PATH}/croissant_aligned/{split}",
+                    get_data_path(split),
                     name=f"CroissantAligned:{split}" + ("-augmented" if is_augmented(split) else ""),
-                    preprocess=augment_aligned_text if is_augmented(split) else None,
+                    preprocess=(
+                        create_augmented_text_from_separated_data
+                        if precomputed_landid
+                        else functools.partial(analyze_bilingual_french_english_data, add_language_in_data=True)
+                    )
+                    if is_augmented(split)
+                    else None,
+                    # postprocess=analyze_bilingual_french_english_data if is_augmented(split) else None,
+                    subsample_criteria="id",
                     **kwargs,
                 )
                 for split in splits
@@ -858,30 +898,74 @@ class DataIteratorCroissantAligned(DataIteratorConcat):
         )
 
 
-def augment_aligned_text(data):  # noqa # C901 `...` is too complex
-    text = data["text"]
-    fields = re.split(r"([ \n]{2,}|\t)", text)
+def analyze_bilingual_french_english_data(data, add_language_in_data=False):  # noqa # C901 `...` is too complex
+    if add_language_in_data:
+        text = data["text"]
+    else:
+        text = data
+
+    fields = re.split(r"( {2,}|\n{2,}|\t)", text.strip())
+    assert (len(fields) + 1) % 2 == 0, f"Got even number of fields {len(fields)} in {fields}"
+    if len(fields) > 3:
+        text_fields = fields[::2]
+        proba_lans = [check_language(text, ["fr", "en"]) for text in text_fields]
+        score_regroupements = [
+            max(
+                sum(p["en"] for p in proba_lans[:i_cut]) + sum(p["fr"] for p in proba_lans[i_cut:]),
+                sum(p["fr"] for p in proba_lans[:i_cut]) + sum(p["en"] for p in proba_lans[i_cut:]),
+            )
+            + 1
+            - abs(len(text_fields[:i_cut]) - len(text_fields[i_cut:]))
+            / max(len(text_fields[:i_cut]), len(text_fields[i_cut:]))
+            for i_cut in range(1, len(text_fields))
+        ]
+        argmax = score_regroupements.index(max(score_regroupements)) + 1
+        # sep = fields[2 * argmax - 1]
+        # if len(sep) == 2: sep = sep[0]
+        # else: sep = " "
+        new_fields = ["".join(fields[: 2 * argmax - 1]), fields[2 * argmax - 1], "".join(fields[2 * argmax :])]
+        print(f"WARNING: regrouped\n{fields}\n---\ninto\n---\n{new_fields}")
+        fields = new_fields
+
     assert len(fields) == 3, f"Got {len(fields)} in {fields}"
     text1, separator, text2 = fields
 
-    languages = data.get("dataset_id", "")
-    if languages.startswith("Unbabel"):
-        languages = languages[len("Unbabel") :]
-    languages = re.sub(r"([A-Z])", r"_\1", "FrEn").lower().strip("_")
-    languages = languages.split("_")
-    if len(languages) != 2:
-        raise ValueError(f"Cannot find languages in {data}")
-    lan1, lan2 = languages
+    score1 = check_language(text1, ["fr", "en"])
+    score2 = check_language(text2, ["fr", "en"])
+    gap1 = score1["en"] - score1["fr"]
+    gap2 = score2["en"] - score2["fr"]
+    if gap1 > gap2:
+        lan1, lan2 = "en", "fr"
+    else:
+        lan1, lan2 = "fr", "en"
 
+    if add_language_in_data:
+        data["text_en"] = text1.strip() if lan1 == "en" else text2.strip()
+        data["text_fr"] = text1.strip() if lan1 == "fr" else text2.strip()
+        data.pop("text")
+        return data
+
+    return create_augmented_text(text1, text2, lan1, lan2)
+
+
+def create_augmented_text_from_separated_data(data):
+    data["text"] = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+    return data
+
+
+def create_augmented_text(text1, text2, lan1, lan2, separator=None):
     uselanguage_prefix = random.random() < 0.5
 
-    separator = random.choice([" ", "   ", "    ", "     ", "\t", "\t\t", "\n", "\n\n"])
+    if separator is None:
+        separator = random.choice([" ", "   ", "    ", "     ", "\t", "\t\t", "\n", "\n\n"])
     before_lan = ""
-    after_lan = random.choice([": ", " : "])
-    if random.random() < 0.3:
-        before_lan = "["
-        after_lan = after_lan.strip() + "] "
-    how_to_write_language = random.choice(range(4))
+    after_lan = random.choice([". ", ": ", " : ", "- ", "-- ", "— "])
+    brackets = random.choice([""] * 4 + ["[]", "()", "{}", "<>"])
+    if brackets:
+        before_lan = brackets[0]
+        after_lan = after_lan.strip().rstrip(".-—") + brackets[1] + " "
+    clear_separation = "\n" in separator or "\t" in separator or bool(brackets)
+    how_to_write_language = random.choice(range(4) if clear_separation else range(1, 4))
 
     text = text1 + separator + text2
 
@@ -895,7 +979,7 @@ def augment_aligned_text(data):  # noqa # C901 `...` is too complex
         elif how_to_write_language == 3:
             lan1, lan2 = (LAN_TO_COMPLETE[lan2][x] for x in [lan1, lan2])
 
-        if random.random() < 0.5:  # Capitalize
+        if random.random() < 0.5 or not clear_separation:  # Capitalize
             lan1, lan2 = (x.capitalize() for x in [lan1, lan2])
 
         if random.random() < 0.5:  # Invert
@@ -904,8 +988,7 @@ def augment_aligned_text(data):  # noqa # C901 `...` is too complex
 
         text = before_lan + lan1 + after_lan + text1 + separator + before_lan + lan2 + after_lan + text2
 
-    data["text"] = text
-    return data
+    return text
 
 
 LAN_TO_COMPLETE = {
@@ -921,7 +1004,7 @@ LAN_TO_COMPLETE = {
 
 
 class DataIteratorClaire(DataIteratorConcat):
-    def __init__(self, language="fr", streaming=True, split=None, use_nc=False, **kwargs):
+    def __init__(self, language="fr", streaming=True, split=None, use_nc=False, subset_regex=None, **kwargs):  # noqa # C901 `...` is too complex
         path = DATA_PATH + f"/claire_{language}"
         full_files = glob.glob(path + "/*/full.txt")
         train_files = glob.glob(path + "/*/train.txt")
@@ -939,7 +1022,14 @@ class DataIteratorClaire(DataIteratorConcat):
         train_files = [f for f in train_files if not any(e in f for e in to_exclude)]
         test_files = [f for f in test_files if not any(e in f for e in to_exclude)]
 
-        assert train_files, f"No files found in {path}"
+        if subset_regex:
+            train_files2 = [f for f in train_files if re.search(subset_regex, f, re.IGNORECASE)]
+            test_files2 = [f for f in test_files if re.search(subset_regex, f, re.IGNORECASE)]
+            assert train_files2, f"No files found in {path}/*/*.txt" + f" with regex {subset_regex} ({train_files})"
+            train_files = train_files2
+            test_files = test_files2
+
+        assert train_files, f"No files found in {path}/*/*.txt"
         if split is None:
             files = train_files + test_files
         elif split == "train":
@@ -982,6 +1072,20 @@ class DataIteratorClaire(DataIteratorConcat):
                 for subname, filenames in dataset_to_filenames.items()
             ],
             name=name,
+        )
+
+
+class DataIteratorEurovoc(DataIteratorParquet):
+    def __init__(self, language="en", filter_by_perplexity=False, **kwargs):
+        name = f"Eurovoc:{language.lower()}"
+        folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "eurovoc")
+        folder = os.path.join(folder, language)
+        DataIteratorParquet.__init__(
+            self,
+            folder,
+            name=name,
+            # filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
+            **kwargs,
         )
 
 
@@ -1153,21 +1257,39 @@ class DataIteratorAmericanStories(DataIteratorConcat):
 
             key = "text"
 
-            def load_parquet(data_file):
-                try:
-                    return datasets.load_dataset(
-                        "parquet",
-                        data_files=data_file,
-                        streaming=streaming,
-                        split="train",
-                    )
-                except Exception as err:
-                    raise RuntimeError(f"Error loading {data_file}") from err
+            # def load_parquet(data_file):
+            #     try:
+            #         return datasets.load_dataset(
+            #             "parquet",
+            #             data_files=data_file,
+            #             streaming=streaming,
+            #             split="train",
+            #         )
+            #     except Exception as err:
+            #         raise RuntimeError(f"Error loading {data_file}") from err
 
-            datas = {
-                os.path.splitext(os.path.basename(data_file))[0]: load_parquet(data_file) for data_file in data_files
-            }
+            # datas = {
+            #     os.path.splitext(os.path.basename(data_file))[0]: load_parquet(data_file) for data_file in data_files
+            # }
             self.parquet_files = data_files
+            data_files = {int(os.path.splitext(os.path.basename(data_file))[0]): data_file for data_file in data_files}
+
+            DataIteratorConcat.__init__(
+                self,
+                [
+                    DataIteratorParquet(
+                        data_files[year],
+                        key=key,
+                        subsample_criteria="article_id",
+                        name=f"AmericanStories:{year}",
+                        # postprocess=remove_simple_lines,
+                        filter_fn=filter_by_perplexity_func(2310) if filter_by_perplexity else None,
+                        **kwargs,
+                    )
+                    for year in sorted(data_files.keys())
+                ],
+                name="AmericanStories",
+            )
 
         else:
             assert not filter_by_perplexity
@@ -1177,22 +1299,22 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                 streaming=streaming,
             )
 
-        DataIteratorConcat.__init__(
-            self,
-            [
-                DataIterator(
-                    datas[year],
-                    key=key,
-                    subsample_criteria="article_id",
-                    name=f"AmericanStories:{year}",
-                    postprocess=remove_simple_lines,
-                    filter_fn=filter_by_perplexity_func(2310) if filter_by_perplexity else None,
-                    **kwargs,
-                )
-                for year in datas.keys()
-            ],
-            name="AmericanStories",
-        )
+            DataIteratorConcat.__init__(
+                self,
+                [
+                    DataIterator(
+                        datas[year],
+                        key=key,
+                        subsample_criteria="article_id",
+                        name=f"AmericanStories:{year}",
+                        # postprocess=remove_simple_lines,
+                        filter_fn=filter_by_perplexity_func(2310) if filter_by_perplexity else None,
+                        **kwargs,
+                    )
+                    for year in datas.keys()
+                ],
+                name="AmericanStories",
+            )
 
 
 class DataIteratorPes2o(DataIteratorConcat):
@@ -1502,7 +1624,7 @@ if __name__ == "__main__":
                 filename += ".txt"
                 print(f"Dumping {filename}")
                 with open(filename, "w", encoding="utf8") as f:
-                    f.write(text)
+                    f.write(text + "\n")
             elif only_dump_examples:
                 break
         if only_dump_examples:
