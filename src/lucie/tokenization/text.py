@@ -1,4 +1,5 @@
 import html
+import math
 import random
 import urllib
 
@@ -380,6 +381,47 @@ def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=
     return prefix + "".join(new_lines)
 
 
+CANDIDATE_LANGUAGES = None
+
+
+def check_language(
+    text,
+    candidate_languages=None,
+):
+    """
+    Return probabilities of the language of the text.
+
+    Args:
+        text (str): the text to check
+        candidate_languages (list): the list of languages to consider (default: all languages supported by langid)
+    Returns:
+        dict: the dictionary of languages and their scores
+    """
+    import langid
+
+    # Restrict (or not the list of languages)
+    global CANDIDATE_LANGUAGES
+    if candidate_languages != CANDIDATE_LANGUAGES:
+        langid.set_languages(candidate_languages)
+        CANDIDATE_LANGUAGES = candidate_languages
+
+    if text.isupper():
+        text = text.lower()
+    language_and_scores = langid.rank(text)
+
+    exps = [math.exp(v / max(1, len(text))) for k, v in language_and_scores]
+    sum_exps = sum(exps)
+
+    language_and_scores = dict(
+        sorted(
+            [(k, e / sum_exps) for (k, _), e in zip(language_and_scores, exps)],
+            key=lambda item: item[1],
+        )
+    )
+
+    return language_and_scores
+
+
 if __name__ == "__main__":
     import argparse
     import multiprocessing
@@ -452,13 +494,19 @@ if __name__ == "__main__":
     for data in get_parquet_datasets(datas):
         parquet_files = data.parquet_files
         postprocess = data.postprocess
+        preprocess = data.preprocess
         key = data.key
         name = data.name
         name_slug = re.sub(r"[ :/]", "--", name)
-        if postprocess is not None:
+        if postprocess is not None or preprocess is not None:
             for filein in tqdm.tqdm(parquet_files):
                 dirname, basename = os.path.split(filein)
-                fileout = os.path.join(dirname + "_cleaned", basename)
+                odirname = dirname
+                if preprocess is not None:
+                    odirname += "_preproc"
+                if postprocess is not None:
+                    odirname += "_cleaned"
+                fileout = os.path.join(odirname, basename)
                 if args.ignore_if_exists and os.path.exists(fileout):
                     print(f"Skipping {filein} -> {fileout}")
                     continue
@@ -467,15 +515,30 @@ if __name__ == "__main__":
                 if args.folder:
                     examples_before = list(df.iloc[: args.num_samples][key])
 
-                if args.threads == 1:
-                    df[key] = df[key].progress_map(postprocess)
-                else:
+                if preprocess:
+                    if args.threads == 1:
+                        raise NotImplementedError("Preprocessing with threads is not implemented")
+                    else:
 
-                    def do_postprocess(d):
-                        d[key] = d[key].progress_map(postprocess)
-                        return d
+                        def do_preprocess(d):
+                            data = []
+                            for _, x in d.iterrows():
+                                x = preprocess(x)
+                                data.append(x)
+                            return pd.concat(data, axis=1).T
 
-                    df = df_parallelize(df, do_postprocess, args.threads)
+                        df = df_parallelize(df, do_preprocess, args.threads)
+
+                if postprocess:
+                    if args.threads == 1:
+                        df[key] = df[key].progress_map(postprocess)
+                    else:
+
+                        def do_postprocess(d):
+                            d[key] = d[key].progress_map(postprocess)
+                            return d
+
+                        df = df_parallelize(df, do_postprocess, args.threads)
 
                 if args.folder:
                     examples_after = list(df.iloc[: args.num_samples][key])
@@ -490,5 +553,10 @@ if __name__ == "__main__":
                             after,
                             file=open(os.path.join(folder, f"{name_slug}_{i}_B.txt"), "w"),
                         )
-                os.makedirs(dirname + "_cleaned", exist_ok=True)
-                df.to_parquet(fileout)
+                os.makedirs(odirname, exist_ok=True)
+                try:
+                    df.to_parquet(fileout)
+                except Exception as err:
+                    if os.path.exists(fileout):
+                        os.remove(fileout)
+                    raise RuntimeError(f"Error writing {fileout}") from err
