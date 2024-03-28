@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-2nodes-tp2-pp2
+#SBATCH --job-name=lucie7b-4nodes-tp2-pp2
 #SBATCH --qos=qos_gpu-dev
-#SBATCH --nodes=2
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
@@ -37,7 +37,7 @@ PP=2
 TP=2
 
 MICRO_BATCH_SIZE=6
-GLOBAL_BATCH_SIZE=48
+GLOBAL_BATCH_SIZE=192
 
 # ----- model
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
@@ -46,9 +46,6 @@ NUM_LAYERS=32 # e.g. llama-13b: 40
 NUM_HEADS=32 # e.g. llama-13b: 40
 SEQ_LENGTH=2048
 NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
-
-MICRO_BATCH_SIZE=6
-GLOBAL_BATCH_SIZE=48 # e.g. llama: 4M tokens
 
 # ------ Optimizer
 TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
@@ -222,10 +219,10 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --optimizer adam \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
-       --log-interval 100 \
-       --save-interval 10000 \
-       --eval-interval 1000 \
-       --eval-iters 100 \
+       --log-interval 1 \
+       --save-interval 1000 \
+       --eval-interval 50 \
+       --eval-iters 50 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
