@@ -24,7 +24,6 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 git clone https://github.com/NVIDIA/apex
 cd apex/
 pip install -r requirements.txt
-module load gcc/9.1.0-cuda-openacc
 module load cuda/12.1.0
 MAX_JOBS=4 pip install -v --disable-pip-version-check --no-cache-dir --no-build-isolation --config-settings "--build-option=--cpp_ext" --config-settings "--build-option=--cuda_ext" ./ 
 # You can run this on CPUs instance as it's compute intensive. You may encounter some errors here, just rerun this command. If it still don't work, consider lowering the value of MAX_JOBS
