@@ -35,12 +35,15 @@ if __name__ == "__main__":
         # Digits
         "$1 234\u00A0567,890  00€ 1.2 3/4",
         # Spaces
-        "Mot Mot\nMot \n Mot   \n   Mot",
+        "Hello Hello\nHello \n Hello   \n   Hello\n\nHello\n\n\n\n\n\n\nHello",
         # Spaces & Brackets
-        "(Mot) (Mot)\n(Mot) \n (Mot)   \n" + " " * 13 + "(Mot)",
-        "[INST]",
+        "(Hello) (Hello)\n(Hello) \n (Hello)   \n" + " " * 13 + "(Hello)",
+        "'Hello' 'Hello'\n'Hello' \n 'Hello'   \n" + " " * 13 + "'Hello' «children» children. «children.» «children».",
+        "[INST] [Mr. le président:] [M. Correspondent:]",
         # Punctuations
-        "website.fr là. (etc...) .- -.",
+        "website.fr www.com es. As. 1s. (etc...)",
+        # Equations
+        "a.(b+c)-d÷e×f belle-mère grand-mother",
     ]
 
     if args.tokenizer.lower() in ["gpt-4"]:
