@@ -5,14 +5,13 @@
 ### Create the conda environment
 ```bash
 module load anaconda-py3/2023.09
-conda create -n lucie-cuda211 python=3.10
+conda create -n lucie python=3.10
 ```
 
 ### Set the conda environment
 ```bash
-conda activate lucie-cuda211
+conda activate lucie
 module load cuda/12.1.0 # use the cuda already installed in Jean-Zay
-module load ninja/1.10.0 # used for fast compilation
 ```
 
 ### Install the latest stable torch from https://pytorch.org/get-started/locally/
@@ -37,6 +36,7 @@ git clone https://github.com/OpenLLM-France/Megatron-DeepSpeed.git
 cd  Megatron-DeepSpeed/
 pip install -e .
 pip install deepspeed==0.12.6
+pip install ninja # Will be needed for compilation
 cd ...
 ```
 
@@ -50,7 +50,7 @@ pip install transformers
 ### Utilisation
 ```bash
 module load anaconda-py3/2023.09
-conda activate lucie-cuda211
+conda activate lucie
 module load cuda/12.1.0
 ```
 
