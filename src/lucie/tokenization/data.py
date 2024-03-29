@@ -54,7 +54,8 @@ def tokenizer_dataset(
     streaming=True,
     debug=False,
     factor=3,
-    more_data=True,
+    more_data=False,
+    use_bilingual=False,
 ):
     """
     Iterator that yields texts to train / test a tokenizer
@@ -68,13 +69,13 @@ def tokenizer_dataset(
     )
 
     programming_languages = ["tex", "python", "c++", "javascript"]
+    if train:
+        programming_languages += ["java", "c", "php", "c#", "go", "typescript", "perl"]
     max_char_base = int(2e9) * factor
     wikipedia_char_base = max_char_base
     code_char_base = int(2e8)
     if more_data:
         wikipedia_char_base = int(1e20)
-        if train:
-            programming_languages += ["java", "c", "php", "c#", "go", "typescript", "perl"]
 
     kwargs_wikipedia = kwargs | (
         dict(
@@ -88,6 +89,8 @@ def tokenizer_dataset(
     kwargs_wikipedia_minority = kwargs_wikipedia.copy()
     if train and less_minority_languages:
         kwargs_wikipedia_minority["max_chars"] = 10 if debug else 200000000 * factor
+        # if more_data:
+        #     kwargs_wikipedia_minority["max_chars"] *= 5
     kwargs_code = kwargs | (
         dict(
             max_chars_per_language=10 if debug else code_char_base,
@@ -147,10 +150,16 @@ def tokenizer_dataset(
         all_data += list(get_datasets("open_data_fr", max_chars=max_char_base, **kwargs))
         all_data += list(get_datasets("claire_fr", subset_regex="theatre", max_chars=max_char_base, **kwargs))
         all_data += list(get_datasets("claire_en", subset_regex="mediasum", max_chars=max_char_base, **kwargs))
-        all_data += list(get_datasets("american_stories", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("american_stories", max_chars=int(max_char_base / 167), **kwargs))
         all_data += list(get_datasets("pes2o", max_chars=max_char_base, **kwargs))
-        all_data += list(get_datasets("eurovoc", max_chars=max_char_base, **kwargs))
+        all_data += list(get_datasets("eurovoc", max_chars=int(max_char_base / 5), **kwargs))
         nickname = "DatasetV2"
+    else:
+        nickname = "DatasetV1"
+
+    if use_bilingual and train:
+        all_data = list(get_datasets("croissant_aligned", train=True, augment_train=False, **kwargs)) + all_data
+        nickname += "-Aligned"
 
     dataset = DataIteratorConcat(all_data)
     print(f"{'Train' if train else 'Evaluate'} on: {dataset.name}")
@@ -852,7 +861,7 @@ class DataIteratorEuroparl(DataIterator):
 
 
 class DataIteratorCroissantAligned(DataIteratorConcat):
-    def __init__(self, train=True, **kwargs):
+    def __init__(self, train=True, augment_train=True, **kwargs):
         if train is not None:
             splits = ["train"] if train else ["test"]
         else:
@@ -866,7 +875,7 @@ class DataIteratorCroissantAligned(DataIteratorConcat):
         precomputed_landid = True
 
         def is_augmented(split):
-            return split == "train"
+            return augment_train and split == "train"
 
         def get_data_path(split):
             return os.path.join(
@@ -1373,6 +1382,7 @@ class DataIteratorPes2o(DataIteratorConcat):
                 json_files = glob.glob(files_regex)
                 if not len(json_files):
                     raise RuntimeError(f"No json files in {files_regex}")
+                logger.info(f"Using {len(json_files)} json files from {files_regex}")
                 self.json_files.extend(json_files)
                 iterators.append(
                     DataIterator(
@@ -1523,6 +1533,7 @@ class DataIteratorCode(DataIteratorConcat):
 
 if __name__ == "__main__":
     import argparse
+    import shutil
     import time
 
     import tqdm
@@ -1570,6 +1581,10 @@ if __name__ == "__main__":
         help="Only dump some examples",
     )
     args = parser.parse_args()
+
+    if args.folder:
+        os.makedirs(args.folder, exist_ok=True)
+        shutil.copy2(__file__, os.path.join(args.folder, os.path.basename(__file__)))
 
     def simple_slugify(name):
         return re.sub(r"[ :/]", "--", name).strip("_-")

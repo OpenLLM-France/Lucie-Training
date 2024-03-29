@@ -52,11 +52,12 @@ _space_internal = "▁"
 def build_tokenizer(
     dropout: Optional[float] = None,
     individual_digits: Optional[bool] = True,
-    separate_spaces_and_punctuations: Optional[bool] = True,
     space_behaviour: Optional[str] = "prefix_all",
-    fuse_unk: Optional[float] = True,
+    separate_punctuation: Optional[bool] = True,
+    add_space_after: Optional[str] = "\n\t(['’\"«“‘‚‹—–―",
+    char_to_isolate: Optional[str] = None,  # ")]'\"»”’›—–―,;:!?",
     do_not_split_spaces: Optional[bool] = False,
-    char_to_prefix_space: Optional[str] = "\n\t(['\"«“‘‚‹—–―",
+    fuse_unk: Optional[float] = True,
 ):
     """
     Build a tokenizer.
@@ -64,14 +65,23 @@ def build_tokenizer(
 
     :param dropout: Dropout rate for BPE
     :param individual_digits: Split digits individually
-    :param separate_spaces_and_punctuations: Make sure not to mix spaces and punctuations with alphanumeric characters
     :param space_behaviour:
         - "prefix_sos": Add a prefix space at the start of the text
-        - "prefix_all": Add a prefix space after each linebreaks and tabulations (not just after the start)
+        - "prefix_all": Add a prefix space after each linebreaks, tabulations, ...
+                        What is defined in add_space_after (not just after the start of string)
         - "split": Do not mix space with other characters
-    :param fuse_unk: Fuse unknown tokens
+    :param separate_punctuation: Make sure not to mix punctuation marks with alphanumeric characters
+    :param add_space_after: Characters after which to enforce a space, when space_behaviour="prefix_all"
+    :param char_to_isolate: Characters to isolate, when either space_behaviour="prefix_all" or separate_punctuation=True
     :param do_not_split_spaces: Experimental (not working)
+    :param fuse_unk: Fuse unknown tokens (useless, as there should not be out-of-vocabulary tokens)
     """
+
+    if separate_punctuation and not char_to_isolate:
+        char_to_isolate = rf"[^\w\s{_space_internal}]+"  # r"[\p{P}\+÷×\-]+"
+    elif char_to_isolate and space_behaviour == "prefix_all":
+        char_to_isolate = r"\p{P}*[" + re.escape(char_to_isolate) + r"]+\p{P}*"
+        separate_punctuation = True
 
     assert space_behaviour in {"prefix_sos", "prefix_all", "split"}
 
@@ -92,8 +102,8 @@ def build_tokenizer(
     ] + (
         [
             # Note: placeholders cannot be handled (using tokenizers.Regex(r"[\t\n]"))
-            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^\1])"), c + " ")
-            for c in char_to_prefix_space
+            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^{re.escape(c)}])"), c + " ")
+            for c in add_space_after
         ]
         if (space_behaviour == "prefix_all")
         else ([tokenizers.normalizers.Replace(" ", _space_internal)] if space_behaviour == "split" else [])
@@ -106,18 +116,22 @@ def build_tokenizer(
             #     tokenizers.Regex(rf"{_space_internal}?([\n\t\p{{P}}])\1*"), behavior="isolated"
             # ),
             # V2
-            tokenizers.pre_tokenizers.Split(tokenizers.Regex(rf"{_space_internal}?\p{{P}}+"), behavior="isolated"),
+            tokenizers.pre_tokenizers.Split(
+                tokenizers.Regex(rf"{_space_internal}?" + char_to_isolate),
+                # behavior="merged_with_next", to be able to have tokens like ".fr", ...
+                behavior="isolated",
+            ),
             tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"[\n\t]"), behavior="isolated"),
         ]
-        if (separate_spaces_and_punctuations and space_behaviour != "split")
+        if (separate_punctuation and space_behaviour != "split")
         else (
             (
                 [
                     tokenizers.pre_tokenizers.Split(tokenizers.Regex(rf"[{_space_internal}\n\t]"), behavior="isolated"),
                 ]
                 + (
-                    [tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"\p{P}+"), behavior="isolated")]
-                    if separate_spaces_and_punctuations
+                    [tokenizers.pre_tokenizers.Split(tokenizers.Regex(char_to_isolate), behavior="isolated")]
+                    if separate_punctuation
                     else []
                 )
             )
@@ -166,7 +180,7 @@ def build_tokenizer(
             tokenizers.decoders.Fuse(),
         ]
         + (
-            [tokenizers.decoders.Replace(c + " ", c) for c in char_to_prefix_space]
+            [tokenizers.decoders.Replace(c + " ", c) for c in add_space_after]
             if (space_behaviour == "prefix_all")
             else []
         )
@@ -310,7 +324,12 @@ def test_tokenizer(tokenizer, sentence):
         tokens = tokenizer.encode(sentence, add_special_tokens=True)
         tokens_strings = tokenizer.convert_ids_to_tokens(tokens)
 
-    return [tokens_strings, tokenizer.decode(tokens)]
+    # Just for display
+    tokens_strings = [
+        t.replace(" ", "▁").replace("Ġ", "▁").replace("\n", "\\n").replace("\t", "\\t") for t in tokens_strings
+    ]
+
+    return tokens_strings, tokenizer.decode(tokens)
 
 
 def set_infinite_length(tokenizer):
@@ -359,7 +378,7 @@ def add_consecutive_spaces(  # noqa # C901 `...` is too complex
         (consecutive_linebreaks, "\n"),
     ):
         # Make all the possible combinations
-        all_spaces = [char * i for i in range(1, n)]
+        all_spaces = [char * i for i in range(1, n + 1)]
 
         # Check that all the spaces are in the tokens
         for s in all_spaces:
@@ -514,8 +533,8 @@ if __name__ == "__main__":
         help="How to deal with whitespaces",
     )
     parser.add_argument(
-        "--separate_spaces_and_punctuations",
-        default=False,
+        "--separate_punctuation",
+        default=True,
         type=str2bool,
         help="Make sure not to mix spaces and punctuations with alphanumeric characters",
     )
@@ -543,14 +562,16 @@ if __name__ == "__main__":
     if args.verbose:
         print("Configure base tokenizer")
 
-    name_tokenizer = os.path.basename(args.base) if args.base else "Lucie"
+    name_tokenizer = os.path.basename(args.base) if args.base else "Lucie2.5"
     name_tokenizer += f"-{args.vocab_size}"
     name_tokenizer += f"-sp{args.consecutive_spaces}-{args.consecutive_tabs}-{args.consecutive_linebreaks}"
     if not args.base:
         if args.individual_digits:
             name_tokenizer += "-digits"
-        if args.separate_spaces_and_punctuations:
-            name_tokenizer += "-punctsV2"
+        if args.separate_punctuation:
+            name_tokenizer += "-punctsV3"
+        elif args.space_behaviour == "prefix_all":
+            name_tokenizer += "-sependpunctsV2"
         name_tokenizer += f"-{args.space_behaviour.replace('_', '')}"
 
     example_sentence = (
@@ -631,7 +652,7 @@ if __name__ == "__main__":
         # From scratch
         tok = build_tokenizer(
             individual_digits=args.individual_digits,
-            separate_spaces_and_punctuations=args.separate_spaces_and_punctuations,
+            separate_punctuation=args.separate_punctuation,
             space_behaviour=args.space_behaviour,
         )
 
@@ -640,7 +661,9 @@ if __name__ == "__main__":
         print(json.dumps(json.loads(tok.to_str())["pre_tokenizer"], indent=2))
         for s in [
             "123 456\u00A0789",
-            "Mot.Mot. Mot...  Mot (Mot) (Mot)   (Mot) \nMot \n Mot",
+            "Mot.Mot. .Mot...  Mot (Mot)(Mot) (Mot)   (Mot) \nMot \n Mot",
+            "«Mot» «Mot.» «Mot».",
+            "a.(b+c)-d÷e×f belle-mère grand-mother",
         ]:
             print(s.replace("\n", "\\n"))
             tokens = tok.pre_tokenizer.pre_tokenize_str(tok.normalizer.normalize_str(s))
@@ -699,7 +722,7 @@ if __name__ == "__main__":
     tokenizer_config["added_tokens_decoder"] = {
         k: v
         for k, v in tokenizer_config["added_tokens_decoder"].items()
-        if v["content"] in _special_tokens or "unused" in v["content"]
+        if v["content"] in _special_tokens  # or "unused" in v["content"]
     }
     tokenizer_config.update(
         {
