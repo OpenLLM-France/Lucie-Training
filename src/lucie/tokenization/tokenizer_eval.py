@@ -6,7 +6,6 @@
 import re
 
 import pandas as pd
-import tiktoken
 import transformers
 from tokenizer_train import set_infinite_length
 
@@ -55,6 +54,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.tokenizer.lower() in ["gpt-4"]:
+        import tiktoken
+
         tokenizer = tiktoken.encoding_for_model("gpt-4")
         all_byte_tokens = []
 
