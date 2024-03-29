@@ -14,9 +14,11 @@ conda activate lucie
 module load cuda/12.1.0 # use the cuda already installed in Jean-Zay
 ```
 
-### Install the latest stable torch from https://pytorch.org/get-started/locally/
+### Install torch and ninja
+We recommend to use the latest stable torch from https://pytorch.org/get-started/locally/
 ```bash
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install ninja # Will be needed for compilation
 ```
 
 ### Install apex
@@ -35,7 +37,6 @@ git clone https://github.com/OpenLLM-France/Megatron-DeepSpeed.git
 cd  Megatron-DeepSpeed/
 pip install -e .
 pip install deepspeed==0.12.6
-pip install ninja # Will be needed for compilation
 cd ...
 ```
 
