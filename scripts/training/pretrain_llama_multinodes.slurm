@@ -1,21 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-4nodes-tp2-pp2
+#SBATCH --job-name=lucie7b-1nodes-tp2-pp2
 #SBATCH --qos=qos_gpu-dev
-#SBATCH --nodes=4
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus
 #SBATCH --constraint=a100
-#SBATCH --time 0:30:00             # maximum execution time (HH:MM:SS)
+#SBATCH --time 0:20:00               # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
 set -x -e
-
-echo "START TIME: $(date)"
-
-variant=main
 
 CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
 LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
@@ -37,14 +33,14 @@ PP=2
 TP=2
 
 MICRO_BATCH_SIZE=6
-GLOBAL_BATCH_SIZE=192
+GLOBAL_BATCH_SIZE=128
 
 # ----- model
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
 FFN_HIDDEN_SIZE=11008 # e.g. llama-13b: 13824
 NUM_LAYERS=32 # e.g. llama-13b: 40
 NUM_HEADS=32 # e.g. llama-13b: 40
-SEQ_LENGTH=2048
+SEQ_LENGTH=2048 # for llama2 it's 4096
 NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
 
 # ------ Optimizer
@@ -56,62 +52,6 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 SAVE_INTERVAL=100
-
-OPTIMIZER_ARGS=" \
-    --lr $LR \
-    --lr-decay-style cosine \
-    --min-lr $MIN_LR \
-    --weight-decay $WEIGHT_DECAY \
-    --clip-grad $GRAD_CLIP \
-    --lr-warmup-iters $LR_WARMUP_STEPS \
-    --optimizer adam \
-    --adam-beta1 0.9 \
-    --adam-beta2 0.95 \
-    "
-# for 20h 1190, for 100h 5990
-#    --exit-duration-in-mins 1190 \
-EXIT_OPTS=" \
-    --exit-duration-in-mins 1190 \
-    "
-
-GPT_ARGS=" \
-    --data-cache-path ~/.cache \
-    --tensor-model-parallel-size 4 \
-    --pipeline-model-parallel-size 4 \
-    --num-layers $NUM_LAYERS \
-    --hidden-size $HIDDEN_SIZE \
-    --ffn-hidden-size $FFN_HIDDEN_SIZE \
-    --num-attention-heads $NUM_HEADS \
-    --micro-batch-size $MICRO_BATCH_SIZE \
-    --global-batch-size $GLOBAL_BATCH_SIZE \
-    --seq-length $SEQ_LENGTH \
-    --max-position-embeddings $SEQ_LENGTH \
-    --train-iters $TRAIN_STEPS \
-    --tokenizer-type PretrainedFromHF  \
-    --tokenizer-name-or-path $TOKENIZER_PATH \
-    --bf16 \
-    --use-flash-attn-v2 \
-    --no-query-key-layer-scaling \
-    --attention-dropout 0 \
-    --hidden-dropout 0 \
-    --use-rotary-position-embeddings \
-    --untie-embeddings-and-output-weights \
-    --swiglu \
-    --normalization rmsnorm \
-    --disable-bias-linear \
-    --num-key-value-heads $NUM_KV_HEADS
-    $OPTIMIZER_ARGS \
-    $EXIT_OPTS \
-    "
-
-# TODO: decide on efficient eval-interval + eval-iters
-
-OUTPUT_ARGS=" \
-    --log-interval 1 \
-    --save-interval $SAVE_INTERVAL \
-    --eval-interval 1000 \
-    --eval-iters 1 \
-    "
 
 # ----- Deepspeed configuration
 ZERO_STAGE=0 # important: bf16 must use z0! it implements its own zero stage 1 equivalent
@@ -150,30 +90,6 @@ if [ "${activation_checkpoint}" = "true" ]; then
   ## new argument for recomputing only the attention layer
   # ds_args="--recompute-granularity selective ${ds_args}"
 fi
-
-export LAUNCHER="python -u -m torch.distributed.run \
-    --nproc_per_node $GPUS_PER_NODE \
-    --nnodes $NNODES \
-    --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
-    --rdzv_backend c10d \
-    --max_restarts 0 \
-    --tee 3 \
-    "
-
-export CMD=" \
-    `pwd`/pretrain_gpt.py \
-    --tensor-model-parallel-size $TP_SIZE \
-    --pipeline-model-parallel-size $PP_SIZE \
-    $GPT_ARGS \
-    $OUTPUT_ARGS \
-    --save $CHECKPOINT_PATH \
-    --load $CHECKPOINT_PATH \
-    --data-impl mmap \
-    --distributed-backend nccl \
-     $ds_args \
-    "
-
-echo $CMD
 
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
