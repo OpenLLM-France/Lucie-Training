@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-1nodes-tp2-pp2
+#SBATCH --job-name=lucie7b-1nodes-tp2-pp1
 #SBATCH --qos=qos_gpu-dev
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
@@ -16,7 +16,7 @@ set -x -e
 CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
 LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
 
-MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed
+MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
 cd $MEGATRON_DEEPSPEED_REPO
 
 DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
@@ -29,11 +29,11 @@ MASTER_PORT=6000
 GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
-PP=2
+PP=1
 TP=2
 
 MICRO_BATCH_SIZE=6
-GLOBAL_BATCH_SIZE=128
+GLOBAL_BATCH_SIZE=192
 
 # ----- model
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
