@@ -1,10 +1,9 @@
-# Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-
 """Processing large data for pretraining."""
 import argparse
 import json
 import multiprocessing
 import os
+import random
 import sys
 import time
 
@@ -36,110 +35,93 @@ class Encoder:
     def initializer(self):
         # Use Encoder class as a container for global data
         Encoder.tokenizer = build_tokenizer(self.args)
-        if False:  # self.args.split_sentences:
-            pass
-            # if not nltk_available:
-            #     print("NLTK is not available to split sentences.")
-            #     exit()
-            # library = f"tokenizers/punkt/{self.args.lang}.pickle"
-            # splitter = nltk.load(library)
-            # if self.args.keep_newlines:
-            #     # this prevents punkt from eating newlines after sentences
-            #     Encoder.splitter = nltk.tokenize.punkt.PunktSentenceTokenizer(
-            #         train_text=splitter._params, lang_vars=CustomLanguageVars()
-            #     )
-            # else:
-            #     Encoder.splitter = splitter
+
+    def encode(self, text, key=None):
+        if key is None:
+            key = self.args.json_keys[0]
+        if isinstance(text, list):
+            sentences = text
         else:
-            Encoder.splitter = IdentitySplitter()
+            sentences = [text]
+        doc_ids = []
+        sentence_lens = []
+        for sentence in sentences:
+            # JL: remove trailing whitespaces and line breaks
+            sentence = sentence.rstrip()
+            sentence_ids = Encoder.tokenizer.tokenize(sentence)
+            if len(sentence_ids) > 0:
+                doc_ids.extend(sentence_ids)
+                sentence_lens.append(len(sentence_ids))
+        if len(doc_ids) > 0 and self.args.append_eod:
+            doc_ids.append(Encoder.tokenizer.eod)
+        return {key: doc_ids}, {key: sentence_lens}, len(text)
 
-    def split(self, json_line):
-        data = json.loads(json_line)
-        output = {}
-        for key in self.args.json_keys:
-            text = data[key]
-            max_len = 1000000
-            tokens_list = [Encoder.splitter.tokenize(text[i : i + max_len]) for i in range(0, len(text), max_len)]
-            output[key] = [tokens for partial in tokens_list for tokens in partial]
-        return json.dumps(output), len(json_line)
-
-    def encode(self, json_line):
+    def encode_json(self, json_line):
         data = json.loads(json_line)
         ids = {}
         lens = {}
         for key in self.args.json_keys:
             text = data[key]
-            if isinstance(text, list):
-                sentences = text
-            else:
-                sentences = [text]
-            doc_ids = []
-            sentence_lens = []
-            for sentence in sentences:
-                # JL: remove trailing whitespaces and line breaks
-                sentence = sentence.rstrip()
-                sentence_ids = Encoder.tokenizer.tokenize(sentence)
-                if len(sentence_ids) > 0:
-                    doc_ids.extend(sentence_ids)
-                    sentence_lens.append(len(sentence_ids))
-            if len(doc_ids) > 0 and self.args.append_eod:
-                doc_ids.append(Encoder.tokenizer.eod)
-            ids[key] = doc_ids
-            lens[key] = sentence_lens
+            _id, _len, _ = self.encode(text, key=key)
+            ids.update(_id)
+            lens.update(_len)
         return ids, lens, len(json_line)
+
+
+def current_date():
+    return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class Partition:
     def __init__(self, args, workers):
         self.args = args
         self.workers = workers
+        self.encoder = None
+        tokenizer = build_tokenizer(self.args)
+        self.vocab_size = tokenizer.vocab_size
 
-    def print_processing_stats(self, count, proc_start, total_bytes_processed):
+    def initializer(self):
+        self.encoder = Encoder(self.args)
+        self.encoder.initializer()
+
+    def print_processing_stats(self, count, proc_start, total_bytes_processed, dataset_name):
         current = time.time()
         elapsed = current - proc_start
         mbs = total_bytes_processed / elapsed / 1024 / 1024
-        print(f"Processed {count} documents", f"({count/elapsed} docs/s, {mbs} MB/s).", file=sys.stderr)
+        print(
+            f"{current_date()} -- {dataset_name}: Processed {count} documents in {elapsed} seconds",
+            f"({count/elapsed} docs/s, {mbs} MB/s).",
+            file=sys.stderr,
+        )
         sys.stdout.flush()
 
-    def split_sentences(self, file_name):
-        input_file_name, output_file_name = file_name
-        print("Opening", input_file_name)
-        fin = open(input_file_name, encoding="utf-8")
-        fout = open(output_file_name, "w")
+    def process_batch(self, input, output_prefix):  # noqa # C901 `...` is too complex
+        """
+        Process a single json file or a list of text
 
-        encoder = Encoder(self.args)
-        pool = multiprocessing.Pool(self.args.threads_tokenization, initializer=encoder.initializer)
-        split_docs = pool.imap(encoder.split, fin, 32)
-
-        proc_start = time.time()
-        total_bytes_processed = 0
-        for i, (doc, bytes_processed) in enumerate(split_docs, start=1):
-            total_bytes_processed += bytes_processed
-            fout.write(doc + "\n")
-            if i % self.args.log_interval == 0:
-                self.print_processing_stats(i, proc_start, total_bytes_processed)
-
-        fin.close()
-        fout.close()
-
-    def process_json_file(self, input_file_name, output_prefix):
-        # print("Opening", input_file_name)
-        fin = open(input_file_name, encoding="utf-8")
+        Args:
+            input: str or list of str
+                input json file or list of text
+            output_prefix: str
+                prefix for output files
+        """
 
         # startup_start = time.time()
-        encoder = Encoder(self.args)
-        tokenizer = build_tokenizer(self.args)
-        if self.args.threads_tokenization > 1:
-            raise NotImplementedError("Multithreading is not supported for encoding.")
-            # pool = multiprocessing.Pool(self.args.threads_tokenization, initializer=encoder.initializer)
-            # encoded_docs = pool.imap(encoder.encode, fin, 32)
+        if self.encoder is None:
+            self.initializer()
+        encoder = self.encoder
+
+        dataset_name = os.path.basename(output_prefix)
+
+        if isinstance(input, str):
+            # print("Opening", input)
+            fin = open(input, encoding="utf-8")
+            encoded_docs = map(encoder.encode_json, fin)
         else:
-            encoder.initializer()
-            encoded_docs = map(encoder.encode, fin)
+            fin = None
+            encoded_docs = map(encoder.encode, input)
 
         level = "document"
-        # if self.args.split_sentences:
-        #     level = "sentence"
 
         output_bin_files = {}
         output_idx_files = {}
@@ -149,7 +131,7 @@ class Partition:
             output_bin_files[key] = f"{output_prefix}_{key}_{level}.bin"
             output_idx_files[key] = f"{output_prefix}_{key}_{level}.idx"
             builders[key] = indexed_dataset.make_builder(
-                output_bin_files[key], impl=self.args.dataset_impl, vocab_size=tokenizer.vocab_size
+                output_bin_files[key], impl=self.args.dataset_impl, vocab_size=self.vocab_size
             )
 
         # startup_end = time.time()
@@ -162,15 +144,27 @@ class Partition:
             for key in doc.keys():
                 builders[key].add_doc(doc[key], sentence_lens[key])
             if i % self.args.log_interval == 0:
-                pass
-                # self.print_processing_stats(i, proc_start, total_bytes_processed)
-        assert i >= 0, f"Error: {input_file_name} is empty."
-        self.print_processing_stats(i, proc_start, total_bytes_processed)
+                self.print_processing_stats(i, proc_start, total_bytes_processed, dataset_name)
 
-        fin.close()
+        # Do not fail on empty dataset (can happen when filtering documents)
+        if i < 0:
+            print(f"WARNING: {input} is empty.")
+            sys.stdout.flush()
+            for key in self.args.json_keys:
+                filename = output_bin_files[key]
+                if os.path.exists(filename):
+                    os.remove(filename)
+            return
+
+        assert i >= 0, f"Error: {input} is empty."
+        self.print_processing_stats(i, proc_start, total_bytes_processed, dataset_name)
+
         builders[key].finalize(output_idx_files[key])
 
-    def process_dataset(self, dataset_name):  # noqa # C901 `...` is too complex
+        if fin is not None:
+            fin.close()
+
+    def process_dataset(self, dataset_name, use_jsonl_file=False):  # noqa # C901 `...` is too complex
         global error_flag, num_processes
 
         remove_jsonl = self.args.remove_jsonl
@@ -186,14 +180,17 @@ class Partition:
                 assert os.path.exists(jsonl_file), f"Error: {jsonl_file} does not exist."
                 remove_jsonl = False
             else:
-                jsonl_file = os.path.join(self.args.jsonl_folder, dataset_name + ".jsonl")
+                if use_jsonl_file:
+                    jsonl_file = os.path.join(self.args.jsonl_folder, dataset_name + ".jsonl")
+                else:
+                    jsonl_file = None
 
             if os.path.exists(expected_file) and self.args.remove_jsonl:
                 # print(f"Skipping {jsonl_file} as {expected_file} exists.")
                 sys.stdout.flush()
                 return
 
-            if not os.path.exists(jsonl_file):
+            if jsonl_file and not os.path.exists(jsonl_file):
                 print(f"Writing {jsonl_file}...")
                 os.makedirs(os.path.dirname(jsonl_file), exist_ok=True)
                 tic = time.time()
@@ -209,7 +206,6 @@ class Partition:
                 sys.stdout.flush()
 
             all_datas.pop(dataset_name)
-            del dataset
 
             if os.path.exists(expected_file):
                 # print(f"Skipping {jsonl_file} as {expected_file} exists.")
@@ -219,29 +215,48 @@ class Partition:
             num_processes.value += 1
             has_increased_num_processes = True
 
-            print(f"Processing {jsonl_file} ({num_processes.value} processes)")
-            sys.stdout.flush()
-
             os.makedirs(self.args.output_folder, exist_ok=True)
             output_prefix = os.path.join(self.args.output_folder, dataset_name)
 
-            self.process_json_file(jsonl_file, output_prefix)
-            print(f"Processed {jsonl_file}...")
-            sys.stdout.flush()
+            if jsonl_file:
+                del dataset
 
-            if remove_jsonl:
-                os.remove(jsonl_file)
+                print(
+                    f"{current_date()} -- Processing {jsonl_file} -> {dataset_name} ({num_processes.value} processes)"
+                )
+                sys.stdout.flush()
+
+                self.process_batch(jsonl_file, output_prefix)
+                print(f"{current_date()} -- Processed {jsonl_file}...")
+                sys.stdout.flush()
+
+                if remove_jsonl:
+                    os.remove(jsonl_file)
+
+            else:
+                print(f"{current_date()} -- Processing {dataset_name} ({num_processes.value} processes)")
+                sys.stdout.flush()
+
+                self.process_batch(dataset, output_prefix)
+                print(f"{current_date()} -- Processed {dataset_name}...")
+                sys.stdout.flush()
+                del dataset
 
         except (Exception, KeyboardInterrupt) as err:
-            print(f"Error processing {dataset_name}: {err}")
+            import traceback
+
+            print(traceback.format_exc())
+            print(f"{current_date()} -- Error processing {dataset_name}: {err}")
             sys.stdout.flush()
             if error_flag is not None:
                 error_flag.value = True
             if has_increased_num_processes:
                 num_processes.value -= 1
+                has_increased_num_processes = False
 
         if has_increased_num_processes:
             num_processes.value -= 1
+            has_increased_num_processes = False
 
 
 global error_flag
@@ -257,7 +272,6 @@ def get_args():
     group.add_argument(
         "--json-keys", nargs="+", default=["text"], help="space separate listed of keys to extract from json"
     )
-    # group.add_argument("--split-sentences", action="store_true", help="Split documents into sentences.")
     group.add_argument("--keep-newlines", action="store_true", help="Keep newlines between sentences when splitting.")
 
     group = parser.add_argument_group(title="tokenizer")
@@ -280,16 +294,13 @@ def get_args():
     group.add_argument(
         "--tokenizer-name-or-path",
         type=str,
-        default="OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all",
+        default="OpenLLM-France/Lucie-tokenizer-v2.9",
         help="Pretrained tokenizer name or path",
     )
     group.add_argument("--vocab-file", type=str, default=None, help="Path to the vocab file")
     group.add_argument("--vocab-size", default=786, help="size of vocab for use with NullTokenizer")
     group.add_argument("--merge-file", type=str, default=None, help="Path to the BPE merge file (if necessary).")
     group.add_argument("--append-eod", action="store_true", help="Append an <eod> token to the end of a document.")
-    group.add_argument(
-        "--lang", type=str, default="french", help="Language to use for NLTK-powered sentence splitting."
-    )
     group = parser.add_argument_group(title="output data")
     group.add_argument("--output-folder", type=str, default="tokenized_data", help="Output folder")
     group.add_argument("--jsonl-folder", type=str, default="tmp_to_tokenize", help="Folder with jsonl files")
@@ -299,7 +310,7 @@ def get_args():
     group.add_argument(
         "--workers",
         type=int,
-        default=16,
+        default=10,
         help=(
             "Number of worker processes to launch."
             "A good default for fast pre-processing "
@@ -326,10 +337,10 @@ def get_args():
 
 def get_file_name(args, file_id):
     file_name, extension = os.path.splitext(args.input)
-    input_file_name = file_name + "_" + str(file_id) + extension
+    input = file_name + "_" + str(file_id) + extension
     sentence_split_file = file_name + "_ss_" + str(file_id) + extension
     output_prefix = args.output_prefix + "_" + str(file_id)
-    file_names = {"partition": input_file_name, "sentence_split": sentence_split_file, "output_prefix": output_prefix}
+    file_names = {"partition": input, "sentence_split": sentence_split_file, "output_prefix": output_prefix}
     return file_names
 
 
@@ -350,6 +361,15 @@ def dataset_to_key_value(dataset):
 def main():
     args = get_args()
 
+    print(f"Output folder: {args.output_folder}")
+    tokenizer_folder = os.path.join(args.output_folder, "tokenizer")
+    if True:  # not os.path.exists(tokenizer_folder):
+        os.makedirs(tokenizer_folder, exist_ok=True)
+        import transformers
+
+        tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer_name_or_path)
+        tokenizer.save_pretrained(tokenizer_folder)
+
     args.remove_jsonl = "tmp" in args.jsonl_folder
 
     global all_datas
@@ -367,13 +387,19 @@ def main():
     # # Shared flag to indicate if an error occurred in any process
     # error_flag = multiprocessing.Value('b', False)
 
-    with multiprocessing.Pool(processes=args.workers) as pool:
+    all_data_names = list(all_datas.keys())
+    # Suffle the data names to avoid processing the largest datasets first
+    random.shuffle(all_data_names)
+
+    with multiprocessing.Pool(
+        processes=args.workers, initializer=partition.initializer
+    ) as pool:  # , maxtasksperchild=1
         # Partially apply the process function with error_flag argument
         # import functools
         # process_dataset = functools.partial(partition.process_dataset, error_flag=error_flag)
 
-        chunk_size = 1  # args.workers # len(all_datas) // args.workers
-        for _ in pool.imap_unordered(partition.process_dataset, sorted(all_datas.keys()), chunk_size):
+        chunk_size = len(all_datas) // args.workers
+        for _ in pool.imap_unordered(partition.process_dataset, all_data_names, chunk_size):
             # Check if any error occurred
             if error_flag.value:
                 # If an error occurred, terminate all processes in the pool

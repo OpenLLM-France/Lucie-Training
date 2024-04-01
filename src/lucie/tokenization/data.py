@@ -301,6 +301,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
                     ),
                     name=f"{dataset.name}:{i:03d}",
                     key=dataset.key,
+                    preprocess=dataset.preprocess,
                     postprocess=dataset.postprocess,
                     filter_fn=dataset.filter_fn,
                 )
@@ -968,7 +969,7 @@ def create_augmented_text(text1, text2, lan1, lan2, separator=None):
     if separator is None:
         separator = random.choice([" ", "   ", "    ", "     ", "\t", "\t\t", "\n", "\n\n"])
     before_lan = ""
-    after_lan = random.choice([". ", ": ", " : ", "- ", "-- ", "— "])
+    after_lan = random.choice([". ", ": ", " : ", "- ", "-- ", "— ", "\n"])
     brackets = random.choice([""] * 4 + ["[]", "()", "{}", "<>"])
     if brackets:
         before_lan = brackets[0]
