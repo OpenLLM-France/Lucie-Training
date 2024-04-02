@@ -96,17 +96,20 @@ def build_tokenizer(
 
     add_prefix_space = space_behaviour != "split"
 
+    input_space = tokenizers.Regex(r"[ \u00A0]")
+
     normalizers = [
-        tokenizers.normalizers.NFKC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
-        tokenizers.normalizers.Replace("\r", ""),
+        tokenizers.normalizers.NFC(),  # Note: This replaces unbreakable space "\u00A0" -> " "
+        tokenizers.normalizers.Replace(tokenizers.Regex(r"[\r\x00]"), ""),
     ] + (
         [
             # Note: placeholders cannot be handled (using tokenizers.Regex(r"[\t\n]"))
-            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^{re.escape(c)}])"), c + " ")
+            # tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^{re.escape(c)}])"), c + " ")
+            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[ \w])"), c + " ")
             for c in add_space_after
         ]
         if (space_behaviour == "prefix_all")
-        else ([tokenizers.normalizers.Replace(" ", _space_internal)] if space_behaviour == "split" else [])
+        else ([tokenizers.normalizers.Replace(input_space, _space_internal)] if space_behaviour == "split" else [])
     )
 
     pretokenizers = (
@@ -164,7 +167,7 @@ def build_tokenizer(
         tokenizer.normalizer = tokenizers.normalizers.Sequence(
             normalizers
             + [
-                tokenizers.normalizers.Replace(" ", _space_internal),
+                tokenizers.normalizers.Replace(input_space, _space_internal),
                 tokenizers.normalizers.Prepend(_space_internal),
             ]
         )
@@ -231,18 +234,71 @@ def get_special_tokens(
     return new_special_tokens
 
 
-def fit_tokenizer(tokenizer, it, len_it=None, vocab_size=32000, batch_size=1000, **special_tokens_options):
+def fit_tokenizer(
+    tokenizer,
+    it,
+    len_it=None,
+    vocab_size=32000,
+    limit_alphabet=1000,
+    enforce_alphabet=True,
+    batch_size=1000,
+    **special_tokens_options,
+):
     """
     Fit a tokenizer on a dataset.
     :param tokenizer: The tokenizer to fit.
     :param it: Generator of texts.
     :param len_it: Length of the generator (optional, only used for the progress bar).
     :param vocab_size: Size of the vocabulary.
+    :param limit_alphabet: Limit the alphabet size
+        (unique characters in the dataset, except from special enforced ones).
+    :param enforce_alphabet: Experimental
     :param batch_size: Size of the batches.
     :return: The fitted tokenizer.
     """
 
     special_tokens = get_special_tokens(**special_tokens_options)
+
+    initial_alphabet = None
+    if enforce_alphabet:
+        import csv
+
+        tsv_file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), os.path.pardir, "assets", "count_tokens.tsv"
+        )
+        initial_alphabet = []
+        exemples_removed = {}
+        with open(tsv_file, encoding="utf-8") as f:
+            reader = csv.reader(f, delimiter="\t", quotechar=None)
+            for row in reader:
+                if len(initial_alphabet) >= limit_alphabet:
+                    break
+                c, o, cat, count = row
+                c = chr(int(o))
+                # Norm NFC
+                import unicodedata
+
+                ci = unicodedata.normalize("NFC", c)
+                if c != ci:
+                    continue
+                if c in special_tokens:
+                    continue
+                if (
+                    len(cat) == 2
+                    and (cat[1] in ["c", "o"] and cat[0] not in ["N", "P"] and cat not in "Sc")
+                    or cat in ["Cf", "Mn"]
+                ):  # Discard oriental characters
+                    # len_bytes = len(c.encode("utf-8"))
+                    # print(f"Ignoring: {c} ({cat=}, {len_bytes=})")
+                    if len(exemples_removed.get(cat, [])) < 100:
+                        exemples_removed[cat] = exemples_removed.get(cat, []) + [c]
+                    continue
+                assert c not in initial_alphabet
+                initial_alphabet.append(c)
+        for cat, exemples in exemples_removed.items():
+            exemples = sorted(exemples)
+            len_bytes = [len(e.encode("utf-8")) for e in exemples]
+            print(f"Ignored {cat} characters: {exemples} {len_bytes}")
 
     bpe_trainer = tokenizers.trainers.BpeTrainer(
         vocab_size=vocab_size,
@@ -250,7 +306,7 @@ def fit_tokenizer(tokenizer, it, len_it=None, vocab_size=32000, batch_size=1000,
         show_progress=True,
         special_tokens=special_tokens,
         limit_alphabet=1000,
-        initial_alphabet=[],
+        initial_alphabet=initial_alphabet,
     )
     tokenizer.train_from_iterator(batchify_iterator(it, batch_size=batch_size), trainer=bpe_trainer, length=len_it)
     return tokenizer
@@ -420,8 +476,8 @@ def add_consecutive_spaces(  # noqa # C901 `...` is too complex
         # Add Replace in the normalizer
         normalizer = tokenizer["normalizer"]
         isseq_normalizer = normalizer["type"] == "Sequence"
-        new_normalizers = ([{"type": "Prepend", "prepend": _space_internal}] if add_prefix_space else []) + [
-            {"type": "Replace", "pattern": {"String": " "}, "content": _space_internal},
+        new_normalizers = ([{"type": "Prepend", "prepend": " "}] if add_prefix_space else []) + [
+            {"type": "Replace", "pattern": {"Regex": "[ \\\\u00A0]"}, "content": _space_internal},
         ]
         if isseq_normalizer:
             normalizer["normalizers"] += new_normalizers
@@ -562,17 +618,18 @@ if __name__ == "__main__":
     if args.verbose:
         print("Configure base tokenizer")
 
-    name_tokenizer = os.path.basename(args.base) if args.base else "Lucie2.5"
+    name_tokenizer = os.path.basename(args.base) if args.base else "LucieNFC"
     name_tokenizer += f"-{args.vocab_size}"
     name_tokenizer += f"-sp{args.consecutive_spaces}-{args.consecutive_tabs}-{args.consecutive_linebreaks}"
     if not args.base:
+        name_tokenizer += "-chosencharsV3"  # NOCOMMIT
         if args.individual_digits:
             name_tokenizer += "-digits"
         if args.separate_punctuation:
             name_tokenizer += "-punctsV3"
         elif args.space_behaviour == "prefix_all":
             name_tokenizer += "-sependpunctsV2"
-        name_tokenizer += f"-{args.space_behaviour.replace('_', '')}"
+        name_tokenizer += f"-{args.space_behaviour.replace('_', '').replace('prefixall', 'prefixallV2')}"
 
     example_sentence = (
         "   [INST] Coucou [/INST] Hello [INST] "
