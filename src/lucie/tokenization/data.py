@@ -14,6 +14,7 @@ import regex as re
 from text import (
     check_language,
     clean_discours,
+    clean_eurovoc,
     clean_wikipedia,
     fix_legi,
     fix_legi_and_remove_title,
@@ -217,6 +218,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 "american_stories",
                 "pes2o",
                 # Multi-language (with switching)
+                "europarl_aligned",
                 "croissant_aligned",
                 # Code
                 "code",
@@ -252,7 +254,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             # )
 
     else:
-        has_language = any(name.startswith(c + "_") for c in multilang_corpora)
+        has_language = any(name.startswith(c + "_") for c in multilang_corpora) and not name.endswith("_aligned")
         if has_language:
             name, language = name.split("_", 1)
             kwargs["language"] = language
@@ -861,6 +863,29 @@ class DataIteratorEuroparl(DataIterator):
         )
 
 
+class DataIteratorEuroparlAligned(DataIteratorConcat):
+    def __init__(self, **kwargs):
+        parquets = glob.glob(f"{DATA_PATH}/europarl/*parquet")
+        assert len(parquets), f"No parquet files found in {DATA_PATH}/europarl"
+
+        parquets = {os.path.basename(p).split(".")[-2]: p for p in parquets}
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIteratorParquet(
+                    parquet_file,
+                    name=f"EuroparlAligned:{languages}",
+                    preprocess=create_augmented_text_from_aligned_data,
+                    subsample_criteria="id",
+                    **kwargs,
+                )
+                for languages, parquet_file in parquets.items()
+            ],
+            name="EuroparlAligned",
+        )
+
+
 class DataIteratorCroissantAligned(DataIteratorConcat):
     def __init__(self, train=True, augment_train=True, **kwargs):
         if train is not None:
@@ -892,7 +917,7 @@ class DataIteratorCroissantAligned(DataIteratorConcat):
                     get_data_path(split),
                     name=f"CroissantAligned:{split}" + ("-augmented" if is_augmented(split) else ""),
                     preprocess=(
-                        create_augmented_text_from_separated_data
+                        create_augmented_text_from_aligned_data
                         if precomputed_landid
                         else functools.partial(analyze_bilingual_french_english_data, add_language_in_data=True)
                     )
@@ -958,8 +983,15 @@ def analyze_bilingual_french_english_data(data, add_language_in_data=False):  # 
     return create_augmented_text(text1, text2, lan1, lan2)
 
 
-def create_augmented_text_from_separated_data(data):
-    data["text"] = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+def create_augmented_text_from_aligned_data(data):
+    if "text_1" in data:
+        lan1 = data.pop("lan_1")
+        lan2 = data.pop("lan_2")
+        text1 = data.pop("text_1").strip()
+        text2 = data.pop("text_2").strip()
+        data["text"] = create_augmented_text(text1, text2, lan1, lan2)
+    else:
+        data["text"] = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
     return data
 
 
@@ -1005,10 +1037,37 @@ LAN_TO_COMPLETE = {
     "fr": {
         "fr": "français",
         "en": "anglais",
+        "it": "italien",
+        "de": "allemand",
+        "es": "espagnol",
     },
     "en": {
         "en": "english",
         "fr": "french",
+        "it": "italian",
+        "de": "german",
+        "es": "spanish",
+    },
+    "it": {
+        "fr": "francese",
+        "en": "inglese",
+        "it": "italiano",
+        "de": "tedesco",
+        "es": "spagnolo",
+    },
+    "de": {
+        "fr": "französisch",
+        "en": "englisch",
+        "it": "italienisch",
+        "de": "deutsch",
+        "es": "spanisch",
+    },
+    "es": {
+        "fr": "francés",
+        "en": "inglés",
+        "it": "italiano",
+        "de": "alemán",
+        "es": "español",
     },
 }
 
@@ -1086,15 +1145,19 @@ class DataIteratorClaire(DataIteratorConcat):
 
 
 class DataIteratorEurovoc(DataIteratorParquet):
-    def __init__(self, language="en", filter_by_perplexity=False, **kwargs):
+    def __init__(self, language="en", filter_by_perplexity=True, **kwargs):
         name = f"Eurovoc:{language.lower()}"
         folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "eurovoc")
-        folder = os.path.join(folder, language)
+        if filter_by_perplexity:
+            folder += f"_{language}"
+        else:
+            folder = os.path.join(folder, language)
         DataIteratorParquet.__init__(
             self,
             folder,
             name=name,
-            # filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
+            filter_fn=filter_by_perplexity_func(1500) if filter_by_perplexity else None,
+            postprocess=clean_eurovoc,
             **kwargs,
         )
 
