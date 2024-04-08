@@ -11,9 +11,6 @@
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
-## Ce que je suis entrain de faire: refaire les toutes premières expériences avec une batch size de 512
-## pour z0, ça doit toujours être que des b512
-
 set -x -e
 
 CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
