@@ -141,9 +141,9 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
        --log-interval 1 \
-       --save-interval 10000 \
-       --eval-interval 10000 \
-       --eval-iters 10000 \
+       --save-interval 100 \
+       --eval-interval 100 \
+       --eval-iters 1 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
