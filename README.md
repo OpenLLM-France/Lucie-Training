@@ -12,6 +12,7 @@ conda create -n lucie python=3.10
 ```bash
 conda activate lucie
 module load cuda/12.1.0 # use the cuda already installed in Jean-Zay
+pip install ninja # used for fast compilation
 ```
 
 ### Install torch and ninja
@@ -58,6 +59,12 @@ module load cuda/12.1.0
 
 ```bash
 sh scripts/training/pretrain_gpt.sh <MEGATRON_REPO> <CACHE_FOLDER>
+```
+
+for multinode:
+
+```bash
+sh scripts/training/pretrain_gpt.sh <MEGATRON_REPO> <CACHE_FOLDER> <CHECKPOINTS_FOLDER>
 ```
 
 ## 2. Training Dataset Storage and Organization

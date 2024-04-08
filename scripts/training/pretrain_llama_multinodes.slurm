@@ -1,15 +1,18 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-1nodes-tp2-pp1
-#SBATCH --qos=qos_gpu-dev
-#SBATCH --nodes=1
+#SBATCH --job-name=run-lucie7b-32nodes-tp2-pp2-z0-b512
+##SBATCH --qos=qos_gpu-dev    
+#SBATCH --nodes=32
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus
 #SBATCH --constraint=a100
-#SBATCH --time 0:20:00               # maximum execution time (HH:MM:SS)
+#SBATCH --time 2:00:00               # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
+
+## Ce que je suis entrain de faire: refaire les toutes premières expériences avec une batch size de 512
+## pour z0, ça doit toujours être que des b512
 
 set -x -e
 
@@ -29,11 +32,11 @@ MASTER_PORT=6000
 GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
-PP=1
 TP=2
+PP=2
 
-MICRO_BATCH_SIZE=6
-GLOBAL_BATCH_SIZE=192
+MICRO_BATCH_SIZE=4 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
+GLOBAL_BATCH_SIZE=512
 
 # ----- model
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
@@ -54,7 +57,7 @@ GRAD_CLIP=1
 SAVE_INTERVAL=100
 
 # ----- Deepspeed configuration
-ZERO_STAGE=0 # important: bf16 must use z0! it implements its own zero stage 1 equivalent
+ZERO_STAGE=1
 
 DS_CONFIG="./ds_config.$SLURM_JOBID.json"
 
@@ -104,6 +107,8 @@ conda activate lucie-torch211
 module load cuda/12.1.0
 # module load git/2.39.1
 
+# --pipeline-model-parallel-size $PP \
+# --no-pipeline-parallel \
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
@@ -136,9 +141,9 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
        --log-interval 1 \
-       --save-interval 1000 \
-       --eval-interval 50 \
-       --eval-iters 50 \
+       --save-interval 10000 \
+       --eval-interval 10000 \
+       --eval-iters 10000 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \

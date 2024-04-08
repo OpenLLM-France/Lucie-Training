@@ -15,7 +15,7 @@ ZERO_STAGE=0
 GPUS_PER_NODE=8
 MASTER_ADDR=localhost
 MASTER_PORT=$(python src/find_free_port.py)
-NNODES=$4
+NNODES=$SLURM_NNODES
 NODE_RANK=0
 
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
