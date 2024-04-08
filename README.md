@@ -60,7 +60,6 @@ module load cuda/12.1.0
 sh scripts/training/pretrain_llama.sh <MEGATRON_REPO> <CACHE_FOLDER> <CHECKPOINTS_FOLDER>
 ```
 
-
 ## 2. Training Dataset Storage and Organization
 
 Training dataset is stored in [HDF5](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) files. This format is designed to store and manage large amounts of data efficiently.
