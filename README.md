@@ -12,7 +12,6 @@ conda create -n lucie python=3.10
 ```bash
 conda activate lucie
 module load cuda/12.1.0 # use the cuda already installed in Jean-Zay
-pip install ninja # used for fast compilation
 ```
 
 ### Install torch and ninja
@@ -58,14 +57,9 @@ module load cuda/12.1.0
 ### Run training for debug
 
 ```bash
-sh scripts/training/pretrain_gpt.sh <MEGATRON_REPO> <CACHE_FOLDER>
+sh scripts/training/pretrain_llama.sh <MEGATRON_REPO> <CACHE_FOLDER> <CHECKPOINTS_FOLDER>
 ```
 
-for multinode:
-
-```bash
-sh scripts/training/pretrain_gpt.sh <MEGATRON_REPO> <CACHE_FOLDER> <CHECKPOINTS_FOLDER>
-```
 
 ## 2. Training Dataset Storage and Organization
 
@@ -76,13 +70,13 @@ The composition of the dataset includes a variety of document types. These docum
 ```
 /path/to/dataset
 ├── english
-│   ├── english_00001-of-10000.hdf5
-│   ├── ...
-│   └── english_10000-of-10000.hdf5
+│   ├── english_00001-of-10000.hdf5
+│   ├── ...
+│   └── english_10000-of-10000.hdf5
 └── code
     ├── the-stack_00001-of-99920.hdf5
-    ├── ...
-    └── the-stack_99920-of-99920.hdf5
+    ├── ...
+    └── the-stack_99920-of-99920.hdf5
 ```
 
 The likelihood of occurrence for different document types should be cataloged in a JSON file, as illustrated in the following example. Here, documents pertaining to code are allocated a likelihood value of 0.13, suggesting that documents associated with code are anticipated to constitute roughly 13% of the entire dataset.
