@@ -7,6 +7,8 @@ import random
 import sys
 import time
 
+import regex as re
+
 from data import decompose_datasets, get_datasets
 
 nltk_available = False
@@ -36,7 +38,11 @@ class Encoder:
         # Use Encoder class as a container for global data
         Encoder.tokenizer = build_tokenizer(self.args)
 
-    def encode(self, text, key=None):
+    def normalizer(self, text):
+        tokenizer = Encoder.tokenizer.tokenizer.backend_tokenizer
+        return tokenizer.normalizer.normalize_str(text)
+
+    def encode(self, text, key=None, max_len_at_once=None):  # noqa # C901 `...` is too complex
         if key is None:
             key = self.args.json_keys[0]
         if isinstance(text, list):
@@ -48,7 +54,55 @@ class Encoder:
         for sentence in sentences:
             # JL: remove trailing whitespaces and line breaks
             sentence = sentence.rstrip()
-            sentence_ids = Encoder.tokenizer.tokenize(sentence)
+            # TODO: use 50000 for default max_len_at_once
+            if max_len_at_once and len(sentence) > max_len_at_once:
+                # JL: Split around digits (assuming the tokenizer will split around them)
+                #     Note: this is an ugly workaround, specific to the tokenizer used (Lucie2.9)
+                sentence_ids = []
+                eos = None
+                num_splits = 0
+                must_delete_first_space = False
+                # _space_token = Encoder.tokenizer.tokenizer.encode("1")[1]
+                while len(sentence):
+                    pos = max(1, max_len_at_once // 2)
+                    next_digit = re.search(r"\d", sentence, pos=pos)
+                    while next_digit is None and pos > 100:
+                        pos = pos // 2
+                        next_digit = re.search(r"\d", sentence, pos=pos)
+                    if next_digit:
+                        next_digit = next_digit.start()
+                    else:
+                        next_digit = len(sentence)
+                    assert next_digit > 0  # Avoid infinite loop
+                    part_of_sentence = sentence[:next_digit]
+                    sentence = sentence[next_digit:]
+                    part_of_sentence_ids = Encoder.tokenizer.tokenize(part_of_sentence)
+                    if len(sentence_ids):
+                        # Remove BOS
+                        part_of_sentence_ids = part_of_sentence_ids[1:]
+                        if must_delete_first_space:
+                            # assert part_of_sentence_ids[0] == _space_token, \
+                            #    f"Space token mismatch: {part_of_sentence_ids[0]} != {space_token}"
+                            part_of_sentence_ids = part_of_sentence_ids[1:]
+
+                    # Remove EOS
+                    if eos is None:
+                        eos = part_of_sentence_ids[-1]
+                    else:
+                        assert eos == part_of_sentence_ids[-1], f"EOS mismatch: {eos} != {part_of_sentence_ids[-1]}"
+                    if len(sentence):
+                        part_of_sentence_ids = part_of_sentence_ids[:-1]
+                    # Accumulate result
+                    sentence_ids.extend(part_of_sentence_ids)
+                    num_splits += 1
+                    # TODO: the following might fail
+                    last_char = self.normalizer(part_of_sentence[-100:])[-1]
+                    must_delete_first_space = last_char not in "\n\t(['’\"«“‘‚‹—–―"
+                assert num_splits >= 1
+                # if num_splits > 1:
+                #     print(f"Splitted {len_sentence} characters into {num_splits} parts")
+            else:
+                sentence_ids = Encoder.tokenizer.tokenize(sentence)
             if len(sentence_ids) > 0:
                 doc_ids.extend(sentence_ids)
                 sentence_lens.append(len(sentence_ids))
@@ -166,6 +220,9 @@ class Partition:
 
     def process_dataset(self, dataset_name, use_jsonl_file=False):  # noqa # C901 `...` is too complex
         global error_flag, num_processes
+
+        if error_flag.value:
+            return
 
         remove_jsonl = self.args.remove_jsonl
         has_increased_num_processes = False
@@ -391,25 +448,27 @@ def main():
     # Suffle the data names to avoid processing the largest datasets first
     random.shuffle(all_data_names)
 
-    with multiprocessing.Pool(
-        processes=args.workers, initializer=partition.initializer
-    ) as pool:  # , maxtasksperchild=1
-        # Partially apply the process function with error_flag argument
-        # import functools
-        # process_dataset = functools.partial(partition.process_dataset, error_flag=error_flag)
+    if args.workers > 1:
+        with multiprocessing.Pool(
+            processes=args.workers, initializer=partition.initializer
+        ) as pool:  # , maxtasksperchild=1
+            # Partially apply the process function with error_flag argument
+            # import functools
+            # process_dataset = functools.partial(partition.process_dataset, error_flag=error_flag)
 
-        chunk_size = len(all_datas) // args.workers
-        for _ in pool.imap_unordered(partition.process_dataset, all_data_names, chunk_size):
-            # Check if any error occurred
+            chunk_size = max(1, len(all_datas) // args.workers)
+            for _ in pool.imap_unordered(partition.process_dataset, all_data_names, chunk_size):
+                # Check if any error occurred
+                if error_flag.value:
+                    # If an error occurred, terminate all processes in the pool
+                    print("An error occurred in one of the processes. Terminating all processes.")
+                    sys.stdout.flush()
+                    pool.terminate()
+                    break
+    else:
+        for _ in map(partition.process_dataset, all_data_names):
             if error_flag.value:
-                # If an error occurred, terminate all processes in the pool
-                print("An error occurred in one of the processes. Terminating all processes.")
-                sys.stdout.flush()
-                pool.terminate()
                 break
-
-        # pool.close()
-        # pool.join()
 
 
 if __name__ == "__main__":
