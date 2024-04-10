@@ -60,7 +60,7 @@ if __name__ == "__main__":
         all_byte_tokens = []
 
     else:
-        tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer)
+        tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer, trust_remote_code=True)
         tokenizer = set_infinite_length(tokenizer)
 
         all_byte_tokens = [

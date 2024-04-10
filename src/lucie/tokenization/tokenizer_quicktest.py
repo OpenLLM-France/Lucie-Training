@@ -18,20 +18,27 @@ def norm_spaces(s):
 
 
 if __name__ == "__main__":
+    example_tokenizers = [
+        "gpt-4",
+        "bigscience/bloom-7b1",
+        "google/gemma-7b",
+        "tiiuae/falcon-7b",
+        "allenai/OLMo-7B",
+        "meta-llama/Llama-2-7b-hf",
+        "mistralai/Mistral-7B-v0.1",
+        "croissantllm/CroissantLLMBase",
+        "CohereForAI/c4ai-command-r-plus",
+        # "Lucie2.9",
+    ]
+
     import argparse
 
     parser = argparse.ArgumentParser(description="Test a tokenizer.")
     parser.add_argument(
         "tokenizer",
         help="Tokenizer to evaluate. Examples: "
-        "gpt-4, "
-        "bigscience/bloom-7b1, "
-        "google/gemma-7b, "
-        "tiiuae/falcon-7b, "
-        "meta-llama/Llama-2-7b-hf, "
-        "mistralai/Mistral-7B-v0.1, "
-        "croissantllm/CroissantLLMBase, "
-        "... or a folder containing a tokenizer.",
+        + ", ".join(example_tokenizers)
+        + "... or a folder containing a tokenizer.",
         nargs="?",
     )
     parser.add_argument(
@@ -73,21 +80,7 @@ if __name__ == "__main__":
     if args.sentence:
         example_sentences = [" ".join(args.sentence)]
 
-    tokenizers = (
-        [args.tokenizer]
-        if args.tokenizer
-        else [
-            "gpt-4",
-            "bigscience/bloom-7b1",
-            "google/gemma-7b",
-            "tiiuae/falcon-7b",
-            # "allenai/OLMo-7B",
-            "meta-llama/Llama-2-7b-hf",
-            "mistralai/Mistral-7B-v0.1",
-            "croissantllm/CroissantLLMBase",
-            "Lucie2.9",
-        ]
-    )
+    tokenizers = [args.tokenizer] if args.tokenizer else example_tokenizers
 
     short_output = not args.tokenizer
 
@@ -98,7 +91,7 @@ if __name__ == "__main__":
         if tokenizer_name.lower() in ["gpt-4"]:
             tokenizer = tiktoken.encoding_for_model(tokenizer_name.lower())
         else:
-            tokenizer = transformers.AutoTokenizer.from_pretrained(tokenizer_name)
+            tokenizer = transformers.AutoTokenizer.from_pretrained(tokenizer_name, trust_remote_code=True)
 
         for example_sentence in example_sentences:
             tokens, decoded = test_tokenizer(tokenizer, example_sentence)
