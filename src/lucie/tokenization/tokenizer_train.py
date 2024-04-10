@@ -240,7 +240,7 @@ def fit_tokenizer(
     len_it=None,
     vocab_size=32000,
     limit_alphabet=1000,
-    enforce_alphabet=True,
+    enforce_alphabet=False,
     batch_size=1000,
     **special_tokens_options,
 ):
@@ -285,7 +285,7 @@ def fit_tokenizer(
                     continue
                 if (
                     len(cat) == 2
-                    and (cat[1] in ["c", "o"] and cat[0] not in ["N", "P"] and cat not in "Sc")
+                    and (cat[1] in ["c", "o"] and cat[0] not in ["N", "P"] and cat not in ["Sc", "So"])
                     or cat in ["Cf", "Mn"]
                 ):  # Discard oriental characters
                     # len_bytes = len(c.encode("utf-8"))
@@ -477,7 +477,7 @@ def add_consecutive_spaces(  # noqa # C901 `...` is too complex
         normalizer = tokenizer["normalizer"]
         isseq_normalizer = normalizer["type"] == "Sequence"
         new_normalizers = ([{"type": "Prepend", "prepend": " "}] if add_prefix_space else []) + [
-            {"type": "Replace", "pattern": {"Regex": "[ \\\\u00A0]"}, "content": _space_internal},
+            {"type": "Replace", "pattern": {"Regex": "[ \\u00A0]"}, "content": _space_internal},
         ]
         if isseq_normalizer:
             normalizer["normalizers"] += new_normalizers
@@ -595,6 +595,12 @@ if __name__ == "__main__":
         help="Make sure not to mix spaces and punctuations with alphanumeric characters",
     )
     parser.add_argument(
+        "--enforce_alphabet",
+        default=True,
+        type=str2bool,
+        help="Restrict the alphabet of unicode characters (avoiding 'exotic' characters)",
+    )
+    parser.add_argument(
         "--output",
         "-o",
         default=None,
@@ -622,7 +628,8 @@ if __name__ == "__main__":
     name_tokenizer += f"-{args.vocab_size}"
     name_tokenizer += f"-sp{args.consecutive_spaces}-{args.consecutive_tabs}-{args.consecutive_linebreaks}"
     if not args.base:
-        name_tokenizer += "-chosencharsV3"  # NOCOMMIT
+        if args.enforce_alphabet:
+            name_tokenizer += "-chosenchars"
         if args.individual_digits:
             name_tokenizer += "-digits"
         if args.separate_punctuation:
@@ -733,6 +740,7 @@ if __name__ == "__main__":
             consecutive_spaces=args.consecutive_spaces,
             consecutive_tabs=args.consecutive_tabs,
             consecutive_linebreaks=args.consecutive_linebreaks,
+            enforce_alphabet=args.enforce_alphabet,
         )
         tok.save(os.path.join(args.output, "tokenizer.json"))
         tok = transformers.PreTrainedTokenizerFast(tokenizer_file=os.path.join(args.output, "tokenizer.json"))
