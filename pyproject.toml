@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "lucie-training"
 version = "0.1.0"
-description = ""
-authors = ["Julien Tourille <julien.tourille@cea.fr>"]
+description = "Scripts to train Lucie LLM"
+authors = []
 license = "GPL-3.0"
 readme = "README.md"
 packages = [
