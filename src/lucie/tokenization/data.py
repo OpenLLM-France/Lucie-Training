@@ -1147,11 +1147,7 @@ class DataIteratorClaire(DataIteratorConcat):
 class DataIteratorEurovoc(DataIteratorParquet):
     def __init__(self, language="en", filter_by_perplexity=True, **kwargs):
         name = f"Eurovoc:{language.lower()}"
-        folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "eurovoc")
-        if filter_by_perplexity:
-            folder += f"_{language}"
-        else:
-            folder = os.path.join(folder, language)
+        folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", f"eurovoc_{language}")
         DataIteratorParquet.__init__(
             self,
             folder,
@@ -1172,9 +1168,7 @@ def filter_by_perplexity_func(threshold):
 
 class DataIteratorGallicaMono(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
-        folder = os.path.join(
-            DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "gallica_mono_parquet"
-        )
+        folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", "gallica_mono_parquet")
         DataIteratorParquet.__init__(
             self,
             folder,
@@ -1190,7 +1184,7 @@ class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, filter_by_perplexity=True, **kwargs):
         folder = os.path.join(
             DATA_PATH,
-            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+            "perplexity_corpus_open_llm",
         )
         DataIteratorConcat.__init__(
             self,
@@ -1213,7 +1207,7 @@ class DataIteratorHal(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
         folder = os.path.join(
             DATA_PATH,
-            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+            "perplexity_corpus_open_llm",
             "hal_parquet",
         )
         DataIteratorParquet.__init__(
@@ -1230,7 +1224,7 @@ class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
         folder = os.path.join(
             DATA_PATH,
-            "perplexity_corpus_open_llm" if filter_by_perplexity else ".",
+            "perplexity_corpus_open_llm",
             "theses_parquet",
         )
         DataIteratorParquet.__init__(
@@ -1309,9 +1303,7 @@ class DataIteratorOpenDataFr(DataIteratorParquetSplitted):
 
 class DataIteratorAmericanStories(DataIteratorConcat):
     def __init__(self, streaming=True, from_huggingface=False, filter_by_perplexity=True, **kwargs):
-        data_path = os.path.join(
-            DATA_PATH, "perplexity_corpus_open_llm" if filter_by_perplexity else ".", "americanstories", "*.parquet"
-        )
+        data_path = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", "americanstories", "*.parquet")
 
         if from_huggingface is None:
             from_huggingface = not os.path.isdir(data_path)
