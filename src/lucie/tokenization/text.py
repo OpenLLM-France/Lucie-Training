@@ -73,6 +73,7 @@ def clean_discours(text):
 def clean_eurovoc(text):
     text = re.sub(r" \(cid:1\)", "", text)
     text = re.sub(r"(\w*)\(cid:(\d+)\)(\w*)", _repair_cid_character, text)
+    # text = re.sub(r"\f", "", text) # should we remove those control characters?
     return re.sub(r" +", " ", text)
 
 
