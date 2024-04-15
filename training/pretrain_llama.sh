@@ -14,7 +14,7 @@ ZERO_STAGE=0
 
 GPUS_PER_NODE=8
 MASTER_ADDR=localhost
-MASTER_PORT=$(python src/find_free_port.py)
+MASTER_PORT=$(python find_free_port.py)
 NNODES=$SLURM_NNODES
 NODE_RANK=0
 
