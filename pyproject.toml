@@ -5,9 +5,7 @@ description = "Scripts to train Lucie LLM"
 authors = []
 license = "GPL-3.0"
 readme = "README.md"
-packages = [
-    { include = "lucie", from = "src"},
-]
+packages = []
 
 
 [tool.poetry.dependencies]
