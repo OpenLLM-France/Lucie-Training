@@ -2,11 +2,17 @@
 # This example script is contributed by external user https://github.com/nrailgun
 set -x
 
+pwd=$(dirname $0)
+
 ######################################
 # Change the below configurations here
 DS_CONFIG=$1/deepspeed.json
-DATASET="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document"
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all # offical llama tokenizer.model
+
+# DATASET="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document"
+# TOKENIZER_PATH="OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all"
+
+DATASET="$(python $pwd/collect_data_and_weights.py /gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9)"
+TOKENIZER_PATH="OpenLLM-France/Lucie-tokenizer-v2.9"
 
 TP=2
 PP=2
@@ -14,7 +20,6 @@ ZERO_STAGE=0
 
 GPUS_PER_NODE=8
 MASTER_ADDR=localhost
-pwd=$(dirname $0)
 MASTER_PORT=$(python $pwd/find_free_port.py)
 NNODES=$SLURM_NNODES
 NODE_RANK=0
