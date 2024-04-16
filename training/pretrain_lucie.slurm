@@ -53,7 +53,8 @@ SEQ_LENGTH=2048 # for llama2 it's 4096
 NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
 
 # ------ Optimizer
-TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
+# TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
+TRAIN_STEPS=2000000 # 2T tokens / (2048 * 512 tokens per batch) = 1907348 steps
 LR=3e-4
 MIN_LR=3e-5
 LR_WARMUP_STEPS=2000
@@ -118,7 +119,7 @@ module load cuda/12.1.0
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path $TOKENS_DIR/data_indices \
+       --data-cache-path $TOKENS_DIR/data_indices_"$TRAIN_STEPS"x"$GLOBAL_BATCH_SIZE"x"$SEQ_LENGTH" \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
