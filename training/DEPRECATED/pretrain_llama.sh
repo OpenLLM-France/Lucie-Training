@@ -128,8 +128,6 @@ torchrun $DISTRIBUTED_ARGS \
        --adam-beta2 0.95 \
        --log-interval 100 \
        --save-interval 10000 \
-       --eval-interval 1000 \
-       --eval-iters 100 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
@@ -141,4 +139,6 @@ torchrun $DISTRIBUTED_ARGS \
        --normalization rmsnorm \
        --disable-bias-linear \
        --num-key-value-heads $NUM_KV_HEADS \
+       --eval-iters 0 \
+       --split "1, 0, 0" \
        $ds_args

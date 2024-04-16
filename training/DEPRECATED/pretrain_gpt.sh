@@ -2,6 +2,8 @@
 
 # Runs the "345M" parameter model
 
+pwd=$(dirname $0)
+
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 
 GPT_ARGS="
@@ -40,7 +42,6 @@ OUTPUT_ARGS="
 DISTRIBUTED_ARGS="
    --DDP-impl torch
 "
-pwd=$(dirname $0)
 MASTER_PORT=$(python $pwd/find_free_port.py)
 echo "The following free master port was found: $MASTER_PORT"
 # /gpfsscratch/rech/qgz/urc37ho/lucie-cache
