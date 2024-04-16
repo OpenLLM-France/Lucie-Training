@@ -89,8 +89,8 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Path to tokenized data",
-        # default="/data-storage/storage0/lucie_tokens_2.9",
-        # nargs="?",
+        default="/data-storage/storage0/lucie_tokens_2.9",
+        nargs="?",
     )
     parser.add_argument(
         "--count",
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
         name = prefix_to_canonical_name(prefix, stats_datasets)
         if name not in stats_datasets:
-            raise RuntimeError(f"WARNING: Dataset {name} cannot be mathed found ({prefix=})")
+            raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=})")
             continue
         if name in not_tokenized_datasets:
             not_tokenized_datasets.remove(name)
@@ -191,13 +191,13 @@ if __name__ == "__main__":
             )
             num_tokens_per_language[language] = num_tokens_per_language.get(language, 0) + (count // len(languages))
 
-    if not_tokenized_datasets:
-        raise RuntimeError(f"WARNING: Datasets missing: {', '.join(not_tokenized_datasets)}")
+    if not_tokenized_datasets and args.debug:
+        print(f"WARNING! Those datasets are missing (not tokenized): {', '.join(not_tokenized_datasets)}")
 
     total_count = sum(num_tokens_per_language.values())
     total_count_weighted = sum(num_tokens_per_language_weighted.values())
     total_count_weighted_rest = total_count_weighted - sum(
-        [num_tokens_per_language_weighted[lan] for lan in language_target_proportions]
+        [num_tokens_per_language_weighted.get(lan, 0) for lan in language_target_proportions]
     )
 
     language_target_proportion_rest = 1 - sum(language_target_proportions.values())
@@ -267,7 +267,7 @@ before={ratio * 100:5.3f}% after={new_ratio * 100:5.3f}%"
                 total_weights += weight
 
             if not args.debug:
-                print(f"{weight:10.9f} {args.folder}/{prefix} ", end="")
+                print(f"{weight:10.9f} {prefix} ", end="")
 
     if not args.debug:
         print()
