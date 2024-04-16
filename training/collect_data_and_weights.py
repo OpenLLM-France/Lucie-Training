@@ -260,14 +260,14 @@ before={count * 100/ total_count_weighted:6.3f}% after={count * weight * 100/ to
                         f"{name:50s}: {language_weight=:7.6f} {additional_weight=:7.6f} {weight=:7.6f}\
 before={ratio * 100:5.3f}% after={new_ratio * 100:5.3f}%"
                     )
+
+                else:
+                    print(f"{weight:10.9f} {prefix} ", end="")
             else:
                 # Median weight is 1
                 # norm_weight = sorted(all_weights)[len(all_weights)//2]
                 norm_weight = 1 / 1000
                 total_weights += weight
-
-            if not args.debug:
-                print(f"{weight:10.9f} {prefix} ", end="")
 
     if not args.debug:
         print()
