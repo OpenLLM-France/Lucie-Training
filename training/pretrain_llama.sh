@@ -14,6 +14,11 @@ DS_CONFIG=$1/deepspeed.json
 DATASET="$(python $pwd/collect_data_and_weights.py /gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9)"
 TOKENIZER_PATH="OpenLLM-France/Lucie-tokenizer-v2.9"
 
+if [ -z "$DATASET" ]; then
+  echo "No data found"
+  exit 1
+fi
+
 TP=2
 PP=2
 ZERO_STAGE=0
