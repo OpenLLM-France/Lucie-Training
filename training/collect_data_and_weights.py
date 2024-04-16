@@ -83,7 +83,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Process some integers.", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="Prints a string with all tokenized data files (prefixes) and their respective weights.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "folder",
