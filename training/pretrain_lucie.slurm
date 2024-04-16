@@ -19,8 +19,17 @@ LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
 MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
 cd $MEGATRON_DEEPSPEED_REPO
 
-DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+# TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.9
+TOKENS_DIR="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9"
+
+# DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
+DATASET="$(python $pwd/collect_data_and_weights.py $TOKENS_DIR)"
+
+if [ -z "$DATASET" ]; then
+  echo "No data found"
+  exit 1
+fi
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
@@ -109,7 +118,7 @@ module load cuda/12.1.0
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache \
+       --data-cache-path $TOKENS_DIR/data_indices \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
@@ -126,7 +135,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
-       --tokenizer-name-or-path $TOKENIZER_PATH \
+       --tokenizer-name-or-path $TOKENIZER_NAME \
        --distributed-backend nccl \
        --lr $LR \
        --lr-decay-style cosine \
@@ -140,7 +149,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --log-interval 1 \
        --save-interval 100 \
        --eval-interval 100 \
-       --eval-iters 1 \
+       --eval-iters 0 \
+       --split "1, 0, 0" \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
