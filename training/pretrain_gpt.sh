@@ -40,7 +40,8 @@ OUTPUT_ARGS="
 DISTRIBUTED_ARGS="
    --DDP-impl torch
 "
-MASTER_PORT=$(python find_free_port.py)
+pwd=$(dirname $0)
+MASTER_PORT=$(python $pwd/find_free_port.py)
 echo "The following free master port was found: $MASTER_PORT"
 # /gpfsscratch/rech/qgz/urc37ho/lucie-cache
 torchrun --master_port $MASTER_PORT $1/pretrain_gpt.py \
