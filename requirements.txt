@@ -1,0 +1,5 @@
+datasets==2.18.0
+deepspeed==0.12.6
+sentencepiece==0.2.0
+tokenizers==0.15.2
+transformers==4.36.1
