@@ -41,7 +41,7 @@ NNODES=$SLURM_NNODES
 TP=2
 PP=2
 
-MICRO_BATCH_SIZE=4 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
+MICRO_BATCH_SIZE=4
 GLOBAL_BATCH_SIZE=512
 
 # ----- model
@@ -112,10 +112,7 @@ module load cpuarch/amd
 module load anaconda-py3/2023.09
 conda activate lucie-torch211
 module load cuda/12.1.0
-# module load git/2.39.1
 
-# --pipeline-model-parallel-size $PP \
-# --no-pipeline-parallel \
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
