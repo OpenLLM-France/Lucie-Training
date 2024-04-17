@@ -4,7 +4,8 @@ import sys
 
 import tqdm
 
-megatron_deepspeed_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "Megatron-DeepSpeed"))
+rootdir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+megatron_deepspeed_folder = os.path.join(rootdir, "Megatron-DeepSpeed")
 sys.path = [megatron_deepspeed_folder] + sys.path  # Better to prepend for "tools" module
 
 from megatron.data import indexed_dataset  # noqa # E402 Module level import not at top of file
@@ -23,7 +24,10 @@ def get_name(dataset):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Count tokens in indexed datasets")
+    parser = argparse.ArgumentParser(
+        description="Count tokens in indexed datasets",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "folder",
         type=str,

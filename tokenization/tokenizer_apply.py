@@ -11,14 +11,8 @@ import regex as re
 
 from data import decompose_datasets, get_datasets
 
-nltk_available = False
-# try:
-#     import nltk
-#     nltk_available = True
-# except ImportError:
-#     nltk_available = False
-
-megatron_deepspeed_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "Megatron-DeepSpeed"))
+rootdir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+megatron_deepspeed_folder = os.path.join(rootdir, "Megatron-DeepSpeed")
 sys.path = [megatron_deepspeed_folder] + sys.path  # Better to prepend for "tools" module
 
 from megatron.data import indexed_dataset  # noqa # E402 Module level import not at top of file
@@ -323,7 +317,10 @@ num_processes = multiprocessing.Value("i", 0)
 
 
 def get_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Tokenize and encode text data for pretraining.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     group = parser.add_argument_group(title="input data")
     group.add_argument("--datasets", type=str, default="all", help="Datasets")
     group.add_argument(
