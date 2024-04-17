@@ -19,11 +19,6 @@ from megatron.data import indexed_dataset  # noqa # E402 Module level import not
 from megatron.tokenizer import build_tokenizer  # noqa # E402 Module level import not at top of file
 
 
-class IdentitySplitter:
-    def tokenize(self, *text):
-        return text
-
-
 class Encoder:
     def __init__(self, args):
         self.args = args
@@ -120,10 +115,9 @@ def current_date():
     return time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-class Partition:
-    def __init__(self, args, workers):
+class TokenizationTask:
+    def __init__(self, args):
         self.args = args
-        self.workers = workers
         self.encoder = None
         tokenizer = build_tokenizer(self.args)
         self.vocab_size = tokenizer.vocab_size
@@ -389,22 +383,6 @@ def get_args():
     return args
 
 
-def get_file_name(args, file_id):
-    file_name, extension = os.path.splitext(args.input)
-    input = file_name + "_" + str(file_id) + extension
-    sentence_split_file = file_name + "_ss_" + str(file_id) + extension
-    output_prefix = args.output_prefix + "_" + str(file_id)
-    file_names = {"partition": input, "sentence_split": sentence_split_file, "output_prefix": output_prefix}
-    return file_names
-
-
-def check_files_exist(in_ss_out_names, key, num_partitions):
-    for i in range(num_partitions):
-        if not os.path.exists(in_ss_out_names[i][key]):
-            return False
-    return True
-
-
 def dataset_to_key_value(dataset):
     if isinstance(dataset, tuple) and len(dataset) == 2:
         return dataset
@@ -433,7 +411,7 @@ def main():
         for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
     )
 
-    partition = Partition(args, args.workers)
+    task = TokenizationTask(args)
 
     print("=" * 20)
     print(f"Processing {len(all_datas)} datasets with {args.workers} workers.")
@@ -446,15 +424,13 @@ def main():
     random.shuffle(all_data_names)
 
     if args.workers > 1:
-        with multiprocessing.Pool(
-            processes=args.workers, initializer=partition.initializer
-        ) as pool:  # , maxtasksperchild=1
+        with multiprocessing.Pool(processes=args.workers, initializer=task.initializer) as pool:  # , maxtasksperchild=1
             # Partially apply the process function with error_flag argument
             # import functools
-            # process_dataset = functools.partial(partition.process_dataset, error_flag=error_flag)
+            # process_dataset = functools.partial(task.process_dataset, error_flag=error_flag)
 
             chunk_size = max(1, len(all_datas) // args.workers)
-            for _ in pool.imap_unordered(partition.process_dataset, all_data_names, chunk_size):
+            for _ in pool.imap_unordered(task.process_dataset, all_data_names, chunk_size):
                 # Check if any error occurred
                 if error_flag.value:
                     # If an error occurred, terminate all processes in the pool
@@ -463,7 +439,7 @@ def main():
                     pool.terminate()
                     break
     else:
-        for _ in map(partition.process_dataset, all_data_names):
+        for _ in map(task.process_dataset, all_data_names):
             if error_flag.value:
                 break
 
