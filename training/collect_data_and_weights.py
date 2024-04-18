@@ -195,6 +195,9 @@ if __name__ == "__main__":
     if not_tokenized_datasets and args.debug:
         print(f"WARNING! Those datasets are missing (not tokenized): {', '.join(not_tokenized_datasets)}")
 
+    # Sort data by count
+    data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1][args.count], reverse=True)}  # noqa
+
     total_count = sum(num_tokens_per_language.values())
     total_count_weighted = sum(num_tokens_per_language_weighted.values())
     total_count_weighted_rest = total_count_weighted - sum(
@@ -217,17 +220,23 @@ if __name__ == "__main__":
         language_weights[language] = weight
 
     if args.debug:
+        num_tokens_per_language_weighted = {  # noqa
+            k: v for k, v in sorted(num_tokens_per_language_weighted.items(), key=lambda item: item[1], reverse=True)
+        }
         total_count_weighted_weighted = sum(
             num_tokens_per_language_weighted[language] * language_weights[language]
             for language in num_tokens_per_language_weighted
         )
+        print("# Weights per language\n```")
         for language, count in num_tokens_per_language_weighted.items():
             language_target_proportion = language_target_proportions[language]
             weight = language_weights[language]
             print(
-                f"Language weight: {language=:4s} {language_target_proportion=:4.3f} {weight=:7.6f}\
+                f"Language weight: {language=:4s} {language_target_proportion=:4.3f} {weight=:9.6f} \
 before={count * 100/ total_count_weighted:6.3f}% after={count * weight * 100/ total_count_weighted_weighted:6.3f}%"
             )
+        print("```\n")
+        print("# Weights per sub-corpus\n```")
 
     for normalize_weight in [False, True]:
         if not normalize_weight:
@@ -258,17 +267,28 @@ before={count * 100/ total_count_weighted:6.3f}% after={count * weight * 100/ to
                 if args.debug:
                     name = os.path.basename(prefix).replace("_text_document", "")
                     print(
-                        f"{name:50s}: {language_weight=:7.6f} {additional_weight=:7.6f} {weight=:7.6f}\
-before={ratio * 100:5.3f}% after={new_ratio * 100:5.3f}%"
+                        f"{name:40s}: {weight=:12.9f} \
+before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f} {additional_weight=:3.1f})"
                     )
 
                 else:
-                    print(f"{weight:10.9f} {prefix} ", end="")
+                    # Print the weight (expected output)
+                    sweight = f"{weight:11.9f}"
+                    print(f"{sweight} {prefix} ", end="")
+
+                    # Check that nothing was rounded to weight=0
+                    if not re.search(r"[^\.0]", sweight):
+                        print()
+                        raise RuntimeError(f"Weight is zero for {prefix}")
             else:
                 # Median weight is 1
                 # norm_weight = sorted(all_weights)[len(all_weights)//2]
-                norm_weight = 1 / 1000
+                # norm_weight = 1 / 1000
+                norm_weight = sum(all_weights) / 100
+
                 total_weights += weight
 
-    if not args.debug:
+    if args.debug:
+        print("```")
+    else:
         print()
