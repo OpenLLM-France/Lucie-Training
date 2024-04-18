@@ -21,7 +21,7 @@ cd $MEGATRON_DEEPSPEED_REPO
 
 # TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
 TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.9
-TOKENS_DIR="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9"
+TOKENS_DIR="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9_grouped"
 
 # DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
 DATASET="$(python $pwd/collect_data_and_weights.py $TOKENS_DIR)"
@@ -113,10 +113,13 @@ module load anaconda-py3/2023.09
 conda activate lucie-torch211
 module load cuda/12.1.0
 
+NUM_SAMPLES=`expr $TRAIN_STEPS \* $GLOBAL_BATCH_SIZE`
+DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$NUM_SAMPLES"x"$SEQ_LENGTH
+
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path $TOKENS_DIR/data_indices_"$TRAIN_STEPS"x"$GLOBAL_BATCH_SIZE"x"$SEQ_LENGTH" \
+       --data-cache-path $DATA_CACHE_PATH \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
