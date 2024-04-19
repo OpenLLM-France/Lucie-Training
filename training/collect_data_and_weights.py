@@ -16,13 +16,14 @@ _stats_programming_languages = {
     stat_name: os.path.join(asset_folder, "programming-languages", "githut", f"gh-{stat_name}.json")
     for stat_name in ["pull-request", "issue-event", "star-event", "push-event"]
 }
+_minimum_count = None
 
 
-def get_programming_language_stat(language, stat_name="pull-request", year=2024, quarter=1):
-    global _stats_programming_languages
+def get_programming_language_stat(
+    language, stat_name="pull-request", min_year=2023, max_year=2024, no_minimum_count=False
+):
+    global _stats_programming_languages, _minimum_count
     assert stat_name in _stats_programming_languages, f"Unknown statistic name {stat_name}"
-    year = str(year)
-    quarter = str(quarter)
     language = format_programming_language(language)
 
     data = _stats_programming_languages[stat_name]
@@ -35,17 +36,30 @@ def get_programming_language_stat(language, stat_name="pull-request", year=2024,
         # Conversion
         data = pd.DataFrame(data)
         data["name"] = data["name"].apply(format_programming_language)
+        data["year"] = data["year"].apply(int)
+        data["quarter"] = data["quarter"].apply(int)
+        data["count"] = data["count"].apply(int)
         _stats_programming_languages[stat_name] = data
 
-    val = data[(data["name"] == language) & (data["year"] == year) & (data["quarter"] == quarter)]
+    data = data[(data["year"] >= min_year) & (data["year"] <= max_year)]
+    val = data[(data["name"] == language)]
     if not len(val):
-        warnings.warn(f"Programming language {language} not found in statistics", stacklevel=2)
-        data[(data["name"] == language)]
-        vals = data[(data["year"] == year) & (data["quarter"] == quarter)]["count"]
-        vals = [int(v) for v in vals]
-        return min(vals)
-    assert len(val) == 1
-    return int(val["count"].item())
+        if no_minimum_count:
+            return 0
+        if _minimum_count is None:
+            _minimum_count = min(
+                [
+                    get_programming_language_stat(
+                        lan, stat_name=stat_name, min_year=min_year, max_year=max_year, no_minimum_count=True
+                    )
+                    for lan in data["name"].unique()
+                ]
+            )
+        warnings.warn(
+            f"Programming language {language} not found in statistics (using {_minimum_count=})", stacklevel=2
+        )
+        return _minimum_count
+    return val["count"].sum()
 
 
 def compute_programming_languages_target_proportions(programming_languages):
