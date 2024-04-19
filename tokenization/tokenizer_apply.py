@@ -1,4 +1,7 @@
 """Processing large data for pretraining."""
+
+# Inspired from Megatron-DeepSpeed/tools/preprocess_data.py
+
 import argparse
 import json
 import multiprocessing

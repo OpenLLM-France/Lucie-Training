@@ -321,11 +321,13 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
 
         print("# Weights per sub-corpus\n```")
 
-    for normalize_weight in [False, True]:
-        if not normalize_weight:
-            all_weights = []
+    for second_pass in [False, True]:
+        if not second_pass:
             total_weights = 0
             norm_weight = 0
+            all_weights = {}
+        else:
+            data = {k: v for k, v in sorted(data.items(), key=lambda x: all_weights[x[0]], reverse=True)}  # noqa
 
         for prefix, d in data.items():
             languages = d["language"].split("-")
@@ -344,8 +346,9 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
 
             weight = ratio * language_weight * additional_weight
 
-            all_weights.append(weight)
-            if normalize_weight:
+            all_weights[prefix] = weight
+
+            if second_pass:
                 new_ratio = weight / total_weights
 
                 weight = weight / norm_weight
@@ -367,11 +370,8 @@ before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f
                         print()
                         raise RuntimeError(f"Weight is zero for {prefix}")
             else:
-                # Median weight is 1
-                # norm_weight = sorted(all_weights)[len(all_weights)//2]
-                # norm_weight = 1 / 1000
-                norm_weight = sum(all_weights) / 100
-
+                # Normalization factor for weights
+                norm_weight = sum(all_weights.values()) / 100
                 total_weights += weight
 
     if args.debug:
