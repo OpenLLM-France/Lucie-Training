@@ -323,11 +323,12 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
 
     for second_pass in [False, True]:
         if not second_pass:
-            total_weights = 0
-            norm_weight = 0
             all_weights = {}
         else:
             data = {k: v for k, v in sorted(data.items(), key=lambda x: all_weights[x[0]], reverse=True)}  # noqa
+            total_weights = sum(all_weights.values())
+            # Normalization factor for weights
+            norm_weight = total_weights / 100
 
         for prefix, d in data.items():
             languages = d["language"].split("-")
@@ -344,13 +345,10 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
                 if re.search(content, prefix):
                     additional_weight *= additional_weights[content]
 
-            weight = ratio * language_weight * additional_weight
-
-            all_weights[prefix] = weight
+            weight = all_weights[prefix] = ratio * language_weight * additional_weight
 
             if second_pass:
                 new_ratio = weight / total_weights
-
                 weight = weight / norm_weight
 
                 if args.debug:
@@ -369,10 +367,6 @@ before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f
                     if not re.search(r"[^\.0]", sweight):
                         print()
                         raise RuntimeError(f"Weight is zero for {prefix}")
-            else:
-                # Normalization factor for weights
-                norm_weight = sum(all_weights.values()) / 100
-                total_weights += weight
 
     if args.debug:
         print("```")
