@@ -2,12 +2,80 @@ import csv
 import json
 import os
 import re
+import warnings
+
+import pandas as pd
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 asset_folder = os.path.join(parent_dir, "assets")
 
-stats_datasets = os.path.join(asset_folder, "stats_datasets.csv")
-assert os.path.exists(stats_datasets), f"File {stats_datasets} does not exist"
+_stats_datasets = os.path.join(asset_folder, "stats_datasets.csv")
+assert os.path.exists(_stats_datasets), f"File {_stats_datasets} does not exist"
+
+_stats_programming_languages = {
+    stat_name: os.path.join(asset_folder, "programming-languages", "githut", f"gh-{stat_name}.json")
+    for stat_name in ["pull-request", "issue-event", "star-event", "push-event"]
+}
+
+
+def get_programming_language_stat(language, stat_name="pull-request", year=2024, quarter=1):
+    global _stats_programming_languages
+    assert stat_name in _stats_programming_languages, f"Unknown statistic name {stat_name}"
+    year = str(year)
+    quarter = str(quarter)
+    language = format_programming_language(language)
+
+    data = _stats_programming_languages[stat_name]
+    if isinstance(data, str):
+        assert os.path.exists(data), f"File {data} does not exist"
+        # First time loading
+        with open(data) as f:
+            data = _stats_programming_languages[stat_name] = json.load(f)
+    if isinstance(data, list):
+        # Conversion
+        data = pd.DataFrame(data)
+        data["name"] = data["name"].apply(format_programming_language)
+        _stats_programming_languages[stat_name] = data
+
+    val = data[(data["name"] == language) & (data["year"] == year) & (data["quarter"] == quarter)]
+    if not len(val):
+        warnings.warn(f"Programming language {language} not found in statistics", stacklevel=2)
+        data[(data["name"] == language)]
+        vals = data[(data["year"] == year) & (data["quarter"] == quarter)]["count"]
+        vals = [int(v) for v in vals]
+        return min(vals)
+    assert len(val) == 1
+    return int(val["count"].item())
+
+
+def compute_programming_languages_target_proportions(programming_languages):
+    programming_languages_weights = {}
+    for language in programming_languages:
+        count = get_programming_language_stat(language)
+        programming_languages_weights[language] = count
+    total = sum(programming_languages_weights.values())
+    programming_languages_weights = {k: v / total for k, v in programming_languages_weights.items()}
+    return programming_languages_weights
+
+
+def read_stats_datasets(stats_datasets_filename=_stats_datasets):
+    with open(stats_datasets_filename) as f:
+        reader = csv.DictReader(f)
+        stats_datasets = {}
+        for d in reader:
+            d = format_dictionary(d)
+            if not d["name"].strip("-"):
+                continue
+            key = canonical_name(d["name"], d["subset"])
+            stats_datasets[key] = d
+
+    return stats_datasets
+
+
+def format_programming_language(name):
+    name = name.split("--")[-1]
+    name = name.replace("_text_document", "")
+    return name.lower()
 
 
 def format_dictionary(d):
@@ -63,20 +131,6 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
                     best_score = score
             print(f"WARNING: Dataset {name} not found: {best_match=}")
     return name
-
-
-def read_stats_datasets(stats_datasets_filename=stats_datasets):
-    with open(stats_datasets_filename) as f:
-        reader = csv.DictReader(f)
-        stats_datasets = {}
-        for d in reader:
-            d = format_dictionary(d)
-            if not d["name"].strip("-"):
-                continue
-            key = canonical_name(d["name"], d["subset"])
-            stats_datasets[key] = d
-
-    return stats_datasets
 
 
 if __name__ == "__main__":
@@ -158,6 +212,7 @@ if __name__ == "__main__":
     data = {}
     num_tokens_per_language = {}
     num_tokens_per_language_weighted = {}
+    num_tokens_per_programming_language = {}
 
     for prefix in prefixes:
         prefix = os.path.join(args.folder, prefix)
@@ -192,6 +247,12 @@ if __name__ == "__main__":
             )
             num_tokens_per_language[language] = num_tokens_per_language.get(language, 0) + (count // len(languages))
 
+        if language == "code":
+            prog_lang = format_programming_language(name)
+            num_tokens_per_programming_language[prog_lang] = (
+                num_tokens_per_programming_language.get(prog_lang, 0) + count
+            )
+
     if not_tokenized_datasets and args.debug:
         print(f"WARNING! Those datasets are missing (not tokenized): {', '.join(not_tokenized_datasets)}")
 
@@ -209,33 +270,55 @@ if __name__ == "__main__":
         language_target_proportion_rest >= 0 and language_target_proportion_rest < 1
     ), f"{language_target_proportion_rest=}"
 
+    # Set the weights for languages (fr, en, code, ...)
     language_weights = {}
     for language, count_weighted in num_tokens_per_language_weighted.items():
         if language in language_target_proportions:
-            language_target_proportion = language_target_proportions[language]
+            target_proportion = language_target_proportions[language]
         else:
-            language_target_proportion = language_target_proportion_rest * count_weighted / total_count_weighted_rest
-            language_target_proportions[language] = language_target_proportion
-        weight = language_target_proportion / (count_weighted / total_count_weighted)
+            target_proportion = language_target_proportion_rest * count_weighted / total_count_weighted_rest
+            language_target_proportions[language] = target_proportion
+        weight = target_proportion / (count_weighted / total_count_weighted)
         language_weights[language] = weight
 
+    # Set the weights for programming languages
+    programming_language_target_proportions = compute_programming_languages_target_proportions(
+        num_tokens_per_programming_language.keys()
+    )
+    programming_language_weights = {}
+    for language, count_weighted in num_tokens_per_programming_language.items():
+        assert language in programming_language_target_proportions, f"{language=} not found"
+        target_proportion = programming_language_target_proportions[language] * language_target_proportions["code"]
+        weight = target_proportion / (count_weighted / total_count_weighted)
+        programming_language_weights[language] = weight
+
     if args.debug:
-        num_tokens_per_language_weighted = {  # noqa
-            k: v for k, v in sorted(num_tokens_per_language_weighted.items(), key=lambda item: item[1], reverse=True)
-        }
-        total_count_weighted_weighted = sum(
-            num_tokens_per_language_weighted[language] * language_weights[language]
-            for language in num_tokens_per_language_weighted
-        )
-        print("# Weights per language\n```")
-        for language, count in num_tokens_per_language_weighted.items():
-            language_target_proportion = language_target_proportions[language]
-            weight = language_weights[language]
-            print(
-                f"Language weight: {language=:4s} {language_target_proportion=:4.3f} {weight=:9.6f} \
-before={count * 100/ total_count_weighted:6.3f}% after={count * weight * 100/ total_count_weighted_weighted:6.3f}%"
-            )
-        print("```\n")
+        for what, lf, num_tokens, target_proportions, weights in [
+            ("language", "4s", num_tokens_per_language_weighted, language_target_proportions, language_weights),
+            (
+                "programming language",
+                "12s",
+                num_tokens_per_programming_language,
+                programming_language_target_proportions,
+                programming_language_weights,
+            ),
+        ]:
+            print(f"# Weights per {what}\n```")
+            num_tokens = {  # noqa
+                k: v for k, v in sorted(num_tokens.items(), key=lambda item: item[1], reverse=True)
+            }
+            total_tokens_weighted = sum(num_tokens[language] * weights[language] for language in num_tokens)
+            total_tokens = sum(num_tokens.values())
+            for language, count in num_tokens.items():
+                target_proportion = target_proportions[language]
+                weight = weights[language]
+                language = language.format("")
+                print(
+                    f"{language=:{lf}} {target_proportion=:4.3f} {weight=:9.6f} \
+before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_tokens_weighted:6.3f}%"
+                )
+            print("```\n")
+
         print("# Weights per sub-corpus\n```")
 
     for normalize_weight in [False, True]:
@@ -250,6 +333,9 @@ before={count * 100/ total_count_weighted:6.3f}% after={count * weight * 100/ to
             ratio = count / total_count
 
             language_weight = max(language_weights[language] for language in languages)
+            if d["language"] == "code":
+                prog_language = format_programming_language(prefix)
+                language_weight = programming_language_weights[prog_language]
 
             additional_weight = 1
             for content in additional_weights:
