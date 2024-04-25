@@ -11,8 +11,7 @@ def parse_logs_file(input_folder: str, output_folder) -> None:
     for zero in Path(input_folder).glob("*/"):
         for batch in zero.glob("*/"):
             for log_file in batch.glob("iterations/*.iterations"):
-                if "tp4" in log_file.stem:
-                    print(log_file)
+                if "tp4" in log_file.stem: # ignore tp4, we haven't run all the experiments for this one.
                     continue
                 nnodes = re.search("\d+nodes", log_file.name).group(0)
                 nnodes = re.search("\d+", nnodes).group(0)
@@ -21,17 +20,8 @@ def parse_logs_file(input_folder: str, output_folder) -> None:
                 pp = pp.replace("no_pp", "pp1")
                 ngpus = 8 * int(nnodes)
                 with open(log_file, "r", encoding='utf-8', errors="ignore") as logs:
-                    for idx, line in enumerate(logs, 1):
-                        # skip the first iteration
-                        if idx == 1:
-                            continue
-                        # only consider the 50 first iteration
-                        if idx == 50:
-                            break
-                        # only take the first 50 iterations and not the first as the iteration time is low for the first iteration and the first iteration after a validation step.
-                        # TODO: enumerate and ignore the first and the step after eval
+                    for line in logs:
                         _, consumed_samples, consumed_tokens, iter_time, _, _, loss, *_, samples_per_seconds, tflops, _ = line.split("|")
-                        # print(consumed_samples, consumed_tokens, iter_time, loss, samples_per_seconds, tflops)
                         consumed_samples = re.search(r'\d+', consumed_samples).group(0)
                         consumed_tokens = re.search(r'\d+', consumed_tokens).group(0)
                         iter_time = re.search(r'\d+.\d+', iter_time).group(0)

@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=run-lucie7b-1nodes-tp2-pp2-z0-b512
-##SBATCH --qos=qos_gpu-dev    
-#SBATCH --nodes=1
+#SBATCH --job-name=lucie7b-4nodes-tp2-pp2-z0-b512
+#SBATCH --qos=qos_gpu-dev            # Avec ce qos la temps d'attente est moins long. Mais n'est possible qu'avec 32 GPUs maximum, donc à commenter si on lance sur plus de 32 GPUs
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
-#SBATCH --cpus-per-task=40           # number of cores per tasks
+#SBATCH --cpus-per-task=64           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus
 #SBATCH --constraint=a100
-#SBATCH --time 00:20:00               # maximum execution time (HH:MM:SS)
+#SBATCH --time 00:20:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
@@ -16,21 +16,11 @@ set -x -e
 CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
 LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
 
-LUCIE_REPO=/gpfswork/rech/qgz/urc37ho/Lucie-Training
 MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
 cd $MEGATRON_DEEPSPEED_REPO
 
-# TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
-TOKENIZER_NAME=OpenLLM-France/Lucie-tokenizer-v2.9
-TOKENS_DIR="/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.9_grouped"
-
-# DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
-DATASET="$(python $LUCIE_REPO/training/collect_data_and_weights.py $TOKENS_DIR)"
-
-if [ -z "$DATASET" ]; then
-  echo "No data found"
-  exit 1
-fi
+DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
+TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
@@ -42,7 +32,7 @@ NNODES=$SLURM_NNODES
 TP=2
 PP=2
 
-MICRO_BATCH_SIZE=4
+MICRO_BATCH_SIZE=4 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
 GLOBAL_BATCH_SIZE=512
 
 # ----- model
@@ -54,8 +44,7 @@ SEQ_LENGTH=2048 # for llama2 it's 4096
 NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
 
 # ------ Optimizer
-# TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
-TRAIN_STEPS=2000000 # 2T tokens / (2048 * 512 tokens per batch) = 1907348 steps
+TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
 LR=3e-4
 MIN_LR=3e-5
 LR_WARMUP_STEPS=2000
@@ -65,7 +54,7 @@ GRAD_CLIP=1
 SAVE_INTERVAL=100
 
 # ----- Deepspeed configuration
-ZERO_STAGE=1
+ZERO_STAGE=0
 
 DS_CONFIG="./ds_config.$SLURM_JOBID.json"
 
@@ -113,16 +102,16 @@ module load cpuarch/amd
 module load anaconda-py3/2023.09
 conda activate lucie-torch211
 module load cuda/12.1.0
+# module load git/2.39.1
 
-NUM_SAMPLES=`expr $TRAIN_STEPS \* $GLOBAL_BATCH_SIZE`
-DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$NUM_SAMPLES"x"$SEQ_LENGTH
-
+# --pipeline-model-parallel-size $PP \
+# --no-pipeline-parallel \
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path $DATA_CACHE_PATH \
+       --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache \
        --tensor-model-parallel-size $TP \
-       --pipeline-model-parallel-size $PP \
+       --pipeline-model-parallel-size $PP
        --num-layers $NUM_LAYERS \
        --hidden-size $HIDDEN_SIZE \
        --ffn-hidden-size $FFN_HIDDEN_SIZE \
@@ -137,7 +126,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
-       --tokenizer-name-or-path $TOKENIZER_NAME \
+       --tokenizer-name-or-path $TOKENIZER_PATH \
        --distributed-backend nccl \
        --lr $LR \
        --lr-decay-style cosine \
@@ -151,8 +140,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --log-interval 1 \
        --save-interval 100 \
        --eval-interval 100 \
-       --eval-iters 0 \
-       --split 1,0,0 \
+       --eval-iters 1 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \

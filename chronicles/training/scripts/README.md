@@ -1,0 +1,3 @@
+These scripts are just used for parsing the output log file of Megatron-Deepspeed:
+- `grep_iterations.sh`: will parse the lines containing "iterations" in the log file. These lines contain the informations we need.
+- `parse_logs.py`: parses the outputs of `grep_iterations` in order to get all the relevant informations for each iterations: loss, sample_per_second, etc. and also get the relevant information about parellelism from the filename.
