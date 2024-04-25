@@ -30,15 +30,15 @@ This is the recommended way to install the dependencies on supercomputers like J
 
 Create a conda environment (first time only):
 ```bash
-module load anaconda-py3/2023.09
+module load anaconda-py3/2023.09 # Use this anaconda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
 conda create -n lucie python=3.10
 ```
 
 Set the conda environment:
 ```bash
-module load anaconda-py3/2023.09
-module load cuda/12.1.0
-module load cpuarch/amd
+module load anaconda-py3/2023.09 # Use this anaconda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
+module load cuda/12.1.0 # Use this cuda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
+module load cpuarch/amd # Specif to Jean-Zay only. Ignore this if you're not on Jean-Zay
 conda activate lucie
 ```
 
