@@ -551,7 +551,7 @@ if __name__ == "__main__":
         "--vocab_size",
         type=int,
         default=32000,
-        help="Size of output vocabulary",
+        help="Size of output vocabulary (ex: 32000, 65024, ...)",
     )
     parser.add_argument(
         "--base",
@@ -706,6 +706,7 @@ if __name__ == "__main__":
         tok = refit_tokenizer(
             tok,
             trainset,
+            vocab_size=args.vocab_size,
             consecutive_spaces=args.consecutive_spaces,
             consecutive_tabs=args.consecutive_tabs,
             consecutive_linebreaks=args.consecutive_linebreaks,
@@ -737,6 +738,7 @@ if __name__ == "__main__":
         tok = fit_tokenizer(
             tok,
             trainset,
+            vocab_size=args.vocab_size,
             consecutive_spaces=args.consecutive_spaces,
             consecutive_tabs=args.consecutive_tabs,
             consecutive_linebreaks=args.consecutive_linebreaks,
