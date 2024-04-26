@@ -65,7 +65,7 @@ GRAD_CLIP=1
 SAVE_INTERVAL=100
 
 # ----- Deepspeed configuration
-ZERO_STAGE=1
+ZERO_STAGE=0
 
 DS_CONFIG="./ds_config.$SLURM_JOBID.json"
 
