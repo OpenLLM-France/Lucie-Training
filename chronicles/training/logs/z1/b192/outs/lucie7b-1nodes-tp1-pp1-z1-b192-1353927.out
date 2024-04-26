@@ -1,0 +1,1734 @@
++ CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
++ LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
++ MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
++ cd /gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
++ DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
++ TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+++ scontrol show hostnames jean-zay-iam02
+++ head -n 1
++ MASTER_ADDR=jean-zay-iam02
++ MASTER_PORT=6000
++ GPUS_PER_NODE=8
++ NNODES=1
++ PP=1
++ TP=1
++ MICRO_BATCH_SIZE=3
++ GLOBAL_BATCH_SIZE=192
++ HIDDEN_SIZE=4096
++ FFN_HIDDEN_SIZE=11008
++ NUM_LAYERS=32
++ NUM_HEADS=32
++ SEQ_LENGTH=2048
++ NUM_KV_HEADS=32
++ TRAIN_STEPS=250000
++ LR=3e-4
++ MIN_LR=3e-5
++ LR_WARMUP_STEPS=2000
++ WEIGHT_DECAY=0.1
++ GRAD_CLIP=1
++ SAVE_INTERVAL=100
++ ZERO_STAGE=1
++ DS_CONFIG=./ds_config.1353927.json
++ activation_checkpoint=false
++ cat
++ ds_args=
++ ds_args=' --deepspeed '
++ ds_args=' --deepspeed_config=./ds_config.1353927.json  --deepspeed '
++ ds_args=' --zero-stage=1  --deepspeed_config=./ds_config.1353927.json  --deepspeed '
++ '[' false = true ']'
++ export CUDA_LAUNCH_BLOCKING=1
++ CUDA_LAUNCH_BLOCKING=1
++ export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
++ TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
++ module purge
++ unset _mlshdbg
++ '[' 0 = 1 ']'
++ unset _mlre _mlIFS
++ '[' -n x ']'
++ _mlIFS=' 	
+'
++ IFS=' '
++ for _mlv in ${MODULES_RUN_QUARANTINE:-}
++ '[' LD_LIBRARY_PATH = LD_LIBRARY_PATH -a LD_LIBRARY_PATH = LD_LIBRARY_PATH ']'
+++ eval 'echo ${LD_LIBRARY_PATH+x}'
++++ echo x
++ '[' -n x ']'
+++ eval 'echo ${LD_LIBRARY_PATH}'
++++ echo /gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' '
++ _mlrv=MODULES_RUNENV_LD_LIBRARY_PATH
+++ eval 'echo ${MODULES_RUNENV_LD_LIBRARY_PATH:-}'
++++ echo
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' '
++ '[' -n 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' ' ']'
+++ eval 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\''' 'LD_LIBRARY_PATH='\'''\''' /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash '"$@"'
++++ LD_LIBRARY_PATH_modquar=/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++++ LD_LIBRARY_PATH=
++++ /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash purge
++ eval
++ _mlstatus=0
++ '[' -n x ']'
++ IFS=' 	
+'
++ unset _mlre _mlv _mlrv _mlIFS
++ '[' -n '' ']'
++ unset _mlshdbg
++ return 0
++ module load cpuarch/amd
++ unset _mlshdbg
++ '[' 0 = 1 ']'
++ unset _mlre _mlIFS
++ '[' -n x ']'
++ _mlIFS=' 	
+'
++ IFS=' '
++ for _mlv in ${MODULES_RUN_QUARANTINE:-}
++ '[' LD_LIBRARY_PATH = LD_LIBRARY_PATH -a LD_LIBRARY_PATH = LD_LIBRARY_PATH ']'
+++ eval 'echo ${LD_LIBRARY_PATH+x}'
++++ echo x
++ '[' -n x ']'
+++ eval 'echo ${LD_LIBRARY_PATH}'
++++ echo /gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' '
++ _mlrv=MODULES_RUNENV_LD_LIBRARY_PATH
+++ eval 'echo ${MODULES_RUNENV_LD_LIBRARY_PATH:-}'
++++ echo
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' '
++ '[' -n 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' ' ']'
+++ eval 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\''' 'LD_LIBRARY_PATH='\'''\''' /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash '"$@"'
++++ LD_LIBRARY_PATH_modquar=/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++++ LD_LIBRARY_PATH=
++++ /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash load cpuarch/amd
++ eval '_LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1;' export '_LMFILES__modshare;
+LOADEDMODULES_modshare=cpuarch/amd:1;' export 'LOADEDMODULES_modshare;
+unset' 'MODULEPATH_modshare;
+_LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd;' export '_LMFILES_;
+LOADEDMODULES=cpuarch/amd;' export 'LOADEDMODULES;
+MODULEPATH=/gpfslocalsup/pub/module-rh/modulefiles:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64;' export 'MODULEPATH;
+test' '0;'
+++ _LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1
+++ export _LMFILES__modshare
+++ LOADEDMODULES_modshare=cpuarch/amd:1
+++ export LOADEDMODULES_modshare
+++ unset MODULEPATH_modshare
+++ _LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd
+++ export _LMFILES_
+++ LOADEDMODULES=cpuarch/amd
+++ export LOADEDMODULES
+++ MODULEPATH=/gpfslocalsup/pub/module-rh/modulefiles:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64
+++ export MODULEPATH
+++ test 0
++ _mlstatus=0
++ '[' -n x ']'
++ IFS=' 	
+'
++ unset _mlre _mlv _mlrv _mlIFS
++ '[' -n '' ']'
++ unset _mlshdbg
++ return 0
++ module load anaconda-py3/2023.09
++ unset _mlshdbg
++ '[' 0 = 1 ']'
++ unset _mlre _mlIFS
++ '[' -n x ']'
++ _mlIFS=' 	
+'
++ IFS=' '
++ for _mlv in ${MODULES_RUN_QUARANTINE:-}
++ '[' LD_LIBRARY_PATH = LD_LIBRARY_PATH -a LD_LIBRARY_PATH = LD_LIBRARY_PATH ']'
+++ eval 'echo ${LD_LIBRARY_PATH+x}'
++++ echo x
++ '[' -n x ']'
+++ eval 'echo ${LD_LIBRARY_PATH}'
++++ echo /gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' '
++ _mlrv=MODULES_RUNENV_LD_LIBRARY_PATH
+++ eval 'echo ${MODULES_RUNENV_LD_LIBRARY_PATH:-}'
++++ echo
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' '
++ '[' -n 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' ' ']'
+++ eval 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\''' 'LD_LIBRARY_PATH='\'''\''' /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash '"$@"'
++++ LD_LIBRARY_PATH_modquar=/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++++ LD_LIBRARY_PATH=
++++ /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash load anaconda-py3/2023.09
++ eval '_LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:1;' export '_LMFILES__modshare;
+LOADEDMODULES_modshare=anaconda-py3/2023.09:1:cpuarch/amd:1;' export 'LOADEDMODULES_modshare;
+MODULES_LMCONFLICT_modshare=anaconda-py3/2023.09\&anaconda-py3\&anaconda-py2:1;' export 'MODULES_LMCONFLICT_modshare;
+_LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09;' export '_LMFILES_;
+LOADEDMODULES=cpuarch/amd:anaconda-py3/2023.09;' export 'LOADEDMODULES;
+MODULES_LMCONFLICT=anaconda-py3/2023.09\&anaconda-py3\&anaconda-py2;' export 'MODULES_LMCONFLICT;
+.' '/gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh;
+conda' activate 'base;
+test' '0;'
+++ _LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:1
+++ export _LMFILES__modshare
+++ LOADEDMODULES_modshare=anaconda-py3/2023.09:1:cpuarch/amd:1
+++ export LOADEDMODULES_modshare
+++ MODULES_LMCONFLICT_modshare='anaconda-py3/2023.09&anaconda-py3&anaconda-py2:1'
+++ export MODULES_LMCONFLICT_modshare
+++ _LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09
+++ export _LMFILES_
+++ LOADEDMODULES=cpuarch/amd:anaconda-py3/2023.09
+++ export LOADEDMODULES
+++ MODULES_LMCONFLICT='anaconda-py3/2023.09&anaconda-py3&anaconda-py2'
+++ export MODULES_LMCONFLICT
+++ . /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
++++ export CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
++++ CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
++++ CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
++++ '[' -z '' ']'
++++ export CONDA_SHLVL=0
++++ CONDA_SHLVL=0
++++ '[' -n '' ']'
++++++ dirname /gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
+++++ dirname /gpfslocalsup/pub/anaconda-py3/2023.09/bin
++++ PATH=/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
++++ export PATH
++++ '[' -z '' ']'
++++ PS1=
+++ conda activate base
+++ local cmd=activate
+++ case "$cmd" in
+++ __conda_activate activate base
+++ '[' -n '' ']'
+++ local ask_conda
++++ PS1=
++++ __conda_exe shell.posix activate base
++++ /gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda shell.posix activate base
+++ ask_conda='PS1='\''(base) '\''
+export PATH='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin'\''
+export CONDA_PREFIX='\''/gpfslocalsup/pub/anaconda-py3/2023.09'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python'\'''
+++ eval 'PS1='\''(base) '\''
+export PATH='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin'\''
+export CONDA_PREFIX='\''/gpfslocalsup/pub/anaconda-py3/2023.09'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python'\'''
++++ PS1='(base) '
++++ export PATH=/gpfslocalsup/pub/anaconda-py3/2023.09/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
++++ PATH=/gpfslocalsup/pub/anaconda-py3/2023.09/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
++++ export CONDA_PREFIX=/gpfslocalsup/pub/anaconda-py3/2023.09
++++ CONDA_PREFIX=/gpfslocalsup/pub/anaconda-py3/2023.09
++++ export CONDA_SHLVL=1
++++ CONDA_SHLVL=1
++++ export CONDA_DEFAULT_ENV=base
++++ CONDA_DEFAULT_ENV=base
++++ export 'CONDA_PROMPT_MODIFIER=(base) '
++++ CONDA_PROMPT_MODIFIER='(base) '
++++ export CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
++++ CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
++++ CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
+++ test 0
++ _mlstatus=0
++ '[' -n x ']'
++ IFS=' 	
+'
++ unset _mlre _mlv _mlrv _mlIFS
++ '[' -n '' ']'
++ unset _mlshdbg
++ return 0
++ conda activate lucie-torch211
++ local cmd=activate
++ case "$cmd" in
++ __conda_activate activate lucie-torch211
++ '[' -n '' ']'
++ local ask_conda
+++ PS1='(base) '
+++ __conda_exe shell.posix activate lucie-torch211
+++ /gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda shell.posix activate lucie-torch211
++ ask_conda='PS1='\''(lucie-torch211) '\''
+export PATH='\''/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin'\''
+export CONDA_PREFIX='\''/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''lucie-torch211'\''
+export CONDA_PROMPT_MODIFIER='\''(lucie-torch211) '\''
+export CONDA_PREFIX_1='\''/gpfslocalsup/pub/anaconda-py3/2023.09'\''
+export CONDA_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python'\''
+. "/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libblas_mkl_activate.sh"
+. "/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libxml2_activate.sh"'
++ eval 'PS1='\''(lucie-torch211) '\''
+export PATH='\''/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin'\''
+export CONDA_PREFIX='\''/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''lucie-torch211'\''
+export CONDA_PROMPT_MODIFIER='\''(lucie-torch211) '\''
+export CONDA_PREFIX_1='\''/gpfslocalsup/pub/anaconda-py3/2023.09'\''
+export CONDA_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python'\''
+. "/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libblas_mkl_activate.sh"
+. "/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libxml2_activate.sh"'
+++ PS1='(lucie-torch211) '
+++ export PATH=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
+++ PATH=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
+++ export CONDA_PREFIX=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211
+++ CONDA_PREFIX=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211
+++ export CONDA_SHLVL=2
+++ CONDA_SHLVL=2
+++ export CONDA_DEFAULT_ENV=lucie-torch211
+++ CONDA_DEFAULT_ENV=lucie-torch211
+++ export 'CONDA_PROMPT_MODIFIER=(lucie-torch211) '
+++ CONDA_PROMPT_MODIFIER='(lucie-torch211) '
+++ export CONDA_PREFIX_1=/gpfslocalsup/pub/anaconda-py3/2023.09
+++ CONDA_PREFIX_1=/gpfslocalsup/pub/anaconda-py3/2023.09
+++ export CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
+++ CONDA_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/conda
+++ export _CE_M=
+++ _CE_M=
+++ export _CE_CONDA=
+++ _CE_CONDA=
+++ export CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
+++ CONDA_PYTHON_EXE=/gpfslocalsup/pub/anaconda-py3/2023.09/bin/python
+++ . /linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libblas_mkl_activate.sh
++++ export CONDA_MKL_INTERFACE_LAYER_BACKUP=
++++ CONDA_MKL_INTERFACE_LAYER_BACKUP=
++++ export MKL_INTERFACE_LAYER=LP64,GNU
++++ MKL_INTERFACE_LAYER=LP64,GNU
+++ . /linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/conda/activate.d/libxml2_activate.sh
++++ test -n ''
++++ xml_catalog_files_libxml2=
++++ XML_CATALOG_FILES=
++++ conda_catalog_files=
++++ ifs_libxml2=' 	
+'
++++ IFS=' '
++++ rem=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211
++++ for pre in ${rem}
++++ test '' = /linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211
++++ conda_catalog_files=/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211
++++ rem=
++++ IFS=' 	
+'
++++ conda_catalog_files='file:///linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/xml/catalog file:///etc/xml/catalog'
++++ export 'XML_CATALOG_FILES=file:///linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/xml/catalog file:///etc/xml/catalog'
++++ XML_CATALOG_FILES='file:///linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/etc/xml/catalog file:///etc/xml/catalog'
++++ unset conda_catalog_files ifs_libxml2 rem
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ module load cuda/12.1.0
++ unset _mlshdbg
++ '[' 0 = 1 ']'
++ unset _mlre _mlIFS
++ '[' -n x ']'
++ _mlIFS=' 	
+'
++ IFS=' '
++ for _mlv in ${MODULES_RUN_QUARANTINE:-}
++ '[' LD_LIBRARY_PATH = LD_LIBRARY_PATH -a LD_LIBRARY_PATH = LD_LIBRARY_PATH ']'
+++ eval 'echo ${LD_LIBRARY_PATH+x}'
++++ echo x
++ '[' -n x ']'
+++ eval 'echo ${LD_LIBRARY_PATH}'
++++ echo /gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' '
++ _mlrv=MODULES_RUNENV_LD_LIBRARY_PATH
+++ eval 'echo ${MODULES_RUNENV_LD_LIBRARY_PATH:-}'
++++ echo
++ _mlre='LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' '
++ '[' -n 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\'' LD_LIBRARY_PATH='\'''\'' ' ']'
+++ eval 'LD_LIBRARY_PATH_modquar='\''/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib'\''' 'LD_LIBRARY_PATH='\'''\''' /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash '"$@"'
++++ LD_LIBRARY_PATH_modquar=/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
++++ LD_LIBRARY_PATH=
++++ /gpfslocalsup/spack_soft/tcl/8.6.8/gcc-4.8.5-5nqkfcnctewdheju62zvqbsonnzszr6m/bin/tclsh /gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/libexec/modulecmd.tcl bash load cuda/12.1.0
++ eval 'LD_LIBRARY_PATH=/gpfslocalsys/cuda/12.1.0/nvvm/lib64:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:/gpfslocalsys/cuda/12.1.0/lib64:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib;' export 'LD_LIBRARY_PATH;
+MANPATH=/gpfslocalsys/cuda/12.1.0/doc/man::/opt/c3/man:/opt/clmgr/man:/opt/sgi/share/man:/opt/clmgr/share/man:/opt/clmgr/lib/cm-cli/man:/gpfslocalsys/slurm/current/share/man:/usr/share/catman:/usr/share/man:/usr/catman:/usr/man;' export 'MANPATH;
+LIBRARY_PATH=/gpfslocalsys/cuda/12.1.0/lib64/stubs:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:/gpfslocalsys/cuda/12.1.0/lib64:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib;' export 'LIBRARY_PATH;
+_LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:/gpfslocalsup/pub/module-rh/modulefiles/cuda/12.1.0;' export '_LMFILES_;
+LOADEDMODULES=cpuarch/amd:anaconda-py3/2023.09:cuda/12.1.0;' export 'LOADEDMODULES;
+MODULES_LMCONFLICT=anaconda-py3/2023.09\&anaconda-py3\&anaconda-py2:cuda/12.1.0\&cuda;' export 'MODULES_LMCONFLICT;
+MANPATH_modshare=:1:/opt/sgi/share/man:1:/gpfslocalsys/slurm/current/share/man:1:/opt/c3/man:1:/opt/clmgr/lib/cm-cli/man:1:/opt/clmgr/share/man:1:/usr/man:1:/usr/catman:1:/opt/clmgr/man:1:/gpfslocalsys/cuda/12.1.0/doc/man:1:/usr/share/man:1:/usr/share/catman:1;' export 'MANPATH_modshare;
+NVHPC_CUDA_HOME=/gpfslocalsys/cuda/12.1.0;' export 'NVHPC_CUDA_HOME;
+LIBRARY_PATH_modshare=/gpfslocalsys/cuda/12.1.0/lib64/stubs:1:/gpfslocalsys/cuda/12.1.0/lib64:1:/gpfslocalsys/slurm/current/lib/slurm:1:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:1:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:1:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:1:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:1:/gpfslocalsys/slurm/current/lib:1;' export 'LIBRARY_PATH_modshare;
+MODULES_LMCONFLICT_modshare=anaconda-py3/2023.09\&anaconda-py3\&anaconda-py2:1:cuda/12.1.0\&cuda:1;' export 'MODULES_LMCONFLICT_modshare;
+CPLUS_INCLUDE_PATH=/gpfslocalsys/cuda/12.1.0/include;' export 'CPLUS_INCLUDE_PATH;
+CUDA_INSTALL_PATH=/gpfslocalsys/cuda/12.1.0;' export 'CUDA_INSTALL_PATH;
+CUDA_ROOT=/gpfslocalsys/cuda/12.1.0;' export 'CUDA_ROOT;
+CUDA_PATH=/gpfslocalsys/cuda/12.1.0;' export 'CUDA_PATH;
+LD_LIBRARY_PATH_modshare=/gpfslocalsys/cuda/12.1.0/lib64:1:/gpfslocalsys/slurm/current/lib/slurm:1:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:1:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:1:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:1:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:1:/gpfslocalsys/slurm/current/lib:1;' export 'LD_LIBRARY_PATH_modshare;
+C_INCLUDE_PATH=/gpfslocalsys/cuda/12.1.0/include;' export 'C_INCLUDE_PATH;
+_LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1:/gpfslocalsup/pub/module-rh/modulefiles/cuda/12.1.0:1:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:1;' export '_LMFILES__modshare;
+LOADEDMODULES_modshare=cuda/12.1.0:1:cpuarch/amd:1:anaconda-py3/2023.09:1;' export 'LOADEDMODULES_modshare;
+PATH=/gpfslocalsys/cuda/12.1.0/samples:/gpfslocalsys/cuda/12.1.0/nvvm/bin:/gpfslocalsys/cuda/12.1.0/bin:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin;' export 'PATH;
+CUDA_HOME=/gpfslocalsys/cuda/12.1.0;' export 'CUDA_HOME;
+PATH_modshare=/usr/bin:1:/gpfslocalsup/bin:1:/usr/local/bin:1:/gpfslocalsys/cuda/12.1.0/bin:1:/opt/sgi/bin:1:/gpfslocalsys/slurm/current/bin:1:/opt/clmgr/bin:1:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:1:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:1:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:1:/opt/sgi/sbin:1:/gpfslocalsys/cuda/12.1.0/samples:1:/bin:1:/opt/clmgr/sbin:1:/gpfslocalsys/bin:1:/gpfslocalsys/cuda/12.1.0/nvvm/bin:1:/sbin:1:/usr/sbin:1:/usr/local/sbin:1:/usr/lpp/mmfs/bin:1:/opt/c3/bin:1;' export 'PATH_modshare;
+test' '0;'
+++ LD_LIBRARY_PATH=/gpfslocalsys/cuda/12.1.0/nvvm/lib64:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:/gpfslocalsys/cuda/12.1.0/lib64:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
+++ export LD_LIBRARY_PATH
+++ MANPATH=/gpfslocalsys/cuda/12.1.0/doc/man::/opt/c3/man:/opt/clmgr/man:/opt/sgi/share/man:/opt/clmgr/share/man:/opt/clmgr/lib/cm-cli/man:/gpfslocalsys/slurm/current/share/man:/usr/share/catman:/usr/share/man:/usr/catman:/usr/man
+++ export MANPATH
+++ LIBRARY_PATH=/gpfslocalsys/cuda/12.1.0/lib64/stubs:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:/gpfslocalsys/cuda/12.1.0/lib64:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:/gpfslocalsys/slurm/current/lib/slurm:/gpfslocalsys/slurm/current/lib
+++ export LIBRARY_PATH
+++ _LMFILES_=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:/gpfslocalsup/pub/module-rh/modulefiles/cuda/12.1.0
+++ export _LMFILES_
+++ LOADEDMODULES=cpuarch/amd:anaconda-py3/2023.09:cuda/12.1.0
+++ export LOADEDMODULES
+++ MODULES_LMCONFLICT='anaconda-py3/2023.09&anaconda-py3&anaconda-py2:cuda/12.1.0&cuda'
+++ export MODULES_LMCONFLICT
+++ MANPATH_modshare=:1:/opt/sgi/share/man:1:/gpfslocalsys/slurm/current/share/man:1:/opt/c3/man:1:/opt/clmgr/lib/cm-cli/man:1:/opt/clmgr/share/man:1:/usr/man:1:/usr/catman:1:/opt/clmgr/man:1:/gpfslocalsys/cuda/12.1.0/doc/man:1:/usr/share/man:1:/usr/share/catman:1
+++ export MANPATH_modshare
+++ NVHPC_CUDA_HOME=/gpfslocalsys/cuda/12.1.0
+++ export NVHPC_CUDA_HOME
+++ LIBRARY_PATH_modshare=/gpfslocalsys/cuda/12.1.0/lib64/stubs:1:/gpfslocalsys/cuda/12.1.0/lib64:1:/gpfslocalsys/slurm/current/lib/slurm:1:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:1:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:1:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:1:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:1:/gpfslocalsys/slurm/current/lib:1
+++ export LIBRARY_PATH_modshare
+++ MODULES_LMCONFLICT_modshare='anaconda-py3/2023.09&anaconda-py3&anaconda-py2:1:cuda/12.1.0&cuda:1'
+++ export MODULES_LMCONFLICT_modshare
+++ CPLUS_INCLUDE_PATH=/gpfslocalsys/cuda/12.1.0/include
+++ export CPLUS_INCLUDE_PATH
+++ CUDA_INSTALL_PATH=/gpfslocalsys/cuda/12.1.0
+++ export CUDA_INSTALL_PATH
+++ CUDA_ROOT=/gpfslocalsys/cuda/12.1.0
+++ export CUDA_ROOT
+++ CUDA_PATH=/gpfslocalsys/cuda/12.1.0
+++ export CUDA_PATH
+++ LD_LIBRARY_PATH_modshare=/gpfslocalsys/cuda/12.1.0/lib64:1:/gpfslocalsys/slurm/current/lib/slurm:1:/gpfslocalsys/cuda/12.1.0/nvvm/lib64:1:/gpfslocalsys/cuda/12.1.0/extras/CUPTI/lib64:1:/gpfslocalsys/cuda/12.1.0/targets/x86_64-linux/lib:1:/gpfslocalsys/cuda/12.1.0/samples/common/lib/linux/x86_64:1:/gpfslocalsys/slurm/current/lib:1
+++ export LD_LIBRARY_PATH_modshare
+++ C_INCLUDE_PATH=/gpfslocalsys/cuda/12.1.0/include
+++ export C_INCLUDE_PATH
+++ _LMFILES__modshare=/gpfslocalsup/pub/module-rh/modulefiles/cpuarch/amd:1:/gpfslocalsup/pub/module-rh/modulefiles/cuda/12.1.0:1:/gpfslocalsup/pub/modules-idris-env4/modulefiles/linux-rhel8-x86_64/anaconda-py3/2023.09:1
+++ export _LMFILES__modshare
+++ LOADEDMODULES_modshare=cuda/12.1.0:1:cpuarch/amd:1:anaconda-py3/2023.09:1
+++ export LOADEDMODULES_modshare
+++ PATH=/gpfslocalsys/cuda/12.1.0/samples:/gpfslocalsys/cuda/12.1.0/nvvm/bin:/gpfslocalsys/cuda/12.1.0/bin:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:/opt/clmgr/sbin:/opt/clmgr/bin:/opt/sgi/sbin:/opt/sgi/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/c3/bin:/usr/lpp/mmfs/bin:/sbin:/bin:/gpfslocalsys/slurm/current/bin:/gpfslocalsup/bin:/gpfslocalsys/bin
+++ export PATH
+++ CUDA_HOME=/gpfslocalsys/cuda/12.1.0
+++ export CUDA_HOME
+++ PATH_modshare=/usr/bin:1:/gpfslocalsup/bin:1:/usr/local/bin:1:/gpfslocalsys/cuda/12.1.0/bin:1:/opt/sgi/bin:1:/gpfslocalsys/slurm/current/bin:1:/opt/clmgr/bin:1:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/bin:1:/gpfslocalsup/pub/anaconda-py3/2023.09/condabin:1:/gpfslocalsup/spack_soft/environment-modules/4.3.1/gcc-4.8.5-ism7cdy4xverxywj27jvjstqwk5oxe2v/bin:1:/opt/sgi/sbin:1:/gpfslocalsys/cuda/12.1.0/samples:1:/bin:1:/opt/clmgr/sbin:1:/gpfslocalsys/bin:1:/gpfslocalsys/cuda/12.1.0/nvvm/bin:1:/sbin:1:/usr/sbin:1:/usr/local/sbin:1:/usr/lpp/mmfs/bin:1:/opt/c3/bin:1
+++ export PATH_modshare
+++ test 0
++ _mlstatus=0
++ '[' -n x ']'
++ IFS=' 	
+'
++ unset _mlre _mlv _mlrv _mlIFS
++ '[' -n '' ']'
++ unset _mlshdbg
++ return 0
++ DISTRIBUTED_ARGS='--nproc_per_node 8 --nnodes 1 --node_rank $SLURM_PROCID --rdzv_endpoint jean-zay-iam02:6000 --rdzv_backend c10d --max_restarts 0 --tee 3'
+++ pwd
++ export 'RUN=torchrun --nproc_per_node 8 --nnodes 1 --node_rank $SLURM_PROCID --rdzv_endpoint jean-zay-iam02:6000 --rdzv_backend c10d --max_restarts 0 --tee 3        /gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/pretrain_gpt.py        --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache        --tensor-model-parallel-size 1        --no-pipeline-parallel        --num-layers 32        --hidden-size 4096        --ffn-hidden-size 11008        --num-attention-heads 32        --micro-batch-size 3        --global-batch-size 192        --seq-length 2048        --max-position-embeddings 2048        --train-iters 250000        --save /gpfswork/rech/qgz/urc37ho/checkpoints/        --load /gpfswork/rech/qgz/urc37ho/checkpoints/        --data-path /gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document        --data-impl mmap        --tokenizer-type PretrainedFromHF         --tokenizer-name-or-path OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all        --distributed-backend nccl        --lr 3e-4        --lr-decay-style cosine        --min-lr 3e-5        --weight-decay 0.1        --clip-grad 1        --lr-warmup-iters 2000        --optimizer adam        --adam-beta1 0.9        --adam-beta2 0.95        --log-interval 1        --save-interval 1000        --eval-interval 50        --eval-iters 50        --bf16        --use-flash-attn-v2        --no-query-key-layer-scaling        --attention-dropout 0        --hidden-dropout 0        --use-rotary-position-embeddings        --untie-embeddings-and-output-weights        --swiglu        --normalization rmsnorm        --disable-bias-linear        --num-key-value-heads 32         --zero-stage=1  --deepspeed_config=./ds_config.1353927.json  --deepspeed                 '
++ RUN='torchrun --nproc_per_node 8 --nnodes 1 --node_rank $SLURM_PROCID --rdzv_endpoint jean-zay-iam02:6000 --rdzv_backend c10d --max_restarts 0 --tee 3        /gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/pretrain_gpt.py        --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache        --tensor-model-parallel-size 1        --no-pipeline-parallel        --num-layers 32        --hidden-size 4096        --ffn-hidden-size 11008        --num-attention-heads 32        --micro-batch-size 3        --global-batch-size 192        --seq-length 2048        --max-position-embeddings 2048        --train-iters 250000        --save /gpfswork/rech/qgz/urc37ho/checkpoints/        --load /gpfswork/rech/qgz/urc37ho/checkpoints/        --data-path /gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document        --data-impl mmap        --tokenizer-type PretrainedFromHF         --tokenizer-name-or-path OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all        --distributed-backend nccl        --lr 3e-4        --lr-decay-style cosine        --min-lr 3e-5        --weight-decay 0.1        --clip-grad 1        --lr-warmup-iters 2000        --optimizer adam        --adam-beta1 0.9        --adam-beta2 0.95        --log-interval 1        --save-interval 1000        --eval-interval 50        --eval-iters 50        --bf16        --use-flash-attn-v2        --no-query-key-layer-scaling        --attention-dropout 0        --hidden-dropout 0        --use-rotary-position-embeddings        --untie-embeddings-and-output-weights        --swiglu        --normalization rmsnorm        --disable-bias-linear        --num-key-value-heads 32         --zero-stage=1  --deepspeed_config=./ds_config.1353927.json  --deepspeed                 '
++ srun --jobid 1353927 bash -c 'torchrun --nproc_per_node 8 --nnodes 1 --node_rank $SLURM_PROCID --rdzv_endpoint jean-zay-iam02:6000 --rdzv_backend c10d --max_restarts 0 --tee 3        /gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/pretrain_gpt.py        --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache        --tensor-model-parallel-size 1        --no-pipeline-parallel        --num-layers 32        --hidden-size 4096        --ffn-hidden-size 11008        --num-attention-heads 32        --micro-batch-size 3        --global-batch-size 192        --seq-length 2048        --max-position-embeddings 2048        --train-iters 250000        --save /gpfswork/rech/qgz/urc37ho/checkpoints/        --load /gpfswork/rech/qgz/urc37ho/checkpoints/        --data-path /gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document        --data-impl mmap        --tokenizer-type PretrainedFromHF         --tokenizer-name-or-path OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all        --distributed-backend nccl        --lr 3e-4        --lr-decay-style cosine        --min-lr 3e-5        --weight-decay 0.1        --clip-grad 1        --lr-warmup-iters 2000        --optimizer adam        --adam-beta1 0.9        --adam-beta2 0.95        --log-interval 1        --save-interval 1000        --eval-interval 50        --eval-iters 50        --bf16        --use-flash-attn-v2        --no-query-key-layer-scaling        --attention-dropout 0        --hidden-dropout 0        --use-rotary-position-embeddings        --untie-embeddings-and-output-weights        --swiglu        --normalization rmsnorm        --disable-bias-linear        --num-key-value-heads 32         --zero-stage=1  --deepspeed_config=./ds_config.1353927.json  --deepspeed                 '
++ tee -a /gpfswork/rech/qgz/urc37ho/lucie-logs/main_log.txt
+[2024-04-03 17:12:52,177] torch.distributed.run: [WARNING] 
+[2024-04-03 17:12:52,177] torch.distributed.run: [WARNING] *****************************************
+[2024-04-03 17:12:52,177] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+[2024-04-03 17:12:52,177] torch.distributed.run: [WARNING] *****************************************
+[default0]:[2024-04-03 17:12:55,667] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default3]:[2024-04-03 17:12:55,665] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default2]:[2024-04-03 17:12:55,699] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default1]:[2024-04-03 17:12:55,699] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default5]:[2024-04-03 17:12:55,716] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default7]:[2024-04-03 17:12:55,715] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default6]:[2024-04-03 17:12:55,813] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default4]:[2024-04-03 17:12:55,797] [INFO] [real_accelerator.py:161:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[default2]:--------------------------------------------------
+[default2]:DeepSpeed C++/CUDA extension op report
+[default2]:--------------------------------------------------
+[default2]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default2]:      runtime if needed. Op compatibility means that your system
+[default2]:      meet the required dependencies to JIT install the op.
+[default2]:--------------------------------------------------
+[default2]:JIT compiled ops requires ninja
+[default2]:ninja .................. [92m[OKAY][0m
+[default2]:--------------------------------------------------
+[default2]:op name ................ installed .. compatible
+[default2]:--------------------------------------------------
+[default0]:--------------------------------------------------
+[default0]:DeepSpeed C++/CUDA extension op report
+[default0]:--------------------------------------------------
+[default0]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default0]:      runtime if needed. Op compatibility means that your system
+[default0]:      meet the required dependencies to JIT install the op.
+[default0]:--------------------------------------------------
+[default0]:JIT compiled ops requires ninja
+[default0]:ninja .................. [92m[OKAY][0m
+[default0]:--------------------------------------------------
+[default0]:op name ................ installed .. compatible
+[default0]:--------------------------------------------------
+[default7]:--------------------------------------------------
+[default7]:DeepSpeed C++/CUDA extension op report
+[default7]:--------------------------------------------------
+[default7]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default7]:      runtime if needed. Op compatibility means that your system
+[default7]:      meet the required dependencies to JIT install the op.
+[default7]:--------------------------------------------------
+[default7]:JIT compiled ops requires ninja
+[default7]:ninja .................. [92m[OKAY][0m
+[default7]:--------------------------------------------------
+[default7]:op name ................ installed .. compatible
+[default7]:--------------------------------------------------
+[default5]:--------------------------------------------------
+[default5]:DeepSpeed C++/CUDA extension op report
+[default5]:--------------------------------------------------
+[default5]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default5]:      runtime if needed. Op compatibility means that your system
+[default5]:      meet the required dependencies to JIT install the op.
+[default5]:--------------------------------------------------
+[default5]:JIT compiled ops requires ninja
+[default5]:ninja .................. [92m[OKAY][0m
+[default5]:--------------------------------------------------
+[default5]:op name ................ installed .. compatible
+[default5]:--------------------------------------------------
+[default3]:--------------------------------------------------
+[default3]:DeepSpeed C++/CUDA extension op report
+[default3]:--------------------------------------------------
+[default3]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default3]:      runtime if needed. Op compatibility means that your system
+[default3]:      meet the required dependencies to JIT install the op.
+[default3]:--------------------------------------------------
+[default3]:JIT compiled ops requires ninja
+[default3]:ninja .................. [92m[OKAY][0m
+[default3]:--------------------------------------------------
+[default3]:op name ................ installed .. compatible
+[default3]:--------------------------------------------------
+[default6]:--------------------------------------------------
+[default6]:DeepSpeed C++/CUDA extension op report
+[default6]:--------------------------------------------------
+[default6]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default6]:      runtime if needed. Op compatibility means that your system
+[default6]:      meet the required dependencies to JIT install the op.
+[default6]:--------------------------------------------------
+[default6]:JIT compiled ops requires ninja
+[default6]:ninja .................. [92m[OKAY][0m
+[default6]:--------------------------------------------------
+[default6]:op name ................ installed .. compatible
+[default6]:--------------------------------------------------
+[default1]:--------------------------------------------------
+[default1]:DeepSpeed C++/CUDA extension op report
+[default1]:--------------------------------------------------
+[default1]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default1]:      runtime if needed. Op compatibility means that your system
+[default1]:      meet the required dependencies to JIT install the op.
+[default1]:--------------------------------------------------
+[default1]:JIT compiled ops requires ninja
+[default1]:ninja .................. [92m[OKAY][0m
+[default1]:--------------------------------------------------
+[default1]:op name ................ installed .. compatible
+[default1]:--------------------------------------------------
+[default4]:--------------------------------------------------
+[default4]:DeepSpeed C++/CUDA extension op report
+[default4]:--------------------------------------------------
+[default4]:NOTE: Ops not installed will be just-in-time (JIT) compiled at
+[default4]:      runtime if needed. Op compatibility means that your system
+[default4]:      meet the required dependencies to JIT install the op.
+[default4]:--------------------------------------------------
+[default4]:JIT compiled ops requires ninja
+[default4]:ninja .................. [92m[OKAY][0m
+[default4]:--------------------------------------------------
+[default4]:op name ................ installed .. compatible
+[default4]:--------------------------------------------------
+[default2]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default2]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default2]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default2]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default2]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default2]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default2]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default1]:/bin/sh: line 0: type: git: not found
+[default0]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default0]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default0]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default0]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default0]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default0]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default5]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default5]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default5]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default5]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default5]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default5]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default3]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default3]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default3]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default3]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default3]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default3]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default6]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default6]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default6]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default6]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default6]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default6]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default1]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default1]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default1]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default1]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default1]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default1]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:[93m [WARNING] [0m async_io requires the dev libaio .so object and headers but these were not found.
+[default4]:[93m [WARNING] [0m async_io: please install the libaio-devel package with yum
+[default4]:[93m [WARNING] [0m If libaio is already installed (perhaps from source), try setting the CFLAGS and LDFLAGS environment variables to where it can be found.
+[default4]:async_io ............... [93m[NO][0m ....... [93m[NO][0m
+[default4]:fused_adam ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:cpu_adam ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:cpu_adagrad ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:cpu_lion ............... [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:[93m [WARNING] [0m Please specify the CUTLASS repo directory as environment variable $CUTLASS_PATH
+[default4]:evoformer_attn ......... [93m[NO][0m ....... [93m[NO][0m
+[default4]:fused_lamb ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:fused_lion ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default2]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default2]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                [default0]:/bin/sh: line 0: type: git: not found
+[default2]:/bin/sh: line 0: type: git: not found
+[default3]:/bin/sh: line 0: type: git: not found
+                                                  [default2]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default2]:--------------------------------------------------
+[default2]:DeepSpeed general environment info:
+[default2]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default2]:torch version .................... 2.2.1
+[default2]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default2]:deepspeed info ................... 0.12.6, unknown, unknown
+[default2]:torch cuda version ............... 12.1
+[default2]:torch hip version ................ None
+[default2]:nvcc version ..................... 12.1
+[default2]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default2]:shared memory (/dev/shm) size .... 251.60 GB
+[default2]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default5]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default5]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default5]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default5]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default5]:--------------------------------------------------
+[default5]:DeepSpeed general environment info:
+[default5]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default5]:torch version .................... 2.2.1
+[default5]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default5]:deepspeed info ................... 0.12.6, unknown, unknown
+[default5]:torch cuda version ............... 12.1
+[default5]:torch hip version ................ None
+[default5]:nvcc version ..................... 12.1
+[default5]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default5]:shared memory (/dev/shm) size .... 251.60 GB
+[default5]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default7]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default7]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default7]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default7]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default7]:--------------------------------------------------
+[default7]:DeepSpeed general environment info:
+[default7]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default7]:torch version .................... 2.2.1
+[default7]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default7]:deepspeed info ................... 0.12.6, unknown, unknown
+[default7]:torch cuda version ............... 12.1
+[default7]:torch hip version ................ None
+[default7]:nvcc version ..................... 12.1
+[default7]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default7]:shared memory (/dev/shm) size .... 251.60 GB
+[default7]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default0]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default0]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default0]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default0]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default0]:--------------------------------------------------
+[default0]:DeepSpeed general environment info:
+[default0]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default0]:torch version .................... 2.2.1
+[default0]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default0]:deepspeed info ................... 0.12.6, unknown, unknown
+[default0]:torch cuda version ............... 12.1
+[default0]:torch hip version ................ None
+[default0]:nvcc version ..................... 12.1
+[default0]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default0]:shared memory (/dev/shm) size .... 251.60 GB
+[default0]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default0]:using world size: 8, data-parallel-size: 8, sequence-parallel size: 1, tensor-model-parallel size: 1, pipeline-model-parallel size: 1 
+[default0]:accumulate and all-reduce gradients in fp32 for bfloat16 data type.
+[default0]:using torch.bfloat16 for parameters ...
+[default0]:------------------------ arguments ------------------------
+[default3]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default3]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default3]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default3]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:/bin/sh: line 0: type: git: not found
+[default6]:/bin/sh: line 0: type: git: not found
+[default7]:/bin/sh: line 0: type: git: not found
+[default5]:/bin/sh: line 0: type: git: not found
+[default0]:loading file tokenizer.model from cache at None
+[default0]:loading file tokenizer.json from cache at /linkhome/rech/genlor01/urc37ho/.cache/huggingface/hub/models--OpenLLM-France--Lucie-tokenizer-v2.4-space_prefix_all/snapshots/edf1b3d40698a2eec64a63aa8731c510e5810ae6/tokenizer.json
+[default0]:loading file added_tokens.json from cache at None
+[default0]:loading file special_tokens_map.json from cache at /linkhome/rech/genlor01/urc37ho/.cache/huggingface/hub/models--OpenLLM-France--Lucie-tokenizer-v2.4-space_prefix_all/snapshots/edf1b3d40698a2eec64a63aa8731c510e5810ae6/special_tokens_map.json
+[default0]:loading file tokenizer_config.json from cache at /linkhome/rech/genlor01/urc37ho/.cache/huggingface/hub/models--OpenLLM-France--Lucie-tokenizer-v2.4-space_prefix_all/snapshots/edf1b3d40698a2eec64a63aa8731c510e5810ae6/tokenizer_config.json
+[default3]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default3]:--------------------------------------------------
+[default3]:DeepSpeed general environment info:
+[default3]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default3]:torch version .................... 2.2.1
+[default3]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default3]:deepspeed info ................... 0.12.6, unknown, unknown
+[default3]:torch cuda version ............... 12.1
+[default3]:torch hip version ................ None
+[default3]:nvcc version ..................... 12.1
+[default3]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default3]:shared memory (/dev/shm) size .... 251.60 GB
+[default3]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default6]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default6]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default6]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default6]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default6]:--------------------------------------------------
+[default6]:DeepSpeed general environment info:
+[default6]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default6]:torch version .................... 2.2.1
+[default6]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default6]:deepspeed info ................... 0.12.6, unknown, unknown
+[default6]:torch cuda version ............... 12.1
+[default6]:torch hip version ................ None
+[default6]:nvcc version ..................... 12.1
+[default6]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default6]:shared memory (/dev/shm) size .... 251.60 GB
+[default6]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default1]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default1]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default1]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default1]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default1]:--------------------------------------------------
+[default1]:DeepSpeed general environment info:
+[default1]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default1]:torch version .................... 2.2.1
+[default1]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default1]:deepspeed info ................... 0.12.6, unknown, unknown
+[default1]:torch cuda version ............... 12.1
+[default1]:torch hip version ................ None
+[default1]:nvcc version ..................... 12.1
+[default1]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default1]:shared memory (/dev/shm) size .... 251.60 GB
+[default1]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default4]:inference_core_ops ..... [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:cutlass_ops ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:quantizer .............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:ragged_device_ops ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:ragged_ops ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:random_ltd ............. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:[93m [WARNING] [0m sparse_attn requires a torch version >= 1.5 and < 2.0 but detected 2.2
+[default4]:[93m [WARNING] [0m using untested triton version (2.2.0), only 1.0.0 is known to be compatible
+[default4]:sparse_attn ............ [93m[NO][0m ....... [93m[NO][0m
+[default4]:spatial_inference ...... [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:transformer ............ [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:stochastic_transformer . [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:transformer_inference .. [93m[NO][0m ....... [92m[OKAY][0m
+[default4]:--------------------------------------------------
+[default4]:DeepSpeed general environment info:
+[default4]:torch install path ............... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch']
+[default4]:torch version .................... 2.2.1
+[default4]:deepspeed install path ........... ['/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/deepspeed']
+[default4]:deepspeed info ................... 0.12.6, unknown, unknown
+[default4]:torch cuda version ............... 12.1
+[default4]:torch hip version ................ None
+[default4]:nvcc version ..................... 12.1
+[default4]:deepspeed wheel compiled w. ...... torch 2.2, cuda 12.1
+[default4]:shared memory (/dev/shm) size .... 251.60 GB
+[default4]:**** Git info for Megatron: git_hash=unknown git_branch=unknown ****
+[default0]:  accumulate_allreduce_grads_in_fp32 .............. True
+[default0]:  adam_beta1 ...................................... 0.9
+[default0]:  adam_beta2 ...................................... 0.95
+[default0]:  adam_eps ........................................ 1e-08
+[default0]:  add_bias_linear ................................. False
+[default0]:  add_position_embedding .......................... False
+[default0]:  adlr_autoresume ................................. False
+[default0]:  adlr_autoresume_interval ........................ 1000
+[default0]:  aml_data_download_path .......................... None
+[default0]:  apply_layernorm_1p .............................. False
+[default0]:  apply_query_key_layer_scaling ................... False
+[default0]:  apply_residual_connection_post_layernorm ........ False
+[default0]:  async_tensor_model_parallel_allreduce ........... False
+[default0]:  attention_dropout ............................... 0.0
+[default0]:  attention_softmax_in_fp32 ....................... False
+[default0]:  barrier_with_L1_time ............................ True
+[default0]:  bert_binary_head ................................ True
+[default0]:  bert_embedder_type .............................. megatron
+[default0]:  bert_load ....................................... None
+[default0]:  bf16 ............................................ True
+[default0]:  bias_dropout_fusion ............................. True
+[default0]:  bias_gelu_fusion ................................ False
+[default0]:  biencoder_projection_dim ........................ 0
+[default0]:  biencoder_shared_query_context_model ............ False
+[default0]:  block_data_path ................................. None
+[default0]:  checkpoint_activations .......................... False
+[default0]:  checkpoint_in_cpu ............................... False
+[default0]:  checkpoint_num_layers ........................... 1
+[default0]:  classes_fraction ................................ 1.0
+[default0]:  clip_grad ....................................... 1.0
+[default0]:  compression_training ............................ False
+[default0]:  consumed_train_samples .......................... 0
+[default0]:  consumed_train_tokens ........................... 0
+[default0]:  consumed_valid_samples .......................... 0
+[default0]:  contigious_checkpointing ........................ False
+[default0]:  cpu_optimizer ................................... False
+[default0]:  cpu_torch_adam .................................. False
+[default0]:  create_moe_param_group .......................... False
+[default0]:  curriculum_learning_legacy ...................... False
+[default0]:  data_cache_path ................................. /linkhome/rech/genlor01/urc37ho/.cache
+[default0]:  data_efficiency_curriculum_learning ............. False
+[default0]:  data_impl ....................................... mmap
+[default0]:  data_parallel_random_init ....................... False
+[default0]:  data_parallel_size .............................. 8
+[default0]:  data_path ....................................... ['/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document']
+[default0]:  data_per_class_fraction ......................... 1.0
+[default0]:  data_sharding ................................... True
+[default0]:  dataloader_type ................................. single
+[default0]:  DDP_impl ........................................ local
+[default0]:  decoder_num_layers .............................. None
+[default0]:  decoder_seq_length .............................. None
+[default0]:  deepscale ....................................... False
+[default0]:  deepscale_config ................................ None
+[default0]:  deepspeed ....................................... True
+[default0]:  deepspeed_activation_checkpointing .............. False
+[default0]:  deepspeed_config ................................ ./ds_config.1353927.json
+[default0]:  deepspeed_mpi ................................... False
+[default0]:  dino_bottleneck_size ............................ 256
+[default0]:  dino_freeze_last_layer .......................... 1
+[default0]:  dino_head_hidden_size ........................... 2048
+[default0]:  dino_local_crops_number ......................... 10
+[default0]:  dino_local_img_size ............................. 96
+[default0]:  dino_norm_last_layer ............................ False
+[default0]:  dino_teacher_temp ............................... 0.07
+[default0]:  dino_warmup_teacher_temp ........................ 0.04
+[default0]:  dino_warmup_teacher_temp_epochs ................. 30
+[default0]:  disable_mem_efficient_ln ........................ True
+[default0]:  distribute_checkpointed_activations ............. False
+[default0]:  distribute_saved_activations .................... False
+[default0]:  distributed_backend ............................. nccl
+[default0]:  distributed_timeout_minutes ..................... 10
+[default0]:  ds_inference .................................... False
+[default0]:  ds_pipeline_enabled ............................. False
+[default0]:  ds_sequence_parallel_size ....................... 1
+[default0]:  embedding_path .................................. None
+[default0]:  embedding_weights_in_fp32 ....................... False
+[default0]:  empty_unused_memory_level ....................... 0
+[default0]:  enable_expert_tensor_parallelism ................ False
+[default0]:  encoder_num_layers .............................. 32
+[default0]:  encoder_seq_length .............................. 2048
+[default0]:  end_weight_decay ................................ 0.1
+[default0]:  eod_mask_loss ................................... False
+[default0]:  eval_interval ................................... 50
+[default0]:  eval_iters ...................................... 50
+[default0]:  evidence_data_path .............................. None
+[default0]:  exit_duration_in_mins ........................... None
+[default0]:  exit_interval ................................... None
+[default0]:  exit_on_missing_checkpoint ...................... False
+[default0]:  exit_signal_handler ............................. False
+[default0]:  expert_interval ................................. 2
+[default0]:  ffn_hidden_size ................................. 11008
+[default0]:  finetune ........................................ False
+[default0]:  force_ds_sequence_parallel ...................... False
+[default0]:  fp16 ............................................ False
+[default0]:  fp16_lm_cross_entropy ........................... False
+[default0]:  fp32_residual_connection ........................ False
+[default0]:  fp8_amax_compute_algo ........................... most_recent
+[default0]:  fp8_amax_history_len ............................ 1
+[default0]:  fp8_e4m3 ........................................ False
+[default0]:  fp8_hybrid ...................................... False
+[default0]:  fp8_interval .................................... 1
+[default0]:  fp8_margin ...................................... 0
+[default0]:  fp8_wgrad ....................................... True
+[default0]:  global_batch_size ............................... 192
+[default0]:  gradient_accumulation_fusion .................... True
+[default0]:  head_lr_mult .................................... 1.0
+[default0]:  hidden_dropout .................................. 0.0
+[default0]:  hidden_size ..................................... 4096
+[default0]:  hidden_size_teacher ............................. None
+[default0]:  hysteresis ...................................... 2
+[default0]:  ict_head_size ................................... None
+[default0]:  ict_load ........................................ None
+[default0]:  img_h ........................................... 224
+[default0]:  img_w ........................................... 224
+[default0]:  indexer_batch_size .............................. 128
+[default0]:  indexer_log_interval ............................ 1000
+[default0]:  inference ....................................... False
+[default0]:  inference_batch_times_seqlen_threshold .......... 512
+[default0]:  init_method_std ................................. 0.02
+[default0]:  init_method_xavier_uniform ...................... False
+[default0]:  initial_loss_scale .............................. 4294967296
+[default0]:  iter_per_epoch .................................. 1250
+[default0]:  kd .............................................. False
+[default0]:  kd_alpha_ce ..................................... 1
+[default0]:  kd_beta_ce ...................................... 1
+[default0]:  kd_temp ......................................... 1.0
+[default0]:  kv_channels ..................................... 128
+[default0]:  layernorm_epsilon ............................... 1e-05
+[default0]:  lazy_mpu_init ................................... None
+[default0]:  load ............................................ /gpfswork/rech/qgz/urc37ho/checkpoints/
+[default0]:  load_iteration .................................. None
+[default0]:  load_teacher .................................... None
+[default0]:  local_rank ...................................... None
+[default0]:  log_batch_size_to_tensorboard ................... False
+[default0]:  log_interval .................................... 1
+[default0]:  log_learning_rate_to_tensorboard ................ True
+[default0]:  log_loss_scale_to_tensorboard ................... True
+[default0]:  log_memory_to_tensorboard ....................... False
+[default0]:  log_num_zeros_in_grad ........................... False
+[default0]:  log_optimizer_states_to_tensorboard ............. False
+[default0]:  log_params_norm ................................. False
+[default0]:  log_timers_to_tensorboard ....................... False
+[default0]:  log_validation_ppl_to_tensorboard ............... False
+[default0]:  log_world_size_to_tensorboard ................... False
+[default0]:  loss_scale ...................................... None
+[default0]:  loss_scale_window ............................... 1000
+[default0]:  lr .............................................. 0.0003
+[default0]:  lr_decay_iters .................................. None
+[default0]:  lr_decay_samples ................................ None
+[default0]:  lr_decay_style .................................. cosine
+[default0]:  lr_decay_tokens ................................. None
+[default0]:  lr_warmup_fraction .............................. None
+[default0]:  lr_warmup_iters ................................. 2000
+[default0]:  lr_warmup_samples ............................... 0
+[default0]:  lr_warmup_tokens ................................ None
+[default0]:  make_vocab_size_divisible_by .................... 128
+[default0]:  mask_factor ..................................... 1.0
+[default0]:  mask_prob ....................................... 0.15
+[default0]:  mask_type ....................................... random
+[default0]:  masked_softmax_fusion ........................... True
+[default0]:  max_position_embeddings ......................... 2048
+[default0]:  max_tokens_to_oom ............................... 12000
+[default0]:  memory_centric_tiled_linear ..................... False
+[default0]:  merge_file ...................................... None
+[default0]:  micro_batch_size ................................ 3
+[default0]:  min_loss_scale .................................. 1.0
+[default0]:  min_lr .......................................... 3e-05
+[default0]:  mlp_type ........................................ standard
+[default0]:  mmap_warmup ..................................... False
+[default0]:  moe_eval_capacity_factor ........................ 1.0
+[default0]:  moe_expert_parallel_size ........................ 1
+[default0]:  moe_loss_coeff .................................. 0.1
+[default0]:  moe_min_capacity ................................ 4
+[default0]:  moe_token_dropping .............................. True
+[default0]:  moe_train_capacity_factor ....................... 1.0
+[default0]:  mos ............................................. False
+[default0]:  multiple_valid_sets ............................. False
+[default0]:  no_load_lr_state ................................ False
+[default0]:  no_load_optim ................................... None
+[default0]:  no_load_rng ..................................... None
+[default0]:  no_persist_layer_norm ........................... False
+[default0]:  no_pipeline_parallel ............................ True
+[default0]:  no_save_optim ................................... None
+[default0]:  no_save_rng ..................................... None
+[default0]:  normalization ................................... rmsnorm
+[default0]:  num_attention_heads ............................. 32
+[default0]:  num_attention_heads_teacher ..................... None
+[default0]:  num_channels .................................... 3
+[default0]:  num_classes ..................................... 1000
+[default0]:  num_experts ..................................... [1]
+[default0]:  num_experts_switch .............................. None
+[default0]:  num_experts_teacher ............................. [1]
+[default0]:  num_key_value_heads ............................. 32
+[default0]:  num_layers ...................................... 32
+[default0]:  num_layers_per_virtual_pipeline_stage ........... None
+[default0]:  num_layers_teacher .............................. None
+[default0]:  num_workers ..................................... 2
+[default0]:  onnx_safe ....................................... None
+[default0]:  openai_gelu ..................................... False
+[default0]:  optimizer ....................................... adam
+[default0]:  output_bert_embeddings .......................... False
+[default0]:  overlap_p2p_comm ................................ False
+[default0]:  override_opt_param_scheduler .................... False
+[default0]:  params_dtype .................................... torch.bfloat16
+[default0]:  partition_activations ........................... False
+[default0]:  patch_dim ....................................... 16
+[default0]:  perform_initialization .......................... True
+[default0]:  pipeline_model_parallel_size .................... 1
+[default0]:  pipeline_model_parallel_split_rank .............. None
+[default0]:  profile_backward ................................ False
+[default0]:  query_in_block_prob ............................. 0.1
+[default0]:  rampup_batch_size ............................... None
+[default0]:  random_ltd ...................................... False
+[default0]:  rank ............................................ 0
+[default0]:  recompute_granularity ........................... None
+[default0]:  recompute_method ................................ None
+[default0]:  recompute_num_layers ............................ 1
+[default0]:  remote_device ................................... none
+[default0]:  reset_attention_mask ............................ False
+[default0]:  reset_iteration ................................. False
+[default0]:  reset_position_ids .............................. False
+[default0]:  retriever_report_topk_accuracies ................ []
+[default0]:  retriever_score_scaling ......................... False
+[default0]:  retriever_seq_length ............................ 256
+[default0]:  retro_add_retriever ............................. False
+[default0]:  retro_cyclic_train_iters ........................ None
+[default0]:  retro_encoder_attention_dropout ................. 0.1
+[default0]:  retro_encoder_hidden_dropout .................... 0.1
+[default0]:  retro_encoder_layers ............................ 2
+[default0]:  retro_num_neighbors ............................. 2
+[default0]:  retro_num_retrieved_chunks ...................... 2
+[default0]:  retro_return_doc_ids ............................ False
+[default0]:  retro_workdir ................................... None
+[default0]:  return_data_index ............................... False
+[default0]:  rotary_percent .................................. 1.0
+[default0]:  sample_rate ..................................... 1.0
+[default0]:  save ............................................ /gpfswork/rech/qgz/urc37ho/checkpoints/
+[default0]:  save_interval ................................... 1000
+[default0]:  scatter_gather_tensors_in_pipeline .............. True
+[default0]:  scattered_embeddings ............................ False
+[default0]:  seed ............................................ 1234
+[default0]:  seq_length ...................................... 2048
+[default0]:  sequence_parallel ............................... False
+[default0]:  sgd_momentum .................................... 0.9
+[default0]:  short_seq_prob .................................. 0.1
+[default0]:  skip_train ...................................... False
+[default0]:  split ........................................... 969, 30, 1
+[default0]:  split_transformers .............................. False
+[default0]:  squared_relu .................................... False
+[default0]:  standalone_embedding_stage ...................... False
+[default0]:  start_weight_decay .............................. 0.1
+[default0]:  swiglu .......................................... True
+[default0]:  swin_backbone_type .............................. tiny
+[default0]:  synchronize_each_layer .......................... False
+[default0]:  tensor_model_parallel_size ...................... 1
+[default0]:  tensorboard_dir ................................. None
+[default0]:  tensorboard_log_interval ........................ 1
+[default0]:  tensorboard_queue_size .......................... 1000
+[default0]:  test_data_path .................................. None
+[default0]:Detected CUDA files, patching ldflags
+[default0]:Emitting ninja build file /gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/fused_kernels/build/build.ninja...
+[default0]:Building extension module scaled_upper_triang_masked_softmax_cuda...
+[default0]:Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
+[default0]:Loading extension module scaled_upper_triang_masked_softmax_cuda...
+[default0]:Detected CUDA files, patching ldflags
+[default0]:Emitting ninja build file /gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/fused_kernels/build/build.ninja...
+[default0]:Building extension module scaled_masked_softmax_cuda...
+[default0]:Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
+[default0]:Loading extension module scaled_masked_softmax_cuda...
+[default0]:Detected CUDA files, patching ldflags
+[default0]:Emitting ninja build file /gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/fused_kernels/build/build.ninja...
+[default0]:Building extension module scaled_softmax_cuda...
+[default0]:Allowing ninja to set a default number of workers... (overridable by setting the environment variable MAX_JOBS=N)
+[default0]:Loading extension module scaled_softmax_cuda...
+[default0]:[rank0]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default2]:[rank2]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default1]:[rank1]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default3]:[rank3]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default7]:[rank7]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default6]:[rank6]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default4]:[rank4]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default5]:[rank5]:[W init.cpp:767] Warning: nvfuser is no longer supported in torch script, use _jit_set_nvfuser_enabled is deprecated and a no-op (function operator())
+[default0]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default0]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default2]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default2]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default1]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default1]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default3]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default3]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default6]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default6]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default7]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default7]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default4]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default4]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default5]:/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/training.py:135: UserWarning: The torch.cuda.*DtypeTensor constructors are no longer recommended. It's best to use methods such as torch.tensor(data, dtype=*, device='cuda') to create tensors. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/tensor/python_tensor.cpp:83.)
+[default5]:  start_time_tensor = get_accelerator().DoubleTensor([_TRAIN_START_TIME])
+[default0]:  tile_factor ..................................... 1
+[default0]:  timing_log_level ................................ 0
+[default0]:  timing_log_option ............................... minmax
+[default0]:  titles_data_path ................................ None
+[default0]:  tokenizer_model ................................. None
+[default0]:  tokenizer_name_or_path .......................... OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+[default0]:  tokenizer_type .................................. PretrainedFromHF
+[default0]:  topk ............................................ 1
+[default0]:  train_data_exact_num_epochs ..................... None
+[default0]:  train_data_path ................................. None
+[default0]:  train_desc_path ................................. None
+[default0]:  train_doc_idx_path .............................. None
+[default0]:  train_idx_path .................................. None
+[default0]:  train_iters ..................................... 250000
+[default0]:  train_sample_idx_path ........................... None
+[default0]:  train_samples ................................... None
+[default0]:  train_shuffle_idx_path .......................... None
+[default0]:  train_tokens .................................... None
+[default0]:  transformer_impl ................................ local
+[default0]:  transformer_pipeline_model_parallel_size ........ 1
+[default0]:  universal_checkpoint ............................ False
+[default0]:  untie_embeddings_and_output_weights ............. True
+[default0]:  use_checkpoint_args ............................. False
+[default0]:  use_checkpoint_opt_param_scheduler .............. False
+[default0]:  use_contiguous_buffers_in_local_ddp ............. True
+[default0]:  use_cpu_initialization .......................... None
+[default0]:  use_dataset_only ................................ False
+[default0]:  use_distributed_optimizer ....................... False
+[default0]:  use_flash_attn .................................. True
+[default0]:  use_flash_attn_triton ........................... False
+[default0]:  use_flash_attn_v1 ............................... False
+[default0]:  use_flash_attn_v2 ............................... True
+[default0]:  use_one_sent_docs ............................... False
+[default0]:  use_pin_memory .................................. False
+[default0]:  use_ring_exchange_p2p ........................... False
+[default0]:  use_rotary_position_embeddings .................. True
+[default0]:  use_tutel ....................................... False
+[default0]:  valid_data_path ................................. None
+[default0]:  variable_seq_lengths ............................ False
+[default0]:  virtual_pipeline_model_parallel_size ............ None
+[default0]:  vision_backbone_type ............................ vit
+[default0]:  vision_pretraining .............................. False
+[default0]:  vision_pretraining_type ......................... classify
+[default0]:  vocab_extra_ids ................................. 0
+[default0]:  vocab_file ...................................... None
+[default0]:  vocab_size ...................................... None
+[default0]:  wandb_api_key ................................... None
+[default0]:  wandb_entity .................................... None
+[default0]:  wandb_id ........................................ None
+[default0]:  wandb_logger .................................... False
+[default0]:  wandb_project ................................... megatron-ds-training
+[default0]:  wandb_resume .................................... None
+[default0]:  wandb_run_name .................................. None
+[default0]:  weight_decay .................................... 0.1
+[default0]:  weight_decay_incr_style ......................... constant
+[default0]:  world_size ...................................... 8
+[default0]:  zero_allgather_bucket_size ...................... 0.0
+[default0]:  zero_contigious_gradients ....................... False
+[default0]:  zero_reduce_bucket_size ......................... 0.0
+[default0]:  zero_reduce_scatter ............................. False
+[default0]:  zero_stage ...................................... 1
+[default0]:-------------------- end of arguments ---------------------
+[default0]:setting number of micro-batches to constant 8
+[default0]:> building PretrainedFromHF tokenizer ...
+[default0]: vocab file is un-used. loading tokenizer from pre-trained model
+[default0]: > padded vocab (size: 32000) with 0 dummy tokens (new size: 32000)
+[default0]:> initializing torch distributed ...
+[default0]:[2024-04-03 17:13:10,168] [INFO] [comm.py:637:init_distributed] cdb=None
+[default0]:[2024-04-03 17:13:10,168] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend nccl
+[default2]:[2024-04-03 17:13:11,043] [INFO] [comm.py:637:init_distributed] cdb=None
+[default7]:[2024-04-03 17:13:11,045] [INFO] [comm.py:637:init_distributed] cdb=None
+[default5]:[2024-04-03 17:13:11,065] [INFO] [comm.py:637:init_distributed] cdb=None
+[default1]:[2024-04-03 17:13:11,059] [INFO] [comm.py:637:init_distributed] cdb=None
+[default3]:[2024-04-03 17:13:11,059] [INFO] [comm.py:637:init_distributed] cdb=None
+[default6]:[2024-04-03 17:13:11,054] [INFO] [comm.py:637:init_distributed] cdb=None
+[default0]:> initialized tensor model parallel with size 1
+[default0]:> initialized pipeline model parallel with size 1
+[default0]:> setting random seeds to 1234 ...
+[default0]:> initializing model parallel cuda seeds on global rank 0, model parallel rank 0, and data parallel rank 0 with model parallel seed: 3952 and data parallel seed: 1234
+[default0]:> compiling dataset index builder ...
+[default0]:make: Entering directory '/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/data'
+[default4]:[2024-04-03 17:13:11,066] [INFO] [comm.py:637:init_distributed] cdb=None
+[default0]:make: Nothing to be done for 'default'.
+[default0]:make: Leaving directory '/gpfsdswork/projects/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya/megatron/data'
+[default0]:>>> done with dataset index builder. Compilation time: 0.041 seconds
+[default0]:> compiling and loading fused kernels ...
+[default0]:ninja: no work to do.
+[default0]:ninja: no work to do.
+[default0]:ninja: no work to do.
+[default0]:>>> done with compiling and loading fused kernels. Compilation time: 20.166 seconds
+[default0]:time to initialize megatron (seconds): 27.839
+[default0]:[after megatron is initialized] datetime: 2024-04-03 17:13:31 
+[default0]:building GPT model ...
+[default0]:[2024-04-03 17:13:31,519] [INFO] [utils.py:791:see_memory_usage] Before Building Model
+[default0]:[2024-04-03 17:13:31,520] [INFO] [utils.py:792:see_memory_usage] MA 0.0 GB         Max_MA 2.16 GB         CA 0.0 GB         Max_CA 2 GB 
+[default0]:[2024-04-03 17:13:31,520] [INFO] [utils.py:799:see_memory_usage] CPU Virtual Memory:  used = 27.26 GB, percent = 5.4%
+[default0]:[2024-04-03 17:13:31,693] [INFO] [utils.py:791:see_memory_usage] After Building Model
+[default0]:[2024-04-03 17:13:31,694] [INFO] [utils.py:792:see_memory_usage] MA 12.55 GB         Max_MA 12.55 GB         CA 12.55 GB         Max_CA 13 GB 
+[default0]:[2024-04-03 17:13:31,694] [INFO] [utils.py:799:see_memory_usage] CPU Virtual Memory:  used = 27.28 GB, percent = 5.4%
+[default0]: > number of parameters on (tensor, pipeline) model parallel rank (0, 0): 6738415616
+[default0]: > total number of parameters in model: 6738415616
+[default0]:> learning rate decay style: cosine
+[default0]:DeepSpeed is enabled.
+[default0]:[2024-04-03 17:13:31,697] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed info: version=0.12.6, git-hash=unknown, git-branch=unknown
+[default0]:[2024-04-03 17:13:34,696] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Flops Profiler Enabled: False
+[default0]:[2024-04-03 17:13:34,697] [INFO] [logging.py:96:log_dist] [Rank 0] Using client Optimizer as basic optimizer
+[default0]:[2024-04-03 17:13:34,697] [INFO] [logging.py:96:log_dist] [Rank 0] Removing param_group that has no 'params' in the basic Optimizer
+[default0]:[2024-04-03 17:13:34,700] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Basic Optimizer = FusedAdam
+[default0]:[2024-04-03 17:13:34,701] [INFO] [utils.py:56:is_zero_supported_optimizer] Checking ZeRO support for optimizer=FusedAdam type=<class 'apex.optimizers.fused_adam.FusedAdam'>
+[default0]:[2024-04-03 17:13:34,701] [INFO] [logging.py:96:log_dist] [Rank 0] Creating torch.bfloat16 ZeRO stage 1 optimizer
+[default0]:[2024-04-03 17:13:34,701] [INFO] [stage_1_and_2.py:148:__init__] Reduce bucket size 500,000,000
+[default0]:[2024-04-03 17:13:34,701] [INFO] [stage_1_and_2.py:149:__init__] Allgather bucket size 500,000,000
+[default0]:[2024-04-03 17:13:34,701] [INFO] [stage_1_and_2.py:150:__init__] CPU Offload: False
+[default0]:[2024-04-03 17:13:34,701] [INFO] [stage_1_and_2.py:151:__init__] Round robin gradient partitioning: False
+[default0]:[2024-04-03 17:14:28,795] [INFO] [utils.py:791:see_memory_usage] Before initializing optimizer states
+[default0]:[2024-04-03 17:14:28,795] [INFO] [utils.py:792:see_memory_usage] MA 15.69 GB         Max_MA 15.69 GB         CA 15.69 GB         Max_CA 16 GB 
+[default0]:[2024-04-03 17:14:28,796] [INFO] [utils.py:799:see_memory_usage] CPU Virtual Memory:  used = 27.8 GB, percent = 5.5%
+[default0]:[2024-04-03 17:14:28,915] [INFO] [utils.py:791:see_memory_usage] After initializing optimizer states
+[default0]:[2024-04-03 17:14:28,915] [INFO] [utils.py:792:see_memory_usage] MA 21.97 GB         Max_MA 25.11 GB         CA 25.11 GB         Max_CA 25 GB 
+[default0]:[2024-04-03 17:14:28,916] [INFO] [utils.py:799:see_memory_usage] CPU Virtual Memory:  used = 27.8 GB, percent = 5.5%
+[default0]:[2024-04-03 17:14:28,916] [INFO] [stage_1_and_2.py:516:__init__] optimizer state initialized
+[default7]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default3]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default6]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default2]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default0]:[2024-04-03 17:14:29,002] [INFO] [utils.py:791:see_memory_usage] After initializing ZeRO optimizer
+[default0]:[2024-04-03 17:14:29,003] [INFO] [utils.py:792:see_memory_usage] MA 21.97 GB         Max_MA 21.97 GB         CA 25.11 GB         Max_CA 25 GB 
+[default0]:[2024-04-03 17:14:29,003] [INFO] [utils.py:799:see_memory_usage] CPU Virtual Memory:  used = 27.8 GB, percent = 5.5%
+[default0]:[2024-04-03 17:14:29,004] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Final Optimizer = FusedAdam
+[default0]:[2024-04-03 17:14:29,004] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed using client LR scheduler
+[default0]:[2024-04-03 17:14:29,004] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed LR Scheduler = <megatron.optimizer_param_scheduler.OptimizerParamScheduler object at 0x15420fe9f0a0>
+[default0]:[2024-04-03 17:14:29,004] [INFO] [logging.py:96:log_dist] [Rank 0] step=0, skipped=0, lr=[0.0, 0.0], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:984:print] DeepSpeedEngine configuration:
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   activation_checkpointing_config  {
+[default0]:    "partition_activations": false, 
+[default0]:    "contiguous_memory_optimization": false, 
+[default0]:    "cpu_checkpointing": false, 
+[default0]:    "number_checkpoints": null, 
+[default0]:    "synchronize_checkpoint_boundary": false, 
+[default0]:    "profile": false
+[default0]:}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   aio_config ................... {'block_size': 1048576, 'queue_depth': 8, 'thread_count': 1, 'single_submit': False, 'overlap_events': True}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   amp_enabled .................. False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   amp_params ................... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   autotuning_config ............ {
+[default0]:    "enabled": false, 
+[default0]:    "start_step": null, 
+[default0]:    "end_step": null, 
+[default0]:    "metric_path": null, 
+[default0]:    "arg_mappings": null, 
+[default0]:    "metric": "throughput", 
+[default0]:    "model_info": null, 
+[default0]:    "results_dir": "autotuning_results", 
+[default0]:    "exps_dir": "autotuning_exps", 
+[default0]:    "overwrite": true, 
+[default0]:    "fast": true, 
+[default0]:    "start_profile_step": 3, 
+[default0]:    "end_profile_step": 5, 
+[default0]:    "tuner_type": "gridsearch", 
+[default0]:    "tuner_early_stopping": 5, 
+[default0]:    "tuner_num_trials": 50, 
+[default0]:    "model_info_path": null, 
+[default0]:    "mp_size": 1, 
+[default0]:    "max_train_batch_size": null, 
+[default0]:    "min_train_batch_size": 1, 
+[default0]:    "max_train_micro_batch_size_per_gpu": 1.024000e+03, 
+[default0]:    "min_train_micro_batch_size_per_gpu": 1, 
+[default0]:    "num_tuning_micro_batch_sizes": 3
+[default0]:}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   bfloat16_enabled ............. True
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   checkpoint_parallel_write_pipeline  False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   checkpoint_tag_validation_enabled  True
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   checkpoint_tag_validation_fail  False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   comms_config ................. <deepspeed.comm.config.DeepSpeedCommsConfig object at 0x15420fe5eaa0>
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   communication_data_type ...... None
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   compression_config ........... {'weight_quantization': {'shared_parameters': {'enabled': False, 'quantizer_kernel': False, 'schedule_offset': 0, 'quantize_groups': 1, 'quantize_verbose': False, 'quantization_type': 'symmetric', 'quantize_weight_in_forward': False, 'rounding': 'nearest', 'fp16_mixed_quantize': False, 'quantize_change_ratio': 0.001}, 'different_groups': {}}, 'activation_quantization': {'shared_parameters': {'enabled': False, 'quantization_type': 'symmetric', 'range_calibration': 'dynamic', 'schedule_offset': 1000}, 'different_groups': {}}, 'sparse_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'row_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'head_pruning': {'shared_parameters': {'enabled': False, 'method': 'topk', 'schedule_offset': 1000}, 'different_groups': {}}, 'channel_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'layer_reduction': {'enabled': False}}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   curriculum_enabled_legacy .... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   curriculum_params_legacy ..... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   data_efficiency_config ....... {'enabled': False, 'seed': 1234, 'data_sampling': {'enabled': False, 'num_epochs': 1000, 'num_workers': 0, 'curriculum_learning': {'enabled': False}}, 'data_routing': {'enabled': False, 'random_ltd': {'enabled': False, 'layer_token_lr_schedule': {'enabled': False}}}}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   data_efficiency_enabled ...... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   dataloader_drop_last ......... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   disable_allgather ............ False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   dump_state ................... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   dynamic_loss_scale_args ...... None
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_enabled ........... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_gas_boundary_resolution  1
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_layer_name ........ bert.encoder.layer
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_layer_num ......... 0
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_max_iter .......... 100
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_stability ......... 1e-06
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_tol ............... 0.01
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   eigenvalue_verbose ........... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   elasticity_enabled ........... False
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   flops_profiler_config ........ {
+[default0]:    "enabled": false, 
+[default0]:    "recompute_fwd_factor": 0.0, 
+[default0]:    "profile_step": 1, 
+[default0]:    "module_depth": -1, 
+[default0]:    "top_modules": 1, 
+[default0]:    "detailed": true, 
+[default0]:    "output_file": null
+[default0]:}
+[default0]:[2024-04-03 17:14:29,005] [INFO] [config.py:988:print]   fp16_auto_cast ............... None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   fp16_enabled ................. False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   fp16_master_weights_and_gradients  False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   global_rank .................. 0
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   grad_accum_dtype ............. None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   gradient_accumulation_steps .. 8
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   gradient_clipping ............ 0.0
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   gradient_predivide_factor .... 1.0
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   graph_harvesting ............. False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   hybrid_engine ................ enabled=False max_out_tokens=512 inference_tp_size=1 release_inference_cache=False pin_parameters=True tp_gather_partition_size=8
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   initial_dynamic_scale ........ 1
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   load_universal_checkpoint .... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   loss_scale ................... 1.0
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   memory_breakdown ............. False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   mics_hierarchial_params_gather  False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   mics_shard_size .............. -1
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   monitor_config ............... tensorboard=TensorBoardConfig(enabled=False, output_path='', job_name='DeepSpeedJobName') wandb=WandbConfig(enabled=False, group=None, team=None, project='deepspeed') csv_monitor=CSVConfig(enabled=False, output_path='', job_name='DeepSpeedJobName') enabled=False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   nebula_config ................ {
+[default0]:    "enabled": false, 
+[default0]:    "persistent_storage_path": null, 
+[default0]:    "persistent_time_interval": 100, 
+[default0]:    "num_of_version_in_retention": 2, 
+[default0]:    "enable_nebula_load": true, 
+[default0]:    "load_path": null
+[default0]:}
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   optimizer_legacy_fusion ...... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   optimizer_name ............... None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   optimizer_params ............. None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   pipeline ..................... {'stages': 'auto', 'partition': 'best', 'seed_layers': False, 'activation_checkpoint_interval': 0, 'pipe_partitioned': True, 'grad_partitioned': True}
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   pld_enabled .................. False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   pld_params ................... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   prescale_gradients ........... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   scheduler_name ............... None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   scheduler_params ............. None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   seq_parallel_communication_data_type  torch.float32
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   sparse_attention ............. None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   sparse_gradients_enabled ..... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   steps_per_print .............. 1
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   train_batch_size ............. 192
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   train_micro_batch_size_per_gpu  3
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   use_data_before_expert_parallel_  False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   use_node_local_storage ....... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   wall_clock_breakdown ......... False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   weight_quantization_config ... None
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   world_size ................... 8
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   zero_allow_untested_optimizer  False
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   zero_config .................. stage=1 contiguous_gradients=True reduce_scatter=True reduce_bucket_size=500,000,000 use_multi_rank_bucket_allreduce=True allgather_partitions=True allgather_bucket_size=500,000,000 overlap_comm=False load_from_fp32_weights=True elastic_checkpoint=False offload_param=None offload_optimizer=None sub_group_size=1,000,000,000 cpu_offload_param=None cpu_offload_use_pin_memory=None cpu_offload=None prefetch_bucket_size=50,000,000 param_persistence_threshold=100,000 model_persistence_threshold=sys.maxsize max_live_parameters=1,000,000,000 max_reuse_distance=1,000,000,000 gather_16bit_weights_on_model_save=False stage3_gather_fp16_weights_on_model_save=False ignore_unused_parameters=True legacy_stage1=False round_robin_gradients=False zero_hpz_partition_size=1 zero_quantized_weights=False zero_quantized_nontrainable_weights=False zero_quantized_gradients=False mics_shard_size=-1 mics_hierarchical_params_gather=False memory_efficient_linear=True pipeline_loading_checkpoint=False override_module_apply=True
+[default1]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default1]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default0]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default0]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default4]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default4]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default6]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default6]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default2]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default2]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default5]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default5]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default3]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default3]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default7]:/linkhome/rech/genlor01/urc37ho/.conda/envs/lucie-torch211/lib/python3.10/site-packages/torch/autograd/__init__.py:266: UserWarning: c10d::broadcast_: an autograd kernel was not registered to the Autograd key(s) but we are trying to backprop through it. This may lead to silently incorrect behavior. This behavior is deprecated and will be removed in a future version of PyTorch. If your operator is differentiable, please ensure you have registered an autograd kernel to the correct Autograd key (e.g. DispatchKey::Autograd, DispatchKey::CompositeImplicitAutograd). If your operator is not differentiable, or to squash this warning and use the previous behavior, please register torch::CppFunction::makeFallthrough() to DispatchKey::Autograd. (Triggered internally at /opt/conda/conda-bld/pytorch_1708025847130/work/torch/csrc/autograd/autograd_not_implemented_fallback.cpp:63.)
+[default7]:  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   zero_enabled ................. True
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   zero_force_ds_cpu_optimizer .. True
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:988:print]   zero_optimization_stage ...... 1
+[default0]:[2024-04-03 17:14:29,006] [INFO] [config.py:974:print_user_config]   json = {
+[default0]:    "train_batch_size": 192, 
+[default0]:    "train_micro_batch_size_per_gpu": 3, 
+[default0]:    "steps_per_print": 1, 
+[default0]:    "zero_optimization": {
+[default0]:        "stage": 1
+[default0]:    }, 
+[default0]:    "bf16": {
+[default0]:        "enabled": true
+[default0]:    }
+[default0]:}
+[default0]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default0]:WARNING: could not find the metadata file /gpfswork/rech/qgz/urc37ho/checkpoints/ 
+[default0]:    will not load any checkpoints and will start from random
+[default5]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default4]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default1]:[2024-04-03 17:14:29,008] [WARNING] [engine.py:2714:load_checkpoint] Unable to find latest file at /gpfswork/rech/qgz/urc37ho/checkpoints/latest, if trying to load latest checkpoint please ensure this file exists or pass an explicit checkpoint tag when loading a checkpoint.
+[default7]:(min, max) time across ranks (ms):
+[default7]:    load-checkpoint ................................: (1.46, 1.66)
+[default0]:[after model, optimizer, and learning rate scheduler are built] datetime: 2024-04-03 17:14:29 
+[default0]:> building train, validation, and test datasets ...
+[default0]: > datasets target sizes (minimum size):
+[default0]:    train:      48000000
+[default0]:    validation: 48009600
+[default0]:    test:       9600
+[default0]:> building train, validation, and test datasets for GPT ...
+[default0]:Single data path provided for train, valid & test
+[default0]: > building dataset index ...
+[default0]:    reading sizes...
+[default0]:    reading pointers...
+[default0]:    reading document index...
+[default0]:    creating numpy buffer of mmap...
+[default0]:    creating memory view of numpy buffer...
+[default0]: > finished creating indexed dataset in 0.013854 seconds
+[default0]:    number of documents: 32615
+[default0]: > dataset split:
+[default0]:    train:
+[default0]:     document indices in [0, 31604) total of 31604 documents
+[default0]:    validation:
+[default0]:     document indices in [31604, 32582) total of 978 documents
+[default0]:    test:
+[default0]:     document indices in [32582, 32615) total of 33 documents
+[default0]: > loading doc-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/fe6c814c145b154028765c11a92796ba_doc_idx.npy
+[default0]: > loading sample-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/fe6c814c145b154028765c11a92796ba_sample_idx.npy
+[default0]: > loading shuffle-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/fe6c814c145b154028765c11a92796ba_shuffle_idx.npy
+[default0]:    loaded indexed file in 0.146 seconds
+[default0]:    total number of samples: 48000143
+[default0]:    total number of epochs: 5351
+[default0]: > loading doc-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/1b5fd6810d33e58956c7fde863bc028e_doc_idx.npy
+[default0]: > loading sample-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/1b5fd6810d33e58956c7fde863bc028e_sample_idx.npy
+[default0]: > loading shuffle-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/1b5fd6810d33e58956c7fde863bc028e_shuffle_idx.npy
+[default0]:    loaded indexed file in 0.081 seconds
+[default0]:    total number of samples: 48009625
+[default0]:    total number of epochs: 182767
+[default0]: > loading doc-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/45b127c277a3142470d94a5392ecbf56_doc_idx.npy
+[default0]: > loading sample-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/45b127c277a3142470d94a5392ecbf56_sample_idx.npy
+[default0]: > loading shuffle-idx mapping from /linkhome/rech/genlor01/urc37ho/.cache/45b127c277a3142470d94a5392ecbf56_shuffle_idx.npy
+[default0]:    loaded indexed file in 0.049 seconds
+[default0]:    total number of samples: 9606
+[default0]:    total number of epochs: 1339
+[default0]:> finished creating GPT datasets ...
+[default7]:(min, max) time across ranks (ms):
+[default7]:    model-and-optimizer-setup ......................: (57621.74, 57746.85)
+[default7]:    train/valid/test-data-iterators-setup ..........: (1363.85, 2282.69)
+[default0]:[after dataloaders are built] datetime: 2024-04-03 17:14:31 
+[default0]:done with setup ...
+[default0]:training ...
+[default0]:[before the start of training step] datetime: 2024-04-03 17:14:31 
+[default0]:[2024-04-03 17:14:43,931] [INFO] [logging.py:96:log_dist] [Rank 0] step=1, skipped=0, lr=[1.5e-07, 1.5e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[Rank 0] (after 1 iterations) memory (MB) | allocated: 22511.1416015625 | max allocated: 69340.6162109375 | reserved: 32504.0 | max reserved: 75128.0
+[default7]: iteration        1/  250000 | consumed samples:          192 | consumed tokens:       393216 | elapsed time per iteration (ms): 12485.5 | learning rate: 1.500E-07 | global batch size:   192 | lm loss: 1.119620E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 15.378 | TFLOPs: 167.18 |
+[default7]: iteration        2/  250000 | consumed samples:          384 | consumed tokens:       786432 | elapsed time per iteration (ms): 11622.0 | learning rate: 3.000E-07 | global batch size:   192 | lm loss: 1.118532E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.520 | TFLOPs: 179.60 |
+[default0]:[2024-04-03 17:14:55,554] [INFO] [logging.py:96:log_dist] [Rank 0] step=2, skipped=0, lr=[3e-07, 3e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default7]: iteration        3/  250000 | consumed samples:          576 | consumed tokens:      1179648 | elapsed time per iteration (ms): 11439.5 | learning rate: 4.500E-07 | global batch size:   192 | lm loss: 1.119067E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.784 | TFLOPs: 182.46 |
+[default0]:[2024-04-03 17:15:06,993] [INFO] [logging.py:96:log_dist] [Rank 0] step=3, skipped=0, lr=[4.4999999999999993e-07, 4.4999999999999993e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:15:06,993] [INFO] [timer.py:260:stop] epoch=0/micro_step=3/global_step=3, RunningAvgSamplesPerSec=113.69038032823268, CurrSamplesPerSec=113.69038032823268, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        4/  250000 | consumed samples:          768 | consumed tokens:      1572864 | elapsed time per iteration (ms): 11465.5 | learning rate: 6.000E-07 | global batch size:   192 | lm loss: 1.118635E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.746 | TFLOPs: 182.05 |
+[default0]:[2024-04-03 17:15:18,458] [INFO] [logging.py:96:log_dist] [Rank 0] step=4, skipped=0, lr=[6e-07, 6e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:15:18,459] [INFO] [timer.py:260:stop] epoch=0/micro_step=4/global_step=4, RunningAvgSamplesPerSec=113.6834148742695, CurrSamplesPerSec=113.67645027375721, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        5/  250000 | consumed samples:          960 | consumed tokens:      1966080 | elapsed time per iteration (ms): 11462.7 | learning rate: 7.500E-07 | global batch size:   192 | lm loss: 1.117697E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.750 | TFLOPs: 182.09 |
+[default0]:[2024-04-03 17:15:29,921] [INFO] [logging.py:96:log_dist] [Rank 0] step=5, skipped=0, lr=[7.499999999999999e-07, 7.499999999999999e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:15:29,922] [INFO] [timer.py:260:stop] epoch=0/micro_step=5/global_step=5, RunningAvgSamplesPerSec=113.6447191891253, CurrSamplesPerSec=113.56740679275234, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        6/  250000 | consumed samples:         1152 | consumed tokens:      2359296 | elapsed time per iteration (ms): 11460.7 | learning rate: 9.000E-07 | global batch size:   192 | lm loss: 1.113059E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.753 | TFLOPs: 182.13 |
+[default0]:[2024-04-03 17:15:41,382] [INFO] [logging.py:96:log_dist] [Rank 0] step=6, skipped=0, lr=[8.999999999999999e-07, 8.999999999999999e-07], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:15:41,383] [INFO] [timer.py:260:stop] epoch=0/micro_step=6/global_step=6, RunningAvgSamplesPerSec=113.66412389954912, CurrSamplesPerSec=113.72237781119269, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        7/  250000 | consumed samples:         1344 | consumed tokens:      2752512 | elapsed time per iteration (ms): 11448.3 | learning rate: 1.050E-06 | global batch size:   192 | lm loss: 1.098545E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.771 | TFLOPs: 182.32 |
+[default0]:[2024-04-03 17:15:52,831] [INFO] [logging.py:96:log_dist] [Rank 0] step=7, skipped=0, lr=[1.05e-06, 1.05e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:15:52,831] [INFO] [timer.py:260:stop] epoch=0/micro_step=7/global_step=7, RunningAvgSamplesPerSec=113.69956511848606, CurrSamplesPerSec=113.84155128632302, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        8/  250000 | consumed samples:         1536 | consumed tokens:      3145728 | elapsed time per iteration (ms): 11446.0 | learning rate: 1.200E-06 | global batch size:   192 | lm loss: 1.093811E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.774 | TFLOPs: 182.36 |
+[default0]:[2024-04-03 17:16:04,277] [INFO] [logging.py:96:log_dist] [Rank 0] step=8, skipped=0, lr=[1.2e-06, 1.2e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:16:04,277] [INFO] [timer.py:260:stop] epoch=0/micro_step=8/global_step=8, RunningAvgSamplesPerSec=113.73994688929307, CurrSamplesPerSec=113.94228677092829, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration        9/  250000 | consumed samples:         1728 | consumed tokens:      3538944 | elapsed time per iteration (ms): 11447.0 | learning rate: 1.350E-06 | global batch size:   192 | lm loss: 1.054648E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.773 | TFLOPs: 182.34 |
+[default0]:[2024-04-03 17:16:15,724] [INFO] [logging.py:96:log_dist] [Rank 0] step=9, skipped=0, lr=[1.35e-06, 1.35e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:16:15,724] [INFO] [timer.py:260:stop] epoch=0/micro_step=9/global_step=9, RunningAvgSamplesPerSec=113.73705345581084, CurrSamplesPerSec=113.71969594590301, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       10/  250000 | consumed samples:         1920 | consumed tokens:      3932160 | elapsed time per iteration (ms): 11454.3 | learning rate: 1.500E-06 | global batch size:   192 | lm loss: 1.051574E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.762 | TFLOPs: 182.23 |
+[default0]:[2024-04-03 17:16:27,178] [INFO] [logging.py:96:log_dist] [Rank 0] step=10, skipped=0, lr=[1.4999999999999998e-06, 1.4999999999999998e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:16:27,179] [INFO] [timer.py:260:stop] epoch=0/micro_step=10/global_step=10, RunningAvgSamplesPerSec=113.6991385113483, CurrSamplesPerSec=113.43444004636507, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       11/  250000 | consumed samples:         2112 | consumed tokens:      4325376 | elapsed time per iteration (ms): 11477.7 | learning rate: 1.650E-06 | global batch size:   192 | lm loss: 1.036879E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.728 | TFLOPs: 181.85 |
+[default0]:[2024-04-03 17:16:38,656] [INFO] [logging.py:96:log_dist] [Rank 0] step=11, skipped=0, lr=[1.6499999999999999e-06, 1.6499999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:16:38,656] [INFO] [timer.py:260:stop] epoch=0/micro_step=11/global_step=11, RunningAvgSamplesPerSec=113.70411757763402, CurrSamplesPerSec=113.74396581239075, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       12/  250000 | consumed samples:         2304 | consumed tokens:      4718592 | elapsed time per iteration (ms): 11462.5 | learning rate: 1.800E-06 | global batch size:   192 | lm loss: 1.006959E+01 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.750 | TFLOPs: 182.10 |
+[default0]:[2024-04-03 17:16:50,119] [INFO] [logging.py:96:log_dist] [Rank 0] step=12, skipped=0, lr=[1.7999999999999997e-06, 1.7999999999999997e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:16:50,119] [INFO] [timer.py:260:stop] epoch=0/micro_step=12/global_step=12, RunningAvgSamplesPerSec=113.68408891315737, CurrSamplesPerSec=113.50414794971805, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:17:01,584] [INFO] [logging.py:96:log_dist] [Rank 0] step=13, skipped=0, lr=[1.95e-06, 1.95e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:01,584] [INFO] [timer.py:260:stop] epoch=0/micro_step=13/global_step=13, RunningAvgSamplesPerSec=113.68455870256352, CurrSamplesPerSec=113.68925681018392, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       13/  250000 | consumed samples:         2496 | consumed tokens:      5111808 | elapsed time per iteration (ms): 11465.1 | learning rate: 1.950E-06 | global batch size:   192 | lm loss: 9.741949E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.746 | TFLOPs: 182.05 |
+[default7]: iteration       14/  250000 | consumed samples:         2688 | consumed tokens:      5505024 | elapsed time per iteration (ms): 11470.1 | learning rate: 2.100E-06 | global batch size:   192 | lm loss: 9.500005E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.739 | TFLOPs: 181.97 |
+[default0]:[2024-04-03 17:17:13,054] [INFO] [logging.py:96:log_dist] [Rank 0] step=14, skipped=0, lr=[2.1e-06, 2.1e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:13,055] [INFO] [timer.py:260:stop] epoch=0/micro_step=14/global_step=14, RunningAvgSamplesPerSec=113.66981009189755, CurrSamplesPerSec=113.50782758053488, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:17:24,524] [INFO] [logging.py:96:log_dist] [Rank 0] step=15, skipped=0, lr=[2.2499999999999996e-06, 2.2499999999999996e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:24,524] [INFO] [timer.py:260:stop] epoch=0/micro_step=15/global_step=15, RunningAvgSamplesPerSec=113.65949907487162, CurrSamplesPerSec=113.53591262103893, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       15/  250000 | consumed samples:         2880 | consumed tokens:      5898240 | elapsed time per iteration (ms): 11469.4 | learning rate: 2.250E-06 | global batch size:   192 | lm loss: 9.285911E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.740 | TFLOPs: 181.99 |
+[default7]: iteration       16/  250000 | consumed samples:         3072 | consumed tokens:      6291456 | elapsed time per iteration (ms): 11493.6 | learning rate: 2.400E-06 | global batch size:   192 | lm loss: 8.974479E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.705 | TFLOPs: 181.60 |
+[default0]:[2024-04-03 17:17:36,017] [INFO] [logging.py:96:log_dist] [Rank 0] step=16, skipped=0, lr=[2.4e-06, 2.4e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:36,018] [INFO] [timer.py:260:stop] epoch=0/micro_step=16/global_step=16, RunningAvgSamplesPerSec=113.60167474036729, CurrSamplesPerSec=112.85527731936571, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       17/  250000 | consumed samples:         3264 | consumed tokens:      6684672 | elapsed time per iteration (ms): 11491.3 | learning rate: 2.550E-06 | global batch size:   192 | lm loss: 8.967542E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.708 | TFLOPs: 181.64 |
+[default0]:[2024-04-03 17:17:47,509] [INFO] [logging.py:96:log_dist] [Rank 0] step=17, skipped=0, lr=[2.5499999999999997e-06, 2.5499999999999997e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:47,509] [INFO] [timer.py:260:stop] epoch=0/micro_step=17/global_step=17, RunningAvgSamplesPerSec=113.58113178210662, CurrSamplesPerSec=113.29430851485884, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       18/  250000 | consumed samples:         3456 | consumed tokens:      7077888 | elapsed time per iteration (ms): 11503.0 | learning rate: 2.700E-06 | global batch size:   192 | lm loss: 8.894437E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.691 | TFLOPs: 181.46 |
+[default0]:[2024-04-03 17:17:59,012] [INFO] [logging.py:96:log_dist] [Rank 0] step=18, skipped=0, lr=[2.7e-06, 2.7e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:17:59,012] [INFO] [timer.py:260:stop] epoch=0/micro_step=18/global_step=18, RunningAvgSamplesPerSec=113.56212685776737, CurrSamplesPerSec=113.27781428015001, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       19/  250000 | consumed samples:         3648 | consumed tokens:      7471104 | elapsed time per iteration (ms): 11508.0 | learning rate: 2.850E-06 | global batch size:   192 | lm loss: 8.505121E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.684 | TFLOPs: 181.38 |
+[default0]:[2024-04-03 17:18:10,520] [INFO] [logging.py:96:log_dist] [Rank 0] step=19, skipped=0, lr=[2.8499999999999994e-06, 2.8499999999999994e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:18:10,520] [INFO] [timer.py:260:stop] epoch=0/micro_step=19/global_step=19, RunningAvgSamplesPerSec=113.5441416704783, CurrSamplesPerSec=113.257151472261, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       20/  250000 | consumed samples:         3840 | consumed tokens:      7864320 | elapsed time per iteration (ms): 11501.0 | learning rate: 3.000E-06 | global batch size:   192 | lm loss: 8.328600E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.694 | TFLOPs: 181.49 |
+[default0]:[2024-04-03 17:18:22,021] [INFO] [logging.py:96:log_dist] [Rank 0] step=20, skipped=0, lr=[2.9999999999999997e-06, 2.9999999999999997e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:18:22,021] [INFO] [timer.py:260:stop] epoch=0/micro_step=20/global_step=20, RunningAvgSamplesPerSec=113.53404607730222, CurrSamplesPerSec=113.3626952545425, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       21/  250000 | consumed samples:         4032 | consumed tokens:      8257536 | elapsed time per iteration (ms): 11498.0 | learning rate: 3.150E-06 | global batch size:   192 | lm loss: 8.580935E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.699 | TFLOPs: 181.53 |
+[default0]:[2024-04-03 17:18:33,519] [INFO] [logging.py:96:log_dist] [Rank 0] step=21, skipped=0, lr=[3.1499999999999995e-06, 3.1499999999999995e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:18:33,520] [INFO] [timer.py:260:stop] epoch=0/micro_step=21/global_step=21, RunningAvgSamplesPerSec=113.51551600023292, CurrSamplesPerSec=113.18300590211048, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:18:45,013] [INFO] [logging.py:96:log_dist] [Rank 0] step=22, skipped=0, lr=[3.2999999999999997e-06, 3.2999999999999997e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:18:45,014] [INFO] [timer.py:260:stop] epoch=0/micro_step=22/global_step=22, RunningAvgSamplesPerSec=113.50754360053075, CurrSamplesPerSec=113.35628049074028, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       22/  250000 | consumed samples:         4224 | consumed tokens:      8650752 | elapsed time per iteration (ms): 11494.0 | learning rate: 3.300E-06 | global batch size:   192 | lm loss: 8.204462E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.704 | TFLOPs: 181.60 |
+[default7]: iteration       23/  250000 | consumed samples:         4416 | consumed tokens:      9043968 | elapsed time per iteration (ms): 11496.6 | learning rate: 3.450E-06 | global batch size:   192 | lm loss: 8.266271E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.701 | TFLOPs: 181.56 |
+[default0]:[2024-04-03 17:18:56,510] [INFO] [logging.py:96:log_dist] [Rank 0] step=23, skipped=0, lr=[3.45e-06, 3.45e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:18:56,510] [INFO] [timer.py:260:stop] epoch=0/micro_step=23/global_step=23, RunningAvgSamplesPerSec=113.49589897775105, CurrSamplesPerSec=113.26350723098723, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       24/  250000 | consumed samples:         4608 | consumed tokens:      9437184 | elapsed time per iteration (ms): 11505.5 | learning rate: 3.600E-06 | global batch size:   192 | lm loss: 8.027024E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.688 | TFLOPs: 181.42 |
+[default0]:[2024-04-03 17:19:08,016] [INFO] [logging.py:96:log_dist] [Rank 0] step=24, skipped=0, lr=[3.5999999999999994e-06, 3.5999999999999994e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:19:08,016] [INFO] [timer.py:260:stop] epoch=0/micro_step=24/global_step=24, RunningAvgSamplesPerSec=113.4607448626255, CurrSamplesPerSec=112.72750646991699, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       25/  250000 | consumed samples:         4800 | consumed tokens:      9830400 | elapsed time per iteration (ms): 11521.3 | learning rate: 3.750E-06 | global batch size:   192 | lm loss: 7.932610E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.665 | TFLOPs: 181.17 |
+[default0]:[2024-04-03 17:19:19,537] [INFO] [logging.py:96:log_dist] [Rank 0] step=25, skipped=0, lr=[3.7499999999999997e-06, 3.7499999999999997e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:19:19,537] [INFO] [timer.py:260:stop] epoch=0/micro_step=25/global_step=25, RunningAvgSamplesPerSec=113.4488764794921, CurrSamplesPerSec=113.18839879388476, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       26/  250000 | consumed samples:         4992 | consumed tokens:     10223616 | elapsed time per iteration (ms): 11506.5 | learning rate: 3.900E-06 | global batch size:   192 | lm loss: 7.929684E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.686 | TFLOPs: 181.40 |
+[default0]:[2024-04-03 17:19:31,044] [INFO] [logging.py:96:log_dist] [Rank 0] step=26, skipped=0, lr=[3.9e-06, 3.9e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:19:31,044] [INFO] [timer.py:260:stop] epoch=0/micro_step=26/global_step=26, RunningAvgSamplesPerSec=113.43834486128661, CurrSamplesPerSec=113.19665616376432, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       27/  250000 | consumed samples:         5184 | consumed tokens:     10616832 | elapsed time per iteration (ms): 11509.1 | learning rate: 4.050E-06 | global batch size:   192 | lm loss: 7.692832E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.682 | TFLOPs: 181.36 |
+[default0]:[2024-04-03 17:19:42,553] [INFO] [logging.py:96:log_dist] [Rank 0] step=27, skipped=0, lr=[4.05e-06, 4.05e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:19:42,553] [INFO] [timer.py:260:stop] epoch=0/micro_step=27/global_step=27, RunningAvgSamplesPerSec=113.42947870269006, CurrSamplesPerSec=113.2171058967327, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       28/  250000 | consumed samples:         5376 | consumed tokens:     11010048 | elapsed time per iteration (ms): 11513.0 | learning rate: 4.200E-06 | global batch size:   192 | lm loss: 7.689698E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.677 | TFLOPs: 181.30 |
+[default0]:[2024-04-03 17:19:54,066] [INFO] [logging.py:96:log_dist] [Rank 0] step=28, skipped=0, lr=[4.2e-06, 4.2e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:19:54,066] [INFO] [timer.py:260:stop] epoch=0/micro_step=28/global_step=28, RunningAvgSamplesPerSec=113.40541625548695, CurrSamplesPerSec=112.80715550034543, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       29/  250000 | consumed samples:         5568 | consumed tokens:     11403264 | elapsed time per iteration (ms): 11550.2 | learning rate: 4.350E-06 | global batch size:   192 | lm loss: 7.756333E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.623 | TFLOPs: 180.71 |
+[default0]:[2024-04-03 17:20:05,616] [INFO] [logging.py:96:log_dist] [Rank 0] step=29, skipped=0, lr=[4.35e-06, 4.35e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:20:05,617] [INFO] [timer.py:260:stop] epoch=0/micro_step=29/global_step=29, RunningAvgSamplesPerSec=113.37351228260434, CurrSamplesPerSec=112.55026399417925, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       30/  250000 | consumed samples:         5760 | consumed tokens:     11796480 | elapsed time per iteration (ms): 11508.6 | learning rate: 4.500E-06 | global batch size:   192 | lm loss: 7.822730E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.683 | TFLOPs: 181.37 |
+[default0]:[2024-04-03 17:20:17,125] [INFO] [logging.py:96:log_dist] [Rank 0] step=30, skipped=0, lr=[4.499999999999999e-06, 4.499999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:20:17,125] [INFO] [timer.py:260:stop] epoch=0/micro_step=30/global_step=30, RunningAvgSamplesPerSec=113.37364978867704, CurrSamplesPerSec=113.37736257872682, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:20:28,631] [INFO] [logging.py:96:log_dist] [Rank 0] step=31, skipped=0, lr=[4.6499999999999995e-06, 4.6499999999999995e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:20:28,632] [INFO] [timer.py:260:stop] epoch=0/micro_step=31/global_step=31, RunningAvgSamplesPerSec=113.36839971077663, CurrSamplesPerSec=113.22159468676755, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       31/  250000 | consumed samples:         5952 | consumed tokens:     12189696 | elapsed time per iteration (ms): 11506.2 | learning rate: 4.650E-06 | global batch size:   192 | lm loss: 7.704297E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.687 | TFLOPs: 181.40 |
+[default0]:[2024-04-03 17:20:40,137] [INFO] [logging.py:96:log_dist] [Rank 0] step=32, skipped=0, lr=[4.8e-06, 4.8e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:20:40,138] [INFO] [timer.py:260:stop] epoch=0/micro_step=32/global_step=32, RunningAvgSamplesPerSec=113.36213885406917, CurrSamplesPerSec=113.18087434028708, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       32/  250000 | consumed samples:         6144 | consumed tokens:     12582912 | elapsed time per iteration (ms): 11506.0 | learning rate: 4.800E-06 | global batch size:   192 | lm loss: 7.589311E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.687 | TFLOPs: 181.41 |
+[default7]: iteration       33/  250000 | consumed samples:         6336 | consumed tokens:     12976128 | elapsed time per iteration (ms): 11630.0 | learning rate: 4.950E-06 | global batch size:   192 | lm loss: 7.494230E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.509 | TFLOPs: 179.47 |
+[default0]:[2024-04-03 17:20:51,767] [INFO] [logging.py:96:log_dist] [Rank 0] step=33, skipped=0, lr=[4.949999999999999e-06, 4.949999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:20:51,768] [INFO] [timer.py:260:stop] epoch=0/micro_step=33/global_step=33, RunningAvgSamplesPerSec=113.35644262676553, CurrSamplesPerSec=113.18582159565025, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:21:03,266] [INFO] [logging.py:96:log_dist] [Rank 0] step=34, skipped=0, lr=[5.0999999999999995e-06, 5.0999999999999995e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:21:03,267] [INFO] [timer.py:260:stop] epoch=0/micro_step=34/global_step=34, RunningAvgSamplesPerSec=113.34934693960459, CurrSamplesPerSec=113.12982039430902, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       34/  250000 | consumed samples:         6528 | consumed tokens:     13369344 | elapsed time per iteration (ms): 11498.9 | learning rate: 5.100E-06 | global batch size:   192 | lm loss: 7.441679E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.697 | TFLOPs: 181.52 |
+[default7]: iteration       35/  250000 | consumed samples:         6720 | consumed tokens:     13762560 | elapsed time per iteration (ms): 11523.7 | learning rate: 5.250E-06 | global batch size:   192 | lm loss: 7.402544E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.661 | TFLOPs: 181.13 |
+[default0]:[2024-04-03 17:21:14,790] [INFO] [logging.py:96:log_dist] [Rank 0] step=35, skipped=0, lr=[5.25e-06, 5.25e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:21:14,791] [INFO] [timer.py:260:stop] epoch=0/micro_step=35/global_step=35, RunningAvgSamplesPerSec=113.32707217820565, CurrSamplesPerSec=112.6188733642738, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       36/  250000 | consumed samples:         6912 | consumed tokens:     14155776 | elapsed time per iteration (ms): 11537.0 | learning rate: 5.400E-06 | global batch size:   192 | lm loss: 7.390253E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.642 | TFLOPs: 180.92 |
+[default0]:[2024-04-03 17:21:26,327] [INFO] [logging.py:96:log_dist] [Rank 0] step=36, skipped=0, lr=[5.4e-06, 5.4e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:21:26,328] [INFO] [timer.py:260:stop] epoch=0/micro_step=36/global_step=36, RunningAvgSamplesPerSec=113.31146217559946, CurrSamplesPerSec=112.79873366108626, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       37/  250000 | consumed samples:         7104 | consumed tokens:     14548992 | elapsed time per iteration (ms): 11527.9 | learning rate: 5.550E-06 | global batch size:   192 | lm loss: 7.166709E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.655 | TFLOPs: 181.06 |
+[default0]:[2024-04-03 17:21:37,855] [INFO] [logging.py:96:log_dist] [Rank 0] step=37, skipped=0, lr=[5.549999999999999e-06, 5.549999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:21:37,856] [INFO] [timer.py:260:stop] epoch=0/micro_step=37/global_step=37, RunningAvgSamplesPerSec=113.29789348742064, CurrSamplesPerSec=112.83848376991051, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       38/  250000 | consumed samples:         7296 | consumed tokens:     14942208 | elapsed time per iteration (ms): 11511.8 | learning rate: 5.700E-06 | global batch size:   192 | lm loss: 7.402219E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.679 | TFLOPs: 181.32 |
+[default0]:[2024-04-03 17:21:49,367] [INFO] [logging.py:96:log_dist] [Rank 0] step=38, skipped=0, lr=[5.699999999999999e-06, 5.699999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:21:49,368] [INFO] [timer.py:260:stop] epoch=0/micro_step=38/global_step=38, RunningAvgSamplesPerSec=113.29673568872494, CurrSamplesPerSec=113.25622763688875, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       39/  250000 | consumed samples:         7488 | consumed tokens:     15335424 | elapsed time per iteration (ms): 11540.2 | learning rate: 5.850E-06 | global batch size:   192 | lm loss: 7.323990E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.637 | TFLOPs: 180.87 |
+[default0]:[2024-04-03 17:22:00,908] [INFO] [logging.py:96:log_dist] [Rank 0] step=39, skipped=0, lr=[5.85e-06, 5.85e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:00,908] [INFO] [timer.py:260:stop] epoch=0/micro_step=39/global_step=39, RunningAvgSamplesPerSec=113.28199305445798, CurrSamplesPerSec=112.75380157784068, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:22:12,445] [INFO] [logging.py:96:log_dist] [Rank 0] step=40, skipped=0, lr=[5.999999999999999e-06, 5.999999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:12,445] [INFO] [timer.py:260:stop] epoch=0/micro_step=40/global_step=40, RunningAvgSamplesPerSec=113.26336134486999, CurrSamplesPerSec=112.578270566516, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       40/  250000 | consumed samples:         7680 | consumed tokens:     15728640 | elapsed time per iteration (ms): 11537.1 | learning rate: 6.000E-06 | global batch size:   192 | lm loss: 7.295577E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.642 | TFLOPs: 180.92 |
+[default7]: iteration       41/  250000 | consumed samples:         7872 | consumed tokens:     16121856 | elapsed time per iteration (ms): 11540.7 | learning rate: 6.150E-06 | global batch size:   192 | lm loss: 7.149356E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.637 | TFLOPs: 180.86 |
+[default0]:[2024-04-03 17:22:23,985] [INFO] [logging.py:96:log_dist] [Rank 0] step=41, skipped=0, lr=[6.1499999999999996e-06, 6.1499999999999996e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:23,986] [INFO] [timer.py:260:stop] epoch=0/micro_step=41/global_step=41, RunningAvgSamplesPerSec=113.24518321275912, CurrSamplesPerSec=112.55871170004522, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       42/  250000 | consumed samples:         8064 | consumed tokens:     16515072 | elapsed time per iteration (ms): 11548.0 | learning rate: 6.300E-06 | global batch size:   192 | lm loss: 7.077083E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.626 | TFLOPs: 180.75 |
+[default0]:[2024-04-03 17:22:35,534] [INFO] [logging.py:96:log_dist] [Rank 0] step=42, skipped=0, lr=[6.299999999999999e-06, 6.299999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:35,534] [INFO] [timer.py:260:stop] epoch=0/micro_step=42/global_step=42, RunningAvgSamplesPerSec=113.225800066801, CurrSamplesPerSec=112.47499856840976, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       43/  250000 | consumed samples:         8256 | consumed tokens:     16908288 | elapsed time per iteration (ms): 11556.0 | learning rate: 6.450E-06 | global batch size:   192 | lm loss: 7.196450E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.615 | TFLOPs: 180.62 |
+[default0]:[2024-04-03 17:22:47,090] [INFO] [logging.py:96:log_dist] [Rank 0] step=43, skipped=0, lr=[6.45e-06, 6.45e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:47,090] [INFO] [timer.py:260:stop] epoch=0/micro_step=43/global_step=43, RunningAvgSamplesPerSec=113.2088245823191, CurrSamplesPerSec=112.53395422854203, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       44/  250000 | consumed samples:         8448 | consumed tokens:     17301504 | elapsed time per iteration (ms): 11545.3 | learning rate: 6.600E-06 | global batch size:   192 | lm loss: 7.069780E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.630 | TFLOPs: 180.79 |
+[default0]:[2024-04-03 17:22:58,635] [INFO] [logging.py:96:log_dist] [Rank 0] step=44, skipped=0, lr=[6.5999999999999995e-06, 6.5999999999999995e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:22:58,636] [INFO] [timer.py:260:stop] epoch=0/micro_step=44/global_step=44, RunningAvgSamplesPerSec=113.19663305447878, CurrSamplesPerSec=112.69903131099439, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       45/  250000 | consumed samples:         8640 | consumed tokens:     17694720 | elapsed time per iteration (ms): 11544.4 | learning rate: 6.750E-06 | global batch size:   192 | lm loss: 7.198438E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.631 | TFLOPs: 180.80 |
+[default0]:[2024-04-03 17:23:10,180] [INFO] [logging.py:96:log_dist] [Rank 0] step=45, skipped=0, lr=[6.749999999999999e-06, 6.749999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:23:10,180] [INFO] [timer.py:260:stop] epoch=0/micro_step=45/global_step=45, RunningAvgSamplesPerSec=113.18270588048374, CurrSamplesPerSec=112.60084330415495, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       46/  250000 | consumed samples:         8832 | consumed tokens:     18087936 | elapsed time per iteration (ms): 11550.2 | learning rate: 6.900E-06 | global batch size:   192 | lm loss: 7.155891E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.623 | TFLOPs: 180.71 |
+[default0]:[2024-04-03 17:23:21,730] [INFO] [logging.py:96:log_dist] [Rank 0] step=46, skipped=0, lr=[6.9e-06, 6.9e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:23:21,730] [INFO] [timer.py:260:stop] epoch=0/micro_step=46/global_step=46, RunningAvgSamplesPerSec=113.16814954547505, CurrSamplesPerSec=112.54574963219926, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       47/  250000 | consumed samples:         9024 | consumed tokens:     18481152 | elapsed time per iteration (ms): 11553.3 | learning rate: 7.050E-06 | global batch size:   192 | lm loss: 6.960784E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.619 | TFLOPs: 180.67 |
+[default0]:[2024-04-03 17:23:33,283] [INFO] [logging.py:96:log_dist] [Rank 0] step=47, skipped=0, lr=[7.049999999999999e-06, 7.049999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:23:33,284] [INFO] [timer.py:260:stop] epoch=0/micro_step=47/global_step=47, RunningAvgSamplesPerSec=113.15651519545854, CurrSamplesPerSec=112.64696136769926, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:23:44,848] [INFO] [logging.py:96:log_dist] [Rank 0] step=48, skipped=0, lr=[7.199999999999999e-06, 7.199999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:23:44,848] [INFO] [timer.py:260:stop] epoch=0/micro_step=48/global_step=48, RunningAvgSamplesPerSec=113.14105200072363, CurrSamplesPerSec=112.44955560923775, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       48/  250000 | consumed samples:         9216 | consumed tokens:     18874368 | elapsed time per iteration (ms): 11564.2 | learning rate: 7.200E-06 | global batch size:   192 | lm loss: 6.886057E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.603 | TFLOPs: 180.49 |
+[default7]: iteration       49/  250000 | consumed samples:         9408 | consumed tokens:     19267584 | elapsed time per iteration (ms): 11571.4 | learning rate: 7.350E-06 | global batch size:   192 | lm loss: 6.972733E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.593 | TFLOPs: 180.38 |
+[default0]:[2024-04-03 17:23:56,419] [INFO] [logging.py:96:log_dist] [Rank 0] step=49, skipped=0, lr=[7.349999999999999e-06, 7.349999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:23:56,420] [INFO] [timer.py:260:stop] epoch=0/micro_step=49/global_step=49, RunningAvgSamplesPerSec=113.11955035601036, CurrSamplesPerSec=112.13923257434439, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:24:07,978] [INFO] [logging.py:96:log_dist] [Rank 0] step=50, skipped=0, lr=[7.499999999999999e-06, 7.499999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:24:07,978] [INFO] [timer.py:260:stop] epoch=0/micro_step=50/global_step=50, RunningAvgSamplesPerSec=113.10700597064405, CurrSamplesPerSec=112.52054192750789, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       50/  250000 | consumed samples:         9600 | consumed tokens:     19660800 | elapsed time per iteration (ms): 11558.8 | learning rate: 7.500E-06 | global batch size:   192 | lm loss: 6.910542E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.611 | TFLOPs: 180.58 |
+[default7]:----------------------------------------------------------------------------------------------
+[default7]: validation loss at iteration 50 | lm loss value: 6.945576E+00 | lm loss PPL: 1.038545E+03 | 
+[default7]:----------------------------------------------------------------------------------------------
+[default7]: iteration       51/  250000 | consumed samples:         9792 | consumed tokens:     20054016 | elapsed time per iteration (ms): 204358.8 | learning rate: 7.650E-06 | global batch size:   192 | lm loss: 6.948018E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 0.940 | TFLOPs: 10.21 |
+[default0]:[2024-04-03 17:27:32,337] [INFO] [logging.py:96:log_dist] [Rank 0] step=51, skipped=0, lr=[7.65e-06, 7.65e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:27:32,337] [INFO] [timer.py:260:stop] epoch=0/micro_step=51/global_step=51, RunningAvgSamplesPerSec=113.09029683399568, CurrSamplesPerSec=112.29402311317065, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:27:43,909] [INFO] [logging.py:96:log_dist] [Rank 0] step=52, skipped=0, lr=[7.8e-06, 7.8e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:27:43,910] [INFO] [timer.py:260:stop] epoch=0/micro_step=52/global_step=52, RunningAvgSamplesPerSec=113.07747809826063, CurrSamplesPerSec=112.45290022994502, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       52/  250000 | consumed samples:         9984 | consumed tokens:     20447232 | elapsed time per iteration (ms): 11572.1 | learning rate: 7.800E-06 | global batch size:   192 | lm loss: 6.700741E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.592 | TFLOPs: 180.37 |
+[default7]: iteration       53/  250000 | consumed samples:        10176 | consumed tokens:     20840448 | elapsed time per iteration (ms): 11553.7 | learning rate: 7.950E-06 | global batch size:   192 | lm loss: 6.989514E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.618 | TFLOPs: 180.66 |
+[default0]:[2024-04-03 17:27:55,463] [INFO] [logging.py:96:log_dist] [Rank 0] step=53, skipped=0, lr=[7.949999999999998e-06, 7.949999999999998e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:27:55,463] [INFO] [timer.py:260:stop] epoch=0/micro_step=53/global_step=53, RunningAvgSamplesPerSec=113.07084810526521, CurrSamplesPerSec=112.74033682396757, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       54/  250000 | consumed samples:        10368 | consumed tokens:     21233664 | elapsed time per iteration (ms): 11555.5 | learning rate: 8.100E-06 | global batch size:   192 | lm loss: 6.884738E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.615 | TFLOPs: 180.63 |
+[default0]:[2024-04-03 17:28:07,019] [INFO] [logging.py:96:log_dist] [Rank 0] step=54, skipped=0, lr=[8.1e-06, 8.1e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:28:07,019] [INFO] [timer.py:260:stop] epoch=0/micro_step=54/global_step=54, RunningAvgSamplesPerSec=113.06427938681897, CurrSamplesPerSec=112.73028376506372, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:28:18,576] [INFO] [logging.py:96:log_dist] [Rank 0] step=55, skipped=0, lr=[8.249999999999999e-06, 8.249999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:28:18,577] [INFO] [timer.py:260:stop] epoch=0/micro_step=55/global_step=55, RunningAvgSamplesPerSec=113.05536194988844, CurrSamplesPerSec=112.59358566978672, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       55/  250000 | consumed samples:        10560 | consumed tokens:     21626880 | elapsed time per iteration (ms): 11557.6 | learning rate: 8.250E-06 | global batch size:   192 | lm loss: 6.766259E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.612 | TFLOPs: 180.60 |
+[default7]: iteration       56/  250000 | consumed samples:        10752 | consumed tokens:     22020096 | elapsed time per iteration (ms): 11643.2 | learning rate: 8.400E-06 | global batch size:   192 | lm loss: 6.855465E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.490 | TFLOPs: 179.27 |
+[default0]:[2024-04-03 17:28:30,220] [INFO] [logging.py:96:log_dist] [Rank 0] step=56, skipped=0, lr=[8.4e-06, 8.4e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:28:30,220] [INFO] [timer.py:260:stop] epoch=0/micro_step=56/global_step=56, RunningAvgSamplesPerSec=113.04798806798426, CurrSamplesPerSec=112.65854406805624, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:28:41,781] [INFO] [logging.py:96:log_dist] [Rank 0] step=57, skipped=0, lr=[8.55e-06, 8.55e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:28:41,781] [INFO] [timer.py:260:stop] epoch=0/micro_step=57/global_step=57, RunningAvgSamplesPerSec=113.03901753234403, CurrSamplesPerSec=112.55671371098494, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       57/  250000 | consumed samples:        10944 | consumed tokens:     22413312 | elapsed time per iteration (ms): 11561.1 | learning rate: 8.550E-06 | global batch size:   192 | lm loss: 6.926835E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.607 | TFLOPs: 180.54 |
+[default7]: iteration       58/  250000 | consumed samples:        11136 | consumed tokens:     22806528 | elapsed time per iteration (ms): 11557.1 | learning rate: 8.700E-06 | global batch size:   192 | lm loss: 6.725144E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.613 | TFLOPs: 180.61 |
+[default0]:[2024-04-03 17:28:53,338] [INFO] [logging.py:96:log_dist] [Rank 0] step=58, skipped=0, lr=[8.7e-06, 8.7e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:28:53,338] [INFO] [timer.py:260:stop] epoch=0/micro_step=58/global_step=58, RunningAvgSamplesPerSec=113.03068913035682, CurrSamplesPerSec=112.57450932342458, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       59/  250000 | consumed samples:        11328 | consumed tokens:     23199744 | elapsed time per iteration (ms): 11559.3 | learning rate: 8.850E-06 | global batch size:   192 | lm loss: 6.739264E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.610 | TFLOPs: 180.57 |
+[default0]:[2024-04-03 17:29:04,897] [INFO] [logging.py:96:log_dist] [Rank 0] step=59, skipped=0, lr=[8.849999999999998e-06, 8.849999999999998e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:29:04,898] [INFO] [timer.py:260:stop] epoch=0/micro_step=59/global_step=59, RunningAvgSamplesPerSec=113.02268667605527, CurrSamplesPerSec=112.57635057002074, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       60/  250000 | consumed samples:        11520 | consumed tokens:     23592960 | elapsed time per iteration (ms): 11561.3 | learning rate: 9.000E-06 | global batch size:   192 | lm loss: 6.763436E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.607 | TFLOPs: 180.54 |
+[default0]:[2024-04-03 17:29:16,459] [INFO] [logging.py:96:log_dist] [Rank 0] step=60, skipped=0, lr=[8.999999999999999e-06, 8.999999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:29:16,459] [INFO] [timer.py:260:stop] epoch=0/micro_step=60/global_step=60, RunningAvgSamplesPerSec=113.01571734628541, CurrSamplesPerSec=112.61988132842022, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       61/  250000 | consumed samples:        11712 | consumed tokens:     23986176 | elapsed time per iteration (ms): 11554.8 | learning rate: 9.150E-06 | global batch size:   192 | lm loss: 6.685548E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.617 | TFLOPs: 180.64 |
+[default0]:[2024-04-03 17:29:28,014] [INFO] [logging.py:96:log_dist] [Rank 0] step=61, skipped=0, lr=[9.149999999999999e-06, 9.149999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:29:28,014] [INFO] [timer.py:260:stop] epoch=0/micro_step=61/global_step=61, RunningAvgSamplesPerSec=113.00858404824811, CurrSamplesPerSec=112.59638785590516, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       62/  250000 | consumed samples:        11904 | consumed tokens:     24379392 | elapsed time per iteration (ms): 11565.4 | learning rate: 9.300E-06 | global batch size:   192 | lm loss: 6.772316E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.601 | TFLOPs: 180.48 |
+[default0]:[2024-04-03 17:29:39,579] [INFO] [logging.py:96:log_dist] [Rank 0] step=62, skipped=0, lr=[9.299999999999999e-06, 9.299999999999999e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:29:39,580] [INFO] [timer.py:260:stop] epoch=0/micro_step=62/global_step=62, RunningAvgSamplesPerSec=112.99937780908273, CurrSamplesPerSec=112.45885194845674, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       63/  250000 | consumed samples:        12096 | consumed tokens:     24772608 | elapsed time per iteration (ms): 11562.5 | learning rate: 9.450E-06 | global batch size:   192 | lm loss: 6.591563E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.605 | TFLOPs: 180.52 |
+[default0]:[2024-04-03 17:29:51,142] [INFO] [logging.py:96:log_dist] [Rank 0] step=63, skipped=0, lr=[9.45e-06, 9.45e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:29:51,142] [INFO] [timer.py:260:stop] epoch=0/micro_step=63/global_step=63, RunningAvgSamplesPerSec=112.99229385322417, CurrSamplesPerSec=112.56887579765943, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:30:02,696] [INFO] [logging.py:96:log_dist] [Rank 0] step=64, skipped=0, lr=[9.6e-06, 9.6e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:30:02,696] [INFO] [timer.py:260:stop] epoch=0/micro_step=64/global_step=64, RunningAvgSamplesPerSec=112.98841362976735, CurrSamplesPerSec=112.7522228939667, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       64/  250000 | consumed samples:        12288 | consumed tokens:     25165824 | elapsed time per iteration (ms): 11553.9 | learning rate: 9.600E-06 | global batch size:   192 | lm loss: 6.517632E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.618 | TFLOPs: 180.66 |
+[default7]: iteration       65/  250000 | consumed samples:        12480 | consumed tokens:     25559040 | elapsed time per iteration (ms): 11563.9 | learning rate: 9.750E-06 | global batch size:   192 | lm loss: 6.769880E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.603 | TFLOPs: 180.50 |
+[default0]:[2024-04-03 17:30:14,260] [INFO] [logging.py:96:log_dist] [Rank 0] step=65, skipped=0, lr=[9.75e-06, 9.75e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:30:14,260] [INFO] [timer.py:260:stop] epoch=0/micro_step=65/global_step=65, RunningAvgSamplesPerSec=112.97805257474862, CurrSamplesPerSec=112.33935731459026, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:30:25,799] [INFO] [logging.py:96:log_dist] [Rank 0] step=66, skipped=0, lr=[9.899999999999998e-06, 9.899999999999998e-06], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:30:25,799] [INFO] [timer.py:260:stop] epoch=0/micro_step=66/global_step=66, RunningAvgSamplesPerSec=112.97649124569104, CurrSamplesPerSec=112.87821443859757, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       66/  250000 | consumed samples:        12672 | consumed tokens:     25952256 | elapsed time per iteration (ms): 11539.1 | learning rate: 9.900E-06 | global batch size:   192 | lm loss: 6.546497E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.639 | TFLOPs: 180.89 |
+[default7]: iteration       67/  250000 | consumed samples:        12864 | consumed tokens:     26345472 | elapsed time per iteration (ms): 11566.0 | learning rate: 1.005E-05 | global batch size:   192 | lm loss: 6.771461E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.600 | TFLOPs: 180.47 |
+[default0]:[2024-04-03 17:30:37,365] [INFO] [logging.py:96:log_dist] [Rank 0] step=67, skipped=0, lr=[1.0049999999999999e-05, 1.0049999999999999e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:30:37,366] [INFO] [timer.py:260:stop] epoch=0/micro_step=67/global_step=67, RunningAvgSamplesPerSec=112.96849488774043, CurrSamplesPerSec=112.45907181292142, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:30:48,930] [INFO] [logging.py:96:log_dist] [Rank 0] step=68, skipped=0, lr=[1.0199999999999999e-05, 1.0199999999999999e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:30:48,930] [INFO] [timer.py:260:stop] epoch=0/micro_step=68/global_step=68, RunningAvgSamplesPerSec=112.9578226674437, CurrSamplesPerSec=112.26842718377303, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       68/  250000 | consumed samples:        13056 | consumed tokens:     26738688 | elapsed time per iteration (ms): 11564.3 | learning rate: 1.020E-05 | global batch size:   192 | lm loss: 6.776447E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.603 | TFLOPs: 180.49 |
+[default7]: iteration       69/  250000 | consumed samples:        13248 | consumed tokens:     27131904 | elapsed time per iteration (ms): 11566.0 | learning rate: 1.035E-05 | global batch size:   192 | lm loss: 6.885873E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.600 | TFLOPs: 180.47 |
+[default0]:[2024-04-03 17:31:00,496] [INFO] [logging.py:96:log_dist] [Rank 0] step=69, skipped=0, lr=[1.035e-05, 1.035e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:31:00,496] [INFO] [timer.py:260:stop] epoch=0/micro_step=69/global_step=69, RunningAvgSamplesPerSec=112.94755204600342, CurrSamplesPerSec=112.2737958824716, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:31:12,062] [INFO] [logging.py:96:log_dist] [Rank 0] step=70, skipped=0, lr=[1.05e-05, 1.05e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:31:12,062] [INFO] [timer.py:260:stop] epoch=0/micro_step=70/global_step=70, RunningAvgSamplesPerSec=112.94058048648976, CurrSamplesPerSec=112.4754384244792, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       70/  250000 | consumed samples:        13440 | consumed tokens:     27525120 | elapsed time per iteration (ms): 11566.1 | learning rate: 1.050E-05 | global batch size:   192 | lm loss: 6.893177E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.600 | TFLOPs: 180.46 |
+[default7]: iteration       71/  250000 | consumed samples:        13632 | consumed tokens:     27918336 | elapsed time per iteration (ms): 11566.2 | learning rate: 1.065E-05 | global batch size:   192 | lm loss: 6.954856E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.600 | TFLOPs: 180.46 |
+[default0]:[2024-04-03 17:31:23,628] [INFO] [logging.py:96:log_dist] [Rank 0] step=71, skipped=0, lr=[1.065e-05, 1.065e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:31:23,629] [INFO] [timer.py:260:stop] epoch=0/micro_step=71/global_step=71, RunningAvgSamplesPerSec=112.93233941471554, CurrSamplesPerSec=112.37475407315144, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:31:35,195] [INFO] [logging.py:96:log_dist] [Rank 0] step=72, skipped=0, lr=[1.08e-05, 1.08e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:31:35,196] [INFO] [timer.py:260:stop] epoch=0/micro_step=72/global_step=72, RunningAvgSamplesPerSec=112.92358664887054, CurrSamplesPerSec=112.32290494611598, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       72/  250000 | consumed samples:        13824 | consumed tokens:     28311552 | elapsed time per iteration (ms): 11566.8 | learning rate: 1.080E-05 | global batch size:   192 | lm loss: 6.900216E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.599 | TFLOPs: 180.45 |
+[default7]: iteration       73/  250000 | consumed samples:        14016 | consumed tokens:     28704768 | elapsed time per iteration (ms): 11563.0 | learning rate: 1.095E-05 | global batch size:   192 | lm loss: 7.002403E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.605 | TFLOPs: 180.51 |
+[default0]:[2024-04-03 17:31:46,758] [INFO] [logging.py:96:log_dist] [Rank 0] step=73, skipped=0, lr=[1.0949999999999998e-05, 1.0949999999999998e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:31:46,759] [INFO] [timer.py:260:stop] epoch=0/micro_step=73/global_step=73, RunningAvgSamplesPerSec=112.91765487422022, CurrSamplesPerSec=112.50397358154329, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default0]:[2024-04-03 17:31:58,330] [INFO] [logging.py:96:log_dist] [Rank 0] step=74, skipped=0, lr=[1.1099999999999999e-05, 1.1099999999999999e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default7]: iteration       74/  250000 | consumed samples:        14208 | consumed tokens:     29097984 | elapsed time per iteration (ms): 11571.4 | learning rate: 1.110E-05 | global batch size:   192 | lm loss: 6.617183E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.593 | TFLOPs: 180.38 |
+[default0]:[2024-04-03 17:31:58,330] [INFO] [timer.py:260:stop] epoch=0/micro_step=74/global_step=74, RunningAvgSamplesPerSec=112.90694336419972, CurrSamplesPerSec=112.15158574236368, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       75/  250000 | consumed samples:        14400 | consumed tokens:     29491200 | elapsed time per iteration (ms): 11569.7 | learning rate: 1.125E-05 | global batch size:   192 | lm loss: 6.805183E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.595 | TFLOPs: 180.41 |
+[default0]:[2024-04-03 17:32:09,900] [INFO] [logging.py:96:log_dist] [Rank 0] step=75, skipped=0, lr=[1.1249999999999999e-05, 1.1249999999999999e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+[default0]:[2024-04-03 17:32:09,900] [INFO] [timer.py:260:stop] epoch=0/micro_step=75/global_step=75, RunningAvgSamplesPerSec=112.90218691678673, CurrSamplesPerSec=112.5607726922149, MemAllocated=21.98GB, MaxMemAllocated=67.72GB
+[default7]: iteration       76/  250000 | consumed samples:        14592 | consumed tokens:     29884416 | elapsed time per iteration (ms): 11570.7 | learning rate: 1.140E-05 | global batch size:   192 | lm loss: 6.738315E+00 | loss scale: 1.0 | actual seqlen:  2048 | number of skipped iterations:   0 | number of nan iterations:   0 | samples per second: 16.594 | TFLOPs: 180.39 |
+[default0]:[2024-04-03 17:32:21,470] [INFO] [logging.py:96:log_dist] [Rank 0] step=76, skipped=0, lr=[1.1399999999999998e-05, 1.1399999999999998e-05], mom=[(0.9, 0.95), (0.9, 0.95)]
+srun: Job step aborted: Waiting up to 62 seconds for job step to finish.
+slurmstepd: error: *** JOB 1353927 ON jean-zay-iam02 CANCELLED AT 2024-04-03T17:32:53 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 1353927.0 ON jean-zay-iam02 CANCELLED AT 2024-04-03T17:32:53 DUE TO TIME LIMIT ***
+[2024-04-03 17:32:53,748] torch.distributed.elastic.agent.server.api: [WARNING] Received Signals.SIGTERM death signal, shutting down workers
+[2024-04-03 17:32:53,748] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83594 closing signal SIGTERM
+[2024-04-03 17:32:53,749] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83595 closing signal SIGTERM
+[2024-04-03 17:32:53,749] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83596 closing signal SIGTERM
+[2024-04-03 17:32:53,750] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83597 closing signal SIGTERM
+[2024-04-03 17:32:53,751] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83598 closing signal SIGTERM
+[2024-04-03 17:32:53,751] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83599 closing signal SIGTERM
+[2024-04-03 17:32:53,751] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83600 closing signal SIGTERM
+[2024-04-03 17:32:53,751] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83601 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83594 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83595 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83596 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83597 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83598 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83599 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83600 closing signal SIGTERM
+[2024-04-03 17:32:53,764] torch.distributed.elastic.multiprocessing.api: [WARNING] Sending process 83601 closing signal SIGTERM

@@ -1,0 +1,107 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(lme4)
+library(ggpubr)
+library(scales)
+```
+
+
+
+```{r}
+df <- read.csv("../all_iters_w_dp.csv")
+```
+
+```{r}
+df
+```
+
+
+
+```{r}
+df1 <- df %>% group_by(stage, batch, ngpus, strategy) %>% summarise(ntokens_per_second = mean(ntokens_per_second))
+p <- ggplot(df1, aes(x=ngpus, y=ntokens_per_second, color=strategy)) +
+  geom_line(aes(linetype=stage), size=1.4)+
+  geom_point(size=2.9) +
+  facet_wrap(batch ~ .) +
+  theme_bw(base_size = 11) +
+  theme(axis.text.x=element_text(size=15),
+        axis.text.y=element_text(size=15),
+        legend.title = element_text(size=10),
+        legend.text = element_text(size=8),
+        legend.position="right",
+        legend.box = "vertical",
+        text = element_text(size = 16)) +
+  scale_x_continuous(labels=c(8, 16, 32, 64, 128), breaks=c(8, 16, 32, 64, 128), trans='log10') +
+  # scale_color_manual(values=c('#1b9e77','#d95f02', '#7570b3', '#e7298a')) +
+  ylab("Tokens/s") +
+  xlab("GPUs")
+```
+
+```{r}
+p
+```
+
+
+```{r}
+ggsave("parallelism_w_dp.png", plot = p, width = 12, height = 7, bg="white")
+```
+
+
+```{r}
+df2 <- filter(df, stage == "z0" & strategy == "tp2-pp2" & ngpus == 64)
+p_l <- ggplot(df2, aes(x=consumed_tokens, y=loss, color=batch)) +
+  geom_line(size=1.4)+
+  theme_bw(base_size = 11) +
+  theme(axis.text.x=element_text(size=15),
+        axis.text.y=element_text(size=15),
+        legend.title = element_text(size=14),
+        legend.text = element_text(size=13),
+        text = element_text(size = 16)) +
+  scale_x_continuous(labels = label_number(unit = "M", scale = 1e-6)) +
+  scale_color_manual(values=c('#9ebcda','#8856a7')) +
+  ylab("Loss") +
+  xlab("Tokens (millions)")
+```
+
+```{r}
+p_l
+```
+
+
+```{r}
+ggsave("loss.png", plot = p, width = 12, height = 7, bg="white")
+```
+
+
+```{r}
+df2 <- filter(df, stage == "z0" & strategy == "tp2-pp2" & ngpus == 64)
+df2$training_time = df2$consumed_tokens / df2$ntokens_per_second
+p_t <- ggplot(df2, aes(x=training_time, y=loss, color=batch)) +
+  geom_line(size=1.4)+
+  theme_bw(base_size = 11) +
+  theme(axis.text.x=element_text(size=15),
+        axis.text.y=element_text(size=15),
+        legend.title = element_text(size=14),
+        legend.text = element_text(size=13),
+        text = element_text(size = 16)) +
+  # scale_x_continuous(labels = label_number(unit = "M", scale = 1e-6)) +
+  scale_color_manual(values=c('#9ebcda','#8856a7')) +
+  ylab("Loss") +
+  xlab("Training time (s)")
+```
+
+```{r}
+p_t
+```
+
+
+
+
