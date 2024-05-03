@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-4nodes-tp2-pp2-z0-b512
-#SBATCH --qos=qos_gpu-dev            # Avec ce qos la temps d'attente est moins long. Mais n'est possible qu'avec 32 GPUs maximum, donc à commenter si on lance sur plus de 32 GPUs
-#SBATCH --nodes=8
+#SBATCH --job-name=run-lucie7b-32nodes-tp2-pp2-z0-b512
+##SBATCH --qos=qos_gpu-dev    
+#SBATCH --nodes=32
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
-#SBATCH --cpus-per-task=64           # number of cores per tasks
+#SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus
 #SBATCH --constraint=a100
-#SBATCH --time 00:20:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 2:00:00               # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
@@ -111,7 +111,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache \
        --tensor-model-parallel-size $TP \
-       --pipeline-model-parallel-size $PP
+       --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
        --hidden-size $HIDDEN_SIZE \
        --ffn-hidden-size $FFN_HIDDEN_SIZE \
