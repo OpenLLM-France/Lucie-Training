@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=run-lucie7b-32nodes-tp2-pp2-z0-b512
-##SBATCH --qos=qos_gpu-dev    
-#SBATCH --nodes=32
+#SBATCH --job-name=run-lucie7b-1nodes-tp2-pp2-z0-b512-tests
+#SBATCH --qos=qos_gpu-dev    
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
