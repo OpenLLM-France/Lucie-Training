@@ -1,22 +1,37 @@
 #!/bin/bash
-#SBATCH --job-name=lucie7b-4nodes-tp2-pp2-z0-b512
+#SBATCH --job-name=test-lucie7b-1nodes-tp1-pp2-z0-b256-m1
 #SBATCH --qos=qos_gpu-dev            # Avec ce qos la temps d'attente est moins long. Mais n'est possible qu'avec 32 GPUs maximum, donc à commenter si on lance sur plus de 32 GPUs
-#SBATCH --nodes=8
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=64           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus
 #SBATCH --constraint=a100
-#SBATCH --time 00:20:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 00:15:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
 set -x -e
 
-CHECKPOINT_PATH=/gpfswork/rech/qgz/urc37ho/checkpoints/
-LOGS_PATH=/gpfswork/rech/qgz/urc37ho/lucie-logs
+echo "START TIME: $(date)"
 
-MEGATRON_DEEPSPEED_REPO=/gpfswork/rech/qgz/urc37ho/Megatron-DeepSpeed-yaya
+# Environement Set Up
+module purge
+module load cpuarch/amd 
+module load anaconda-py3/2023.09 # Use this anaconda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
+module load cuda/12.1.0 # Use this cuda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
+module load gcc/12.2.0
+conda activate lucie
+# module load git/2.39.1
+
+EXPE_NAME=testestest
+OUTPUT_PATH=/gpfswork/rech/qgz/uzq54wg
+CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$EXPE_NAME
+TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$EXPE_NAME
+LOGS_PATH=$OUTPUT_PATH/lucie-logs/$EXPE_NAME
+mkdir -p $LOGS_PATH
+
+MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
 cd $MEGATRON_DEEPSPEED_REPO
 
 DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
@@ -29,18 +44,18 @@ MASTER_PORT=6000
 GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
-TP=2
+TP=1
 PP=2
 
-MICRO_BATCH_SIZE=4 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
-GLOBAL_BATCH_SIZE=512
+GLOBAL_BATCH_SIZE=256
+MICRO_BATCH_SIZE=1 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
 
 # ----- model
 HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
 FFN_HIDDEN_SIZE=11008 # e.g. llama-13b: 13824
 NUM_LAYERS=32 # e.g. llama-13b: 40
 NUM_HEADS=32 # e.g. llama-13b: 40
-SEQ_LENGTH=2048 # for llama2 it's 4096
+SEQ_LENGTH=4096 # for llama2 it's 4096
 NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
 
 # ------ Optimizer
@@ -56,11 +71,9 @@ SAVE_INTERVAL=100
 # ----- Deepspeed configuration
 ZERO_STAGE=0
 
-DS_CONFIG="./ds_config.$SLURM_JOBID.json"
+config_json="./ds_config.$SLURM_JOBID.json"
 
-activation_checkpoint="false"
-
-cat <<EOT > $DS_CONFIG
+cat <<EOT > $config_json
 {
   "train_batch_size" : $GLOBAL_BATCH_SIZE,
   "train_micro_batch_size_per_gpu": $MICRO_BATCH_SIZE,
@@ -74,22 +87,33 @@ cat <<EOT > $DS_CONFIG
 }
 EOT
 
-ds_args=""
-ds_args=" --deepspeed ${ds_args}"
-ds_args=" --deepspeed_config=$DS_CONFIG ${ds_args}"
-ds_args=" --zero-stage=$ZERO_STAGE ${ds_args}"
+# no activation checkpoint
+DEEPSPEED_ARGS=" \
+    --deepspeed \
+    --deepspeed_config ${config_json} \
+    --zero-stage ${ZERO_STAGE} \
+    "
 
-if [ "${activation_checkpoint}" = "true" ]; then
-  ds_args="--deepspeed-activation-checkpointing ${ds_args}"
+# activation checkpoint
+# DEEPSPEED_ARGS=" \
+#     --deepspeed \
+#     --deepspeed_config ${config_json} \
+#     --zero-stage ${ZERO_STAGE} \
+#     --deepspeed-activation-checkpointing \
+#     --recompute-granularity full \
+#     --recompute-method uniform \
+#     "
 
-  ## old argument for recomputing the transformer layer
-  # ds_args="--checkpoint-activations ${ds_args}"
-
-  ## new argument for recomputing the transformer layer
-  ds_args="--recompute-granularity full --recompute-method uniform ${ds_args}"
-  ## new argument for recomputing only the attention layer
-  # ds_args="--recompute-granularity selective ${ds_args}"
-fi
+LOG_ARGS=" \
+       --log-interval 1 \
+       --tensorboard-dir $TENSORBOARD_PATH \
+       --tensorboard-log-interval 1 \
+       --log-timers-to-tensorboard \
+       --log-batch-size-to-tensorboard \
+       --log-memory-to-tensorboard \
+       --log-world-size-to-tensorboard \
+       --tensorboard-queue-size 5 \
+       "
 
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
@@ -97,21 +121,14 @@ export CUDA_LAUNCH_BLOCKING=1
 # hide duplicated errors using this hack - will be properly fixed in pt-1.12
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
 
-module purge
-module load cpuarch/amd
-module load anaconda-py3/2023.09
-conda activate lucie-torch211
-module load cuda/12.1.0
-# module load git/2.39.1
-
 # --pipeline-model-parallel-size $PP \
 # --no-pipeline-parallel \
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path /linkhome/rech/genlor01/urc37ho/.cache \
+       --data-cache-path /gpfswork/rech/qgz/uzq54wg/.cache \
        --tensor-model-parallel-size $TP \
-       --pipeline-model-parallel-size $PP
+       --pipeline-model-parallel-size $PP \
        --num-layers $NUM_LAYERS \
        --hidden-size $HIDDEN_SIZE \
        --ffn-hidden-size $FFN_HIDDEN_SIZE \
@@ -137,10 +154,10 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --optimizer adam \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
-       --log-interval 1 \
        --save-interval 100 \
        --eval-interval 100 \
-       --eval-iters 1 \
+       --eval-iters 0 \
+       --split 1,0,0 \
        --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
@@ -152,7 +169,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --normalization rmsnorm \
        --disable-bias-linear \
        --num-key-value-heads $NUM_KV_HEADS \
-       $ds_args \
+       $DEEPSPEED_ARGS \
+       $LOG_ARGS \
        $EXIT_OPTS \
        "
 
