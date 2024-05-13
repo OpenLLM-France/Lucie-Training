@@ -36,9 +36,10 @@ conda create -n lucie python=3.10
 
 Set the conda environment:
 ```bash
+module load cpuarch/amd # Specif to Jean-Zay only. Ignore this if you're not on Jean-Zay
 module load anaconda-py3/2023.09 # Use this anaconda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
 module load cuda/12.1.0 # Use this cuda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
-module load cpuarch/amd # Specif to Jean-Zay only. Ignore this if you're not on Jean-Zay
+module load gcc/12.2.0
 conda activate lucie
 ```
 
@@ -57,7 +58,7 @@ pip install -r requirements.txt
 
 Install ninja:
 ```bash
-pip install ninja
+conda install ninja
 ```
 > `ninja` will be needed for compiling some parts of Megatron-Deepspeed
 
