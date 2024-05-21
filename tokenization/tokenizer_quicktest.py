@@ -19,6 +19,7 @@ def norm_spaces(s):
 
 if __name__ == "__main__":
     example_tokenizers = [
+        "gpt-3.5-turbo",
         "gpt-4",
         "bigscience/bloom-7b1",
         "google/gemma-7b",
@@ -88,7 +89,7 @@ if __name__ == "__main__":
         example_sentences = [example_sentences[-1]]
 
     for tokenizer_name in tokenizers:
-        if tokenizer_name.lower() in ["gpt-4"]:
+        if tokenizer_name.lower().startswith("gpt"):
             tokenizer = tiktoken.encoding_for_model(tokenizer_name.lower())
         else:
             tokenizer = transformers.AutoTokenizer.from_pretrained(tokenizer_name, trust_remote_code=True)
