@@ -20,13 +20,7 @@ df <- read.csv("../all_iters_w_dp.csv")
 ```
 
 ```{r}
-df
-```
-
-
-
-```{r}
-df1 <- df %>% group_by(stage, batch, ngpus, strategy) %>% summarise(ntokens_per_second = mean(ntokens_per_second))
+df1 <- df %>% group_by(stage, batch, ngpus, strategy) %>% summarise(ntokens_per_second = median(ntokens_per_second))
 p <- ggplot(df1, aes(x=ngpus, y=ntokens_per_second, color=strategy)) +
   geom_line(aes(linetype=stage), size=1.4)+
   geom_point(size=2.9) +
@@ -54,10 +48,17 @@ p
 ggsave("parallelism_w_dp.png", plot = p, width = 12, height = 7, bg="white")
 ```
 
+```{r}
+df
+```
+
 
 ```{r}
-df2 <- filter(df, stage == "z0" & strategy == "tp2-pp2" & ngpus == 64)
-p_l <- ggplot(df2, aes(x=consumed_tokens, y=loss, color=batch)) +
+df2 <- filter(df, stage == "z0" & TP == 2 & PP == 2 & ngpus == 128)
+df3 <- df2 %>% group_by(batch) %>% summarise(ntokens_per_second = median(ntokens_per_second),
+                                     consumed_tokens = consumed_tokens,
+                                     loss = loss)
+p_l <- ggplot(df3, aes(x=consumed_tokens, y=loss, color=batch)) +
   geom_line(size=1.4)+
   theme_bw(base_size = 11) +
   theme(axis.text.x=element_text(size=15),
@@ -82,9 +83,8 @@ ggsave("loss.png", plot = p, width = 12, height = 7, bg="white")
 
 
 ```{r}
-df2 <- filter(df, stage == "z0" & strategy == "tp2-pp2" & ngpus == 64)
-df2$training_time = df2$consumed_tokens / df2$ntokens_per_second
-p_t <- ggplot(df2, aes(x=training_time, y=loss, color=batch)) +
+df3$training_time = df3$consumed_tokens / df3$ntokens_per_second
+p_t <- ggplot(df3, aes(x=training_time, y=loss, color=batch)) +
   geom_line(size=1.4)+
   theme_bw(base_size = 11) +
   theme(axis.text.x=element_text(size=15),
@@ -102,6 +102,6 @@ p_t <- ggplot(df2, aes(x=training_time, y=loss, color=batch)) +
 p_t
 ```
 
-
-
-
+```{r}
+ggsave("loss_training_time.png", plot = p_t, width = 12, height = 7, bg="white")
+```
