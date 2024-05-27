@@ -550,7 +550,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--vocab_size",
         type=int,
-        default=32000,
+        default=65024,
         help="Size of output vocabulary (ex: 32000, 65024, ...)",
     )
     parser.add_argument(
