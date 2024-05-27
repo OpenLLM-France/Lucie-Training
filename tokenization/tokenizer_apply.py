@@ -345,7 +345,7 @@ def get_args():
     group.add_argument(
         "--tokenizer-name-or-path",
         type=str,
-        default="OpenLLM-France/Lucie-tokenizer-v2.9",
+        default="OpenLLM-France/Lucie-tokenizer-65k",
         help="Pretrained tokenizer name or path",
     )
     group.add_argument("--vocab-file", type=str, default=None, help="Path to the vocab file")

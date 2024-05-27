@@ -10,6 +10,7 @@ import types
 import warnings
 
 import datasets
+import numpy as np
 import regex as re
 from text import (
     check_language,
@@ -1163,7 +1164,18 @@ class DataIteratorEurovoc(DataIteratorParquet):
 
 
 def filter_by_perplexity_func(threshold):
-    return lambda x: len(x["ccnet_perplexity"]) and x["ccnet_perplexity"][0] <= threshold
+    return lambda x: filter_by_perplexity(x, threshold)
+
+
+def filter_by_perplexity(x, threshold):
+    perplexities = x["ccnet_perplexity"]
+    if not perplexities:
+        return False
+    # first_is_lower = perplexities and perplexities[0] <= threshold
+    mean_is_lower = np.mean(perplexities) <= threshold
+    # median_is_lower = np.median(perplexities) <= threshold
+    mean_or_median_is_lower = mean_is_lower or np.median(perplexities) <= threshold
+    return mean_or_median_is_lower
 
 
 class DataIteratorGallicaMono(DataIteratorParquet):
