@@ -1169,6 +1169,8 @@ def filter_by_perplexity_func(threshold):
 
 def filter_by_perplexity(x, threshold):
     perplexities = x["ccnet_perplexity"]
+    if not perplexities:
+        return False
     # first_is_lower = perplexities and perplexities[0] <= threshold
     mean_is_lower = np.mean(perplexities) <= threshold
     # median_is_lower = np.median(perplexities) <= threshold
