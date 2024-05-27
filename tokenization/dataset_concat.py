@@ -49,7 +49,8 @@ if __name__ == "__main__":
             else:
                 output_path = re.sub(r"\-*\d*\d([a-zA-Z_]+).idx$", r"\1", input_path)
             input_path = os.path.splitext(input_path)[0]
-            # output_path = os.path.splitext(output_path)[0]
+            if output_path.endswith(".idx"):
+                output_path = os.path.splitext(output_path)[0]
             output_path = os.path.join(output_folder, os.path.basename(output_path))
             output_to_inputs.setdefault(output_path, []).append(input_path)
 
