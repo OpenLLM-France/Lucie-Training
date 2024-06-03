@@ -1,4 +1,4 @@
-language ,name                 ,subset       , M pages, B words, B chars,#words/page,#chars/word, B tokens,#tokens/words,#chars/tokens
+language ,name                 ,subset       ,  M docs, B words, B chars, #words/doc,#chars/word, B tokens,#tokens/words,#chars/tokens
 ---      ,---                  ,---          , 669.094, 243.103,1809.497,        363,        7.4,  599.923,            ,            
 fr       ,---                  ,---          ,  13.609, 106.063, 646.067,       7794,        6.1,  213.290,            ,            
 en       ,---                  ,---          , 106.574,  61.945, 382.142,        581,        6.2,  103.849,        1.68,        3.68

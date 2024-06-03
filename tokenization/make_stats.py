@@ -57,7 +57,7 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
 
 
 KEYS = {
-    "num pages": "#pages",
+    "num pages": "#docs",
     "num words": "#words",
     "num chars": "#chars",
 }
@@ -70,11 +70,11 @@ def compute_extra_stats(data, tokencount_folder):
         return data
     try:
         assert "#words" in data, f"Missing #words in {data.keys()}"
-        data["M pages"] = data["#pages"] / 1_000_000
+        data["M docs"] = data["#docs"] / 1_000_000
         data["B words"] = data["#words"] / 1_000_000_000
         data["B chars"] = data["#chars"] / 1_000_000_000
-        data["#words/page"] = data["#words"] / (data["#pages"] or 1)
-        # data["#chars/page"] = data["#chars"] / data["#pages"]
+        data["#words/doc"] = data["#words"] / (data["#docs"] or 1)
+        # data["#chars/page"] = data["#chars"] / data["#docs"]
         data["#chars/word"] = data["#chars"] / (data["#words"] or 1)
 
         if tokencount_folder:
@@ -86,10 +86,10 @@ def compute_extra_stats(data, tokencount_folder):
             data["#chars/tokens"] = None
             if key in total_tokens:
                 data["B tokens"] = total_tokens[key] / 1_000_000_000
-                if abs(data["M pages"] - total_sequences_check[key] / 1_000_000) > 0.01:
+                if abs(data["M docs"] - total_sequences_check[key] / 1_000_000) > 0.01:
                     print(
                         f"WARNING: mismatch for {key}: \
-(stats) {data['M pages']} != (token) {total_sequences_check[key] / 1_000_000}"
+(stats) {data['M docs']} != (token) {total_sequences_check[key] / 1_000_000}"
                     )
                 else:
                     data["#tokens/words"] = data["B tokens"] / data["B words"]
@@ -99,7 +99,7 @@ def compute_extra_stats(data, tokencount_folder):
             elif not data.get("subset"):
                 print(f"WARNING: missing {key} in tokens")
 
-        data.pop("#pages")
+        data.pop("#docs")
         data.pop("#words")
         data.pop("#chars")
 
@@ -119,11 +119,11 @@ def format_stats_display(data):
         ("language", "{:<9s}"),
         ("name", "{:<21s}"),
         ("subset", "{:<13s}"),
-        ("M pages", "{:8.3f}"),
+        ("M docs", "{:8.3f}"),
         ("B words", "{:8.3f}"),
         ("B chars", "{:8.3f}"),
         ("B tokens", "{:9.3f}"),
-        ("#words/page", "{:11.0f}"),
+        ("#words/doc", "{:11.0f}"),
         ("#chars/page", "{:11.0f}"),
         ("#chars/word", "{:11.1f}"),
         ("#tokens/words", "{:12.2f}"),
