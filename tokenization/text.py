@@ -28,8 +28,9 @@ def html_unescape(text):
 def remove_useless_lines(text):
     # Remove cesures
     text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)
-    # Remove lines when it does not start with a capital letter
+    # Remove lines coming after coma and semi-colon
     text = re.sub(r"([,;])\s*\n", r"\1 ", text)
+    # Remove lines when it does not start with a capital letter
     text = re.sub(r"\n\s*([a-z»])", r" \1", text)
     text = remove_double_spaces(text)
     return text
