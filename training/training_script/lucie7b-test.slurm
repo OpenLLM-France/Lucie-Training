@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
 #SBATCH --time 00:10:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=./out/%x-%j.out # STDOUT
+#SBATCH --output=./out/%x-%j.out     # STDOUT
 #SBATCH --account=qgz@a100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --job-name=lucie-test
@@ -19,9 +19,9 @@ set -x -e
 echo "START TIME: $(date)"
 
 # Load env and variables
-source ~/Lucie-Training/training/setup_env.sh
+source ~/Lucie-Training/training/set_env.sh
 
-VARIANT=training
+VARIANT=training-test
 CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints
 TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
 LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
@@ -54,12 +54,15 @@ PP=4
 ZERO_STAGE=0
 
 # ------ Optimizer
-TRAIN_STEPS=250000 
 LR=3e-4
 MIN_LR=3e-5
-LR_WARMUP_STEPS=2000
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
+
+TRAIN_SAMPLES=750_000_000 # 3T tokens
+LR_DECAY_SAMPLES=750_000_000 # 3T tokens - not use right now
+LR_WARMUP_SAMPLES=2_000_000
+RAMPUP_SAMPLES=10_000_000
 
 SAVE_INTERVAL=1000
 
@@ -109,12 +112,13 @@ OPTIMIZER_ARGS=" \
        --lr $LR \
        --lr-decay-style cosine \
        --min-lr $MIN_LR \
-       --weight-decay $WEIGHT_DECAY \
+       --lr-warmup-samples $LR_WARMUP_SAMPLES \
        --clip-grad $GRAD_CLIP \
-       --lr-warmup-iters $LR_WARMUP_STEPS \
        --optimizer adam \
        --adam-beta1 0.9 \
        --adam-beta2 0.95 \
+       --adam-eps 1e-5 \
+       --weight-decay $WEIGHT_DECAY \
        "
 
 LOG_ARGS=" \
@@ -125,7 +129,7 @@ LOG_ARGS=" \
        --log-batch-size-to-tensorboard \
        --log-memory-to-tensorboard \
        --log-world-size-to-tensorboard \
-       --tensorboard-queue-size 1 \
+       --tensorboard-queue-size 5 \
        --no-log-loss-scale-to-tensorboard \
        "
 
@@ -153,7 +157,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        $EXTRA_ARGS \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
-       --train-iters $TRAIN_STEPS \
+       --train-samples $TRAIN_SAMPLES \
+       --rampup-batch-size 256 128 $RAMPUP_SAMPLES \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
