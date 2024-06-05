@@ -54,7 +54,7 @@ def build_tokenizer(
     individual_digits: Optional[bool] = True,
     space_behaviour: Optional[str] = "prefix_all",
     separate_punctuation: Optional[bool] = True,
-    add_space_after: Optional[str] = "\n\t(['’\"«“‘‚‹—–―",
+    add_space_after: Optional[str] = "\n\t([{/<'’\"«“‘‚‹—–―",
     char_to_isolate: Optional[str] = None,  # ")]'\"»”’›—–―,;:!?",
     do_not_split_spaces: Optional[bool] = False,
     fuse_unk: Optional[float] = True,
@@ -105,7 +105,7 @@ def build_tokenizer(
         [
             # Note: placeholders cannot be handled (using tokenizers.Regex(r"[\t\n]"))
             # tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[^{re.escape(c)}])"), c + " ")
-            tokenizers.normalizers.Replace(tokenizers.Regex(rf"({re.escape(c)})(?=[ \w])"), c + " ")
+            tokenizers.normalizers.Replace(tokenizers.Regex(rf"{re.escape(c)}(?=[ \w])"), c + " ")
             for c in add_space_after
         ]
         if (space_behaviour == "prefix_all")
