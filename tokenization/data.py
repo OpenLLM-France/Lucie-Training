@@ -221,7 +221,8 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 # Multi-language (with switching)
                 "europarl_aligned",
                 "croissant_aligned",
-                # Code
+                # Code, tex, math...
+                "math_pile",
                 "code",
             ]
         ):
@@ -1468,6 +1469,55 @@ class DataIteratorPes2o(DataIteratorConcat):
             DataIteratorConcat.__init__(self, iterators, name=name)
 
 
+class DataIteratorMathPile(DataIteratorConcat):
+    def __init__(self, streaming=True, train=None, **kwargs):
+        if train is not None:
+            splits = ["train"] if train else ["validation"]
+        else:
+            splits = ["validation", "train"]
+
+        name = "MathPile"
+
+        train_iterators = []
+        valid_iterators = []
+        self.json_files = []
+        for split in splits:
+            is_train = split == "train"
+            split_folder = f"{DATA_PATH}/mathpile_commercial/{split}"
+            for type in sorted(os.listdir(split_folder)):
+                preprocess = None
+                if type == "stackexchange":
+
+                    def preprocess(x):
+                        question = x["question"]["Body"]
+                        answers = [a["Body"] for a in x["answers"]]
+                        return x | {"text": question + "\n\n".join(answers)}
+
+                files_regex = f"{split_folder}/{type}/*.jsonl"
+                json_files = glob.glob(files_regex)
+                if not len(json_files):
+                    raise RuntimeError(f"No json files in {files_regex}")
+                logger.info(f"Using {len(json_files)} json files from {files_regex}")
+                self.json_files.extend(json_files)
+                (train_iterators if is_train else valid_iterators).append(
+                    DataIterator(
+                        datasets.load_dataset(
+                            "json",
+                            streaming=streaming,
+                            data_files=json_files,
+                            split="train",
+                        ),
+                        preprocess=preprocess,
+                        name=f"{name}:{type}" if is_train else f"{name}:{split}:{type}",
+                        **kwargs,
+                    )
+                )
+
+        DataIteratorConcat.__init__(
+            self, train_iterators + [DataIteratorConcat(valid_iterators, name=f"{name}:validation")], name=name
+        )
+
+
 ########################################
 # Datasets: Code
 
@@ -1707,7 +1757,7 @@ if __name__ == "__main__":
             num_words += nw
             num_chars += len(text)
             if num_dumped < num_examples and folder and (not args.long_examples or nw > 50_000):
-                example_folder = os.path.join(folder, "long_examples")
+                example_folder = os.path.join(folder, "long_examples" if args.long_examples else "examples")
                 os.makedirs(example_folder, exist_ok=True)
                 filename = os.path.join(example_folder, f"{prefix_example_files}")
                 if num_examples > 1:
