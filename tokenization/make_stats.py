@@ -39,6 +39,8 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
         language = "it"
     elif "TheStack" in name:
         language = "code"
+    elif "MathPile" in name:
+        language = "en"
     else:
         language = "fr"
     # Multi-lingual corpora
