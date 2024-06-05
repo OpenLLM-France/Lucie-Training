@@ -26,6 +26,7 @@ if __name__ == "__main__":
         "tiiuae/falcon-7b",
         "allenai/OLMo-7B",
         "meta-llama/Llama-2-7b-hf",
+        "meta-llama/Meta-Llama-3-8B-Instruct",
         "mistralai/Mistral-7B-v0.1",
         "croissantllm/CroissantLLMBase",
         "CohereForAI/c4ai-command-r-plus",
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     ]
 
     if args.sentence:
-        example_sentences = [" ".join(args.sentence)]
+        example_sentences = [" ".join(args.sentence).replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r")]
 
     tokenizers = [args.tokenizer] if args.tokenizer else example_tokenizers
 
