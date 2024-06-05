@@ -1648,6 +1648,12 @@ if __name__ == "__main__":
         default=False,
         help="Only dump some examples",
     )
+    parser.add_argument(
+        "--long_examples",
+        action="store_true",
+        default=False,
+        help="Only dump long examples (more than 50k words)",
+    )
     args = parser.parse_args()
 
     if args.folder:
@@ -1689,33 +1695,38 @@ if __name__ == "__main__":
                     prefix_example_files += "--" + to_insert
         print(f"Computing stats for {name_slug}...")
         tic = time.time()
-        i_page = -1
+        num_pages = 0
         num_words = 0
         num_chars = 0
-        for i_page, text in enumerate(tqdm.tqdm(it, total=len(it))):
-            if args.max_examples and i_page >= args.max_examples:
-                i_page -= 1
+        num_dumped = 0
+        for text in tqdm.tqdm(it, total=len(it)):
+            if args.max_examples and num_dumped >= args.max_examples:
                 break
-            num_words += len(text.split())
+            num_pages += 1
+            nw = len(text.split())
+            num_words += nw
             num_chars += len(text)
-            if i_page < num_examples and folder:
-                example_folder = os.path.join(folder, "examples")
+            if num_dumped < num_examples and folder and (not args.long_examples or nw > 50_000):
+                example_folder = os.path.join(folder, "long_examples")
                 os.makedirs(example_folder, exist_ok=True)
                 filename = os.path.join(example_folder, f"{prefix_example_files}")
                 if num_examples > 1:
-                    filename += f"_{i_page:02d}"
+                    filename += f"_{num_dumped:02d}"
                 filename += ".txt"
                 print(f"Dumping {filename}")
                 with open(filename, "w", encoding="utf8") as f:
                     f.write(text + "\n")
-            elif only_dump_examples:
+                num_dumped += 1
+            elif num_dumped >= num_examples and only_dump_examples:
                 break
         if only_dump_examples:
             return {}
+        if num_pages <= 0:
+            raise RuntimeError("No page found, or iterations stopped before completion (stats are not full)")
         toc = time.time()
         stats = {
             "time to iterate (sec)": toc - tic,
-            "num pages": i_page + 1,
+            "num pages": num_pages,
             "num words": num_words,
             "num chars": num_chars,
         }
