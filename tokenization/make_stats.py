@@ -10,7 +10,7 @@ def to_name_subset(name):
         name = name.replace("--", ":")
         name, subset = name.split(":", 1)
     if subset:
-        subset = subset.replace("_opendata", "").replace(":", "")
+        subset = subset.replace("_opendata", "").lstrip(":")
     return name, subset
 
 
@@ -20,10 +20,12 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
     for lan in "fr", "en", "de", "es", "it":
         subset2 = subset.rstrip(":.0123456789")
         if subset.startswith(lan):
+            print("NOCOMMIT", subset, lan)
+        if subset.startswith(lan) and (len(subset) == len(lan) or subset[len(lan)] in ".:-"):
             if "-" in subset and len(subset2) == 5:
                 subset = subset2
                 lan = subset
-            subset = subset[len(lan) :]
+            subset = subset[len(lan) :].strip(":.")
             if "gutenberg" in name.lower():
                 subset = ""
             return lan, name + "." + lan, subset
@@ -39,7 +41,7 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
         language = "it"
     elif "TheStack" in name:
         language = "code"
-    elif "MathPile" in name:
+    elif "Pile" in name:  # Pile and MathPile
         language = "en"
     else:
         language = "fr"
@@ -200,18 +202,6 @@ if __name__ == "__main__":
     output_metadata_file = args.output_metadata_file
     output_metadata_file_detailed = args.output_metadata_file_detailed
     avoid_subsets = True
-
-    # stat_folder = "stats"
-    # output_metadata_file = "../assets/stats_datasets.csv"
-    # output_metadata_file_detailed = "../assets/stats_datasets_detailed.csv"
-    # tokencount_folder = "stats_tokens"
-    # avoid_subsets = True
-
-    # stat_folder = "Lucie2.9/stats_training"
-    # output_metadata_file = "../assets/stats_train_tokenizer.csv"
-    # output_metadata_file_detailed = "../assets/stats_train_tokenizer_detailed.csv"
-    # tokencount_folder = None
-    # avoid_subsets = False
 
     global total_tokens
     ground_total_tokens = 0

@@ -244,7 +244,7 @@ if __name__ == "__main__":
 
         json_filename = prefix + ".json"
         if not os.path.exists(json_filename):
-            raise ValueError(f"File {json_filename} does not exist")
+            raise RuntimeError(f"File {json_filename} does not exist")
         with open(json_filename) as f:
             d = json.load(f)
 
