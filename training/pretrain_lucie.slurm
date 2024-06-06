@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=run-lucie7b-1nodes-tp2-pp2-z0-b512
-##SBATCH --qos=qos_gpu-dev    
+#SBATCH --qos=qos_gpu-t3
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=40           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH --gres=gpu:8                 # number of gpus
+#SBATCH --gres=gpu:8                 # number of gpus per node
 #SBATCH --constraint=a100
-#SBATCH --time 00:20:00               # maximum execution time (HH:MM:SS)
+#SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
 #SBATCH --account=qgz@a100
 
@@ -37,7 +37,7 @@ MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
 GPUS_PER_NODE=8
-NNODES=$SLURM_NNODES
+NNODES=$SLURM_JOB_NUM_NODES
 
 TP=2
 PP=2
