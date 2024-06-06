@@ -29,8 +29,9 @@ mkdir -p $LOGS_PATH
 
 cd $MEGATRON_DEEPSPEED_REPO
 
-DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
+TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
