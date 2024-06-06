@@ -119,12 +119,16 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
     if name.endswith("_text_document"):
         name = name[: -len("_text_document")]
     name = re.sub(r"\d+$", "", name)
-    name = name.rstrip("_").rstrip("-")
+    name = name.rstrip("_").rstrip("-.")
     if name not in possible_names:
         if "--" in name:
             name2 = "--".join(name.split("--")[:-1])
             if name2 in possible_names:
                 name = name2
+            else:
+                name2 = name.split("--")[0]
+                if name2 in possible_names:
+                    name = name2
         if name not in possible_names:
             name2 = re.sub(r"\.\d+$", "", name)
             if name2 in possible_names:
@@ -158,7 +162,7 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Path to tokenized data",
-        default="/data-storage/storage0/lucie_tokens_2.9",
+        default="/data-storage/storage0/lucie_tokens_65k_grouped",
         nargs="?",
     )
     parser.add_argument(
