@@ -29,8 +29,9 @@ mkdir -p $LOGS_PATH
 
 cd $MEGATRON_DEEPSPEED_REPO
 
-DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
+TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
@@ -41,11 +42,11 @@ NNODES=$SLURM_NNODES
 
 # ----- model
 HIDDEN_SIZE=4096 
-FFN_HIDDEN_SIZE=11008 
+FFN_HIDDEN_SIZE=12288 
 NUM_LAYERS=32 
 NUM_HEADS=32
 SEQ_LENGTH=4096 
-NUM_KV_HEADS=32 
+NUM_KV_HEADS=8 
 
 GLOBAL_BATCH_SIZE=1024
 MICRO_BATCH_SIZE=2
@@ -60,7 +61,7 @@ WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
 TRAIN_SAMPLES=750_000_000 # 3T tokens
-LR_DECAY_SAMPLES=750_000_000 # 3T tokens - not use right now
+LR_DECAY_SAMPLES=750_000_000 # 3T tokens - not used right now
 LR_WARMUP_SAMPLES=2_000_000
 RAMPUP_SAMPLES=10_000_000
 
