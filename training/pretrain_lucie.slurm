@@ -85,7 +85,7 @@ cat <<EOT > $config_json
   "bf16": {
     "enabled": true
   },
-  gradient_clipping": 1.0,
+  "gradient_clipping": 1.0,
   "steps_per_print": 2000,
   "wall_clock_breakdown": false
 }
