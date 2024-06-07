@@ -86,7 +86,7 @@ cat <<EOT > $config_json
     "enabled": true
   },
   gradient_clipping": 1.0,
-  "steps_per_print": 1,
+  "steps_per_print": 2000,
   "wall_clock_breakdown": false
 }
 EOT
@@ -129,7 +129,7 @@ OPTIMIZER_ARGS=" \
        "
 
 LOG_ARGS=" \
-       --log-interval 1000 \
+       --log-interval 1 \
        --tensorboard-dir $TENSORBOARD_PATH \
        --tensorboard-log-interval 1 \
        --log-timers-to-tensorboard \
@@ -139,6 +139,11 @@ LOG_ARGS=" \
        --tensorboard-queue-size 5 \
        --no-log-loss-scale-to-tensorboard \
        "
+
+# for 20h 1190, for 100h 5990
+EXIT_OPTS=" \
+    --exit-duration-in-mins 1190 \
+    "
 
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
@@ -176,6 +181,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --split 1,0,0 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
+       --seed 42 \
        --save $CHECKPOINT_PATH \
        --load $CHECKPOINT_PATH \
        $GPT_ARGS \
@@ -185,6 +191,11 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        $EXIT_OPTS \
        "
 
-clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+SRUN_ARGS=" \
+    --wait=60 \
+    --kill-on-bad-exit=1 \
+    "
+
+clear; srun $SRUN_ARGS --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
 
 echo "END TIME: $(date)"
