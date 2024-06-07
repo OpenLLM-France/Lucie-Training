@@ -1,4 +1,4 @@
-# setup_env.sh
+#!/bin/bash
 
 # Environement
 module purge
