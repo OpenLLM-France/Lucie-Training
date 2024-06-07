@@ -11,4 +11,3 @@ conda activate lucie
 # Variables
 export OUTPUT_PATH=/gpfswork/rech/qgz/uzq54wg
 export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
-export DATA_CACHE=/gpfswork/rech/qgz/uzq54wg/.cache
