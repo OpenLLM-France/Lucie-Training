@@ -2,6 +2,8 @@ import html
 import math
 import random
 import urllib
+from itertools import groupby
+from collections import Counter
 
 import regex as re
 
@@ -77,6 +79,110 @@ def clean_eurovoc(text):
     # text = re.sub(r"\f", "", text) # should we remove those control characters?
     return re.sub(r" +", " ", text)
 
+### Theses
+def clean_theses(text, remove_headers_and_footers=True, remove_page_number=True, remove_tables=False):
+    roman_numeral_pattern = r'(?:X{0,2})(?:IX|IV|V?I{0,3})'
+    roman_numeral_pattern_lower = r'(?:x{0,2})(?:ix|iv|v?i{0,3})'
+    bullet_point = r'[-\u2022\u2023\u25E6\u2043\u2219]'
+    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
+
+    def _remove_double_spaces(text):
+        return re.sub(r" {2,}", r" ", text)
+
+    def _remove_hal_first_page(text):
+        return re.sub(r'.*?HAL is a multi-disciplinary open access.*?\x0c', '', text, flags=re.DOTALL)
+
+    def _remove_page_number(text):
+        # numbers
+        text = re.sub(r"([\n\x0c])\d+\n*\x0c", r'\1\n\x0c', text)
+        text = re.sub(r"\x0c\n*\d+([\n\x0c])", r'\x0c\n\1', text)
+        # latin numbers
+        text = re.sub(r"([\n\x0c]){}\n*\x0c".format(roman_numeral_pattern_lower), r'\1\n\x0c', text)
+        text = re.sub(r"\x0c\n*{}([\n\x0c])".format(roman_numeral_pattern_lower), r'\x0c\n\1', text)
+        return text
+
+    def _remove_useless_line_breaks(text):
+        text = re.sub(r"(\p{Ll})-\n(\p{Ll})", r"\1\2", text)
+        text = re.sub(r"([,;])[\n\x0c]+(\p{Ll})", r"\1 \2", text)
+        text = re.sub(r"(\p{L})[\n\x0c]+(\p{Ll})", r"\1 \2", text)
+        text = re.sub(r"({})\n+(\p{{L}})".format((bullet_point)), r"\1 \2", text)
+        return text
+
+    def _fix_titles_and_biblio(text):
+        # Fix Titles
+        text = re.sub(r'([\n\x0c](?:[1-9]\.)+)\n*(\p{Lu})', r'\1 \2', text)
+        text = re.sub(r'([\n\x0c][1-9](?:\.[1-9])+)\n*(\p{Lu})', r'\1 \2', text)
+        text = re.sub(r'([\n\x0c]{}\.(?:[1-9]\.)*)\n*(\p{{Lu}})'.format(roman_numeral_pattern), r'\1 \2', text)
+        # Fix Biblio
+        text = re.sub(r'([\n\x0c]\[\w+\])\n*(\p{Lu})', r'\1 \2', text)
+        # Fix lines with only dots 
+        text = re.sub(r'^\.+$\n?', '', text, flags=re.MULTILINE)
+        return text
+
+    def _remove_empty_pages(text):
+        return re.sub(r'\x0c\s*\x0c', '\x0c', text)
+
+    def _find_and_remove_duplicates(text, lines):
+        count_lines = Counter(lines)
+        duplicated_lines = [k for k, v in count_lines.items() if (v >= 5) and (len(k)>=10)]
+        for l in duplicated_lines:
+            print(l)
+            text = re.sub(r'([\n\x0c]){}([\n\x0c])'.format(re.escape(l)), r'\1\2', text)
+        return text
+
+    def _remove_headers_and_footers(text):
+        header_lines = [line for page in text.split('\x0c') for line in page.split('\n')[:5]]
+        footer_lines = [line for page in text.split('\x0c') for line in page.split('\n')[-5:]]
+        text = _find_and_remove_duplicates(text, header_lines)
+        text = _find_and_remove_duplicates(text, footer_lines)
+        return text
+
+    def _remove_pages_with_control_char(text):
+        out = []
+        for page in text.split('\x0c'):
+            num_control_char = len(re.findall(control_char_pattern_except_page_break, page))
+            length = len(page)
+            if length>0 and num_control_char/length < 0.1:
+                out.append(page)
+            else:
+                out.append('')
+        return '\x0c'.join(out)
+
+    def filter_consecutive(text, n_characters = 30, n_consecutive = 20):
+        lines = text.split('\n')
+        is_bad_lines = [len(line) <= n_characters for line in lines]
+
+        is_consec_bad_lines = []
+        for key, group in groupby(is_bad_lines):
+            group_list = list(group)
+            group_len = len(group_list)
+            if group_len >= n_consecutive and key:
+                is_consec_bad_lines.extend([True] * group_len)
+            else:
+                is_consec_bad_lines.extend([False] * group_len)
+
+        text = '\n'.join([line for line, is_bad in zip(lines, is_consec_bad_lines) if not is_bad ])
+        return text
+
+    def _remove_tables(text):
+        out = []
+        for page in text.split('\x0c'):
+            out.append(filter_consecutive(page))
+        return '\x0c'.join(out)
+
+    text = _remove_hal_first_page(text)
+    text = _remove_pages_with_control_char(text)
+    if remove_headers_and_footers:
+        text = _remove_headers_and_footers(text)
+    if remove_page_number:
+        text = _remove_page_number(text)
+    if remove_tables:
+        text = _remove_tables(text)
+    text = _remove_useless_line_breaks(text)
+    text = _fix_titles_and_biblio(text)
+    text = _remove_double_spaces(text)
+    text = _remove_empty_pages(text)
+    return text
 
 def _repair_cid_character(match):  # noqa # C901 `...` is too complex
     i = int(match.group(2))
