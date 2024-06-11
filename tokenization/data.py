@@ -16,9 +16,9 @@ from text import (
     check_language,
     clean_discours,
     clean_eurovoc,
-    clean_wikipedia,
-    clean_theses,
     clean_gutenberg,
+    clean_theses,
+    clean_wikipedia,
     fix_legi,
     fix_legi_and_remove_title,
     html_unescape,
@@ -1271,8 +1271,10 @@ class DataIteratorTheses(DataIteratorParquet):
             self,
             folder,
             name="Theses",
-            postprocess=lambda text: clean_theses(text),
-            filter_fn=lambda x: filter_thesis_heuristic(x),
+            postprocess=lambda text: clean_theses(
+                text, remove_headers_and_footers=True, remove_page_number=True, remove_tables=False
+            ),
+            filter_fn=filter_by_perplexity_func(2535) if filter_by_perplexity else None,
             key="complete_text",
             **kwargs,
         )
@@ -1508,7 +1510,7 @@ class DataIteratorPile(DataIteratorConcat):
         iterators = []
         parent_folder = f"{DATA_PATH}/pile-uncopyrighted"
         # train_regex = f"{parent_folder}/train/*.jsonl.zst"
-        train_regex = f"{parent_folder}/train_sorted/*.jsonl"
+        train_regex = f"{parent_folder}/train_sorted_undup/*.jsonl"
         # self.json_files = []
         for type in splits:
             is_train = type == "train"
@@ -1528,7 +1530,12 @@ class DataIteratorPile(DataIteratorConcat):
                             data_files=json_file,
                             split="train",
                         ),
-                        name=f"{name}:{type}" + (f":{os.path.basename(json_file).split('.')[0]}" if is_train else ""),
+                        name=name
+                        + (
+                            f":{os.path.basename(json_file).split('.')[0].replace('pile_', '')}"
+                            if is_train
+                            else f":{type}"
+                        ),
                         **kwargs,
                     )
                 )
