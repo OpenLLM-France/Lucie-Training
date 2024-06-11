@@ -79,6 +79,13 @@ def clean_eurovoc(text):
     # text = re.sub(r"\f", "", text) # should we remove those control characters?
     return re.sub(r" +", " ", text)
 
+def clean_gutenberg(text):
+    def remove_licence(text):
+        pattern = r'\n\n            \*\*\* END OF THE PROJECT GUTENBERG EBOOK.*'
+        return re.sub(pattern, '', text, flags=re.DOTALL)
+    text = remove_licence(text)
+    return text
+
 ### Theses
 def clean_theses(text, remove_headers_and_footers=True, remove_page_number=True, remove_tables=False):
     roman_numeral_pattern = r'(?:X{0,2})(?:IX|IV|V?I{0,3})'
