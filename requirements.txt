@@ -5,3 +5,4 @@ six==1.16.0
 tokenizers==0.15.2
 transformers==4.36.1
 flash-attn==2.5.8
+zstandard==0.22.0
