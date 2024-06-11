@@ -54,6 +54,7 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
     if subset:
         subset = subset.strip(":").replace(":", "-")
         subset = subset.split(":")[0]
+        subset = subset.replace("train-pile_", "")
 
     return language, name, subset
 
@@ -116,11 +117,11 @@ def get_stat_names(compute_token_stats=True):
     return list(dummy.keys())
 
 
-def format_stats_display(data):
+def format_stats_display(data, main=True):
     for name, format in [
         ("language", "{:<9s}"),
         ("name", "{:<21s}"),
-        ("subset", "{:<13s}"),
+        ("subset", "{:<12s}" if main else "{:<28s}"),
         ("M docs", "{:8.3f}"),
         ("B words", "{:8.3f}"),
         ("B chars", "{:8.3f}"),
@@ -367,7 +368,7 @@ if __name__ == "__main__":
         )
 
         fieldnames = ["language", "name", "subset"] + get_stat_names(bool(tokencount_folder))
-        header_with_spaces = format_stats_display(dict(zip(fieldnames, fieldnames)))
+        header_with_spaces = format_stats_display(dict(zip(fieldnames, fieldnames)), ONLY_DETAILED)
 
         if ONLY_DETAILED:
             output_metadata_file_detailed = output_metadata_file
@@ -378,7 +379,7 @@ if __name__ == "__main__":
                 writer.writerow(header_with_spaces)
                 for row in rows:
                     row = compute_extra_stats(row, tokencount_folder)
-                    row = format_stats_display(row)
+                    row = format_stats_display(row, ONLY_DETAILED)
                     writer.writerow(row)
 
         with open(output_metadata_file_detailed, "w", encoding="utf8") as f:
@@ -386,5 +387,5 @@ if __name__ == "__main__":
             writer.writerow(header_with_spaces)
             for row in rows_detailed:
                 row = compute_extra_stats(row, tokencount_folder)
-                row = format_stats_display(row)
+                row = format_stats_display(row, ONLY_DETAILED)
                 writer.writerow(row)
