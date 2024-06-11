@@ -29,8 +29,9 @@ logging.basicConfig()
 logger.setLevel(logging.INFO)
 
 _folder = os.path.dirname(os.path.realpath(__file__))
+_asset_folder = os.path.join(os.path.dirname(_folder), "assets")
 _the_stack_metadata_file = os.path.join(
-    os.path.dirname(_folder), "assets", "programming-languages", "the-stack-dedup-programming-languages-stats.json"
+    _asset_folder, "programming-languages", "the-stack-dedup-programming-languages-stats.json"
 )
 assert os.path.isfile(_the_stack_metadata_file)
 
@@ -1149,6 +1150,23 @@ class DataIteratorClaire(DataIteratorConcat):
         )
 
 
+class DataIteratorStac(DataIterator):
+    def __init__(self, streaming=True, **kwargs):
+        filenames = [DATA_PATH + f"/stac/{subset}.txt" for subset in ["train", "test"]]
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "text",
+                data_files={"train": filenames},
+                streaming=streaming,
+                sample_by="paragraph",
+                split="train",
+            ),
+            name="Stac",
+            **kwargs,
+        )
+
+
 class DataIteratorEurovoc(DataIteratorParquet):
     def __init__(self, language="en", filter_by_perplexity=True, **kwargs):
         name = f"Eurovoc:{language.lower()}"
@@ -1472,6 +1490,46 @@ class DataIteratorPes2o(DataIteratorConcat):
             DataIteratorConcat.__init__(self, iterators, name=name)
 
 
+class DataIteratorPile(DataIteratorConcat):
+    def __init__(self, streaming=True, train=True, **kwargs):
+        if train is not None:
+            splits = ["train"] if train else ["val"]
+        else:
+            splits = ["train", "val", "test"]
+
+        name = "Pile"
+
+        iterators = []
+        parent_folder = f"{DATA_PATH}/pile-uncopyrighted"
+        # train_regex = f"{parent_folder}/train/*.jsonl.zst"
+        train_regex = f"{parent_folder}/train_sorted/*.jsonl"
+        # self.json_files = []
+        for type in splits:
+            is_train = type == "train"
+            files_regex = train_regex if is_train else f"{parent_folder}/{type}.jsonl.zst"
+            type = type.replace("pile_", "")
+            json_files = glob.glob(files_regex)
+            if not len(json_files):
+                raise RuntimeError(f"No json files in {files_regex}")
+            logger.info(f"Using {len(json_files)} json files from {files_regex}")
+            # self.json_files.extend(json_files)
+            for json_file in sorted(json_files):
+                iterators.append(
+                    DataIterator(
+                        datasets.load_dataset(
+                            "json",
+                            streaming=streaming,
+                            data_files=json_file,
+                            split="train",
+                        ),
+                        name=f"{name}:{type}" + (f":{os.path.basename(json_file).split('.')[0]}" if is_train else ""),
+                        **kwargs,
+                    )
+                )
+
+        DataIteratorConcat.__init__(self, iterators, name=name)
+
+
 class DataIteratorMathPile(DataIteratorConcat):
     def __init__(self, streaming=True, train=None, **kwargs):
         if train is not None:
@@ -1483,7 +1541,7 @@ class DataIteratorMathPile(DataIteratorConcat):
 
         train_iterators = []
         valid_iterators = []
-        self.json_files = []
+        # self.json_files = []
         for split in splits:
             is_train = split == "train"
             split_folder = f"{DATA_PATH}/mathpile_commercial/{split}"
@@ -1501,7 +1559,7 @@ class DataIteratorMathPile(DataIteratorConcat):
                 if not len(json_files):
                     raise RuntimeError(f"No json files in {files_regex}")
                 logger.info(f"Using {len(json_files)} json files from {files_regex}")
-                self.json_files.extend(json_files)
+                # self.json_files.extend(json_files)
                 (train_iterators if is_train else valid_iterators).append(
                     DataIterator(
                         datasets.load_dataset(
@@ -1672,15 +1730,10 @@ if __name__ == "__main__":
         help="Which dataset to test",
     )
     parser.add_argument(
-        "--max_examples",
-        type=int,
-        default=None,
-        help="Maximum number of samples to iterate on",
-    )
-    parser.add_argument(
         "--folder",
         type=str,
-        default=None,
+        default=os.path.join(_asset_folder, "stats_raw"),
+        # default=None,
         help="Folder to dump some example data into",
     )
     parser.add_argument(
@@ -1694,6 +1747,12 @@ if __name__ == "__main__":
         type=int,
         default=10,
         help="Number of pages to dump as examples (when --folder is specified)",
+    )
+    parser.add_argument(
+        "--max_examples",
+        type=int,
+        default=None,
+        help="Maximum number of samples to iterate on",
     )
     parser.add_argument(
         "--only_dump_examples",
@@ -1746,6 +1805,9 @@ if __name__ == "__main__":
                     prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
                 else:
                     prefix_example_files += "--" + to_insert
+            elif ignore_if_exists:
+                # Create an empty file to avoid recomputing
+                json.dump({}, open(stat_filename, "w", encoding="utf8"))
         print(f"Computing stats for {name_slug}...")
         tic = time.time()
         num_pages = 0
@@ -1827,39 +1889,42 @@ if __name__ == "__main__":
             its = [it]
             global_stats = None
 
-        max_num_examples_per_subset = num_examples  # / len(its)
-        for subset in its:
-            subname = subset.name
-            num_examples = int(max_num_examples_per_subset) + (
-                1 if random.random() < (max_num_examples_per_subset % 1) else 0
-            )
-            if num_examples == 0 and any(s in subname for s in ("tex", "python")):
-                num_examples = 2
-            if "other" in name.lower():
-                num_examples = args.num_examples
-            if num_examples == 0 and args.only_dump_examples:
-                continue
-            print(f"* {subname}")
-            if main_prefix_example_files:
-                suffix = remove_common_prefix(name_slug, simple_slugify(subname))
-                prefix_example_files = f"{main_prefix_example_files}{suffix}"
-            else:
-                prefix_example_files = None
-            stats = test_iterator(
-                subset,
-                folder=args.folder,
-                name=subname,
-                ignore_if_exists=args.ignore_if_exists,
-                num_examples=num_examples,
-                only_dump_examples=args.only_dump_examples,
-                prefix_example_files=prefix_example_files,
-            )
-            if args.only_dump_examples:
-                continue
-            print(json.dumps(stats, indent=4))
+        try:
+            max_num_examples_per_subset = num_examples  # / len(its)
+            for subset in its:
+                subname = subset.name
+                num_examples = int(max_num_examples_per_subset) + (
+                    1 if random.random() < (max_num_examples_per_subset % 1) else 0
+                )
+                if num_examples == 0 and any(s in subname for s in ("tex", "python")):
+                    num_examples = 2
+                if "other" in name.lower():
+                    num_examples = args.num_examples
+                if num_examples == 0 and args.only_dump_examples:
+                    continue
+                print(f"* {subname}")
+                if main_prefix_example_files:
+                    suffix = remove_common_prefix(name_slug, simple_slugify(subname))
+                    prefix_example_files = f"{main_prefix_example_files}{suffix}"
+                else:
+                    prefix_example_files = None
+                stats = test_iterator(
+                    subset,
+                    folder=args.folder,
+                    name=subname,
+                    ignore_if_exists=args.ignore_if_exists,
+                    num_examples=num_examples,
+                    only_dump_examples=args.only_dump_examples,
+                    prefix_example_files=prefix_example_files,
+                )
+                if args.only_dump_examples:
+                    continue
+                print(json.dumps(stats, indent=4))
 
-            if global_stats is not None:
-                update_stats(global_stats, stats)
+                if global_stats is not None:
+                    update_stats(global_stats, stats)
+        except Exception as err:
+            raise RuntimeError(f"Error while iterating on '{subname}'") from err
 
         if args.only_dump_examples:
             continue

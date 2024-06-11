@@ -264,7 +264,7 @@ def fit_tokenizer(
         import csv
 
         tsv_file = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), os.path.pardir, "assets", "count_tokens.tsv"
+            os.path.dirname(os.path.realpath(__file__)), os.path.pardir, "assets", "count_unicode_characters.tsv"
         )
         initial_alphabet = []
         exemples_removed = {}

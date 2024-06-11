@@ -14,7 +14,7 @@ from megatron.data import indexed_dataset  # noqa # E402 Module level import not
 def get_name(dataset):
     name = os.path.basename(dataset)
     f = name.split("--")
-    if f[1] in ["en", "fr", "de", "es", "it"]:
+    if len(f) >= 2 and f[1] in ["en", "fr", "de", "es", "it"]:
         name = "--".join(f[:2])
     else:
         name = f[0]
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Folder with indexed datasets",
-        default="/data-storage/storage0/lucie_tokens_2.9",
+        default="/data-storage/storage0/lucie_tokens_65k_grouped",
         nargs="?",
     )
     args = parser.parse_args()
@@ -56,12 +56,20 @@ if __name__ == "__main__":
         if save_in_json:
             json_file = path + ".json"
         if json_file and os.path.exists(json_file):
-            data = json.load(open(json_file))
-            total_tokens = data["total_tokens"]
-            total_sequences = data["total_sequences"]
-            min_tokens = data["min_tokens"]
-            max_tokens = data["max_tokens"]
+            try:
+                data = json.load(open(json_file))
+                total_tokens = data["total_tokens"]
+                total_sequences = data["total_sequences"]
+                min_tokens = data["min_tokens"]
+                max_tokens = data["max_tokens"]
+            except Exception as e:
+                print(f"Error reading {json_file}: {e}")
+                total_tokens = 0
         else:
+            if save_in_json:
+                # Create empty file
+                with open(json_file, "w") as f:
+                    pass
             dataset = indexed_dataset.MMapIndexedDataset(path)
             total_tokens = 0
             total_sequences = 0
