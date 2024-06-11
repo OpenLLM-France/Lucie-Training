@@ -16,22 +16,8 @@ text_types = {
     "mixed": ["PeS2o"],
 }
 
-text_types = {k: [x.lower() for x in v] for k, v in text_types.items()}
-
-
-def is_ocr_dataset(name, subset):
-    if name in ["---", "", None]:
-        return ""
-    res = "false"
-    if any(d in name.lower() for d in text_types["ocr"]):
-        res = "true"
-    if any(d in name.lower() for d in text_types["mixed"]):
-        res = "mixed"
-    return res
-
-
 datasets_categories = {
-    "technical": ["Theses", "HAL", "Persee", "OpenEdition", "PeS2o", "PhilPapers", "NIH ExPorter"],
+    "technical": ["Theses", "HAL", "Persee", "OpenEdition", "PeS2o", "PhilPapers", "NIH ExPorter", "USPTO Backgrounds"],
     "legal": ["OpenData", "FreeLaw"],
     "parlementary": [
         "Eurovoc.es",
@@ -62,9 +48,32 @@ datasets_categories = {
 }
 
 
+def _norm_string(s):
+    return s.lower().replace("_", " ")
+
+
+text_types = {k: [_norm_string(x) for x in v] for k, v in text_types.items()}
+datasets_categories = {k: [_norm_string(x) for x in v] for k, v in datasets_categories.items()}
+
+
+def is_ocr_dataset(name, subset):
+    if name in ["---", "", None]:
+        return ""
+    name = _norm_string(name)
+    res = "false"
+    if any(d in name for d in text_types["ocr"]):
+        res = "true"
+    if any(d in name for d in text_types["mixed"]):
+        res = "mixed"
+    return res
+
+
 def get_dataset_category(name, subset):
     if name in ["---", "", None]:
         return ""
+    name = _norm_string(name)
+    if name == "pile" and subset:
+        name = _norm_string(subset)
     for cat, datasets in datasets_categories.items():
         if name in datasets:
             return cat
