@@ -80,9 +80,12 @@ def clean_eurovoc(text):
     return re.sub(r" +", " ", text)
 
 def clean_gutenberg(text):
+    def remove_gallica_mention(text):
+        return re.sub('http://gallica.bnf.fr', '', text)
     def remove_licence(text):
         pattern = r'\n\n            \*\*\* END OF THE PROJECT GUTENBERG EBOOK.*'
-        return re.sub(pattern, '', text, flags=re.DOTALL)
+        return re.sub(pattern, '', text, flags=re.DOTALL) 
+    text = remove_gallica_mention(text)
     text = remove_licence(text)
     return text
 
