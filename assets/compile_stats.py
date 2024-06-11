@@ -2,6 +2,74 @@ import csv
 import json
 import os
 
+text_types = {
+    "ocr": [
+        "AmericanStories",
+        "Eurovoc",
+        "GallicaPress",
+        "GallicaMonographies",
+        "HAL",
+        # 'OtherFr',
+        "Persee",
+        "Theses",
+    ],
+    "mixed": ["PeS2o"],
+}
+
+text_types = {k: [x.lower() for x in v] for k, v in text_types.items()}
+
+
+def is_ocr_dataset(name, subset):
+    if name in ["---", "", None]:
+        return ""
+    res = "false"
+    if any(d in name.lower() for d in text_types["ocr"]):
+        res = "true"
+    if any(d in name.lower() for d in text_types["mixed"]):
+        res = "mixed"
+    return res
+
+
+datasets_categories = {
+    "technical": ["Theses", "HAL", "Persee", "OpenEdition", "PeS2o", "PhilPapers", "NIH ExPorter"],
+    "legal": ["OpenData", "FreeLaw"],
+    "parlementary": [
+        "Eurovoc.es",
+        "Eurovoc.de",
+        "Eurovoc.it",
+        "Eurovoc.en",
+        "Europarl.fr",
+        "Europarl.en",
+        "Europarl.es",
+        "Europarl.de",
+        "EuroparlAligned.fr-en",
+        "EuroparlAligned.es-en",
+        "EuroparlAligned.it-en",
+        "EuroparlAligned.de-fr",
+        "DiscoursPublics",
+    ],
+    "dialogue": ["Claire.en", "Claire.fr", "Stac"],
+    "book": ["GallicaMonographies", "Gutenberg.en", "Gutenberg.de", "Gutenberg.it", "Gutenberg.es", "Gutenberg.fr"],
+    "newspaper": ["AmericanStories", "GallicaPress"],
+    "forum": ["Ubuntu IRC", "StackExchange"],
+    "wiki": ["Wikiother.fr", "Wikipedia.en", "Wikipedia.es", "Wikipedia.de", "Wikipedia.it", "Wikipedia.fr"],
+    "code": ["TheStack"],
+    "math": ["MathPile", "DM Mathematics"],
+    "misc": [
+        "CroissantAligned",
+        "OtherFr",
+    ],
+}
+
+
+def get_dataset_category(name, subset):
+    if name in ["---", "", None]:
+        return ""
+    for cat, datasets in datasets_categories.items():
+        if name in datasets:
+            return cat
+    return None
+
 
 # Ignore datasets
 def ignore_datasets(name):
