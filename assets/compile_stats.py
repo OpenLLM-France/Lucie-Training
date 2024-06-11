@@ -2,6 +2,74 @@ import csv
 import json
 import os
 
+text_types = {
+    "ocr": [
+        "AmericanStories",
+        "Eurovoc",
+        "GallicaPress",
+        "GallicaMonographies",
+        "HAL",
+        # 'OtherFr',
+        "Persee",
+        "Theses",
+    ],
+    "mixed": ["PeS2o"],
+}
+
+text_types = {k: [x.lower() for x in v] for k, v in text_types.items()}
+
+
+def is_ocr_dataset(name, subset):
+    if name in ["---", "", None]:
+        return ""
+    res = "false"
+    if any(d in name.lower() for d in text_types["ocr"]):
+        res = "true"
+    if any(d in name.lower() for d in text_types["mixed"]):
+        res = "mixed"
+    return res
+
+
+datasets_categories = {
+    "technical": ["Theses", "HAL", "Persee", "OpenEdition", "PeS2o", "PhilPapers", "NIH ExPorter"],
+    "legal": ["OpenData", "FreeLaw"],
+    "parlementary": [
+        "Eurovoc.es",
+        "Eurovoc.de",
+        "Eurovoc.it",
+        "Eurovoc.en",
+        "Europarl.fr",
+        "Europarl.en",
+        "Europarl.es",
+        "Europarl.de",
+        "EuroparlAligned.fr-en",
+        "EuroparlAligned.es-en",
+        "EuroparlAligned.it-en",
+        "EuroparlAligned.de-fr",
+        "DiscoursPublics",
+    ],
+    "dialogue": ["Claire.en", "Claire.fr", "Stac"],
+    "book": ["GallicaMonographies", "Gutenberg.en", "Gutenberg.de", "Gutenberg.it", "Gutenberg.es", "Gutenberg.fr"],
+    "newspaper": ["AmericanStories", "GallicaPress"],
+    "forum": ["Ubuntu IRC", "StackExchange"],
+    "wiki": ["Wikiother.fr", "Wikipedia.en", "Wikipedia.es", "Wikipedia.de", "Wikipedia.it", "Wikipedia.fr"],
+    "code": ["TheStack"],
+    "math": ["MathPile", "DM Mathematics"],
+    "misc": [
+        "CroissantAligned",
+        "OtherFr",
+    ],
+}
+
+
+def get_dataset_category(name, subset):
+    if name in ["---", "", None]:
+        return ""
+    for cat, datasets in datasets_categories.items():
+        if name in datasets:
+            return cat
+    return None
+
 
 def to_name_subset(name):
     name = name.replace("stats_", "").replace(".json", "").replace("_text_document", "")
@@ -73,6 +141,10 @@ def compute_extra_stats(data, tokencount_folder):
         return data
     try:
         assert "#words" in data, f"Missing #words in {data.keys()}"
+
+        data["ocr"] = is_ocr_dataset(data.get("name", ""), data.get("subset"))
+        data["category"] = get_dataset_category(data.get("name", ""), data.get("subset"))
+
         data["M docs"] = data["#docs"] / 1_000_000
         data["B words"] = data["#words"] / 1_000_000_000
         data["B chars"] = data["#chars"] / 1_000_000_000
@@ -122,6 +194,8 @@ def format_stats_display(data, main=True):
         ("language", "{:<9s}"),
         ("name", "{:<21s}"),
         ("subset", "{:<12s}" if main else "{:<28s}"),
+        ("ocr", "{:<6s}"),
+        ("category", "{:<13s}"),
         ("M docs", "{:8.3f}"),
         ("B words", "{:8.3f}"),
         ("B chars", "{:8.3f}"),
