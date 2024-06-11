@@ -120,6 +120,7 @@ def clean_theses(text, remove_headers_and_footers=True, remove_page_number=True,
         text = re.sub(r'([\n\x0c](?:[1-9]\.)+)\n*(\p{Lu})', r'\1 \2', text)
         text = re.sub(r'([\n\x0c][1-9](?:\.[1-9])+)\n*(\p{Lu})', r'\1 \2', text)
         text = re.sub(r'([\n\x0c]{}\.(?:[1-9]\.)*)\n*(\p{{Lu}})'.format(roman_numeral_pattern), r'\1 \2', text)
+        text = re.sub(r'([\n\x0c]{}(?:\.[1-9])*)\n*(\p{{Lu}})'.format(roman_numeral_pattern), r'\1 \2', text)
         # Fix Biblio
         text = re.sub(r'([\n\x0c]\[\w+\])\n*(\p{Lu})', r'\1 \2', text)
         # Fix lines with only dots 
@@ -133,7 +134,6 @@ def clean_theses(text, remove_headers_and_footers=True, remove_page_number=True,
         count_lines = Counter(lines)
         duplicated_lines = [k for k, v in count_lines.items() if (v >= 5) and (len(k)>=10)]
         for l in duplicated_lines:
-            print(l)
             text = re.sub(r'([\n\x0c]){}([\n\x0c])'.format(re.escape(l)), r'\1\2', text)
         return text
 
