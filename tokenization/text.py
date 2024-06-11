@@ -101,8 +101,8 @@ def clean_theses(text, remove_headers_and_footers=True, remove_page_number=True,
 
     def _remove_page_number(text):
         # numbers
-        text = re.sub(r"([\n\x0c])\d+\n*\x0c", r'\1\n\x0c', text)
-        text = re.sub(r"\x0c\n*\d+([\n\x0c])", r'\x0c\n\1', text)
+        text = re.sub(r"([\n\x0c])[ -|/\n]*?\d+[ -|/\n]*?(\x0c)", r'\1\2', text)
+        text = re.sub(r"(\x0c)[ -|/]*?\d+[ -|/]*?([\n\x0c])", r'\1\2', text)
         # latin numbers
         text = re.sub(r"([\n\x0c]){}\n*\x0c".format(roman_numeral_pattern_lower), r'\1\n\x0c', text)
         text = re.sub(r"\x0c\n*{}([\n\x0c])".format(roman_numeral_pattern_lower), r'\x0c\n\1', text)
