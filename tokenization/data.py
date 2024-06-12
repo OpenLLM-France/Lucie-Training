@@ -1253,6 +1253,12 @@ class DataIteratorHal(DataIteratorParquet):
             **kwargs,
         )
 
+def filter_thesis_heuristic(data):
+    if data['word_count'] < 1000:
+        return False
+    if data['character_count'] < 10000:
+        return False
+    return True
 
 class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1265,8 +1271,8 @@ class DataIteratorTheses(DataIteratorParquet):
             self,
             folder,
             name="Theses",
-            postprocess=lambda text: clean_theses(text, remove_headers_and_footers=True, remove_page_number=True, remove_tables=False),
-            filter_fn=filter_by_perplexity_func(2535) if filter_by_perplexity else None,
+            postprocess=lambda text: clean_theses(text),
+            filter_fn=lambda x: filter_thesis_heuristic(x),
             key="complete_text",
             **kwargs,
         )
