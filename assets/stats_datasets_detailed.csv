@@ -1,7 +1,7 @@
 language ,name                 ,subset                      ,ocr   ,category     ,  M docs, B words, B chars, #words/doc,#chars/word, B tokens,#tokens/words,#chars/tokens
----      ,---                  ,---                         ,      ,             , 695.601, 266.005,1963.306,        382,        7.4,  564.974,            ,            
+---      ,---                  ,---                         ,      ,             , 695.601, 266.005,1963.306,        382,        7.4,  602.500,        2.26,        3.26
 fr       ,---                  ,---                         ,      ,             ,  13.609, 106.063, 646.067,       7794,        6.1,  190.762,        1.80,        3.39
-en       ,---                  ,---                         ,      ,             , 133.082,  84.847, 535.950,        638,        6.3,  106.764,            ,            
+en       ,---                  ,---                         ,      ,             , 133.082,  84.847, 535.950,        638,        6.3,  144.291,        1.70,        3.71
 fr-en    ,---                  ,---                         ,      ,             , 410.032,  17.016, 107.658,         41,        6.3,   25.493,        1.50,        4.22
 de       ,---                  ,---                         ,      ,             ,   3.137,   2.520,  17.076,        803,        6.8,    5.244,        2.08,        3.26
 es       ,---                  ,---                         ,      ,             ,   2.204,   2.104,  12.466,        955,        5.9,    3.703,        1.76,        3.37
@@ -55,13 +55,13 @@ fr       ,Europarl.fr          ,                            ,false ,parlementary
 en       ,PeS2o                ,s2orc-train                 ,mixed ,technical    ,   8.242,  36.092, 226.904,       4379,        6.3,         ,            ,            
 en       ,PeS2o                ,s2ag-train                  ,mixed ,technical    ,  30.569,   5.926,  40.273,        194,        6.8,         ,            ,            
 en       ,PeS2o                ,validation                  ,mixed ,technical    ,   0.161,   0.279,   1.785,       1734,        6.4,         ,            ,            
-en       ,Pile                 ,FreeLaw                     ,false ,legal        ,   3.415,   8.204,  52.580,       2403,        6.4,         ,            ,            
-en       ,Pile                 ,StackExchange               ,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,         ,            ,            
-en       ,Pile                 ,USPTO_Backgrounds           ,false ,technical    ,   5.139,   3.492,  22.309,        680,        6.4,         ,            ,            
-en       ,Pile                 ,DM_Mathematics              ,false ,math         ,   0.992,   1.746,   8.127,       1760,        4.7,         ,            ,            
-en       ,Pile                 ,Ubuntu_IRC                  ,false ,forum        ,   0.010,   0.867,   5.610,      83577,        6.5,         ,            ,            
-en       ,Pile                 ,PhilPapers                  ,false ,technical    ,   0.031,   0.363,   2.304,      11801,        6.3,         ,            ,            
-en       ,Pile                 ,NIH_ExPorter                ,false ,technical    ,   0.914,   0.288,   1.979,        315,        6.9,         ,            ,            
+en       ,Pile                 ,FreeLaw                     ,false ,legal        ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
+en       ,Pile                 ,StackExchange               ,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,   10.275,        2.27,        3.27
+en       ,Pile                 ,USPTO_Backgrounds           ,false ,technical    ,   5.139,   3.492,  22.309,        680,        6.4,    5.105,        1.46,        4.37
+en       ,Pile                 ,DM_Mathematics              ,false ,math         ,   0.992,   1.746,   8.127,       1760,        4.7,    4.928,        2.82,        1.65
+en       ,Pile                 ,Ubuntu_IRC                  ,false ,forum        ,   0.010,   0.867,   5.610,      83577,        6.5,    2.159,        2.49,        2.60
+en       ,Pile                 ,PhilPapers                  ,false ,technical    ,   0.031,   0.363,   2.304,      11801,        6.3,    0.618,        1.70,        3.73
+en       ,Pile                 ,NIH_ExPorter                ,false ,technical    ,   0.914,   0.288,   1.979,        315,        6.9,    0.431,        1.50,        4.59
 en       ,AmericanStories      ,1922                        ,true  ,newspaper    ,   2.024,   0.314,   1.801,        155,        5.7,         ,            ,            
 en       ,AmericanStories      ,1921                        ,true  ,newspaper    ,   1.972,   0.300,   1.718,        152,        5.7,         ,            ,            
 en       ,AmericanStories      ,1920                        ,true  ,newspaper    ,   1.732,   0.252,   1.441,        145,        5.7,         ,            ,            
@@ -247,7 +247,7 @@ en       ,Claire.en            ,DailyDialog                 ,false ,dialogue    
 en       ,Claire.en            ,ICSI                        ,false ,dialogue     ,   0.000,   0.001,   0.006,      11841,        6.2,    0.002,        2.03,        3.06
 en       ,Claire.en            ,AMI                         ,false ,dialogue     ,   0.000,   0.001,   0.005,       5744,        6.3,    0.002,        2.09,        3.03
 en       ,Europarl.en          ,                            ,false ,parlementary ,   0.011,   0.056,   0.339,       5071,        6.0,    0.069,        1.22,        4.92
-en       ,Stac                 ,                            ,false ,dialogue     ,   0.000,   0.000,   0.000,       1176,        6.2,         ,            ,            
+en       ,Stac                 ,                            ,false ,dialogue     ,   0.000,   0.000,   0.000,       1176,        6.2,    0.000,        2.28,        2.71
 fr-en    ,CroissantAligned     ,train                       ,false ,misc         , 408.029,  16.469, 102.757,         40,        6.2,         ,            ,            
 fr-en    ,EuroparlAligned.fr-en,                            ,false ,parlementary ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
 de       ,Wikipedia.de         ,                            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
