@@ -1199,6 +1199,45 @@ def filter_by_perplexity(x, threshold):
     mean_or_median_is_lower = mean_is_lower or np.median(perplexities) <= threshold
     return mean_or_median_is_lower
 
+def preproc_gallica(data):
+    text = data['complete_text']
+
+    L = 10000
+    list_of_chunks = [] # list of chunk start and end
+    good_ppl = [(ppl <= 1000) and (ppl >= 10) and (lan=='fr') and (lan_score>=0.65) for ppl, lan, lan_score in zip(data['ccnet_perplexity'], data['fasttext_language'], data['ccnet_language_score'])]
+    for i, actual_chunk_is_good in enumerate(good_ppl):
+        if actual_chunk_is_good:
+            start = text.rfind('\n', 0, i*L)
+            start = start if start != -1 else 0
+            end = text.find('\n', (i+1)*L)
+            end = end if end != -1 else len(text)
+            list_of_chunks.append((start, end))
+
+    def post_proc(list_of_chunks):
+        previous_end = None
+        list_of_chunks_ = []
+        for start, end in list_of_chunks:
+            if (previous_end is not None) and (previous_end > start):
+                start = previous_end
+            list_of_chunks_.append((start, end))
+            previous_end = end
+        return list_of_chunks_
+    
+    list_of_chunks = post_proc(list_of_chunks)
+
+    cleaned_text = ''
+    previous_end = None
+    for start, end in list_of_chunks:
+        if previous_end is None and start > 0:
+            cleaned_text += '\n\n[...]\n\n'
+        if previous_end is not None and start > previous_end:
+            cleaned_text += '\n\n[...]\n\n'
+        cleaned_text += text[start:end]
+        previous_end = end
+
+    cleaned_text = '' if cleaned_text == '\n\n[...]\n\n' else cleaned_text # In the case all the text is removed
+    data['complete_text'] = cleaned_text
+    return data
 
 class DataIteratorGallicaMono(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1208,11 +1247,11 @@ class DataIteratorGallicaMono(DataIteratorParquet):
             folder,
             key="complete_text",
             name="GallicaMonographies",
+            preprocess=preproc_gallica,
             postprocess=html_unescape,  # clean_pdf_extraction_and_html
-            filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
+            # filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
             **kwargs,
         )
-
 
 class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1227,8 +1266,9 @@ class DataIteratorGallicaPress(DataIteratorConcat):
                     os.path.join(folder, f"gallica_presse_{source}_parquet"),
                     key="complete_text",
                     name=f"GallicaPress:{source}",
+                    preprocess=preproc_gallica,
                     postprocess=html_unescape,  # clean_pdf_extraction
-                    filter_fn=filter_by_perplexity_func(690) if filter_by_perplexity else None,
+                    # filter_fn=filter_by_perplexity_func(690) if filter_by_perplexity else None,
                     **kwargs,
                 )
                 for source in ("html", "txt")
@@ -1258,7 +1298,7 @@ def filter_thesis_heuristic(data):
         return False
     if data['character_count'] < 10000:
         return False
-    return True
+    return filter_by_perplexity(data, 2535)
 
 class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1272,7 +1312,7 @@ class DataIteratorTheses(DataIteratorParquet):
             folder,
             name="Theses",
             postprocess=lambda text: clean_theses(text),
-            filter_fn=lambda x: filter_thesis_heuristic(x),
+            filter_fn=lambda data: filter_thesis_heuristic(data),
             key="complete_text",
             **kwargs,
         )
