@@ -84,7 +84,7 @@ def clean_gutenberg(text):
     def remove_licence(text):
         pattern = r'\n\n            \*\*\* END OF THE PROJECT GUTENBERG EBOOK.*'
         return re.sub(pattern, '', text, flags=re.DOTALL) 
-    text = remove_gallica_mention(text)
+    # text = remove_gallica_mention(text)
     text = remove_licence(text)
     return text
 
@@ -135,8 +135,8 @@ def filter_pages(text):
 
         if (i == 0) and ('HAL is a multi-disciplinary open access' in page):
             pass
-        elif 'copyright' in normalized_page:
-            pass
+        # elif 'Copyright ©' in page:
+        #     pass
         elif num_normalized_words <= 5:
             pass
         elif num_lines > 200:
