@@ -5,10 +5,10 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
-#SBATCH --time 01:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=./out/%x-%j.out # STDOUT
 #SBATCH --account=qgz@a100
-#SBATCH --qos=qos_gpu-dev
+#SBATCH --qos=qos_gpu-t3
 #SBATCH --job-name=lucie-test
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=ogouvert@linagora.com
@@ -43,25 +43,25 @@ NNODES=$SLURM_NNODES
 
 # ----- model
 HIDDEN_SIZE=512 
-FFN_HIDDEN_SIZE=1548 
-NUM_LAYERS=12 
+FFN_HIDDEN_SIZE=1536 
+NUM_LAYERS=6 
 NUM_HEADS=8
-SEQ_LENGTH=4096
 NUM_KV_HEADS=8 
+SEQ_LENGTH=4096
 
 GLOBAL_BATCH_SIZE=256
 MICRO_BATCH_SIZE=16
 ZERO_STAGE=0
 
 # ------ Optimizer
-TRAIN_STEPS=100_000 
+TRAIN_STEPS=30_000 
 LR=3e-4
 MIN_LR=3e-5
 LR_WARMUP_STEPS=2000
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
-SAVE_INTERVAL=20_000
+SAVE_INTERVAL=10_000
 
 config_json="./ds_config.$SLURM_JOBID.json"
 
@@ -146,11 +146,15 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
+EXIT_OPTS=" \
+    --exit-duration-in-mins 1190 \
+    "
+
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path $DATA_CACHE_PATH \
        --tensor-model-parallel-size 1 \
-       --no-pipeline-parallel \
+       --pipeline-model-parallel-size 1 \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
        --train-iters $TRAIN_STEPS \
@@ -171,6 +175,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        $OPTIMIZER_ARGS \
        $DEEPSPEED_ARGS \
        $LOG_ARGS \
+       $EXIT_OPTS \
        "
 
 clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
