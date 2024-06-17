@@ -1637,7 +1637,7 @@ class DataIteratorPile(DataIteratorConcat):
 
 
 class DataIteratorMathPile(DataIteratorConcat):
-    def __init__(self, streaming=True, train=None, **kwargs):
+    def __init__(self, streaming=True, train=True, **kwargs):
         if train is not None:
             splits = ["train"] if train else ["validation"]
         else:
