@@ -319,7 +319,7 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     group = parser.add_argument_group(title="input data")
-    group.add_argument("--datasets", type=str, default="all", help="Datasets")
+    group.add_argument("--datasets", type=str, default="all", help="Datasets", nargs="+")
     group.add_argument(
         "--json-keys", nargs="+", default=["text"], help="space separate listed of keys to extract from json"
     )
