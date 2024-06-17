@@ -195,7 +195,15 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 yield ds
         return
 
-    multilang_corpora = ["wikipedia", "wikiother", "gutenberg", "europarl", "claire", "eurovoc"]
+    multilang_corpora = [
+        "wikipedia",
+        "wikiother",
+        "gutenberg",
+        "europarl",
+        "claire",
+        "eurovoc",
+        "validated_youtube",
+    ]  # "youtube",
 
     name = name.lower()
 
@@ -249,6 +257,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             # "gutenberg": ["fr", "en", "de", "es", "it"],
             "europarl": ["fr", "en", "de", "es"],
             "eurovoc": ["en", "de", "es", "it"],
+            "validated_youtube": ["fr"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
@@ -261,7 +270,9 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
     else:
         has_language = any(name.startswith(c + "_") for c in multilang_corpora) and not name.endswith("_aligned")
         if has_language:
-            name, language = name.split("_", 1)
+            fields = name.split("_")
+            language = fields[-1]
+            name = "_".join(fields[:-1])
             kwargs["language"] = language
         camel_name = "".join([w.capitalize() for w in name.split("_")])
         class_name = f"DataIterator{camel_name}"
@@ -1181,6 +1192,40 @@ class DataIteratorEurovoc(DataIteratorParquet):
         )
 
 
+class DataIteratorYoutube(DataIteratorParquet):
+    def __init__(self, language="en", filter_by_perplexity=True, **kwargs):
+        name = f"YouTube:{language.lower()}"
+        folder = os.path.join(DATA_PATH, "YouTube", language)
+        DataIteratorParquet.__init__(
+            self,
+            folder,
+            name=name,
+            **kwargs,
+        )
+
+
+class DataIteratorValidatedYoutube(DataIterator):
+    def __init__(self, language="fr", streaming=True, **kwargs):  # noqa # C901 `...` is too complex
+        path = DATA_PATH + f"/youtube_{language}"
+        files = glob.glob(path + "/*.txt")
+
+        assert files, f"No files found in {path}/*.txt"
+
+        name = f"ValidatedYouTube:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "text",
+                data_files={"train": files},
+                streaming=streaming,
+                sample_by="paragraph",
+                split="train",
+            ),
+            name=name,
+            **kwargs,
+        )
+
+
 ########################################
 # Datasets: French
 
@@ -1199,17 +1244,23 @@ def filter_by_perplexity(x, threshold):
     mean_or_median_is_lower = mean_is_lower or np.median(perplexities) <= threshold
     return mean_or_median_is_lower
 
+
 def preproc_gallica(data):
-    text = data['complete_text']
+    text = data["complete_text"]
 
     L = 10000
-    list_of_chunks = [] # list of chunk start and end
-    good_ppl = [(ppl <= 1000) and (ppl >= 10) and (lan=='fr') and (lan_score>=0.65) for ppl, lan, lan_score in zip(data['ccnet_perplexity'], data['fasttext_language'], data['ccnet_language_score'])]
+    list_of_chunks = []  # list of chunk start and end
+    good_ppl = [
+        (ppl <= 1000) and (ppl >= 10) and (lan == "fr") and (lan_score >= 0.65)
+        for ppl, lan, lan_score in zip(
+            data["ccnet_perplexity"], data["fasttext_language"], data["ccnet_language_score"]
+        )
+    ]
     for i, actual_chunk_is_good in enumerate(good_ppl):
         if actual_chunk_is_good:
-            start = text.rfind('\n', 0, i*L)
+            start = text.rfind("\n", 0, i * L)
             start = start if start != -1 else 0
-            end = text.find('\n', (i+1)*L)
+            end = text.find("\n", (i + 1) * L)
             end = end if end != -1 else len(text)
             list_of_chunks.append((start, end))
 
@@ -1222,22 +1273,23 @@ def preproc_gallica(data):
             list_of_chunks_.append((start, end))
             previous_end = end
         return list_of_chunks_
-    
+
     list_of_chunks = post_proc(list_of_chunks)
 
-    cleaned_text = ''
+    cleaned_text = ""
     previous_end = None
     for start, end in list_of_chunks:
         if previous_end is None and start > 0:
-            cleaned_text += '\n\n[...]\n\n'
+            cleaned_text += "\n\n[...]\n\n"
         if previous_end is not None and start > previous_end:
-            cleaned_text += '\n\n[...]\n\n'
+            cleaned_text += "\n\n[...]\n\n"
         cleaned_text += text[start:end]
         previous_end = end
 
-    cleaned_text = '' if cleaned_text == '\n\n[...]\n\n' else cleaned_text # In the case all the text is removed
-    data['complete_text'] = cleaned_text
+    cleaned_text = "" if cleaned_text == "\n\n[...]\n\n" else cleaned_text  # In the case all the text is removed
+    data["complete_text"] = cleaned_text
     return data
+
 
 class DataIteratorGallicaMono(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1252,6 +1304,7 @@ class DataIteratorGallicaMono(DataIteratorParquet):
             # filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
             **kwargs,
         )
+
 
 class DataIteratorGallicaPress(DataIteratorConcat):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1293,12 +1346,14 @@ class DataIteratorHal(DataIteratorParquet):
             **kwargs,
         )
 
+
 def filter_thesis_heuristic(data):
-    if data['word_count'] < 1000:
+    if data["word_count"] < 1000:
         return False
-    if data['character_count'] < 10000:
+    if data["character_count"] < 10000:
         return False
     return filter_by_perplexity(data, 2535)
+
 
 class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
