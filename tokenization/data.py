@@ -12,6 +12,9 @@ import warnings
 import datasets
 import numpy as np
 import regex as re
+import unicodedata
+import string
+
 from text import (
     check_language,
     clean_discours,
@@ -1244,7 +1247,16 @@ def filter_by_perplexity(x, threshold):
     mean_or_median_is_lower = mean_is_lower or np.median(perplexities) <= threshold
     return mean_or_median_is_lower
 
-
+def repare_overlapping_chunks(list_of_chunks):
+    previous_end = None
+    list_of_chunks_ = []
+    for start, end in list_of_chunks:
+        if (previous_end is not None) and (previous_end > start):
+            start = previous_end
+        list_of_chunks_.append((start, end))
+        previous_end = end
+    return list_of_chunks_
+    
 def preproc_gallica(data):
     text = data["complete_text"]
 
@@ -1264,17 +1276,7 @@ def preproc_gallica(data):
             end = end if end != -1 else len(text)
             list_of_chunks.append((start, end))
 
-    def post_proc(list_of_chunks):
-        previous_end = None
-        list_of_chunks_ = []
-        for start, end in list_of_chunks:
-            if (previous_end is not None) and (previous_end > start):
-                start = previous_end
-            list_of_chunks_.append((start, end))
-            previous_end = end
-        return list_of_chunks_
-
-    list_of_chunks = post_proc(list_of_chunks)
+    list_of_chunks = repare_overlapping_chunks(list_of_chunks)
 
     cleaned_text = ""
     previous_end = None
@@ -1347,27 +1349,104 @@ class DataIteratorHal(DataIteratorParquet):
         )
 
 
+TRANSLATION_TABLE_PUNCTUATION = str.maketrans("", "", string.punctuation)
+
+def normalize(
+        text: str,
+        remove_punct: bool = True,
+        lowercase: bool = True,
+        nfd_unicode: bool = True,
+        white_space: bool = True
+) -> str:
+    """ Normalize the text by lowercasing and removing punctuation. """
+    # remove punctuation
+    if remove_punct:
+        text = text.translate(TRANSLATION_TABLE_PUNCTUATION)
+
+    # lowercase
+    if lowercase:
+        text = text.lower()
+
+    if white_space:
+        text = text.strip()
+        text = re.sub(r"\s+", " ", text)
+
+    # NFD unicode normalization
+    if nfd_unicode:
+        text = unicodedata.normalize("NFD", text)
+
+    return text
+
+def filter_chunk_theses(page):
+    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
+
+    num_lines = len(page.split('\n'))
+    normalized_page = normalize(page)
+    normalized_words = normalized_page.split()
+    num_normalized_words = len(normalized_words)
+    frac_unicode = 1- len(unicodedata.normalize("NFD", page)) / len(page) if len(page)>0 else None 
+    frac_punctuation = 1- len(page.translate(TRANSLATION_TABLE_PUNCTUATION)) / len(page) if len(page)>0 else None 
+    numerical_chars_frac = sum(map(str.isnumeric, normalized_page)) / len(normalized_page) if len(normalized_page)>0 else None
+    mean_word_length = float(sum(map(len, normalized_words))) / num_normalized_words if num_normalized_words >0 else None
+    frac_control_char = len(re.findall(control_char_pattern_except_page_break, page)) / num_lines if num_lines else None 
+
+    if num_normalized_words <= 5:
+        return False
+    elif num_lines > 200:
+        return False
+    elif frac_control_char > 0.2:
+        return False
+    elif mean_word_length > 10 or mean_word_length < 1.5: 
+        return False
+    elif frac_unicode > 0.2:
+        return False
+    elif frac_punctuation >= 0.2:
+        return False
+    elif numerical_chars_frac > 0.2:
+        return False
+    else:
+        return True
+
+def preproc_theses(data, threshold=2000):
+    complete_text = data['complete_text']
+    filtered_text = ''
+
+    for idx, (start, end, avg_logprob, lan_score, lan) in enumerate(zip(
+        data['chunk_start'], data['chunk_end'], data['ccnet_avg_log_prob'], data['ccnet_language_score'], data['fasttext_language']
+        )):
+        chunk = complete_text[start:end]
+        if idx <= 1:
+            filtered_text += chunk
+        elif 10**avg_logprob > threshold:
+            pass
+        elif lan not in ['fr', 'en', 'it', 'es', 'de']: 
+            pass 
+        elif filter_chunk_theses(chunk): 
+            filtered_text += chunk
+    data['complete_text'] = filtered_text
+    return data
+
 def filter_thesis_heuristic(data):
     if data["word_count"] < 1000:
         return False
     if data["character_count"] < 10000:
         return False
-    return filter_by_perplexity(data, 2535)
-
+    return True
 
 class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
         folder = os.path.join(
             DATA_PATH,
-            "perplexity_corpus_open_llm",
+            "perplexity_corpus_open_llm_v2",
             "theses_parquet",
         )
         DataIteratorParquet.__init__(
             self,
             folder,
             name="Theses",
-            postprocess=lambda text: clean_theses(text),
-            filter_fn=lambda data: filter_thesis_heuristic(data),
+            preprocess=preproc_theses,
+            postprocess=clean_theses,
+            filter_fn=filter_thesis_heuristic,
             key="complete_text",
             **kwargs,
         )

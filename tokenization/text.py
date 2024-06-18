@@ -3,7 +3,6 @@ import math
 import random
 import urllib
 import regex as re
-import unicodedata
 import string
 from collections import Counter
 
@@ -88,88 +87,26 @@ def clean_gutenberg(text):
     text = remove_licence(text)
     return text
 
-### Theses
-TRANSLATION_TABLE_PUNCTUATION = str.maketrans("", "", string.punctuation)
-
-def normalize(
-        text: str,
-        remove_punct: bool = True,
-        lowercase: bool = True,
-        nfd_unicode: bool = True,
-        white_space: bool = True
-) -> str:
-    """ Normalize the text by lowercasing and removing punctuation. """
-    # remove punctuation
-    if remove_punct:
-        text = text.translate(TRANSLATION_TABLE_PUNCTUATION)
-
-    # lowercase
-    if lowercase:
-        text = text.lower()
-
-    if white_space:
-        text = text.strip()
-        text = re.sub(r"\s+", " ", text)
-
-    # NFD unicode normalization
-    if nfd_unicode:
-        text = unicodedata.normalize("NFD", text)
-
-    return text
-
-
-def filter_pages(text):
-    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
-    pages = [text[match.start():match.end()] for match in re.finditer(r"([^\x0c]*[\x0c]|[^\x0c]+$)", text)]
-    out = []
-    for i, page in enumerate(pages):
-        num_lines = len(page.split('\n'))
-        normalized_page = normalize(page)
-        normalized_words = normalized_page.split()
-        num_normalized_words = len(normalized_words)
-        frac_unicode = 1- len(unicodedata.normalize("NFD", page)) / len(page) if len(page)>0 else None 
-        frac_punctuation = 1- len(page.translate(TRANSLATION_TABLE_PUNCTUATION)) / len(page) if len(page)>0 else None 
-        numerical_chars_frac = sum(map(str.isnumeric, normalized_page)) / len(normalized_page) if len(normalized_page)>0 else None
-        mean_word_length = float(sum(map(len, normalized_words))) / num_normalized_words if num_normalized_words >0 else None
-        frac_control_char = len(re.findall(control_char_pattern_except_page_break, page)) / num_lines if num_lines else None 
-
-        if (i == 0) and ('HAL is a multi-disciplinary open access' in page):
-            pass
-        # elif 'Copyright ©' in page:
-        #     pass
-        elif num_normalized_words <= 5:
-            pass
-        elif num_lines > 200:
-            pass
-        elif frac_control_char > 0.2:
-            pass
-        elif mean_word_length > 10 or mean_word_length < 1.5: 
-            pass
-        elif frac_unicode > 0.2:
-            pass
-        elif frac_punctuation >= 0.2:
-            pass
-        elif numerical_chars_frac > 0.2:
-            pass
-        else:
-            out.append(page)
-    return ''.join(out)
-
-def filter_lines(text):
-    lines = [text[match.start():match.end()] for match in re.finditer(r"([^\n\x0c]*[\n\x0c]|[^\n\x0c]+$)", text)]
-    count_lines = Counter(lines)
-    duplicated_lines = [k for k, v in count_lines.items() if (v >= 10) and (len(k)>=10)]
-    out = []
-    for i, line in enumerate(lines):
-        if line in duplicated_lines:
-            pass
-        else:
-            out.append(line)
-    return ''.join(out)
-
+### Theses      
 def clean_theses(text):
-    text = filter_pages(text)
-    text = filter_lines(text)
+    def remove_HAL(text):
+        pattern = r'^.*?HAL is a multi-disciplinary open access.*?\x0c'
+        return re.sub(pattern, '', text, flags=re.DOTALL)  
+
+    def filter_duplicated_lines(text):
+        lines = [text[match.start():match.end()] for match in re.finditer(r"([^\n\x0c]*[\n\x0c]|[^\n\x0c]+$)", text)]
+        count_lines = Counter(lines)
+        duplicated_lines = [k for k, v in count_lines.items() if (v >= 10) and (len(k)>=10)]
+        out = []
+        for i, line in enumerate(lines):
+            if line in duplicated_lines:
+                pass
+            else:
+                out.append(line)
+        return ''.join(out)
+
+    text = remove_HAL(text)
+    text = filter_duplicated_lines(text)
     return text
 
 def _repair_cid_character(match):  # noqa # C901 `...` is too complex
