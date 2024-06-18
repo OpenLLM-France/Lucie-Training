@@ -34,7 +34,7 @@ datasets_categories = {
         "EuroparlAligned.de-fr",
         "DiscoursPublics",
     ],
-    "dialogue": ["Claire.en", "Claire.fr", "Stac"],
+    "dialogue": ["Claire.en", "Claire.fr", "Stac", "ValidatedYouTube.fr"],
     "book": ["GallicaMonographies", "Gutenberg.en", "Gutenberg.de", "Gutenberg.it", "Gutenberg.es", "Gutenberg.fr"],
     "newspaper": ["AmericanStories", "GallicaPress"],
     "forum": ["Ubuntu IRC", "StackExchange"],
