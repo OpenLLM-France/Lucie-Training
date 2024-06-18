@@ -17,34 +17,84 @@ text_types = {
 }
 
 datasets_categories = {
-    "technical": ["Theses", "HAL", "Persee", "OpenEdition", "PeS2o", "PhilPapers", "NIH ExPorter", "USPTO Backgrounds"],
-    "legal": ["OpenData", "FreeLaw"],
-    "parlementary": [
-        "Eurovoc.es",
+    "technical": [
+        "HAL", 
+        "NIH_ExPorter",
+        "OpenEdition", 
+        "Persee", 
+        "PeS2o", 
+        "PhilPapers", 
+        "Theses", 
+        "USPTO_Backgrounds",
+        ],
+    "legi_written": [
+        "amendements_parlement", 
         "Eurovoc.de",
-        "Eurovoc.it",
         "Eurovoc.en",
-        "Europarl.fr",
+        "Eurovoc.es",
+        "Eurovoc.it",
+        "FreeLaw",
+        "LEGI", 
+        "OpenData",
+        "questions_ecrites_parlement", 
+        ],
+    "legi_spoken": [
+        "DiscoursPublics",
+        "interventions_parlement",   
+        ],
+    "legi_dialogue": [
+        "AssembleeNationale",
         "Europarl.en",
         "Europarl.es",
-        "Europarl.de",
+        "Europarl.de", 
+        "Europarl.fr",
+        "FREDSum",
+        "Senat", 
+        ],
+    "dialogue": [
+        "Claire.en", 
+        "Claire.fr", 
+        "Stac",
+        "ValidatedYouTube.fr",
+        ],
+    "book": [
+        "GallicaMonographies", 
+        "Gutenberg.en", 
+        "Gutenberg.de", 
+        "Gutenberg.it", 
+        "Gutenberg.es", 
+        "Gutenberg.fr",
+        ],
+    "newspaper": [
+        "AmericanStories", 
+        "GallicaPress",
+        ],
+    "forum": [
+        "StackExchange",
+        "Ubuntu_IRC", 
+        ],
+    "wiki": [
+        "Wikiother.fr", 
+        "Wikipedia.en", 
+        "Wikipedia.es", 
+        "Wikipedia.de", 
+        "Wikipedia.it", 
+        "Wikipedia.fr",
+        ],
+    "programming": [
+        "TheStack",
+        ],
+    "math": [
+        "DM_Mathematics",
+        "MathPile", 
+        ],
+    "aligned": [
+        "CroissantAligned",
         "EuroparlAligned.fr-en",
         "EuroparlAligned.es-en",
         "EuroparlAligned.it-en",
         "EuroparlAligned.de-fr",
-        "DiscoursPublics",
-    ],
-    "dialogue": ["Claire.en", "Claire.fr", "Stac", "ValidatedYouTube.fr"],
-    "book": ["GallicaMonographies", "Gutenberg.en", "Gutenberg.de", "Gutenberg.it", "Gutenberg.es", "Gutenberg.fr"],
-    "newspaper": ["AmericanStories", "GallicaPress"],
-    "forum": ["Ubuntu IRC", "StackExchange"],
-    "wiki": ["Wikiother.fr", "Wikipedia.en", "Wikipedia.es", "Wikipedia.de", "Wikipedia.it", "Wikipedia.fr"],
-    "code": ["TheStack"],
-    "math": ["MathPile", "DM Mathematics"],
-    "misc": [
-        "CroissantAligned",
-        "OtherFr",
-    ],
+    ]
 }
 
 
@@ -72,7 +122,7 @@ def get_dataset_category(name, subset):
     if name in ["---", "", None]:
         return ""
     name = _norm_string(name)
-    if name == "pile" and subset:
+    if name in ["pile", "otherfr"] and subset:
         name = _norm_string(subset)
     for cat, datasets in datasets_categories.items():
         if name in datasets:

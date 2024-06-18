@@ -17,76 +17,76 @@ fr       ,Theses               ,            ,true  ,technical    ,   0.105,   7.
 fr       ,Persee               ,            ,true  ,technical    ,   1.094,   3.250,  20.314,       2970,        6.2,    5.754,        1.77,        3.53
 fr       ,OpenEdition          ,            ,false ,technical    ,   0.939,   2.225,  14.459,       2369,        6.5,    3.604,        1.62,        4.01
 fr       ,Wikipedia.fr         ,            ,false ,wiki         ,   2.648,   1.726,   9.879,        652,        5.7,    2.940,        1.70,        3.36
-fr       ,OpenData             ,            ,false ,legal        ,   1.169,   0.755,   4.638,        646,        6.1,    1.209,        1.60,        3.84
+fr       ,OpenData             ,            ,false ,legi_written ,   1.169,   0.755,   4.638,        646,        6.1,    1.209,        1.60,        3.84
 fr       ,Wikiother.fr         ,            ,false ,wiki         ,   0.836,   0.576,   3.427,        690,        5.9,    0.912,        1.58,        3.76
 fr       ,Gutenberg.fr         ,            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
 fr       ,Claire.fr            ,            ,false ,dialogue     ,   0.039,   0.209,   1.314,       5321,        6.3,    0.310,        1.48,        4.23
-fr       ,DiscoursPublics      ,            ,false ,parlementary ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
+fr       ,DiscoursPublics      ,            ,false ,legi_spoken  ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
 fr       ,ValidatedYouTube.fr  ,            ,false ,dialogue     ,   0.038,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
-fr       ,OtherFr              ,questions_ecrites_parlement,false ,misc         ,   0.189,   0.108,   0.705,        572,        6.5,    0.156,        1.44,        4.52
-fr       ,OtherFr              ,interventions_parlement,false ,misc         ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
-fr       ,OtherFr              ,LEGI        ,false ,misc         ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
-fr       ,Europarl.fr          ,            ,false ,parlementary ,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
-fr       ,OtherFr              ,amendements_parlement,false ,misc         ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
+fr       ,OtherFr              ,questions_ecrites_parlement,false ,legi_written ,   0.189,   0.108,   0.705,        572,        6.5,    0.156,        1.44,        4.52
+fr       ,OtherFr              ,interventions_parlement,false ,legi_spoken  ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
+fr       ,OtherFr              ,LEGI        ,false ,legi_written ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
+fr       ,Europarl.fr          ,            ,false ,legi_dialogue,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
+fr       ,OtherFr              ,amendements_parlement,false ,legi_written ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
 en       ,PeS2o                ,            ,mixed ,technical    ,  38.972,  42.296, 268.963,       1085,        6.4,   65.365,        1.55,        4.11
 en       ,AmericanStories      ,            ,true  ,newspaper    ,  59.420,   8.902,  50.844,        150,        5.7,   14.313,        1.61,        3.55
-en       ,Pile                 ,FreeLaw     ,false ,legal        ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
+en       ,Pile                 ,FreeLaw     ,false ,legi_written ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
 en       ,Wikipedia.en         ,            ,false ,wiki         ,   6.893,   4.708,  26.616,        683,        5.7,    7.898,        1.68,        3.37
 en       ,Pile                 ,StackExchange,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,   10.275,        2.27,        3.27
 en       ,Gutenberg.en         ,            ,false ,book         ,   0.056,   3.544,  20.579,      62936,        5.8,    5.516,        1.56,        3.73
 en       ,Pile                 ,USPTO_Backgrounds,false ,technical    ,   5.139,   3.492,  22.309,        680,        6.4,    5.105,        1.46,        4.37
 en       ,MathPile             ,            ,false ,math         ,   0.737,   3.408,  27.290,       4626,        8.0,    9.637,        2.83,        2.83
 en       ,Pile                 ,DM_Mathematics,false ,math         ,   0.992,   1.746,   8.127,       1760,        4.7,    4.928,        2.82,        1.65
-en       ,Eurovoc.en           ,            ,true  ,parlementary ,   0.272,   1.523,   9.468,       5594,        6.2,    2.571,        1.69,        3.68
+en       ,Eurovoc.en           ,            ,true  ,legi_written ,   0.272,   1.523,   9.468,       5594,        6.2,    2.571,        1.69,        3.68
 en       ,Pile                 ,Ubuntu_IRC  ,false ,forum        ,   0.010,   0.867,   5.610,      83577,        6.5,    2.159,        2.49,        2.60
 en       ,Claire.en            ,            ,false ,dialogue     ,   0.949,   0.818,   4.709,        861,        5.8,    1.161,        1.42,        4.06
 en       ,Pile                 ,PhilPapers  ,false ,technical    ,   0.031,   0.363,   2.304,      11801,        6.3,    0.618,        1.70,        3.73
 en       ,Pile                 ,NIH_ExPorter,false ,technical    ,   0.914,   0.288,   1.979,        315,        6.9,    0.431,        1.50,        4.59
-en       ,Europarl.en          ,            ,false ,parlementary ,   0.011,   0.056,   0.339,       5071,        6.0,    0.069,        1.22,        4.92
+en       ,Europarl.en          ,            ,false ,legi_dialogue,   0.011,   0.056,   0.339,       5071,        6.0,    0.069,        1.22,        4.92
 en       ,Stac                 ,            ,false ,dialogue     ,   0.000,   0.000,   0.000,       1176,        6.2,    0.000,        2.28,        2.71
-fr-en    ,CroissantAligned     ,            ,false ,misc         , 408.029,  16.911, 107.003,         41,        6.3,   25.351,        1.50,        4.22
-fr-en    ,EuroparlAligned.fr-en,            ,false ,parlementary ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
+fr-en    ,CroissantAligned     ,            ,false ,aligned      , 408.029,  16.911, 107.003,         41,        6.3,   25.351,        1.50,        4.22
+fr-en    ,EuroparlAligned.fr-en,            ,false ,aligned      ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
 de       ,Wikipedia.de         ,            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
-de       ,Eurovoc.de           ,            ,true  ,parlementary ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
+de       ,Eurovoc.de           ,            ,true  ,legi_written ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
 de       ,Gutenberg.de         ,            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
-de       ,Europarl.de          ,            ,false ,parlementary ,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
+de       ,Europarl.de          ,            ,false ,legi_dialogue,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
 es       ,Wikipedia.es         ,            ,false ,wiki         ,   1.947,   1.245,   7.161,        639,        5.8,    2.124,        1.71,        3.37
-es       ,Eurovoc.es           ,            ,true  ,parlementary ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
-es       ,Europarl.es          ,            ,false ,parlementary ,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
+es       ,Eurovoc.es           ,            ,true  ,legi_written ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
+es       ,Europarl.es          ,            ,false ,legi_dialogue,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
 es       ,Gutenberg.es         ,            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.092,        1.80,        3.30
 it       ,Wikipedia.it         ,            ,false ,wiki         ,   1.870,   1.060,   6.161,        567,        5.8,    1.959,        1.85,        3.14
-it       ,Eurovoc.it           ,            ,true  ,parlementary ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
+it       ,Eurovoc.it           ,            ,true  ,legi_written ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
 it       ,Gutenberg.it         ,            ,false ,book         ,   0.001,   0.066,   0.414,      68616,        6.3,    0.129,        1.96,        3.21
-es-en    ,EuroparlAligned.es-en,            ,false ,parlementary ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
-it-en    ,EuroparlAligned.it-en,            ,false ,parlementary ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
-de-fr    ,EuroparlAligned.de-fr,            ,false ,parlementary ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
-code     ,TheStack             ,javascript  ,false ,code         ,  21.109,   8.526, 141.647,        404,       16.6,   58.609,        6.87,        2.42
-code     ,TheStack             ,java        ,false ,code         ,  20.152,   7.421,  89.297,        368,       12.0,   27.680,        3.73,        3.23
-code     ,TheStack             ,c           ,false ,code         ,   8.626,   5.916,  57.428,        686,        9.7,   24.092,        4.07,        2.38
-code     ,TheStack             ,python      ,false ,code         ,  12.962,   5.434,  64.304,        419,       11.8,   21.683,        3.99,        2.97
-code     ,TheStack             ,php         ,false ,code         ,  15.905,   4.865,  66.844,        306,       13.7,   22.883,        4.70,        2.92
-code     ,TheStack             ,c++         ,false ,code         ,   6.378,   4.584,  50.892,        719,       11.1,   18.835,        4.11,        2.70
-code     ,TheStack             ,c#          ,false ,code         ,  10.839,   3.574,  46.286,        330,       13.0,   13.381,        3.74,        3.46
-code     ,TheStack             ,go          ,false ,code         ,   4.730,   2.735,  25.738,        578,        9.4,   10.262,        3.75,        2.51
-code     ,TheStack             ,typescript  ,false ,code         ,  10.637,   2.617,  28.815,        246,       11.0,    9.836,        3.76,        2.93
-code     ,TheStack             ,rust        ,false ,code         ,   1.387,   0.872,   9.529,        629,       10.9,    3.241,        3.72,        2.94
-code     ,TheStack             ,ruby        ,false ,code         ,   3.405,   0.646,   7.139,        190,       11.1,    2.392,        3.70,        2.98
-code     ,TheStack             ,swift       ,false ,code         ,   1.756,   0.553,   6.134,        315,       11.1,    1.876,        3.39,        3.27
-code     ,TheStack             ,scala       ,false ,code         ,   1.362,   0.457,   4.862,        335,       10.6,    1.587,        3.47,        3.06
-code     ,TheStack             ,kotlin      ,false ,code         ,   2.243,   0.454,   5.769,        202,       12.7,    1.758,        3.87,        3.28
-code     ,TheStack             ,tex         ,false ,code         ,   0.398,   0.394,   3.805,        989,        9.7,    1.507,        3.83,        2.53
-code     ,TheStack             ,lua         ,false ,code         ,   0.559,   0.318,   3.279,        570,       10.3,    1.367,        4.29,        2.40
-code     ,TheStack             ,dart        ,false ,code         ,   0.933,   0.308,   3.864,        331,       12.5,    1.242,        4.03,        3.11
-code     ,TheStack             ,haskell     ,false ,code         ,   0.545,   0.307,   2.364,        563,        7.7,    0.807,        2.63,        2.93
-code     ,TheStack             ,perl        ,false ,code         ,   0.392,   0.297,   2.634,        757,        8.9,    1.149,        3.87,        2.29
-code     ,TheStack             ,assembly    ,false ,code         ,   0.248,   0.209,   1.575,        840,        7.5,    0.867,        4.15,        1.82
-code     ,TheStack             ,fortran     ,false ,code         ,   0.165,   0.192,   1.843,       1158,        9.6,    0.780,        4.07,        2.36
-code     ,TheStack             ,julia       ,false ,code         ,   0.299,   0.152,   1.539,        510,       10.1,    0.660,        4.34,        2.33
-code     ,TheStack             ,ocaml       ,false ,code         ,   0.160,   0.130,   1.107,        812,        8.5,    0.430,        3.31,        2.58
-code     ,TheStack             ,mathematica ,false ,code         ,   0.027,   0.120,   1.720,       4454,       14.4,    1.117,        9.32,        1.54
-code     ,TheStack             ,elixir      ,false ,code         ,   0.282,   0.073,   0.737,        259,       10.1,    0.258,        3.53,        2.85
-code     ,TheStack             ,erlang      ,false ,code         ,   0.099,   0.066,   0.726,        661,       11.0,    0.260,        3.96,        2.79
-code     ,TheStack             ,clojure     ,false ,code         ,   0.126,   0.045,   0.492,        355,       11.0,    0.179,        3.98,        2.75
-code     ,TheStack             ,r           ,false ,code         ,   0.039,   0.028,   0.305,        711,       10.9,    0.158,        5.67,        1.93
-code     ,TheStack             ,matlab      ,false ,code         ,   0.001,   0.009,   0.037,       8940,        4.3,    0.043,        4.94,        0.87
-code     ,TheStack             ,racket      ,false ,code         ,   0.004,   0.005,   0.038,       1141,        7.9,    0.015,        3.18,        2.48
+es-en    ,EuroparlAligned.es-en,            ,false ,aligned      ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
+it-en    ,EuroparlAligned.it-en,            ,false ,aligned      ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
+de-fr    ,EuroparlAligned.de-fr,            ,false ,aligned      ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
+code     ,TheStack             ,javascript  ,false ,programming  ,  21.109,   8.526, 141.647,        404,       16.6,   58.609,        6.87,        2.42
+code     ,TheStack             ,java        ,false ,programming  ,  20.152,   7.421,  89.297,        368,       12.0,   27.680,        3.73,        3.23
+code     ,TheStack             ,c           ,false ,programming  ,   8.626,   5.916,  57.428,        686,        9.7,   24.092,        4.07,        2.38
+code     ,TheStack             ,python      ,false ,programming  ,  12.962,   5.434,  64.304,        419,       11.8,   21.683,        3.99,        2.97
+code     ,TheStack             ,php         ,false ,programming  ,  15.905,   4.865,  66.844,        306,       13.7,   22.883,        4.70,        2.92
+code     ,TheStack             ,c++         ,false ,programming  ,   6.378,   4.584,  50.892,        719,       11.1,   18.835,        4.11,        2.70
+code     ,TheStack             ,c#          ,false ,programming  ,  10.839,   3.574,  46.286,        330,       13.0,   13.381,        3.74,        3.46
+code     ,TheStack             ,go          ,false ,programming  ,   4.730,   2.735,  25.738,        578,        9.4,   10.262,        3.75,        2.51
+code     ,TheStack             ,typescript  ,false ,programming  ,  10.637,   2.617,  28.815,        246,       11.0,    9.836,        3.76,        2.93
+code     ,TheStack             ,rust        ,false ,programming  ,   1.387,   0.872,   9.529,        629,       10.9,    3.241,        3.72,        2.94
+code     ,TheStack             ,ruby        ,false ,programming  ,   3.405,   0.646,   7.139,        190,       11.1,    2.392,        3.70,        2.98
+code     ,TheStack             ,swift       ,false ,programming  ,   1.756,   0.553,   6.134,        315,       11.1,    1.876,        3.39,        3.27
+code     ,TheStack             ,scala       ,false ,programming  ,   1.362,   0.457,   4.862,        335,       10.6,    1.587,        3.47,        3.06
+code     ,TheStack             ,kotlin      ,false ,programming  ,   2.243,   0.454,   5.769,        202,       12.7,    1.758,        3.87,        3.28
+code     ,TheStack             ,tex         ,false ,programming  ,   0.398,   0.394,   3.805,        989,        9.7,    1.507,        3.83,        2.53
+code     ,TheStack             ,lua         ,false ,programming  ,   0.559,   0.318,   3.279,        570,       10.3,    1.367,        4.29,        2.40
+code     ,TheStack             ,dart        ,false ,programming  ,   0.933,   0.308,   3.864,        331,       12.5,    1.242,        4.03,        3.11
+code     ,TheStack             ,haskell     ,false ,programming  ,   0.545,   0.307,   2.364,        563,        7.7,    0.807,        2.63,        2.93
+code     ,TheStack             ,perl        ,false ,programming  ,   0.392,   0.297,   2.634,        757,        8.9,    1.149,        3.87,        2.29
+code     ,TheStack             ,assembly    ,false ,programming  ,   0.248,   0.209,   1.575,        840,        7.5,    0.867,        4.15,        1.82
+code     ,TheStack             ,fortran     ,false ,programming  ,   0.165,   0.192,   1.843,       1158,        9.6,    0.780,        4.07,        2.36
+code     ,TheStack             ,julia       ,false ,programming  ,   0.299,   0.152,   1.539,        510,       10.1,    0.660,        4.34,        2.33
+code     ,TheStack             ,ocaml       ,false ,programming  ,   0.160,   0.130,   1.107,        812,        8.5,    0.430,        3.31,        2.58
+code     ,TheStack             ,mathematica ,false ,programming  ,   0.027,   0.120,   1.720,       4454,       14.4,    1.117,        9.32,        1.54
+code     ,TheStack             ,elixir      ,false ,programming  ,   0.282,   0.073,   0.737,        259,       10.1,    0.258,        3.53,        2.85
+code     ,TheStack             ,erlang      ,false ,programming  ,   0.099,   0.066,   0.726,        661,       11.0,    0.260,        3.96,        2.79
+code     ,TheStack             ,clojure     ,false ,programming  ,   0.126,   0.045,   0.492,        355,       11.0,    0.179,        3.98,        2.75
+code     ,TheStack             ,r           ,false ,programming  ,   0.039,   0.028,   0.305,        711,       10.9,    0.158,        5.67,        1.93
+code     ,TheStack             ,matlab      ,false ,programming  ,   0.001,   0.009,   0.037,       8940,        4.3,    0.043,        4.94,        0.87
+code     ,TheStack             ,racket      ,false ,programming  ,   0.004,   0.005,   0.038,       1141,        7.9,    0.015,        3.18,        2.48
