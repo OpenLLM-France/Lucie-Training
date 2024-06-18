@@ -345,7 +345,7 @@ if __name__ == "__main__":
             # This is ugly...
             if avoid_subsets:
                 if ONLY_DETAILED:
-                    if name.lower() not in ["thestack"] and subset:
+                    if name.lower() not in ["thestack", "pile", "otherfr"] and subset:
                         continue
             else:
                 subset = None
