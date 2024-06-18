@@ -1,20 +1,20 @@
 language ,name                 ,subset                      ,ocr   ,category     ,  M docs, B words, B chars, #words/doc,#chars/word, B tokens,#tokens/words,#chars/tokens
----      ,---                  ,---                         ,      ,             , 696.121, 269.689,1985.756,        387,        7.4,  602.410,            ,            
-fr       ,---                  ,---                         ,      ,             ,  14.135, 109.867, 669.325,       7773,        6.1,  190.762,            ,            
-en       ,---                  ,---                         ,      ,             , 133.074,  84.716, 535.072,        637,        6.3,  144.201,        1.70,        3.71
+---      ,---                  ,---                         ,      ,             , 696.130, 269.034,1982.080,        386,        7.4,  606.949,        2.26,        3.27
+fr       ,---                  ,---                         ,      ,             ,  14.137, 109.180, 665.396,       7723,        6.1,  195.454,        1.79,        3.40
+en       ,---                  ,---                         ,      ,             , 133.082,  84.748, 535.325,        637,        6.3,  144.056,        1.70,        3.72
 fr-en    ,---                  ,---                         ,      ,             , 410.032,  17.016, 107.658,         41,        6.3,   25.493,        1.50,        4.22
-de       ,---                  ,---                         ,      ,             ,   3.137,   2.531,  17.148,        807,        6.8,    5.244,        2.07,        3.27
-es       ,---                  ,---                         ,      ,             ,   2.204,   2.106,  12.473,        955,        5.9,    3.703,        1.76,        3.37
-it       ,---                  ,---                         ,      ,             ,   2.117,   1.856,  11.442,        877,        6.2,    3.617,        1.95,        3.16
+de       ,---                  ,---                         ,      ,             ,   3.137,   2.531,  17.148,        807,        6.8,    5.240,        2.07,        3.27
+es       ,---                  ,---                         ,      ,             ,   2.204,   2.106,  12.473,        955,        5.9,    3.701,        1.76,        3.37
+it       ,---                  ,---                         ,      ,             ,   2.117,   1.856,  11.442,        877,        6.2,    3.615,        1.95,        3.16
 es-en    ,---                  ,---                         ,      ,             ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
 it-en    ,---                  ,---                         ,      ,             ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
 de-fr    ,---                  ,---                         ,      ,             ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
 code     ,---                  ,---                         ,      ,             , 125.768,  51.305, 630.749,        408,       12.3,  228.955,        4.46,        2.75
-fr       ,GallicaPress         ,html                        ,true  ,newspaper    ,   1.748,  41.144, 250.982,      23544,        6.1,   77.130,            ,            
-fr       ,GallicaPress         ,txt                         ,true  ,newspaper    ,   1.457,  26.352, 157.900,      18083,        6.0,   39.857,            ,            
-fr       ,GallicaMonographies  ,                            ,true  ,book         ,   0.278,  15.106,  90.456,      54392,        6.0,   25.424,            ,            
+fr       ,GallicaPress         ,html                        ,true  ,newspaper    ,   1.748,  41.144, 250.982,      23544,        6.1,   74.027,        1.80,        3.39
+fr       ,GallicaPress         ,txt                         ,true  ,newspaper    ,   1.457,  26.352, 157.900,      18083,        6.0,   47.579,        1.81,        3.32
+fr       ,GallicaMonographies  ,                            ,true  ,book         ,   0.278,  15.106,  90.456,      54392,        6.0,   25.169,        1.67,        3.59
 fr       ,HAL                  ,                            ,true  ,technical    ,   0.349,   9.356,  58.308,      26811,        6.2,   16.224,        1.73,        3.59
-fr       ,Theses               ,                            ,true  ,technical    ,   0.103,   8.235,  51.696,      80143,        6.3,   16.165,        1.96,        3.20
+fr       ,Theses               ,                            ,true  ,technical    ,   0.105,   7.548,  47.767,      72157,        6.3,   16.165,        2.14,        2.95
 fr       ,Persee               ,                            ,true  ,technical    ,   1.094,   3.250,  20.314,       2970,        6.2,    5.754,        1.77,        3.53
 fr       ,OpenEdition          ,                            ,false ,technical    ,   0.939,   2.225,  14.459,       2369,        6.5,    3.604,        1.62,        4.01
 fr       ,Wikipedia.fr         ,                            ,false ,wiki         ,   2.648,   1.726,   9.879,        652,        5.7,    2.940,        1.70,        3.36
@@ -30,7 +30,7 @@ fr       ,OtherFr              ,questions_ecrites_parlement ,false ,misc        
 fr       ,OtherFr              ,interventions_parlement     ,false ,misc         ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
 fr       ,OtherFr              ,LEGI                        ,false ,misc         ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
 fr       ,OtherFr              ,amendements_parlement       ,false ,misc         ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
-fr       ,Gutenberg.fr         ,                            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.391,        1.72,        3.56
+fr       ,Gutenberg.fr         ,                            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
 fr       ,Claire.fr            ,AssembleeNationale          ,false ,dialogue     ,   0.004,   0.130,   0.822,      28841,        6.3,    0.187,        1.44,        4.41
 fr       ,Claire.fr            ,Senat                       ,false ,dialogue     ,   0.001,   0.051,   0.330,      69631,        6.4,    0.076,        1.48,        4.33
 fr       ,Claire.fr            ,Theatre                     ,false ,dialogue     ,   0.031,   0.017,   0.096,        538,        5.7,    0.029,        1.73,        3.31
@@ -51,7 +51,7 @@ fr       ,Claire.fr            ,Rhapsodie                   ,false ,dialogue    
 fr       ,Claire.fr            ,ParisStories                ,false ,dialogue     ,   0.000,   0.000,   0.000,        502,        5.4,    0.000,        1.54,        3.52
 fr       ,Claire.fr            ,UBS                         ,false ,dialogue     ,   0.000,   0.000,   0.000,        192,        6.3,    0.000,        2.06,        3.04
 fr       ,DiscoursPublics      ,                            ,false ,parlementary ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
-fr       ,ValidatedYouTube.fr  ,                            ,false ,             ,   0.038,   0.145,   1.003,       3862,        6.9,         ,            ,            
+fr       ,ValidatedYouTube.fr  ,                            ,false ,dialogue     ,   0.038,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
 fr       ,Europarl.fr          ,                            ,false ,parlementary ,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
 en       ,PeS2o                ,s2orc-train                 ,mixed ,technical    ,   8.242,  36.092, 226.904,       4379,        6.3,         ,            ,            
 en       ,PeS2o                ,s2ag-train                  ,mixed ,technical    ,  30.569,   5.926,  40.273,        194,        6.8,         ,            ,            
@@ -231,7 +231,7 @@ en       ,AmericanStories      ,1811                        ,true  ,newspaper   
 en       ,AmericanStories      ,1798                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         56,        5.7,         ,            ,            
 en       ,AmericanStories      ,1774                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,          0,        0.0,         ,            ,            
 en       ,Wikipedia.en         ,                            ,false ,wiki         ,   6.893,   4.708,  26.616,        683,        5.7,    7.898,        1.68,        3.37
-en       ,Gutenberg.en         ,                            ,false ,book         ,   0.056,   3.544,  20.579,      62936,        5.8,    5.661,        1.60,        3.64
+en       ,Gutenberg.en         ,                            ,false ,book         ,   0.056,   3.544,  20.579,      62936,        5.8,    5.516,        1.56,        3.73
 en       ,MathPile             ,arXiv                       ,false ,math         ,   0.340,   2.750,  22.850,       8086,        8.3,    8.399,        3.05,        2.72
 en       ,MathPile             ,commoncrawl                 ,false ,math         ,   0.074,   0.373,   2.486,       5014,        6.7,    0.691,        1.85,        3.60
 en       ,MathPile             ,stackexchange               ,false ,math         ,   0.265,   0.121,   0.826,        459,        6.8,    0.270,        2.23,        3.06
@@ -252,15 +252,15 @@ fr-en    ,CroissantAligned     ,                            ,false ,misc        
 fr-en    ,EuroparlAligned.fr-en,                            ,false ,parlementary ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
 de       ,Wikipedia.de         ,                            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
 de       ,Eurovoc.de           ,                            ,true  ,parlementary ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
-de       ,Gutenberg.de         ,                            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.198,        2.00,        3.31
+de       ,Gutenberg.de         ,                            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
 de       ,Europarl.de          ,                            ,false ,parlementary ,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
 es       ,Wikipedia.es         ,                            ,false ,wiki         ,   1.947,   1.245,   7.161,        639,        5.8,    2.124,        1.71,        3.37
 es       ,Eurovoc.es           ,                            ,true  ,parlementary ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
 es       ,Europarl.es          ,                            ,false ,parlementary ,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
-es       ,Gutenberg.es         ,                            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.094,        1.84,        3.22
+es       ,Gutenberg.es         ,                            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.092,        1.80,        3.30
 it       ,Wikipedia.it         ,                            ,false ,wiki         ,   1.870,   1.060,   6.161,        567,        5.8,    1.959,        1.85,        3.14
 it       ,Eurovoc.it           ,                            ,true  ,parlementary ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
-it       ,Gutenberg.it         ,                            ,false ,book         ,   0.001,   0.066,   0.414,      68616,        6.3,    0.131,        1.99,        3.16
+it       ,Gutenberg.it         ,                            ,false ,book         ,   0.001,   0.066,   0.414,      68616,        6.3,    0.129,        1.96,        3.21
 es-en    ,EuroparlAligned.es-en,                            ,false ,parlementary ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
 it-en    ,EuroparlAligned.it-en,                            ,false ,parlementary ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
 de-fr    ,EuroparlAligned.de-fr,                            ,false ,parlementary ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
