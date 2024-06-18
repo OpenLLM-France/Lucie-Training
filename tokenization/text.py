@@ -3,7 +3,6 @@ import math
 import random
 import urllib
 import regex as re
-import string
 from collections import Counter
 
 def clean_pdf_extraction(text, html_escape=False):
@@ -87,8 +86,10 @@ def clean_gutenberg(text):
     text = remove_licence(text)
     return text
 
-### Theses      
+### Theses   
 def clean_theses(text):
+    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
+
     def remove_HAL(text):
         pattern = r'^.*?HAL is a multi-disciplinary open access.*?\x0c'
         return re.sub(pattern, '', text, flags=re.DOTALL)  
@@ -105,8 +106,23 @@ def clean_theses(text):
                 out.append(line)
         return ''.join(out)
 
+    def _remove_pages(text):
+        pages = [text[match.start():match.end()] for match in re.finditer(r"([^\x0c]*[\x0c]|[^\x0c]+$)", text)]
+        out = ''
+        for page in pages:
+            num_lines = len(page.split('\n'))
+            frac_control_char = len(re.findall(control_char_pattern_except_page_break, page)) / len(page)
+            if num_lines > 200:
+                pass
+            elif frac_control_char > .2:
+                pass
+            else:
+                out += page
+        return out
+
     text = remove_HAL(text)
     text = filter_duplicated_lines(text)
+    text = _remove_pages(text)
     return text
 
 def _repair_cid_character(match):  # noqa # C901 `...` is too complex

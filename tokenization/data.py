@@ -1348,65 +1348,6 @@ class DataIteratorHal(DataIteratorParquet):
             **kwargs,
         )
 
-
-TRANSLATION_TABLE_PUNCTUATION = str.maketrans("", "", string.punctuation)
-
-def normalize(
-        text: str,
-        remove_punct: bool = True,
-        lowercase: bool = True,
-        nfd_unicode: bool = True,
-        white_space: bool = True
-) -> str:
-    """ Normalize the text by lowercasing and removing punctuation. """
-    # remove punctuation
-    if remove_punct:
-        text = text.translate(TRANSLATION_TABLE_PUNCTUATION)
-
-    # lowercase
-    if lowercase:
-        text = text.lower()
-
-    if white_space:
-        text = text.strip()
-        text = re.sub(r"\s+", " ", text)
-
-    # NFD unicode normalization
-    if nfd_unicode:
-        text = unicodedata.normalize("NFD", text)
-
-    return text
-
-def filter_chunk_theses(page):
-    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
-
-    num_lines = len(page.split('\n'))
-    normalized_page = normalize(page)
-    normalized_words = normalized_page.split()
-    num_normalized_words = len(normalized_words)
-    frac_unicode = 1- len(unicodedata.normalize("NFD", page)) / len(page) if len(page)>0 else None 
-    frac_punctuation = 1- len(page.translate(TRANSLATION_TABLE_PUNCTUATION)) / len(page) if len(page)>0 else None 
-    numerical_chars_frac = sum(map(str.isnumeric, normalized_page)) / len(normalized_page) if len(normalized_page)>0 else None
-    mean_word_length = float(sum(map(len, normalized_words))) / num_normalized_words if num_normalized_words >0 else None
-    frac_control_char = len(re.findall(control_char_pattern_except_page_break, page)) / num_lines if num_lines else None 
-
-    if num_normalized_words <= 5:
-        return False
-    elif num_normalized_words / num_lines <= 5:
-        return False 
-    elif frac_control_char > 0.2:
-        return False
-    elif mean_word_length > 10 or mean_word_length < 1.5: 
-        return False
-    elif frac_unicode > 0.2:
-        return False
-    elif frac_punctuation >= 0.2:
-        return False
-    elif numerical_chars_frac > 0.2:
-        return False
-    else:
-        return True
-
 def preproc_theses(data, threshold=2000):
     complete_text = data['complete_text']
     filtered_text = ''
@@ -1421,7 +1362,7 @@ def preproc_theses(data, threshold=2000):
             pass
         elif lan not in ['fr', 'en', 'it', 'es', 'de']: 
             pass 
-        elif filter_chunk_theses(chunk): 
+        else: 
             filtered_text += chunk
     data['complete_text'] = filtered_text
     return data
