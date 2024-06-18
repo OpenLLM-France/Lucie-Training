@@ -1392,8 +1392,8 @@ def filter_chunk_theses(page):
 
     if num_normalized_words <= 5:
         return False
-    elif num_lines > 200:
-        return False
+    elif num_normalized_words / num_lines <= 5:
+        return False 
     elif frac_control_char > 0.2:
         return False
     elif mean_word_length > 10 or mean_word_length < 1.5: 
