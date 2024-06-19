@@ -32,8 +32,8 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Folder with indexed datasets",
-        default="/data-storage/storage0/lucie_tokens_65k_grouped",
-        nargs="?",
+        # default="/data-storage/storage0/lucie_tokens_65k",
+        # nargs="?",
     )
     args = parser.parse_args()
 
@@ -90,6 +90,7 @@ if __name__ == "__main__":
                         "max_tokens": max_tokens,
                     },
                     open(json_file, "w"),
+                    indent=4,
                 )
 
         total_num_tokens["TOTAL"] = total_num_tokens.get("TOTAL", 0) + total_tokens
