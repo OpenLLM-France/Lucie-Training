@@ -422,7 +422,10 @@ class DataIterator(DataIteratorBase):
 
     def _get_next(self):
         try:
-            return next(self.dataset_iter)
+            data = next(self.dataset_iter)
+            if self.preprocess:
+                data = self.preprocess(data)
+            return data
         except TypeError as err:
             # Sometimes this can occur because of empty transcription:
             # TypeError: Couldn't cast array of type binary to null
@@ -465,8 +468,6 @@ class DataIterator(DataIteratorBase):
                     criterion = data[self.subsample_criteria]
                     r = string_to_random01(criterion)
 
-        if self.preprocess:
-            data = self.preprocess(data)
         try:
             text = data[self.key]
         except KeyError as err:
@@ -1371,7 +1372,7 @@ def preproc_theses(data, threshold=2000):
         else:
             filtered_text += chunk
     cleaned_text = clean_theses(filtered_text)
-    data["complete_text"] = cleaned_text
+    data["text"] = cleaned_text
     data["word_count"] = len(cleaned_text.split())
     data["character_count"] = len(cleaned_text)
     return data
@@ -1399,7 +1400,7 @@ class DataIteratorTheses(DataIteratorParquet):
             preprocess=preproc_theses,
             # postprocess=clean_theses, # clean_theses is called in preproc_theses
             filter_fn=filter_thesis_heuristic,
-            key="complete_text",
+            key="text",
             **kwargs,
         )
 
