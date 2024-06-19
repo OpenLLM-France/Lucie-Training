@@ -12,9 +12,6 @@ import warnings
 import datasets
 import numpy as np
 import regex as re
-import unicodedata
-import string
-
 from text import (
     check_language,
     clean_discours,
@@ -1247,6 +1244,7 @@ def filter_by_perplexity(x, threshold):
     mean_or_median_is_lower = mean_is_lower or np.median(perplexities) <= threshold
     return mean_or_median_is_lower
 
+
 def repare_overlapping_chunks(list_of_chunks):
     previous_end = None
     list_of_chunks_ = []
@@ -1256,7 +1254,8 @@ def repare_overlapping_chunks(list_of_chunks):
         list_of_chunks_.append((start, end))
         previous_end = end
     return list_of_chunks_
-    
+
+
 def preproc_gallica(data):
     text = data["complete_text"]
 
@@ -1348,24 +1347,35 @@ class DataIteratorHal(DataIteratorParquet):
             **kwargs,
         )
 
-def preproc_theses(data, threshold=2000):
-    complete_text = data['complete_text']
-    filtered_text = ''
 
-    for idx, (start, end, avg_logprob, lan_score, lan) in enumerate(zip(
-        data['chunk_start'], data['chunk_end'], data['ccnet_avg_log_prob'], data['ccnet_language_score'], data['fasttext_language']
-        )):
+def preproc_theses(data, threshold=2000):
+    complete_text = data["complete_text"]
+    filtered_text = ""
+
+    for idx, (start, end, avg_logprob, lan) in enumerate(
+        zip(
+            data["chunk_start"],
+            data["chunk_end"],
+            data["ccnet_avg_log_prob"],
+            # data["ccnet_language_score"],
+            data["fasttext_language"],
+        )
+    ):
         chunk = complete_text[start:end]
         if idx <= 1:
             filtered_text += chunk
         elif 10**avg_logprob > threshold:
             pass
-        elif lan not in ['fr', 'en', 'it', 'es', 'de']: 
-            pass 
-        else: 
+        elif lan not in ["fr", "en", "it", "es", "de"]:
+            pass
+        else:
             filtered_text += chunk
-    data['complete_text'] = filtered_text
+    cleaned_text = clean_theses(filtered_text)
+    data["complete_text"] = cleaned_text
+    data["word_count"] = len(cleaned_text.split())
+    data["character_count"] = len(cleaned_text)
     return data
+
 
 def filter_thesis_heuristic(data):
     if data["word_count"] < 1000:
@@ -1373,6 +1383,7 @@ def filter_thesis_heuristic(data):
     if data["character_count"] < 10000:
         return False
     return True
+
 
 class DataIteratorTheses(DataIteratorParquet):
     def __init__(self, filter_by_perplexity=True, **kwargs):
@@ -1386,7 +1397,7 @@ class DataIteratorTheses(DataIteratorParquet):
             folder,
             name="Theses",
             preprocess=preproc_theses,
-            postprocess=clean_theses,
+            # postprocess=clean_theses, # clean_theses is called in preproc_theses
             filter_fn=filter_thesis_heuristic,
             key="complete_text",
             **kwargs,
