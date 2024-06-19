@@ -2,8 +2,10 @@ import html
 import math
 import random
 import urllib
-import regex as re
 from collections import Counter
+
+import regex as re
+
 
 def clean_pdf_extraction(text, html_escape=False):
     text = remove_page_numbers(text)
@@ -76,45 +78,49 @@ def clean_eurovoc(text):
     # text = re.sub(r"\f", "", text) # should we remove those control characters?
     return re.sub(r" +", " ", text)
 
+
 def clean_gutenberg(text):
     def remove_gallica_mention(text):
-        return re.sub('.*?http://gallica.bnf.fr.*?\n', '', text)
+        return re.sub(".*?http://gallica.bnf.fr.*?\n", "", text)
+
     def remove_licence(text):
-        pattern = r'\n\n            \*\*\* END OF THE PROJECT GUTENBERG EBOOK.*'
-        return re.sub(pattern, '', text, flags=re.DOTALL) 
+        pattern = r"\n\n            \*\*\* END OF THE PROJECT GUTENBERG EBOOK.*"
+        return re.sub(pattern, "", text, flags=re.DOTALL)
+
     # text = remove_gallica_mention(text)
     text = remove_licence(text)
     return text
 
-### Theses   
+
+### Theses
 def clean_theses(text):
-    control_char_pattern_except_page_break = r'[\x00-\x08\x0B\x0E-\x1F\x7F�]'
+    control_char_pattern_except_page_break = r"[\x00-\x08\x0B\x0E-\x1F\x7F�]"
 
     def remove_HAL(text):
-        pattern = r'^.*?HAL is a multi-disciplinary open access.*?\x0c'
-        return re.sub(pattern, '', text, flags=re.DOTALL)  
+        pattern = r"^.*?HAL is a multi-disciplinary open access.*?\x0c"
+        return re.sub(pattern, "", text, flags=re.DOTALL)
 
     def filter_duplicated_lines(text):
-        lines = [text[match.start():match.end()] for match in re.finditer(r"([^\n\x0c]*[\n\x0c]|[^\n\x0c]+$)", text)]
+        lines = [text[match.start() : match.end()] for match in re.finditer(r"([^\n\x0c]*[\n\x0c]|[^\n\x0c]+$)", text)]
         count_lines = Counter(lines)
-        duplicated_lines = [k for k, v in count_lines.items() if (v >= 10) and (len(k)>=10)]
+        duplicated_lines = [k for k, v in count_lines.items() if (v >= 10) and (len(k) >= 10)]
         out = []
-        for i, line in enumerate(lines):
+        for line in lines:
             if line in duplicated_lines:
                 pass
             else:
                 out.append(line)
-        return ''.join(out)
+        return "".join(out)
 
     def _remove_pages(text):
-        pages = [text[match.start():match.end()] for match in re.finditer(r"([^\x0c]*[\x0c]|[^\x0c]+$)", text)]
-        out = ''
+        pages = [text[match.start() : match.end()] for match in re.finditer(r"([^\x0c]*[\x0c]|[^\x0c]+$)", text)]
+        out = ""
         for page in pages:
-            num_lines = len(page.split('\n'))
+            num_lines = len(page.split("\n"))
             frac_control_char = len(re.findall(control_char_pattern_except_page_break, page)) / len(page)
             if num_lines > 200:
                 pass
-            elif frac_control_char > .2:
+            elif frac_control_char > 0.2:
                 pass
             else:
                 out += page
@@ -123,7 +129,9 @@ def clean_theses(text):
     text = remove_HAL(text)
     text = filter_duplicated_lines(text)
     text = _remove_pages(text)
+    text = text.strip()
     return text
+
 
 def _repair_cid_character(match):  # noqa # C901 `...` is too complex
     i = int(match.group(2))
