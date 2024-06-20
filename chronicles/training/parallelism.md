@@ -1,6 +1,6 @@
 # Search for the Best Parallelism Option on Jean-Zay
 
-Each experiment experiment is runed for ~20min, and we collected the statistics from Megatron logs. One line of log looks like:
+Each experiment is runed for ~20min, and we collected the statistics from Megatron logs. One line of log looks like:
 
 `[default7]: iteration 2/ 250000 | consumed samples: 384 | consumed tokens: 786432 | elapsed time per iteration (ms): 5350.0 | learning rate: 3.000E-07 | global batch size: 192 | lm loss: 1.119602E+01 | grad norm: 18.118 | num zeros: 0.0 | actual seq length: 2048 | number of skipped iterations: 0 | number of nan iterations: 0 | samples per second: 35.888 | TFLOPs: 48.77 |`
 
@@ -22,6 +22,10 @@ We use 3D parallelism, with `TP=Tensor Parallelism, PP=Pipeline Parallelism, DP=
 
 ## Global Batch Size Options:
 The micro batch size depends on the parallelization strategy as some strategies are more memory-intensive than others, and therefore we can set a large micro-batch size for some and not for others. In general, we tested the maximum Micro Batch Size (MBS) that does not cause OOM and respects the rule of divisibility: `GBS % (MBS * nGPUs / TT / TP) == 0`.
+
+## Comparisons for different parallism strategies
+
+The following figure gives the throughput (Tokens per second) for each parallism strategy on different number of GPUs and for different batch sizes.
 
 
 | nGPUs   | TP=1, PP=1 |        | TP=2, PP=1 |        | TP=1, PP=2 |        | TP=2, PP=2 |        |
