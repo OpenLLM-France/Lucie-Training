@@ -1,6 +1,6 @@
 # Loss Curves as a Function of Batch Sizes for 2048 context length
 
-We illustrate this with the [best](parallelism.md#comparisons-for-different-parallelism-strategies-for-2048-context-length) parallelism strategy for 2048 context length found in: `TP=2,PP=2`.
+For ~20min of training, we illustrate this with the [best](parallelism.md#comparisons-for-different-parallelism-strategies-for-2048-context-length) parallelism strategy for 2048 context length found in: `TP=2,PP=2`.
 
 ## Loss ~ Tokens
 
