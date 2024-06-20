@@ -23,7 +23,7 @@ We use 3D parallelism, with `TP=Tensor Parallelism, PP=Pipeline Parallelism, DP=
 ## Global Batch Size Options:
 The micro batch size depends on the parallelization strategy as some strategies are more memory-intensive than others, and therefore we can set a large micro-batch size for some and not for others. In general, we tested the maximum Micro Batch Size (MBS) that does not cause OOM and respects the rule of divisibility: `GBS % (MBS * nGPUs / TT / TP) == 0`.
 
-## Comparisons for different parallism strategies for 2048 context length
+## Comparisons for different parallelism strategies for 2048 context length
 
 The following figure gives the throughput (Tokens per second) for each parallism strategy on different number of GPUs and for different batch sizes.
 
