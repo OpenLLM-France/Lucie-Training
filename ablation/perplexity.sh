@@ -20,7 +20,7 @@ NNODES=$SLURM_NNODES
 # ----- data
 TOKENIZER_PATH=/datasets/lucie_tokens_65k_grouped/tokenizer
 TOKENS_DIR=/local_data/lucie_tokens_65k_grouped
-DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_alt.py $TOKENS_DIR)"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_ablation.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
