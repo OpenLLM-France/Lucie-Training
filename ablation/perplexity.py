@@ -426,22 +426,17 @@ def evaluate_and_print_results(data_loader, model, num_original_tokens, num_toke
         results = {
             "loss": val_loss,
             "ppl": ppl,
-            "ajusted_ppl": adjusted_ppl,
+            "adjusted_ppl": adjusted_ppl,
             "token_ratio": token_ratio
         }
-        print_rank_0(f"val_loss: {val_loss}")
-        print_rank_0(f"ppl: {ppl}")
-        print_rank_0(f"adjusted_ppl: {adjusted_ppl}")
-        print_rank_0(f"token_ratio: {token_ratio}")
-        print_rank_0(f" > results: {results}")
-        with open('./eval_results.json', 'w') as json_file:
-            json.dump(results, json_file)
-
 
         length = len(string) + 1
         print('-' * length)
         print(string)
         print('-' * length)
+
+        return results
+
 
 ### Main
 def main():
@@ -484,17 +479,17 @@ def main():
         print_rank_0(f"num_tokenized_tokens: {num_tokenized_tokens}")
         test_iter = build_test_data_iterators(dataloader)
 
-        # WARNING: I think we have an issue with parallelism here as the json is overriden by the last process
-        evaluate_and_print_results(test_iter, model, num_original_tokens, num_tokenized_tokens, eval_iters)
-        
-        # Go fetch the json file and print the results
-        with open('./eval_results.json') as f:
-            data = json.load(f)
-        ppl = data['ppl']
-        loss = data['loss']
-        adjusted_ppl = data['ajusted_ppl']
-        token_ratio = data['token_ratio']
+        # Evaluate the model
+        results = evaluate_and_print_results(test_iter, model, num_original_tokens, num_tokenized_tokens, eval_iters)
+
+        # Fetch the results
+        ppl = results['ppl']
+        loss = results['loss']
+        adjusted_ppl = results['adjusted_ppl']
+        token_ratio = results['token_ratio']
         print(f"Dataset name: {ds.name} | Loss: {loss:.5f} | PPL: {ppl:.5f} | Adjusted PPL: {adjusted_ppl:.5f} | Token Ratio: {token_ratio:.5f}")
+
+        # Store them in a dictionary
         domain_ppls[ds.name] = {
             "loss": loss,
             "ppl": ppl,
@@ -521,6 +516,7 @@ def main():
             nb_tok_tok = ds_data['num_tokenized_tokens']
             tok_ratio = ds_data['token_ratio']
             writer.writerow([ds_name, loss, ppl, adj_ppl, nb_origin_tok, nb_tok_tok, tok_ratio])
+
 
 if __name__ == "__main__":
     initialize_megatron(extra_args_provider=get_test_dataset_args)
