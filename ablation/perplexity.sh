@@ -14,8 +14,10 @@ fi
 MASTER_ADDR=127.0.0.1 #$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-GPUS_PER_NODE=2
+GPUS_PER_NODE=1
 NNODES=$SLURM_NNODES
+
+WOLD_SIZE=$(($GPUS_PER_NODE * $NNODES))
 
 # ----- data
 TOKENIZER_PATH=/datasets/lucie_tokens_65k_grouped/tokenizer
@@ -60,7 +62,8 @@ cat <<EOT > $config_json
 }
 EOT
 
-CHECKPOINT_PATH=/home/lucas.hervier/Lucie-Training/results/checkpoints/test0
+CHECKPOINT_PATH=/home/agustin-martin.picard/Lucie-Training/results/checkpoints/gyoza-85M
+PERPLEXITY_RESULTS_PATH=/home/agustin-martin.picard/Lucie-Training/results/perplexity_results/gyoza-85M
 
 # ------ Optimizer
 TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
@@ -142,7 +145,7 @@ torchrun $DISTRIBUTED_ARGS \
       --tokenizer-name-or-path $TOKENIZER_PATH \
       --distributed-backend nccl \
       --load $CHECKPOINT_PATH \
-      --load-iteration 3000 \
+      --load-iteration 10000 \
       --inference \
       --finetune \
       $DEEPSPEED_ARGS \
