@@ -8,6 +8,7 @@ import pickle
 import random
 import types
 import warnings
+import pandas as pd
 
 import datasets
 import numpy as np
@@ -203,6 +204,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         "claire",
         "eurovoc",
         "validated_youtube",
+        "cultura_x"
     ]  # "youtube",
 
     name = name.lower()
@@ -1229,7 +1231,37 @@ class DataIteratorValidatedYoutube(DataIterator):
             **kwargs,
         )
 
+from urllib.parse import urlparse
+class DataIteratorCulturaX(DataIterator):
+    def __init__(self, language="fr", streaming=True, sampling_strategy='head', **kwargs): 
+        name = f"CulturaX:{language.lower()}"
+        df_urls = pd.read_csv(os.path.join(DATA_PATH, 'culturax/combined_data_sorted.csv'))
 
+        if sampling_strategy == 'head':
+            list_of_urls = df_urls.iloc[:200]['url'].values
+            filter_fn = lambda data: urlparse(str(data['url'])).netloc in list_of_urls
+        elif sampling_strategy == 'tail':
+            raise(NotImplementedError)
+            list_of_urls = df_urls.iloc[200:]['url'].values
+        elif sampling_strategy == 'random':
+            raise(NotImplementedError)
+        else:
+            filter_fn=None
+
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "uonlp/CulturaX", 
+                language, 
+                token=True, 
+                streaming=streaming, 
+                split='train'
+            ),
+            name=name,
+            filter_fn=filter_fn,
+            **kwargs,
+        )
+        
 ########################################
 # Datasets: French
 
