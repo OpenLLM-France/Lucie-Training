@@ -51,7 +51,7 @@ class BenchmarkDataIterator(DataIteratorConcat):
             hf_repo_kwargs = {}
         if isinstance(splits, str):
             splits = [splits]
-        elif isinstance(splits, None):
+        elif splits is None:
             splits = ["validation"]
 
         hf_dataset = datasets.load_dataset(hf_repo_name, **hf_repo_kwargs)
@@ -71,44 +71,51 @@ class BenchmarkDataIterator(DataIteratorConcat):
         super().__init__(it_datasets)
 
 
+def remove_annotation_from_text(text):
+    if isinstance(text, list):
+        return [remove_annotation_from_text(t) for t in text]
+
+    def dot_or_nothing(match):
+        if "." in match.group(1):
+            return ""
+        return "."
+
+    text = re.sub(r"(\.?)(\s*)(\[[a-zA-Z]*\])", dot_or_nothing, text).lstrip(" .")
+    return text
+
+
+def preprocess_hellaswag(data):
+    prompt = data["ctx"]
+    label = data["label"]
+    endings = data["endings"]
+    if not label:
+        return {}
+    label = int(label)
+    positive = [endings[label]]
+    negative = endings[:label] + endings[label + 1 :]
+    return {
+        "prompt": remove_annotation_from_text(prompt),
+        "positive": remove_annotation_from_text(positive),
+        "negative": remove_annotation_from_text(negative),
+    }
+
+
+def filter_hellaswag(data):
+    return data.get("positive")
+
+
+class DataIteratorHellaswag(BenchmarkDataIterator):
+    def __init__(self, splits="validation"):
+        super().__init__(
+            "Rowan/hellaswag",
+            preprocess=preprocess_hellaswag,
+            filter_fn=filter_hellaswag,
+            splits=splits,
+        )
+
+
 if __name__ == "__main__":
-
-    def remove_annotation_from_text(text):
-        if isinstance(text, list):
-            return [remove_annotation_from_text(t) for t in text]
-
-        def dot_or_nothing(match):
-            if "." in match.group(1):
-                return ""
-            return "."
-
-        text = re.sub(r"(\.?)(\s*)(\[[a-zA-Z]*\])", dot_or_nothing, text).lstrip(" .")
-        return text
-
-    def preprocess_hellaswag(data):
-        prompt = data["ctx"]
-        label = data["label"]
-        endings = data["endings"]
-        if not label:
-            return {}
-        label = int(label)
-        positive = [endings[label]]
-        negative = endings[:label] + endings[label + 1 :]
-        return {
-            "prompt": remove_annotation_from_text(prompt),
-            "positive": remove_annotation_from_text(positive),
-            "negative": remove_annotation_from_text(negative),
-        }
-
-    def filter_hellaswag(data):
-        return data.get("positive")
-
-    dataset = BenchmarkDataIterator(
-        "Rowan/hellaswag",
-        splits=["validation"],  # test is not labeled
-        preprocess=preprocess_hellaswag,
-        filter_fn=filter_hellaswag,
-    )
+    dataset = DataIteratorHellaswag()
 
     for data in dataset:
         print(data)

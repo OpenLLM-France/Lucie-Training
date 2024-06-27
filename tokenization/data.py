@@ -468,6 +468,9 @@ class DataIterator(DataIteratorBase):
                     criterion = data[self.subsample_criteria]
                     r = string_to_random01(criterion)
 
+        if not self.key:
+            return data
+
         try:
             text = data[self.key]
         except KeyError as err:
