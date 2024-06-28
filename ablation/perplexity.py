@@ -9,6 +9,7 @@ import csv
 
 import numpy as np
 import torch
+import torch.distributed as dist
 
 from megatron import get_args
 from megatron.initialize import initialize_megatron
@@ -412,30 +413,47 @@ def evaluate_and_print_results(data_loader, model, num_original_tokens, num_toke
     print_rank_0(f"total_loss_dict: {total_loss_dict}")
     string = ''
 
-    if is_last_rank():
+    # Compute the metrics
+    val_loss = torch.tensor(total_loss_dict['lm loss'].item() / (num_tokenized_tokens - 1),
+                            device=get_accelerator().device_name())
+    ppl = torch.tensor(math.exp(min(20, val_loss.item())), device=get_accelerator().device_name())
+    token_ratio = torch.tensor((num_tokenized_tokens - 1) / (num_original_tokens - 1),
+                               device=get_accelerator().device_name())
+    adjusted_ppl = torch.tensor(math.exp(min(20, val_loss.item() * token_ratio.item())),
+                                device=get_accelerator().device_name())
 
-        val_loss = total_loss_dict['lm loss'].item() / (num_tokenized_tokens - 1)
-        ppl = math.exp(min(20, val_loss))
-        token_ratio = (num_tokenized_tokens - 1) / (num_original_tokens - 1)
-        adjusted_ppl = math.exp(min(20, val_loss * token_ratio))
-        string += 'avg loss: {:.4E} | '.format(val_loss)
-        string += 'ppl: {:.4E} | '.format(ppl)
-        string += 'adjusted ppl: {:.4E} | '.format(adjusted_ppl)
-        string += 'token ratio: {} |'.format(token_ratio)
+    # All reduce to synchronize the results across GPUs
+    dist.all_reduce(val_loss, op=dist.ReduceOp.SUM)  # mean reduction is not supported
+    dist.all_reduce(ppl, op=dist.ReduceOp.SUM)
+    dist.all_reduce(adjusted_ppl, op=dist.ReduceOp.SUM)
+    dist.all_reduce(token_ratio, op=dist.ReduceOp.SUM)
 
-        results = {
-            "loss": val_loss,
-            "ppl": ppl,
-            "adjusted_ppl": adjusted_ppl,
-            "token_ratio": token_ratio
-        }
+    # Divide by data shards
+    NB_SHARDS = mpu.get_data_parallel_world_size()
+    print_rank_0(f" > NB_SHARDS: {NB_SHARDS}")
+    val_loss = val_loss / NB_SHARDS
+    token_ratio = token_ratio / NB_SHARDS
 
-        length = len(string) + 1
-        print('-' * length)
-        print(string)
-        print('-' * length)
+    # Print some results
+    string += 'avg loss: {:.4E} | '.format(val_loss)
+    string += 'ppl: {:.4E} | '.format(ppl)
+    string += 'adjusted ppl: {:.4E} | '.format(adjusted_ppl)
+    string += 'token ratio: {} |'.format(token_ratio)
 
-        return results
+    # Save in dictionary for one domain
+    results = {
+        "loss": val_loss,
+        "ppl": ppl,
+        "adjusted_ppl": adjusted_ppl,
+        "token_ratio": token_ratio
+    }
+
+    length = len(string) + 1
+    print('-' * length)
+    print(string)
+    print('-' * length)
+
+    return results
 
 
 ### Main
@@ -461,6 +479,7 @@ def main():
 
     # Use the datasets to evaluate the model
     domain_ppls = {}
+    test_datasets = [test_datasets]  # TODO remove!
     for ds in test_datasets:
         dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
         num_tokenized_tokens = 0
