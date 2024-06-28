@@ -260,6 +260,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             "europarl": ["fr", "en", "de", "es"],
             "eurovoc": ["en", "de", "es", "it"],
             "validated_youtube": ["fr"],
+            "cultura_x": ["fr", "en", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", **kwargs):
@@ -1232,22 +1233,47 @@ class DataIteratorValidatedYoutube(DataIterator):
         )
 
 from urllib.parse import urlparse
+import urllib.request  # the lib that handles the url stuff
+
 class DataIteratorCulturaX(DataIterator):
-    def __init__(self, language="fr", streaming=True, sampling_strategy='head', **kwargs): 
-        name = f"CulturaX:{language.lower()}"
-        df_urls = pd.read_csv(os.path.join(DATA_PATH, 'culturax/combined_data_sorted.csv'))
+    def __init__(self, language="fr", source='OSCAR-2301', streaming=True, **kwargs): 
+        # source: mC4, OSCAR-2019, OSCAR-2109, OSCAR-2201, OSCAR-2301
+        name = f"CulturaX:{source.lower()}:{language.lower()}"
 
-        if sampling_strategy == 'head':
-            list_of_urls = df_urls.iloc[:200]['url'].values
-            filter_fn = lambda data: urlparse(str(data['url'])).netloc in list_of_urls
-        elif sampling_strategy == 'tail':
-            raise(NotImplementedError)
-            list_of_urls = df_urls.iloc[200:]['url'].values
-        elif sampling_strategy == 'random':
-            raise(NotImplementedError)
+        if language == 'fr':
+            keywords = ['fr.wikipedia', 'wiktionary', 'wikisource', 'theses.fr']
+        elif language == 'en':
+            keywords = ['en.wikipedia'] # + arxiv, pubmed...
         else:
-            filter_fn=None
+            keywords = ['wikipedia']
 
+        def load_bad_words(language):
+            target_url = f'https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/{language}'
+            response = urllib.request.urlopen(target_url)
+            bad_words = response.read().decode('utf-8')
+            bad_words = [bad_word.lower() for bad_word in bad_words.split('\n') if bad_word!='' and ' ' not in bad_word]
+            return set(bad_words)
+        
+        def is_obscene(text):
+            words = set(re.sub(r'[^\p{L} ]+', '', text).split())
+            bad_words = load_bad_words(language)
+            number_of_obscene_words = len(words.intersection(bad_words))
+            return number_of_obscene_words > 0 
+
+        def filter_fn(data): # (returns True if the example is to be kept, False otherwise)
+            if data['source'] != source:
+                return False
+            if any(keyword in data['url'] for keyword in keywords):
+                return False
+            if is_obscene(data['text']):
+                return False
+            return True
+
+        # # DEBUG
+        # def preprocess(data):
+        #     data['text'] = '\n'.join([data['url'], data['text']])
+        #     return data
+        
         DataIterator.__init__(
             self,
             datasets.load_dataset(
@@ -1255,9 +1281,10 @@ class DataIteratorCulturaX(DataIterator):
                 language, 
                 token=True, 
                 streaming=streaming, 
-                split='train'
+                split='train',
             ),
             name=name,
+            # preprocess=preprocess,
             filter_fn=filter_fn,
             **kwargs,
         )
