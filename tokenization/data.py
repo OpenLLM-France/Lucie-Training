@@ -1257,7 +1257,7 @@ class DataIteratorCulturaX(DataIteratorConcat):
             words = set(re.sub(r'[^\p{L} ]+', '', text).split())
             bad_words = load_bad_words(language)
             number_of_obscene_words = len(words.intersection(bad_words))
-            return number_of_obscene_words >= 5
+            return number_of_obscene_words >= 3
 
         def filter_fn(data, language, source): # (returns True if the example is to be kept, False otherwise)
             if data['source'] != source:
