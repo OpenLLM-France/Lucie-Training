@@ -1,18 +1,16 @@
 import functools
 import glob
-import hashlib
 import json
 import logging
 import os
-import pickle
 import random
 import types
 import warnings
-import pandas as pd
 
 import datasets
 import numpy as np
 import regex as re
+import tqdm
 from text import (
     check_language,
     clean_discours,
@@ -23,6 +21,8 @@ from text import (
     fix_legi,
     fix_legi_and_remove_title,
     html_unescape,
+    is_obscene,
+    string_to_random01,
 )
 
 logger = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
         "claire",
         "eurovoc",
         "validated_youtube",
-        "cultura_x"
+        "cultura_x",
     ]  # "youtube",
 
     name = name.lower()
@@ -508,20 +508,6 @@ class DataIterator(DataIteratorBase):
         if self.max_docs:
             return min(len(self.dataset), self.max_docs)
         return len(self.dataset)
-
-
-def string_to_random01(x):
-    # Get the hash value of the input string
-    # hash_value = hash(str(x))
-    hash_value = int(hashlib.sha256(pickle.dumps(str(x))).hexdigest(), 16)
-
-    # Normalize the hash value to the range [0, 1]
-    # normalized_value = (hash_value & 0xFFFFFFFF) / 0xFFFFFFFF
-    normalized_value = (
-        hash_value & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-    ) / 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-
-    return normalized_value
 
 
 class DataIteratorConcat(DataIteratorBase):
@@ -1212,7 +1198,7 @@ class DataIteratorYoutube(DataIteratorParquet):
 
 
 class DataIteratorValidatedYoutube(DataIterator):
-    def __init__(self, language="fr", streaming=True, **kwargs):  # noqa # C901 `...` is too complex
+    def __init__(self, language="fr", streaming=True, **kwargs):
         path = DATA_PATH + f"/youtube_{language}"
         files = glob.glob(path + "/*.txt")
 
@@ -1232,39 +1218,36 @@ class DataIteratorValidatedYoutube(DataIterator):
             **kwargs,
         )
 
-from urllib.parse import urlparse
-import urllib.request  # the lib that handles the url stuff
 
 class DataIteratorCulturaX(DataIteratorConcat):
-    def __init__(self, language="fr", streaming=True, **kwargs): 
-        def is_url_duplicated(data, language):
-            if language == 'fr':
-                keywords = ['fr.wikipedia', 'wiktionary', 'wikisource', 'theses.fr']
-            elif language == 'en':
-                keywords = ['en.wikipedia'] # + arxiv, pubmed...
+    def __init__(self, language="fr", split="train", streaming=True, **kwargs):
+        num_parquets = {
+            "it": 256,
+            "fr": 512,
+            "de": 512,
+            "es": 512,
+            "en": 2048,
+        }.get(language, None)
+
+        assert num_parquets, f"Unsupported language {language}. Number of parquets not defined (512?). Please visit https://huggingface.co/datasets/uonlp/CulturaX/tree/main/{language}"
+        num_parquets = min(num_parquets, 512)  # Arbitrary limit for English !
+
+        def is_url_duplicated(url, language):
+            if language == "fr":
+                keywords = ["fr.wikipedia", "wiktionary", "wikisource", "theses.fr"]
+            elif language == "en":
+                keywords = ["en.wikipedia"]  # + arxiv, pubmed...
             else:
-                keywords = ['wikipedia']
-            return any(keyword in data['url'] for keyword in keywords)
+                keywords = ["wikipedia"]
+            return any(keyword in url for keyword in keywords)
 
-        def load_bad_words(language):
-            target_url = f'https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/{language}'
-            response = urllib.request.urlopen(target_url)
-            bad_words = response.read().decode('utf-8')
-            bad_words = [bad_word.lower() for bad_word in bad_words.split('\n') if bad_word!='' and ' ' not in bad_word]
-            return set(bad_words)
-        
-        def is_obscene(text, language):
-            words = set(re.sub(r'[^\p{L} ]+', '', text).split())
-            bad_words = load_bad_words(language)
-            number_of_obscene_words = len(words.intersection(bad_words))
-            return number_of_obscene_words >= 3
-
-        def filter_fn(data, language, source): # (returns True if the example is to be kept, False otherwise)
-            if data['source'] != source:
+        def filter_fn(data, language, source=None):
+            # returns True if the example is to be kept, False otherwise
+            if source and (data["source"] != source):
                 return False
-            if is_url_duplicated(data, language):
+            if is_url_duplicated(data["url"], language):
                 return False
-            if is_obscene(data['text'], language):
+            if is_obscene(data["text"], language):
                 return False
             return True
 
@@ -1272,26 +1255,31 @@ class DataIteratorCulturaX(DataIteratorConcat):
         # def preprocess(data):
         #     data['text'] = '\n'.join([data['url'], data['text']])
         #     return data
-        
+
         DataIteratorConcat.__init__(
             self,
             [
                 DataIterator(
                     datasets.load_dataset(
-                        "uonlp/CulturaX", 
-                        language, 
-                        token=True, 
-                        streaming=streaming, 
-                        split='train',
+                        "uonlp/CulturaX",
+                        # language,
+                        data_files=f"{language}/{language}_part_{iparquet:05d}.parquet",
+                        streaming=streaming,
+                        split=split,
+                        # token=True,
                     ),
-                    name=f"CulturaX:{language.lower()}:{source.lower()}",
-                    filter_fn=lambda data: filter_fn(data, language, source),
+                    # name=f"CulturaX:{language.lower()}:{split}:{source.lower()}",
+                    # filter_fn=lambda data: filter_fn(data, language, source),
+                    name=f"CulturaX:{language.lower()}:{split}_{iparquet}",
+                    filter_fn=lambda data: filter_fn(data, language),
                     **kwargs,
                 )
-                for source in ('mC4', 'OSCAR-2019', 'OSCAR-2109', 'OSCAR-2201', 'OSCAR-2301')
+                # for source in ('mC4', 'OSCAR-2019', 'OSCAR-2109', 'OSCAR-2201', 'OSCAR-2301')
+                for iparquet in tqdm.tqdm(range(num_parquets), desc="Initializing CulturaX...")
             ],
-            name=f'CulturaX:{language.lower()}',
+            name=f"CulturaX:{language.lower()}:{split}",
         )
+
 
 ########################################
 # Datasets: French
@@ -1918,8 +1906,6 @@ if __name__ == "__main__":
     import argparse
     import shutil
     import time
-
-    import tqdm
 
     random.seed(1234)
 

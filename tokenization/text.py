@@ -1,8 +1,11 @@
+import hashlib
 import html
 import math
+import pickle
 import random
 import urllib
 from collections import Counter
+from urllib.parse import urlparse
 
 import regex as re
 
@@ -623,6 +626,50 @@ def check_language(
     )
 
     return language_and_scores
+
+
+def load_bad_words(language):
+    target_url = f"https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/{language}"
+    response = urllib.request.urlopen(target_url)
+    bad_words = response.read().decode("utf-8")
+    bad_words = [bad_word.lower() for bad_word in bad_words.split("\n") if bad_word != "" and " " not in bad_word]
+    return set(bad_words)
+
+
+_bad_words = {}
+
+
+def is_obscene(text, language):
+    global _bad_words
+    if language not in _bad_words:
+        _bad_words[language] = load_bad_words(language)
+    bad_words = _bad_words[language]
+
+    words = set(re.sub(r"[^\p{L} ]+", "", text).split())
+    number_of_obscene_words = len(words.intersection(bad_words))
+    return number_of_obscene_words >= 3
+
+
+def canonical_url(url):
+    return urlparse(url).netloc
+
+
+def string_to_random01(x):
+    # Get the hash value of the input string
+    # hash_value = hash(str(x))
+    hash_value = int(hashlib.sha256(pickle.dumps(str(x))).hexdigest(), 16)
+
+    # Normalize the hash value to the range [0, 1]
+    # normalized_value = (hash_value & 0xFFFFFFFF) / 0xFFFFFFFF
+    normalized_value = (
+        hash_value & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    ) / 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+    return normalized_value
+
+
+def string_to_random_range(x, mini, maxi):
+    return round(mini - 0.5 + string_to_random01(x) * (maxi + 1 - mini))
 
 
 if __name__ == "__main__":
