@@ -322,23 +322,16 @@ if __name__ == "__main__":
         ]
     )
 
-    domain_target_proportion_rest = 1 - sum(domain_target_proportions.values())
-    assert (
-        domain_target_proportion_rest >= 0 and domain_target_proportion_rest < 1
-    ), f"{domain_target_proportion_rest=}"
+    # normalize the domain_target_proportions
+    total_proportions = sum(domain_target_proportions.values())
+    assert total_proportions > 0
+    normalized_domain_target_proportions = {k: v/total_proportions for k,v in domain_target_proportions.items()}
 
     # Set the weights for domain (newspaper, book, code, ...)
     domain_weights = {}
     for domain, count_weighted in num_tokens_per_domain_weighted.items():
-        if domain in domain_target_proportions:
-            target_proportion = domain_target_proportions[domain]
-        else:
-            target_proportion = (
-                domain_target_proportion_rest
-                * count_weighted
-                / total_count_weighted_rest
-            )
-            domain_target_proportions[domain] = target_proportion
+        assert domain in normalized_domain_target_proportions, f"{domain=} not found in {domain_target_proportions}"
+        target_proportion = normalized_domain_target_proportions[domain]
         weight = target_proportion / (count_weighted / total_count_weighted)
         domain_weights[domain] = weight
 
@@ -469,5 +462,3 @@ before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({domain_weight=:8.6f} 
         print("```")
     else:
         print()
-
-# DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_alt.py /local_data/lucie_tokens_65k_grouped)"
