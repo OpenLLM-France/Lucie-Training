@@ -234,13 +234,12 @@ if __name__ == "__main__":
             "domain_target_proportions": domain_target_proportions,
             "additional_weights": additional_weights,
         }
+        if not os.path.exists(args.save_weights_path):
+            os.makedirs(args.save_weights_path)
         with open(f"{args.save_weights_path}/proportion_args.json", "w") as f:
             f.write(json.dumps(proportion_dict, indent=4))
 
     stats_datasets = read_stats_datasets()
-
-    # import json
-    # print(json.dumps(stats_datasets, indent=4))
 
     not_tokenized_datasets = list(stats_datasets.keys())
 
@@ -278,18 +277,23 @@ if __name__ == "__main__":
             if re.search(content, prefix):
                 additional_weight *= additional_weights[content]
 
-        domains = d["category"].split("-")
+        # get the corresponding domain of the dataset
+        category = d["category"]
+        language = d["language"]
+        domain = language + "--" + category
+
+        # get the number of tokens in the dataset
         count = d[args.count]
         count_weighted = additional_weight * count
-        for domain in domains:
-            num_tokens_per_domain_weighted[domain] = num_tokens_per_domain_weighted.get(
-                domain, 0
-            ) + (count_weighted // len(domains))
-            num_tokens_per_domain[domain] = num_tokens_per_domain.get(domain, 0) + (
-                count // len(domains)
-            )
 
-        if domain == "code":
+        # update the number of tokens and the number of tokens weighted for the domain
+        num_tokens_per_domain_weighted[domain] = num_tokens_per_domain_weighted.get(
+            domain, 0
+        ) + count_weighted
+        num_tokens_per_domain[domain] = num_tokens_per_domain.get(domain, 0) + count
+
+        # update the number of tokens for the programming language if it is a code dataset
+        if domain == "code--programming":
             prog_lang = format_programming_language(name)
             num_tokens_per_programming_language[prog_lang] = (
                 num_tokens_per_programming_language.get(prog_lang, 0) + count
@@ -351,7 +355,7 @@ if __name__ == "__main__":
         ), f"{language=} not found"
         target_proportion = (
             programming_language_target_proportions[language]
-            * domain_target_proportions["code"]
+            * domain_target_proportions["code--programming"]
         )
         weight = target_proportion / (count_weighted / total_count_weighted)
         programming_language_weights[language] = weight
@@ -394,8 +398,6 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
                 )
             print("```\n")
 
-        print("# Weights per sub-domain\n```")
-
     for second_pass in [False, True]:
         if not second_pass:
             all_weights = {}
@@ -414,12 +416,20 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
             final_weight_dict = {}
 
         for prefix, d in data.items():
-            domains = d["category"].split("-")
+            # get the corresponding domain of the dataset
+            language = d["language"]
+            category = d["category"]
+            domain = language + "--" + category
+
+            # get the number of tokens in the dataset
             count = d[args.count]
+            # get the proportion of the dataset in the total number of tokens
             ratio = count / total_count
 
-            domain_weight = max(domain_weights[domain] for domain in domains)
-            if d["category"] == "code":
+            domain_weight = domain_weights[domain]
+
+            # override the domain weight if the dataset is a code dataset by the programming language weight
+            if d["category"] == "programming":
                 prog_language = format_programming_language(prefix)
                 domain_weight = programming_language_weights[prog_language]
 
