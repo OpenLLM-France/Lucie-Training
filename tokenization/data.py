@@ -1235,17 +1235,16 @@ class DataIteratorValidatedYoutube(DataIterator):
 from urllib.parse import urlparse
 import urllib.request  # the lib that handles the url stuff
 
-class DataIteratorCulturaX(DataIterator):
-    def __init__(self, language="fr", source='OSCAR-2301', streaming=True, **kwargs): 
-        # source: mC4, OSCAR-2019, OSCAR-2109, OSCAR-2201, OSCAR-2301
-        name = f"CulturaX:{source.lower()}:{language.lower()}"
-
-        if language == 'fr':
-            keywords = ['fr.wikipedia', 'wiktionary', 'wikisource', 'theses.fr']
-        elif language == 'en':
-            keywords = ['en.wikipedia'] # + arxiv, pubmed...
-        else:
-            keywords = ['wikipedia']
+class DataIteratorCulturaX(DataIteratorConcat):
+    def __init__(self, language="fr", streaming=True, **kwargs): 
+        def is_url_duplicated(data, language):
+            if language == 'fr':
+                keywords = ['fr.wikipedia', 'wiktionary', 'wikisource', 'theses.fr']
+            elif language == 'en':
+                keywords = ['en.wikipedia'] # + arxiv, pubmed...
+            else:
+                keywords = ['wikipedia']
+            return any(keyword in data['url'] for keyword in keywords)
 
         def load_bad_words(language):
             target_url = f'https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/{language}'
@@ -1254,18 +1253,18 @@ class DataIteratorCulturaX(DataIterator):
             bad_words = [bad_word.lower() for bad_word in bad_words.split('\n') if bad_word!='' and ' ' not in bad_word]
             return set(bad_words)
         
-        def is_obscene(text):
+        def is_obscene(text, language):
             words = set(re.sub(r'[^\p{L} ]+', '', text).split())
             bad_words = load_bad_words(language)
             number_of_obscene_words = len(words.intersection(bad_words))
-            return number_of_obscene_words > 0 
+            return number_of_obscene_words >= 5
 
-        def filter_fn(data): # (returns True if the example is to be kept, False otherwise)
+        def filter_fn(data, language, source): # (returns True if the example is to be kept, False otherwise)
             if data['source'] != source:
                 return False
-            if any(keyword in data['url'] for keyword in keywords):
+            if is_url_duplicated(data, language):
                 return False
-            if is_obscene(data['text']):
+            if is_obscene(data['text'], language):
                 return False
             return True
 
@@ -1274,21 +1273,26 @@ class DataIteratorCulturaX(DataIterator):
         #     data['text'] = '\n'.join([data['url'], data['text']])
         #     return data
         
-        DataIterator.__init__(
+        DataIteratorConcat.__init__(
             self,
-            datasets.load_dataset(
-                "uonlp/CulturaX", 
-                language, 
-                token=True, 
-                streaming=streaming, 
-                split='train',
-            ),
-            name=name,
-            # preprocess=preprocess,
-            filter_fn=filter_fn,
-            **kwargs,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "uonlp/CulturaX", 
+                        language, 
+                        token=True, 
+                        streaming=streaming, 
+                        split='train',
+                    ),
+                    name=f"CulturaX:{language.lower()}:{source.lower()}",
+                    filter_fn=lambda data: filter_fn(data, language, source),
+                    **kwargs,
+                )
+                for source in ('mC4', 'OSCAR-2019', 'OSCAR-2109', 'OSCAR-2201', 'OSCAR-2301')
+            ],
+            name=f'CulturaX:{language.lower()}',
         )
-        
+
 ########################################
 # Datasets: French
 
