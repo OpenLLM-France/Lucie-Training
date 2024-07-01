@@ -33,7 +33,7 @@ TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
 TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DOMAIN_PROPORTIONS_PATH=training/domain_proportions.yml
 DATASET_ARGS=" \
-    --domain_proportions $DOMAIN_PROPORTIONS_PATH \
+    --domain_proportions $HOME/$DOMAIN_PROPORTIONS_PATH \
     --save_weights_path $OUTPUT_PATH/dataset_weights/$VARIANT \
     "
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_ablation.py $TOKENS_DIR $DATASET_ARGS)"
