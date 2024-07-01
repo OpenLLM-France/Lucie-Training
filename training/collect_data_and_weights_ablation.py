@@ -180,7 +180,7 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
                 if best_match is None or score < best_score:
                     best_match = possible_name
                     best_score = score
-            print(f"WARNING: Dataset {name} not found: {best_match=}")
+            # print(f"WARNING: Dataset {name} not found: {best_match=}")
     return name
 
 
