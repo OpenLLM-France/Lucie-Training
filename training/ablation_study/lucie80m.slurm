@@ -31,7 +31,7 @@ cd $MEGATRON_DEEPSPEED_REPO
 # ----- data
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
 TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-DOMAIN_PROPORTIONS_PATH=training/domain_proportions.yml
+DOMAIN_PROPORTIONS_PATH=Lucie-Training/training/domain_proportions.yml
 DATASET_ARGS=" \
     --domain_proportions $HOME/$DOMAIN_PROPORTIONS_PATH \
     --save_weights_path $OUTPUT_PATH/dataset_weights/$VARIANT \
