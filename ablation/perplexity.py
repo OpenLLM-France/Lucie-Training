@@ -479,6 +479,7 @@ def main():
 
     # Use the datasets to evaluate the model
     domain_ppls = {}
+    test_datasets = [test_datasets]  # TODO remove!
     for ds in test_datasets:
         dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
         num_tokenized_tokens = 0
