@@ -1236,9 +1236,9 @@ class DataIteratorCulturaX(DataIteratorConcat):
             if language == "fr":
                 keywords = ["fr.wikipedia", "wiktionary", "wikisource", "theses.fr"]
             elif language == "en":
-                keywords = ["en.wikipedia"]  # + arxiv, pubmed...
+                keywords = ["en.wikipedia", "arxiv.org", "www.ncbi.nlm.nih.gov/pmc", "philpapers.org"]  # + arxiv, pubmed...
             else:
-                keywords = ["wikipedia"]
+                keywords = ["wikipedia", "europarl", "op.europa.eu"]
             return any(keyword in url for keyword in keywords)
 
         def filter_fn(data, language, source=None):
@@ -1280,6 +1280,30 @@ class DataIteratorCulturaX(DataIteratorConcat):
             name=f"CulturaX:{language.lower()}:{split}",
         )
 
+from datasets import load_dataset_builder
+class DataIteratorFineWebEdu(DataIteratorConcat):
+    def __init__(self, language="en", split="train", streaming=True, **kwargs):
+        builder_configs = load_dataset_builder("HuggingFaceFW/fineweb-edu").builder_configs
+        target_years = [2024, 2023, 2022, 2021]
+        sources = [k for k in builder_configs.keys() for year in target_years if k.startswith(f"CC-MAIN-{year}")]
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "HuggingFaceFW/fineweb-edu",
+                        data_files=f"data/{source}/*.parquet",
+                        streaming=streaming,
+                        split=split,
+                    ),
+                    name=f"FineWebEdu:{source.lower()}",
+                    **kwargs,
+                )
+                for source in sources
+            ],
+            name=f"FineWebEdu",
+        )
 
 ########################################
 # Datasets: French
