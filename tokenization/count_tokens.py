@@ -62,8 +62,8 @@ if __name__ == "__main__":
                 total_sequences = data["total_sequences"]
                 min_tokens = data["min_tokens"]
                 max_tokens = data["max_tokens"]
-            except Exception as e:
-                print(f"Error reading {json_file}: {e}")
+            except Exception:
+                # print(f"Error reading {json_file}: {e}")
                 total_tokens = 0
         else:
             if save_in_json:
