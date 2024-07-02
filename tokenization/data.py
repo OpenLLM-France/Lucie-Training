@@ -231,6 +231,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 # English
                 "american_stories",
                 "pes2o",
+                "fine_web_edu",
                 # Multi-language (with switching)
                 "europarl_aligned",
                 "croissant_aligned",
@@ -1236,7 +1237,12 @@ class DataIteratorCulturaX(DataIteratorConcat):
             if language == "fr":
                 keywords = ["fr.wikipedia", "wiktionary", "wikisource", "theses.fr"]
             elif language == "en":
-                keywords = ["en.wikipedia", "arxiv.org", "www.ncbi.nlm.nih.gov/pmc", "philpapers.org"]  # + arxiv, pubmed...
+                keywords = [
+                    "en.wikipedia",
+                    "arxiv.org",
+                    "www.ncbi.nlm.nih.gov/pmc",
+                    "philpapers.org",
+                ]  # + arxiv, pubmed...
             else:
                 keywords = ["wikipedia", "europarl", "op.europa.eu"]
             return any(keyword in url for keyword in keywords)
@@ -1280,10 +1286,10 @@ class DataIteratorCulturaX(DataIteratorConcat):
             name=f"CulturaX:{language.lower()}:{split}",
         )
 
-from datasets import load_dataset_builder
+
 class DataIteratorFineWebEdu(DataIteratorConcat):
-    def __init__(self, language="en", split="train", streaming=True, **kwargs):
-        builder_configs = load_dataset_builder("HuggingFaceFW/fineweb-edu").builder_configs
+    def __init__(self, split="train", streaming=True, **kwargs):
+        builder_configs = datasets.load_dataset_builder("HuggingFaceFW/fineweb-edu").builder_configs
         target_years = [2024, 2023, 2022, 2021]
         sources = [k for k in builder_configs.keys() for year in target_years if k.startswith(f"CC-MAIN-{year}")]
 
@@ -1302,8 +1308,9 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                 )
                 for source in sources
             ],
-            name=f"FineWebEdu",
+            name="FineWebEdu",
         )
+
 
 ########################################
 # Datasets: French
