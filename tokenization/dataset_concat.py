@@ -30,6 +30,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--verbose", "-v", action="store_true", default=False, help="Verbose mode, where it tells what it's doing"
     )
+    parser.add_argument("--only", default=False, help="Only process when output match this regex")
     parser.add_argument(
         "--dry-run", "-n", action="store_true", default=False, help="Show what would be done without doing it"
     )
@@ -52,6 +53,8 @@ if __name__ == "__main__":
             if output_path.endswith(".idx"):
                 output_path = os.path.splitext(output_path)[0]
             output_path = os.path.join(output_folder, os.path.basename(output_path))
+            if args.only and args.only not in output_path:
+                continue
             output_to_inputs.setdefault(output_path, []).append(input_path)
 
         outputs = sorted(output_to_inputs.keys())
