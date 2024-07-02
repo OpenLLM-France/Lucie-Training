@@ -1226,7 +1226,7 @@ class DataIteratorCulturaX(DataIteratorConcat):
             "fr": 512,
             "de": 512,
             "es": 512,
-            "en": 2048,
+            "en": 3072,
         }.get(language, None)
 
         assert num_parquets, f"Unsupported language {language}. Number of parquets not defined (512?). Please visit https://huggingface.co/datasets/uonlp/CulturaX/tree/main/{language}"
