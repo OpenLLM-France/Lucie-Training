@@ -18,83 +18,90 @@ text_types = {
 
 datasets_categories = {
     "technical": [
-        "HAL", 
+        "HAL",
         "NIH_ExPorter",
-        "OpenEdition", 
-        "Persee", 
-        "PeS2o", 
-        "PhilPapers", 
-        "Theses", 
+        "OpenEdition",
+        "Persee",
+        "PeS2o",
+        "PhilPapers",
+        "Theses",
         "USPTO_Backgrounds",
-        ],
+    ],
     "legi_written": [
-        "amendements_parlement", 
+        "amendements_parlement",
         "Eurovoc.de",
         "Eurovoc.en",
         "Eurovoc.es",
         "Eurovoc.it",
         "FreeLaw",
-        "LEGI", 
+        "LEGI",
         "OpenData",
-        "questions_ecrites_parlement", 
-        ],
+        "questions_ecrites_parlement",
+    ],
     "legi_spoken": [
         "DiscoursPublics",
-        "interventions_parlement",   
-        ],
+        "interventions_parlement",
+    ],
     "legi_dialogue": [
         "AssembleeNationale",
         "Europarl.en",
         "Europarl.es",
-        "Europarl.de", 
+        "Europarl.de",
         "Europarl.fr",
         "FREDSum",
-        "Senat", 
-        ],
+        "Senat",
+    ],
     "dialogue": [
-        "Claire.en", 
-        "Claire.fr", 
+        "Claire.en",
+        "Claire.fr",
         "Stac",
         "ValidatedYouTube.fr",
-        ],
+    ],
     "book": [
-        "GallicaMonographies", 
-        "Gutenberg.en", 
-        "Gutenberg.de", 
-        "Gutenberg.it", 
-        "Gutenberg.es", 
+        "GallicaMonographies",
+        "Gutenberg.en",
+        "Gutenberg.de",
+        "Gutenberg.it",
+        "Gutenberg.es",
         "Gutenberg.fr",
-        ],
+    ],
     "newspaper": [
-        "AmericanStories", 
+        "AmericanStories",
         "GallicaPress",
-        ],
+    ],
     "forum": [
         "StackExchange",
-        "Ubuntu_IRC", 
-        ],
+        "Ubuntu_IRC",
+    ],
     "wiki": [
-        "Wikiother.fr", 
-        "Wikipedia.en", 
-        "Wikipedia.es", 
-        "Wikipedia.de", 
-        "Wikipedia.it", 
+        "Wikiother.fr",
+        "Wikipedia.en",
+        "Wikipedia.es",
+        "Wikipedia.de",
+        "Wikipedia.it",
         "Wikipedia.fr",
-        ],
+    ],
     "programming": [
         "TheStack",
-        ],
+    ],
     "math": [
         "DM_Mathematics",
-        "MathPile", 
-        ],
+        "MathPile",
+    ],
     "aligned": [
         "CroissantAligned",
         "EuroparlAligned.fr-en",
         "EuroparlAligned.es-en",
         "EuroparlAligned.it-en",
         "EuroparlAligned.de-fr",
-    ]
+    ],
+    "web": [
+        "culturax.fr",
+        "culturax.en",
+        "culturax.de",
+        "culturax.es",
+        "culturax.it",
+    ],
 }
 
 
@@ -127,6 +134,7 @@ def get_dataset_category(name, subset):
     for cat, datasets in datasets_categories.items():
         if name in datasets:
             return cat
+    print(f"WARNING: category not found for {name}")
     return None
 
 
@@ -138,6 +146,10 @@ def to_name_subset(name):
         name, subset = name.split(":", 1)
     if subset:
         subset = subset.replace("_opendata", "").lstrip(":")
+    if "train" in subset and "cultura" in name.lower():
+        subset = subset.replace("train", "")
+    if subset:
+        subset = subset.strip(":_")
     return name, subset
 
 
@@ -151,6 +163,7 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
                 subset = subset2
                 lan = subset
             subset = subset[len(lan) :].strip(":.")
+            subset = subset.strip(":_")
             if "gutenberg" in name.lower():
                 subset = ""
             return lan, name + "." + lan, subset
@@ -166,12 +179,12 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
         language = "it"
     elif "TheStack" in name:
         language = "code"
-    elif "Pile" in name or "Stac" in name:  # Pile and MathPile
+    elif "Pile" in name or "Stac" in name or "FineWebEdu" in name:  # Pile and MathPile
         language = "en"
     else:
         language = "fr"
     # Multi-lingual corpora
-    if name in ["Claire", "Wikipedia", "Europarl", "Gutenberg", "Wikiother", "Eurovoc", "EuroparlAligned"]:
+    if name in ["Claire", "Wikipedia", "Europarl", "Gutenberg", "Wikiother", "Eurovoc", "EuroparlAligned", "CulturaX"]:
         language = None
     if name == "CroissantAligned":
         language = "fr-en"
@@ -182,6 +195,7 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
         subset = subset.strip(":").replace(":", "-")
         subset = subset.split(":")[0]
         subset = subset.replace("train-pile_", "")
+        subset = subset.strip(":_")
 
     return language, name, subset
 
@@ -418,6 +432,7 @@ if __name__ == "__main__":
                 row.update({KEYS[k]: v for k, v in data.items() if k in KEYS})
             except Exception as err:
                 raise RuntimeError(f"Error processing {data_fullname}") from err
+            assert SORT_BY in row, f"Missing {SORT_BY} in {row}"
             if subset:
                 rows_detailed.append(row)
             else:
@@ -428,6 +443,7 @@ if __name__ == "__main__":
                 continue
             row = row.copy()
             row["subset"] = ""
+            assert SORT_BY in row, f"Missing {SORT_BY} in {row}"
             rows_detailed.append(row)
 
         # Make total per language
@@ -464,39 +480,33 @@ if __name__ == "__main__":
                 "language": language,
                 "name": "-" * 3,  # TOTAL
             } | {k: v for k, v in data.items() if k in KEYS.values()}
+            assert SORT_BY in row, f"Missing {SORT_BY} in {row}"
             if data["#datasets"] > 0:  # 1
                 rows.append(row)
                 row = row.copy()
                 row["subset"] = "-" * 3  # TOTAL
                 rows_detailed.append(row.copy())
 
-        rows = sorted(
-            rows,
-            key=lambda row: (
+        def sort_function(row):
+            return (
                 (8 if row["language"] == "---" else 0)
                 + (4 if row["name"] == "---" else 0)
                 + (2 if row.get("subset") == "---" else 0),
-                0 if row["language"] == "code" else totals_per_language[norm_language(row["language"])][SORT_BY],
+                {"code": 0, "fr": 1e32}.get(
+                    row["language"], totals_per_language.get(norm_language(row["language"]), {SORT_BY: 1e20})[SORT_BY]
+                ),
                 row[SORT_BY],
                 row["name"],
-            ),
+            )
+
+        rows = sorted(
+            rows,
+            key=lambda row: sort_function(row),
             reverse=True,
         )
         rows_detailed = sorted(
             rows_detailed,
-            key=lambda row: (
-                (8 if row["language"] == "---" else 0)
-                + (4 if row["name"] == "---" else 0)
-                + (2 if row.get("subset") == "---" else 0),
-                0
-                if row["language"] == "code"
-                else totals_per_language.get(norm_language(row["language"]), {SORT_BY: 1e20})[SORT_BY],
-                totals_per_dataset.get(row["name"] + row["subset"] if ONLY_DETAILED else row["name"], {SORT_BY: 1e20})[
-                    SORT_BY
-                ],
-                row[SORT_BY],
-                row["name"],
-            ),
+            key=lambda row: sort_function(row),
             reverse=True,
         )
 
