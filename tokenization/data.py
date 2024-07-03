@@ -281,7 +281,8 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
             scope = globals()
         python_class = scope.get(f"DataIterator{camel_name}", None)
         if not python_class:
-            raise RuntimeError(f"Cannot find python class {class_name} in {scope.keys()}")
+            candidates = sorted([k for k in scope.keys() if k.startswith("DataIterator")])
+            raise RuntimeError(f"Cannot find python class {class_name} in {candidates}")
         yield python_class(**kwargs)
 
 
