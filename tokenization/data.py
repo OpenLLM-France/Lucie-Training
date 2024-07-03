@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import random
+import time
 import types
 import warnings
 
@@ -174,7 +175,7 @@ def tokenizer_dataset(
     return dataset
 
 
-def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too complex
+def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` is too complex
     """
     Iterator that yields one or sevaral datasets
 
@@ -192,7 +193,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
 
     if isinstance(name, list):
         for n in name:
-            for ds in get_datasets(n, **kwargs):
+            for ds in get_datasets(n, use_nc=use_nc, scope=scope, **kwargs):
                 yield ds
         return
 
@@ -240,7 +241,7 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
                 "code",
             ]
         ):
-            for ds in get_datasets(name, **kwargs):
+            for ds in get_datasets(name, use_nc=use_nc, scope=scope, **kwargs):
                 yield ds
 
     elif name.startswith("tok"):
@@ -264,12 +265,8 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             "cultura_x": ["fr", "en", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
-            for ds in get_datasets(f"{name}_{language}", **kwargs):
+            for ds in get_datasets(f"{name}_{language}", use_nc=use_nc, scope=scope, **kwargs):
                 yield ds
-            # yield DataIteratorConcat(
-            #     list(get_datasets(f"{name}_{language}", **kwargs)),
-            #     name=name.capitalize(),
-            # )
 
     else:
         has_language = any(name.startswith(c + "_") for c in multilang_corpora) and not name.endswith("_aligned")
@@ -280,9 +277,11 @@ def get_datasets(name, use_nc=True, **kwargs):  # noqa # C901 `...` is too compl
             kwargs["language"] = language
         camel_name = "".join([w.capitalize() for w in name.split("_")])
         class_name = f"DataIterator{camel_name}"
-        python_class = globals().get(f"DataIterator{camel_name}", None)
+        if scope is None:
+            scope = globals()
+        python_class = scope.get(f"DataIterator{camel_name}", None)
         if not python_class:
-            raise RuntimeError(f"Cannot find python class {class_name}")
+            raise RuntimeError(f"Cannot find python class {class_name} in {scope.keys()}")
         yield python_class(**kwargs)
 
 
@@ -1931,12 +1930,121 @@ class DataIteratorCode(DataIteratorConcat):
 
 
 ########################################
-# Quick test
+# Test Helpers
+
+
+def test_iterator(  # noqa # C901 `...` is too complex
+    it,
+    folder=None,
+    name="",
+    ignore_if_exists=False,
+    num_examples=0,
+    only_dump_examples=False,
+    prefix_example_files=None,
+    max_examples=None,
+    long_examples=False,
+):
+    name_slug = simple_slugify(name)
+    if prefix_example_files is None:
+        prefix_example_files = name_slug
+    stats = None
+    if folder:
+        stat_filename = os.path.join(folder, f"stats_{name_slug}.json")
+        if os.path.isfile(stat_filename):
+            stats = json.load(open(stat_filename, encoding="utf8"))
+            if ignore_if_exists and not only_dump_examples:
+                print(f"Skipping {name_slug} (already computed)")
+                return stats
+            num_billion_words = stats["num words"] / 1_000_000_000
+            to_insert = f"{num_billion_words:06.3f}B"
+            if "--" in prefix_example_files:
+                prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
+            else:
+                prefix_example_files += "--" + to_insert
+        elif ignore_if_exists:
+            # Create an empty file to avoid recomputing
+            json.dump({}, open(stat_filename, "w", encoding="utf8"))
+    print(f"Computing stats for {name_slug}...")
+    tic = time.time()
+    num_docs = 0
+    num_words = None
+    num_chars = None
+    num_dumped = 0
+    for text in tqdm.tqdm(it, total=len(it)):
+        if max_examples and num_dumped >= max_examples:
+            break
+        num_docs += 1
+
+        # Accumulate number of words and characters
+        if isinstance(text, str):
+            if num_words is None:
+                num_words = 0
+                num_chars = 0
+            nw = len(text.split())
+            num_words += nw
+            num_chars += len(text)
+        else:
+            assert isinstance(text, dict)
+            if num_words is None:
+                num_words = {}
+                num_chars = {}
+            nw = 0
+            for k, v in text.items():
+                if isinstance(v, list):
+                    v = " ".join(v)
+                assert isinstance(v, str), f"Invalid type for {k}: {v}"
+                if k not in num_words:
+                    num_words[k] = 0
+                    num_chars[k] = 0
+                nwi = len(v.split())
+                nw += nwi
+                num_words[k] += nwi
+                num_chars[k] += len(v)
+
+        if num_dumped < num_examples and folder and (not long_examples or nw > 50_000):
+            example_folder = os.path.join(folder, "long_examples" if long_examples else "examples")
+            os.makedirs(example_folder, exist_ok=True)
+            filename = os.path.join(example_folder, f"{prefix_example_files}")
+            if num_examples > 1:
+                filename += f"_{num_dumped:02d}"
+            filename += ".txt"
+            print(f"Dumping {filename}")
+            with open(filename, "w", encoding="utf8") as f:
+                f.write(text + "\n")
+            num_dumped += 1
+        elif num_dumped >= num_examples and only_dump_examples:
+            break
+    if only_dump_examples:
+        return {}
+    if num_docs <= 0:
+        raise RuntimeError("No page found, or iterations stopped before completion (stats are not full)")
+    toc = time.time()
+    stats = {
+        "time to iterate (sec)": toc - tic,
+        "num pages": num_docs,
+        "num words": num_words,
+        "num chars": num_chars,
+    }
+    if folder:
+        json.dump(
+            stats,
+            open(stat_filename, "w", encoding="utf8"),
+            indent=2,
+            ensure_ascii=False,
+        )
+    return stats
+
+
+def simple_slugify(name):
+    return re.sub(r"[ :/]", "--", name).strip("_-")
+
+
+########################################
+# Main
 
 if __name__ == "__main__":
     import argparse
     import shutil
-    import time
 
     random.seed(1234)
 
@@ -1993,87 +2101,9 @@ if __name__ == "__main__":
         os.makedirs(args.folder, exist_ok=True)
         shutil.copy2(__file__, os.path.join(args.folder, os.path.basename(__file__)))
 
-    def simple_slugify(name):
-        return re.sub(r"[ :/]", "--", name).strip("_-")
-
     def remove_common_prefix(main, sub):
         common_prefix = os.path.commonprefix([main, sub])
         return sub[len(common_prefix) :]
-
-    def test_iterator(  # noqa # C901 `...` is too complex
-        it,
-        folder=None,
-        name="",
-        ignore_if_exists=False,
-        num_examples=0,
-        only_dump_examples=False,
-        prefix_example_files=None,
-    ):
-        name_slug = simple_slugify(name)
-        if prefix_example_files is None:
-            prefix_example_files = name_slug
-        stats = None
-        if folder:
-            stat_filename = os.path.join(folder, f"stats_{name_slug}.json")
-            if os.path.isfile(stat_filename):
-                stats = json.load(open(stat_filename, encoding="utf8"))
-                if ignore_if_exists and not only_dump_examples:
-                    print(f"Skipping {name_slug} (already computed)")
-                    return stats
-                num_billion_words = stats["num words"] / 1_000_000_000
-                to_insert = f"{num_billion_words:06.3f}B"
-                if "--" in prefix_example_files:
-                    prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
-                else:
-                    prefix_example_files += "--" + to_insert
-            elif ignore_if_exists:
-                # Create an empty file to avoid recomputing
-                json.dump({}, open(stat_filename, "w", encoding="utf8"))
-        print(f"Computing stats for {name_slug}...")
-        tic = time.time()
-        num_pages = 0
-        num_words = 0
-        num_chars = 0
-        num_dumped = 0
-        for text in tqdm.tqdm(it, total=len(it)):
-            if args.max_examples and num_dumped >= args.max_examples:
-                break
-            num_pages += 1
-            nw = len(text.split())
-            num_words += nw
-            num_chars += len(text)
-            if num_dumped < num_examples and folder and (not args.long_examples or nw > 50_000):
-                example_folder = os.path.join(folder, "long_examples" if args.long_examples else "examples")
-                os.makedirs(example_folder, exist_ok=True)
-                filename = os.path.join(example_folder, f"{prefix_example_files}")
-                if num_examples > 1:
-                    filename += f"_{num_dumped:02d}"
-                filename += ".txt"
-                print(f"Dumping {filename}")
-                with open(filename, "w", encoding="utf8") as f:
-                    f.write(text + "\n")
-                num_dumped += 1
-            elif num_dumped >= num_examples and only_dump_examples:
-                break
-        if only_dump_examples:
-            return {}
-        if num_pages <= 0:
-            raise RuntimeError("No page found, or iterations stopped before completion (stats are not full)")
-        toc = time.time()
-        stats = {
-            "time to iterate (sec)": toc - tic,
-            "num pages": num_pages,
-            "num words": num_words,
-            "num chars": num_chars,
-        }
-        if folder:
-            json.dump(
-                stats,
-                open(stat_filename, "w", encoding="utf8"),
-                indent=2,
-                ensure_ascii=False,
-            )
-        return stats
 
     def update_stats(global_stats, stats):
         for k, v in stats.items():
@@ -2137,6 +2167,8 @@ if __name__ == "__main__":
                     num_examples=num_examples,
                     only_dump_examples=args.only_dump_examples,
                     prefix_example_files=prefix_example_files,
+                    max_examples=args.max_examples,
+                    long_examples=args.long_examples,
                 )
                 if args.only_dump_examples:
                     continue
