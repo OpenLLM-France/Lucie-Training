@@ -2,6 +2,7 @@ import random
 
 import datasets
 import regex as re
+from tqdm import tqdm
 
 from data import (
     DataIterator,
@@ -41,6 +42,7 @@ class BenchmarkDataIterator(DataIteratorConcat):
         preprocess=lambda x: x,
         filter_fn=None,
         splits=None,
+        name=None,
     ):
         """
         Initialize the BenchmarkDataIterator.
@@ -64,7 +66,8 @@ class BenchmarkDataIterator(DataIteratorConcat):
         elif splits is None:
             splits = ["validation"]
 
-        name = hf_repo_kargs[0]
+        if name is None:
+            name = hf_repo_kargs[0].split("/")[-1]
 
         hf_dataset = datasets.load_dataset(*hf_repo_kargs, **hf_repo_kwargs)
         it_datasets = []
@@ -80,7 +83,7 @@ class BenchmarkDataIterator(DataIteratorConcat):
                         key=None,
                     )
                 )
-        assert len(it_datasets), "No data found"
+        assert len(it_datasets), f"No data found with parameters {hf_repo_kargs=}, {hf_repo_kwargs=}, {splits=}"
         super().__init__(it_datasets, name=name)
 
 
@@ -120,10 +123,32 @@ class DataIteratorHellaswagFrBench(BenchmarkDataIterator):
         )
 
 
-class DataIteratorMMLU(BenchmarkDataIterator):
-    def __init__(self, splits="validation", subject="abstract_algebra", **kwargs):  # GET LIST OF CONFIGS
+class DataIteratorMMLU(DataIteratorConcat):
+    def __init__(self, splits="validation", subjects=None, **kwargs):
+        repo_name = "cais/mmlu"
+        if subjects is None:
+            # Take all subjects
+            config = datasets.load_dataset_builder(repo_name, "all")
+            subjects = [c.name for c in config.BUILDER_CONFIGS]
+            subjects = [s for s in subjects if s not in ["all"]]
+            if "train" not in splits:
+                subjects = [s for s in subjects if s not in ["auxiliary_train"]]
+        assert len(subjects), "No subjects found"
+        split_name = splits if isinstance(splits, str) else "_".join(splits)
+        dataset_name = f"MMLU--{split_name}"
         super().__init__(
-            ["cais/mmlu", subject], preprocess=preprocess_mmlu, filter_fn=filter_unlabeled, splits=splits, **kwargs
+            [
+                BenchmarkDataIterator(
+                    [repo_name, subject],
+                    preprocess=preprocess_mmlu,
+                    filter_fn=filter_unlabeled,
+                    splits=splits,
+                    name=f"{dataset_name}--{subject}",
+                    **kwargs,
+                )
+                for subject in tqdm(subjects, desc="Initializing MMLU dataset...")
+            ],
+            name=dataset_name,
         )
 
 
@@ -296,11 +321,20 @@ if __name__ == "__main__":
         default=["all"],
         help="Which dataset to test",
     )
+    parser.add_argument(
+        "--splits",
+        type=str,
+        default=None,
+        help="Which split to use (ex: 'train', 'validation', 'test', 'validation,test', ...)",
+    )
     args = parser.parse_args()
 
-    for dataset in get_benchmark_datasets(args.dataset):
-        # for data in tqdm(dataset, desc=f"Crawling {dataset.name}"):
-        #     print(data)
+    kwargs = {}
+    if args.splits:
+        kwargs["splits"] = args.splits.split(",")
+
+    all_datasets = get_benchmark_datasets(args.dataset, **kwargs)
+    for dataset in all_datasets:
         stats = test_iterator(
             dataset,
             name=dataset.name,
