@@ -87,10 +87,23 @@ class BenchmarkDataIterator(DataIteratorConcat):
         super().__init__(it_datasets, name=name)
 
 
-class DataIteratorARC(BenchmarkDataIterator):
-    def __init__(self, splits="validation", level="ARC-Challenge", **kwargs):  # config: "ARC-Challenge", "ARC-Easy"
+class DataIteratorARC(DataIteratorConcat):
+    def __init__(self, splits="validation", levels=None, **kwargs):
+        if levels is None:
+            levels = ["ARC-Challenge", "ARC-Easy"]
         super().__init__(
-            ["allenai/ai2_arc", level], preprocess=preprocess_arc, filter_fn=filter_unlabeled, splits=splits, **kwargs
+            [
+                BenchmarkDataIterator(
+                    ["allenai/ai2_arc", level],
+                    preprocess=preprocess_arc,
+                    filter_fn=filter_unlabeled,
+                    splits=splits,
+                    name=f"ARC--{level}",
+                    **kwargs,
+                )
+                for level in levels
+            ],
+            name="ARC",
         )
 
 
@@ -182,7 +195,7 @@ def get_benchmark_datasets(name="all", **kwargs):
             "hellaswag",
             "hellaswag_fr_bench",
             "m_m_l_u",
-            "m_m_m_l_u",
+            "m_m_m_l_u",  # French
             "openbook",
         ]
     return get_datasets(name, scope=globals(), **kwargs)
