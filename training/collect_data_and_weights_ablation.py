@@ -180,7 +180,7 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
                 if best_match is None or score < best_score:
                     best_match = possible_name
                     best_score = score
-            print(f"WARNING: Dataset {name} not found: {best_match=}")
+            # print(f"WARNING: Dataset {name} not found: {best_match=}")
     return name
 
 
@@ -258,7 +258,8 @@ if __name__ == "__main__":
         prefix = os.path.join(args.folder, prefix)
         name = prefix_to_canonical_name(prefix, stats_datasets)
         if name not in stats_datasets:
-            raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=})")
+            #  throw an error with the new CulturaX dataset for now
+            # raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=})")
             continue
         if name in not_tokenized_datasets:
             not_tokenized_datasets.remove(name)
@@ -298,7 +299,6 @@ if __name__ == "__main__":
             num_tokens_per_programming_language[prog_lang] = (
                 num_tokens_per_programming_language.get(prog_lang, 0) + count
             )
-    print(json.dumps(data, indent=4))
 
     if not_tokenized_datasets and args.debug:
         print(
@@ -348,7 +348,7 @@ if __name__ == "__main__":
         ), f"{language=} not found"
         target_proportion = (
             programming_language_target_proportions[language]
-            * domain_target_proportions["code--programming"]
+            * normalized_domain_target_proportions["code--programming"]
         )
         weight = target_proportion / (count_weighted / total_count_weighted)
         programming_language_weights[language] = weight
