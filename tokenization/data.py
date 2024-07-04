@@ -22,6 +22,7 @@ from text import (
     fix_legi_and_remove_title,
     html_unescape,
     is_obscene,
+    lucie_rules_pass_for_redpajama,
     string_to_random01,
 )
 
@@ -1309,6 +1310,34 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                 for source in sources
             ],
             name="FineWebEdu",
+        )
+
+
+class DataIteratorRedPajama(DataIteratorConcat):
+    def __init__(self, language="es", split="train", streaming=True, **kwargs):
+        _CC_SNAPSHOT_IDS = ["2023-14"]
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "togethercomputer/RedPajama-Data-V2",
+                        name="default",
+                        partition="head_middle",
+                        snapshots=[snapshot],
+                        languages=[language],
+                        streaming=streaming,
+                        split=split,
+                    ),
+                    name=f"RedPajama:{snapshot.lower()}:{language.lower()}",
+                    key="raw_content",
+                    filter_fn=lambda x: lucie_rules_pass_for_redpajama(x)[0],
+                    **kwargs,
+                )
+                for snapshot in _CC_SNAPSHOT_IDS
+            ],
+            name=f"RedPajama:{language.lower()}",
         )
 
 

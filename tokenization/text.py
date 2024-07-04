@@ -1,5 +1,6 @@
 import hashlib
 import html
+import json
 import math
 import pickle
 import random
@@ -654,6 +655,114 @@ def canonical_url(url):
     return urlparse(url).netloc
 
 
+def lucie_rules_pass_for_redpajama(sample) -> bool:  # noqa # C901 `...` is too complex
+    """function returns True if the sample complies with Gopher rules"""
+    signals = json.loads(sample["quality_signals"])
+
+    ### Lucie
+    # rule 1: ppl between 10 and 1000
+    perplexity = signals["ccnet_perplexity"][0][2]
+    if perplexity < 10 or perplexity > 1000:
+        return False, "lucie: perplexity"
+
+    # rule 2: confidence in language > 0.65
+    language_score = signals["ccnet_language_score"][0][2]
+    if language_score < 0.7:
+        return False, "lucie: language score"
+
+    # rule 3: similarity with wikipedia
+    wikipedia_score = signals["rps_doc_ml_wikipedia_score"][0][2]
+    if wikipedia_score < 0.2:
+        return False, "lucie: wikipedia score"
+
+    rps_doc_ut1_blacklist = signals["rps_doc_ut1_blacklist"][0][2]
+    # https://data.together.xyz/redpajama-data-v2/v1.0.0/artifacts/ut1_domain_categories.json
+    if rps_doc_ut1_blacklist is not None:
+        return False, "lucie: blacklist"
+
+    ### C4
+    # rule 1: at least 3 sentences
+    num_sentences = signals["rps_doc_num_sentences"][0][2]
+    if num_sentences < 3:
+        return False, "C4: num sentences"
+
+    # rule 2: page may not contain bad words in bad url
+    n_bad_words = signals["rps_doc_ldnoobw_words"][0][2]
+    if n_bad_words > 3:  # C4 is 0
+        return False, "modified C4: toxic words"
+
+    # rule 3: page may not contain placeholder "lorem ipsum" text
+    lorem_ipsum = signals["rps_doc_lorem_ipsum"][0][2]
+    if lorem_ipsum > 0:
+        return False, "C4: lorem ipsum"
+
+    ### Gopher
+    # rule 1: number of words between 50 and 10'000
+    word_count = signals["rps_doc_word_count"][0][2]
+    if word_count < 50 or word_count > 100_000:
+        return False, "Gopher: word count"
+
+    # rule 2: mean word length between 3 and 10
+    mean_word_length = signals["rps_doc_mean_word_length"][0][2]
+    if mean_word_length < 3 or mean_word_length > 10:
+        return False, "Gopher: mean word length"
+
+    # rule 2: symbol to word ratio below 0.1
+    symbol_word_ratio = signals["rps_doc_symbol_to_word_ratio"][0][2]
+    if symbol_word_ratio > 0.1:
+        return False, "Gopher: symbol word ratio"
+
+    # rule 3: 90% of lines need to start without a bullet point
+    n_lines = signals["ccnet_nlines"][0][2]
+    n_lines_bulletpoint_start = sum(map(lambda ln: ln[2], signals["rps_lines_start_with_bulletpoint"]))  # noqa # C901 `...` is too complex
+    if n_lines_bulletpoint_start / n_lines > 0.9:
+        return False, "Gopher: bulletpoint start"
+
+    # rule 4: more than 30% ending with an ellipsis
+    lines_end_with_ellipsis_ratio = signals["rps_doc_frac_lines_end_with_ellipsis"][0][2]
+    if lines_end_with_ellipsis_ratio > 0.3:
+        return False, "Gopher: lines_end_with_ellipsis_ratio"
+
+    # rule 5: 70% of words in a document contain at least one alphabetic character
+    rps_doc_frac_no_alph_words = signals["rps_doc_frac_no_alph_words"][0][2]
+    if rps_doc_frac_no_alph_words > 0.3:  # gopher is 0.2
+        return False, "modified Gopher: rps_doc_frac_no_alph_words"
+
+    # Repetition removal
+    rps_doc_frac_chars_top_2gram = signals["rps_doc_frac_chars_top_2gram"][0][2]
+    rps_doc_frac_chars_top_3gram = signals["rps_doc_frac_chars_top_3gram"][0][2]
+    rps_doc_frac_chars_top_4gram = signals["rps_doc_frac_chars_top_4gram"][0][2]
+    rps_doc_frac_chars_dupe_5grams = signals["rps_doc_frac_chars_dupe_5grams"][0][2]
+    rps_doc_frac_chars_dupe_6grams = signals["rps_doc_frac_chars_dupe_6grams"][0][2]
+    rps_doc_frac_chars_dupe_7grams = signals["rps_doc_frac_chars_dupe_7grams"][0][2]
+    rps_doc_frac_chars_dupe_8grams = signals["rps_doc_frac_chars_dupe_8grams"][0][2]
+    rps_doc_frac_chars_dupe_9grams = signals["rps_doc_frac_chars_dupe_9grams"][0][2]
+    rps_doc_frac_chars_dupe_10grams = signals["rps_doc_frac_chars_dupe_10grams"][0][2]
+    if rps_doc_frac_chars_top_2gram > 0.2:
+        return False, "Gopher: rps_doc_frac_chars_top_2gram"
+    if rps_doc_frac_chars_top_3gram > 0.18:
+        return False, "Gopher: rps_doc_frac_chars_top_3gram"
+    if rps_doc_frac_chars_top_4gram > 0.16:
+        return False, "Gopher: rps_doc_frac_chars_top_4gram"
+    if rps_doc_frac_chars_dupe_5grams > 0.15:
+        return False, "Gopher: rps_doc_frac_chars_dupe_5grams"
+    if rps_doc_frac_chars_dupe_6grams > 0.14:
+        return False, "Gopher: rps_doc_frac_chars_dupe_6grams"
+    if rps_doc_frac_chars_dupe_7grams > 0.13:
+        return False, "Gopher: rps_doc_frac_chars_dupe_7grams"
+    if rps_doc_frac_chars_dupe_8grams > 0.12:
+        return False, "Gopher: rps_doc_frac_chars_dupe_8grams"
+    if rps_doc_frac_chars_dupe_9grams > 0.11:
+        return False, "Gopher: rps_doc_frac_chars_dupe_9grams"
+    if rps_doc_frac_chars_dupe_10grams > 0.10:
+        return False, "Gopher: rps_doc_frac_chars_dupe_10grams"
+
+    # Remove duplicates
+    if signals["is_duplicate"]:
+        return False, "lucie: is_duplicate"
+    return True, ""
+
+
 def string_to_random01(x):
     # Get the hash value of the input string
     # hash_value = hash(str(x))
@@ -680,7 +789,6 @@ if __name__ == "__main__":
     import numpy as np
     import pandas as pd
     import tqdm
-
     from data import (
         DataIteratorConcat,
         DataIteratorParquet,
