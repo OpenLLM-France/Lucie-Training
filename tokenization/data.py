@@ -206,6 +206,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
         "eurovoc",
         "validated_youtube",
         "cultura_x",
+        "subscene",
     ]  # "youtube",
 
     name = name.lower()
@@ -257,12 +258,12 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
         languages = {
             "claire": ["fr", "en"],
             "wikiother": ["fr"],
-            # "wikipedia": ["fr", "en", "de", "es", "it"],
-            # "gutenberg": ["fr", "en", "de", "es", "it"],
             "europarl": ["fr", "en", "de", "es"],
             "eurovoc": ["en", "de", "es", "it"],
             "validated_youtube": ["fr"],
-            "cultura_x": ["fr", "en", "de", "es", "it"],
+            # "wikipedia": ["fr", "en", "de", "es", "it"],
+            # "gutenberg": ["fr", "en", "de", "es", "it"],
+            # "cultura_x": ["fr", "en", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", use_nc=use_nc, scope=scope, **kwargs):
@@ -1545,6 +1546,47 @@ class DataIteratorOpenDataFr(DataIteratorParquetSplitted):
             name="OpenData" if not regex_parquet else regex_parquet,
             postprocess=kwargs.pop("postprocess", fix_legi),
             regex_parquet=regex_parquet,
+            **kwargs,
+        )
+
+
+class DataIteratorSubscene(DataIterator):
+    def __init__(self, split="train", language="fr", streaming=True, **kwargs):
+        file = f"{DATA_PATH}/subscene/{split}/corpus.jsonl"
+        assert os.path.isfile(file), f"Missing file {file}"
+
+        key = {
+            "fr": "french",
+            "en": "english",
+            "de": "german",
+            "es": "spanish",
+            "it": "italian",
+        }.get(language)
+        assert key is not None, f"Unsupported language {language}"
+
+        NO_TEXT = {"text": ""}
+
+        def preprocess(x):
+            text = x.get(key)
+            if text is None:
+                return NO_TEXT
+            text = text.get("subtitles")
+            if text is None:
+                print(f"Missing subtitles in {text.keys()}")
+                return NO_TEXT
+            assert isinstance(text, list)
+            return {"text": "\n".join(text)}
+
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "json",
+                data_files=file,
+                streaming=streaming,
+                split="train",
+            ),
+            name=f"Subscene:{language}",
+            preprocess=preprocess,
             **kwargs,
         )
 
