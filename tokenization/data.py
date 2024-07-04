@@ -23,6 +23,7 @@ from text import (
     fix_legi_and_remove_title,
     html_unescape,
     is_obscene,
+    is_url_duplicated,
     lucie_rules_pass_for_redpajama,
     string_to_random01,
 )
@@ -1234,20 +1235,6 @@ class DataIteratorCulturaX(DataIteratorConcat):
         assert num_parquets, f"Unsupported language {language}. Number of parquets not defined (512?). Please visit https://huggingface.co/datasets/uonlp/CulturaX/tree/main/{language}"
         num_parquets = min(num_parquets, 512)  # Arbitrary limit for English !
 
-        def is_url_duplicated(url, language):
-            if language == "fr":
-                keywords = ["fr.wikipedia", "wiktionary", "wikisource", "theses.fr"]
-            elif language == "en":
-                keywords = [
-                    "en.wikipedia",
-                    "arxiv.org",
-                    "www.ncbi.nlm.nih.gov/pmc",
-                    "philpapers.org",
-                ]  # + arxiv, pubmed...
-            else:
-                keywords = ["wikipedia", "europarl", "op.europa.eu"]
-            return any(keyword in url for keyword in keywords)
-
         def filter_fn(data, language, source=None):
             # returns True if the example is to be kept, False otherwise
             if source and (data["source"] != source):
@@ -1332,7 +1319,7 @@ class DataIteratorRedPajama(DataIteratorConcat):
                     ),
                     name=f"RedPajama:{snapshot.lower()}:{language.lower()}",
                     key="raw_content",
-                    filter_fn=lambda x: lucie_rules_pass_for_redpajama(x)[0],
+                    filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
                     **kwargs,
                 )
                 for snapshot in _CC_SNAPSHOT_IDS

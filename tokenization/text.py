@@ -655,7 +655,22 @@ def canonical_url(url):
     return urlparse(url).netloc
 
 
-def lucie_rules_pass_for_redpajama(sample) -> bool:  # noqa # C901 `...` is too complex
+def is_url_duplicated(url, language):
+    if language == "fr":
+        keywords = ["fr.wikipedia", "wiktionary", "wikisource", "theses.fr"]
+    elif language == "en":
+        keywords = [
+            "en.wikipedia",
+            "arxiv.org",
+            "www.ncbi.nlm.nih.gov/pmc",
+            "philpapers.org",
+        ]  # + arxiv, pubmed...
+    else:
+        keywords = ["wikipedia", "europarl", "op.europa.eu"]
+    return any(keyword in url for keyword in keywords)
+
+
+def lucie_rules_pass_for_redpajama(sample, language) -> bool:  # noqa # C901 `...` is too complex
     """function returns True if the sample complies with Gopher rules"""
     signals = json.loads(sample["quality_signals"])
 
@@ -679,6 +694,11 @@ def lucie_rules_pass_for_redpajama(sample) -> bool:  # noqa # C901 `...` is too 
     # https://data.together.xyz/redpajama-data-v2/v1.0.0/artifacts/ut1_domain_categories.json
     if rps_doc_ut1_blacklist is not None:
         return False, "lucie: blacklist"
+
+    url = json.loads(sample["meta"])["url"]
+    url_dedup = is_url_duplicated(url, language)
+    if url_dedup:
+        return False, "lucie: deduplicated url"
 
     ### C4
     # rule 1: at least 3 sentences
