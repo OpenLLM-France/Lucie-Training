@@ -1303,7 +1303,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 
 class DataIteratorRedPajama(DataIteratorConcat):
-    def __init__(self, language="es", split="train", streaming=True, **kwargs):
+    def __init__(self, language="fr", split="train", streaming=True, **kwargs):
         _CC_SNAPSHOT_IDS = ["2023-14"]
 
         DataIteratorConcat.__init__(
