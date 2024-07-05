@@ -1292,6 +1292,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                         split=split,
                     ),
                     name=f"FineWebEdu:{source.lower()}",
+                    filter_fn=lambda data: not is_url_duplicated(data["url"], "en"),
                     **kwargs,
                 )
                 for source in sources
