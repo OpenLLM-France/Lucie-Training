@@ -664,7 +664,11 @@ def is_url_duplicated(url, language):
             "arxiv.org",
             "www.ncbi.nlm.nih.gov/pmc",
             "philpapers.org",
-        ]  # + arxiv, pubmed...
+            "exporter.nih.gov",
+            "irclogs.ubuntu.com",
+            "courtlistener.com",
+            "uspto.gov",
+        ]
     else:
         keywords = ["wikipedia", "europarl", "op.europa.eu"]
     return any(keyword in url for keyword in keywords)
