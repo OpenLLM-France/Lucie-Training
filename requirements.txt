@@ -6,3 +6,4 @@ tokenizers==0.15.2
 transformers==4.36.1
 flash-attn==2.5.8
 zstandard==0.22.0
+tensorboard==2.16.2
