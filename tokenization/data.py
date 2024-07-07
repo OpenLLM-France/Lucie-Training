@@ -6,6 +6,7 @@ import os
 import random
 import time
 import types
+import urllib
 import warnings
 
 import datasets
@@ -208,6 +209,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
         "eurovoc",
         "validated_youtube",
         "cultura_x",
+        "red_pajama",
         "subscene",
     ]  # "youtube",
 
@@ -266,6 +268,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
             # "wikipedia": ["fr", "en", "de", "es", "it"],
             # "gutenberg": ["fr", "en", "de", "es", "it"],
             # "cultura_x": ["fr", "en", "de", "es", "it"],
+            "red_pajama": ["fr", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", use_nc=use_nc, scope=scope, **kwargs):
@@ -1304,30 +1307,104 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", split="train", streaming=True, **kwargs):
-        _CC_SNAPSHOT_IDS = ["2023-14"]
+        repo = "togethercomputer/RedPajama-Data-V2"
 
-        DataIteratorConcat.__init__(
-            self,
-            [
-                DataIterator(
+        # Get all snapshots, sorted from the most recent one to the oldest one
+        target_url = f"https://huggingface.co/datasets/{repo}/raw/main/_CC_SNAPSHOT_IDS"
+        response = urllib.request.urlopen(target_url)
+        _CC_SNAPSHOT_IDS = response.read().decode("utf-8")
+        _CC_SNAPSHOT_IDS = sorted(
+            [f for f in _CC_SNAPSHOT_IDS.split("\n") if f],
+            reverse=True,
+        )
+        assert len(_CC_SNAPSHOT_IDS) > 0, f"No snapshot found in {target_url}"
+
+        num_to_take = {
+            "fr": 10,  # ?
+            "en": 0,  # ?
+            "de": 10,
+            "es": 10,
+            "it": 10,
+        }.get(language)
+        if not num_to_take:
+            raise ValueError(f"Unsupported language {language}")
+
+        # snapshots = _CC_SNAPSHOT_IDS[:num_to_take]
+
+        # DataIteratorConcat.__init__(
+        #     self,
+        #     [
+        #         DataIterator(
+        #             datasets.load_dataset(
+        #                 repo,
+        #                 name="default",
+        #                 partition=partition,
+        #                 snapshots=[snapshot],
+        #                 languages=[language],
+        #                 streaming=streaming,
+        #                 split=split,
+        #             ),
+        #             name=f"RedPajama:{language}:{snapshot}_{partition}",
+        #             key="raw_content",
+        #             filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
+        #             **kwargs,
+        #         )
+        #         for snapshot in snapshots
+        #         for partition in [
+        #             "head_middle",
+        #             # "tail",
+        #         ]
+        #     ],
+        #     name=f"RedPajama:{language}",
+        # )
+
+        partition = "head_middle"
+        selected_datatasets = []
+        for snapshot in _CC_SNAPSHOT_IDS:
+            subname = f"RedPajama:{language}:{snapshot}_{partition}"
+            try:
+                ds = DataIterator(
                     datasets.load_dataset(
-                        "togethercomputer/RedPajama-Data-V2",
+                        repo,
                         name="default",
-                        partition="head_middle",
+                        partition=partition,
                         snapshots=[snapshot],
                         languages=[language],
                         streaming=streaming,
                         split=split,
                     ),
-                    name=f"RedPajama:{snapshot.lower()}:{language.lower()}",
+                    name=subname,
                     key="raw_content",
                     filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
                     **kwargs,
                 )
-                for snapshot in _CC_SNAPSHOT_IDS
-            ],
-            name=f"RedPajama:{language.lower()}",
+            except Exception as e:
+                print(f"Skipping {subname} because of error: {e}")
+                continue
+            print(f"OK for {subname}")
+            selected_datatasets.append(ds)
+            if len(selected_datatasets) >= num_to_take:
+                break
+
+        DataIteratorConcat.__init__(
+            self,
+            selected_datatasets,
+            name=f"RedPajama:{language}",
         )
+
+
+class CheckedDataIterator(DataIterator):
+    def __init__(self, *kargs, **kwargs):
+        DataIterator.__init__(self, *kargs, **kwargs)
+        self.first = DataIterator.__next__(self)
+        assert self.first is not None
+
+    def __next__(self):
+        if self.first is None:
+            return DataIterator.__next__(self)
+        data = self.first
+        self.first = None
+        return data
 
 
 ########################################
@@ -2068,7 +2145,8 @@ def test_iterator(  # noqa # C901 `...` is too complex
             if num_examples > 1:
                 filename += f"_{num_dumped:02d}"
             filename += ".txt"
-            print(f"Dumping {filename}")
+            if num_dumped == 0:
+                print(f"Dumping {filename}")
             with open(filename, "w", encoding="utf8") as f:
                 f.write(text + "\n")
             num_dumped += 1
