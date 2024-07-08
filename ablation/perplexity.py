@@ -398,7 +398,6 @@ def evaluate(data_iterator,
                             total_loss_dict[key] = total_loss_dict.get(
                                 key, get_accelerator().FloatTensor([0.0])) + loss_dict[key]
 
-        print_rank_0(f" > Nb of iterations: {iteration}")
     # Move model back to the train mode.
     for model_module in model:
         model_module.train()
@@ -479,8 +478,9 @@ def main():
 
     # Use the datasets to evaluate the model
     domain_ppls = {}
-    test_datasets = [test_datasets]  # TODO remove!
-    for ds in test_datasets:
+    nb_ds = len(test_datasets)
+    for idx, ds in enumerate(test_datasets):
+        print_rank_0(f"Dataset #{idx}/{nb_ds}")
         dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
         num_tokenized_tokens = 0
         num_original_tokens = 0
