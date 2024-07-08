@@ -5,13 +5,13 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
-#SBATCH --time 08:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 06:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=./out/%x-%j.out # STDOUT
 #SBATCH --account=qgz@a100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=lucas.hervier@irt-saintexupery.com
-#SBATCH --job-name=lucie80m-ablation-study-datamix-config0
+#SBATCH --job-name=lucie80m-ablation-study-datamix-config0-30ksteps
 
 set -x -e
 
@@ -20,11 +20,13 @@ echo "START TIME: $(date)"
 # Load env and variables
 source ~/Lucie-Training/training/set_env.sh
 
+# VARIANT=test
 VARIANT=ablation_lucie80m_datamix_config0
 CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
 TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
 LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
 mkdir -p $LOGS_PATH
+mkdir -p $TENSORBOARD_PATH
 
 cd $MEGATRON_DEEPSPEED_REPO
 
@@ -37,7 +39,7 @@ DATASET_ARGS=" \
     --save_weights_path $OUTPUT_PATH/dataset_weights/$VARIANT \
     "
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_ablation.py $TOKENS_DIR $DATASET_ARGS)"
-DATA_CACHE_PATH=/gpfswork/rech/qgz/uzq54wg/.cache
+DATA_CACHE_PATH=/gpfswork/rech/qgz/uye67mo/.cache
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
@@ -171,7 +173,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --save-interval $SAVE_INTERVAL \
        --eval-interval 1000 \
        --eval-iters 0 \
-       --split 0.99,0.005,0.005 \
+       --split 0.98,0.01,0.01 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
        --save $CHECKPOINT_PATH \
