@@ -77,7 +77,7 @@ SAVE_INTERVAL=5_000
 
 DS_CONFIG_PATH=$OUTPUT_PATH/ds_configs/$VARIANT/$SLURM_JOB_NAME
 mkdir -p $DS_CONFIG_PATH
-config_json="$DS_CONFIG_PATNH/$SLURM_JOBID.json"
+config_json="$DS_CONFIG_PATH/$SLURM_JOBID.json"
 
 cat <<EOT > $config_json
 {
