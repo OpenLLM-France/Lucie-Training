@@ -212,6 +212,21 @@ def get_test_split_(splits_string, size):
     for index, split in enumerate(splits):
         splits_index.append(splits_index[index] +
                             int(round(split * float(size))))
+    # Adjust the splits index if it includes zero samples
+    if splits[1] > 0 and splits_index[2] - splits_index[1] < 1:
+        if splits_index[1] > 1:
+            splits_index[1] -= 1
+            splits_index[2] = splits_index[1] + 1
+
+    if splits[2] > 0 and splits_index[3] - splits_index[2] < 1:
+        if splits_index[2] - splits_index[1] > 1:
+            splits_index[2] -= 1
+            splits_index[3] = splits_index[2] + 1
+        else:
+            if splits_index[1] > 1:
+                splits_index[1] -= 1
+                splits_index[2] -= 1
+                splits_index[3] = splits_index[2] + 1
     diff = splits_index[-1] - size
     for index in range(1, len(splits_index)):
         splits_index[index] -= diff
