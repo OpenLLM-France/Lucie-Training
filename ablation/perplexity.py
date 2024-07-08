@@ -456,16 +456,16 @@ def evaluate_and_print_results(data_loader, model, num_original_tokens, num_toke
 
     # Save in dictionary for one domain
     results = {
-        "loss": val_loss,
-        "ppl": ppl,
-        "adjusted_ppl": adjusted_ppl,
-        "token_ratio": token_ratio
+        "loss": val_loss.detach().cpu().numpy(),
+        "ppl": ppl.detach().cpu().numpy(),
+        "adjusted_ppl": adjusted_ppl.detach().cpu().numpy(),
+        "token_ratio": token_ratio.detach().cpu().numpy()
     }
 
     length = len(string) + 1
-    print('-' * length)
-    print(string)
-    print('-' * length)
+    print_rank_0('-' * length)
+    print_rank_0(string)
+    print_rank_0('-' * length)
 
     return results
 
