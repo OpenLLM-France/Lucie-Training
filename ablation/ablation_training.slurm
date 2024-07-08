@@ -20,7 +20,7 @@ source ~/Lucie-Training/training/set_env.sh
 
 # Variables that are set with command-line arguments
 MODEL_CONFIG="" # can be lucie80m, lucie410m
-DATA_CONFIG="" # see the files name (without the .yml ext) in ablation/data_config for options
+DATA_CONFIG=""  # see the files name (without the .yml ext) in ablation/data_config for options
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -63,9 +63,9 @@ GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
 # ----- model
-source ~/Lucie-Training/ablation/models_config/${MODEL_CONFIG}.sh
+source $HOME/Lucie-Training/ablation/models_config/${MODEL_CONFIG}.sh
 
-# ------ Optimizer
+# ----- optimizer
 TRAIN_STEPS=30_000 
 LR=3e-4
 MIN_LR=3e-5
@@ -75,7 +75,9 @@ GRAD_CLIP=1
 
 SAVE_INTERVAL=5_000
 
-config_json="./ds_config.$SLURM_JOBID.json"
+DS_CONFIG_PATH=$OUTPUT_PATH/ds_configs/$VARIANT/$SLURM_JOB_NAME
+mkdir -p $DS_CONFIG_PATH
+config_json="$DS_CONFIG_PATNH/$SLURM_JOBID.json"
 
 cat <<EOT > $config_json
 {
@@ -191,5 +193,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        "
 
 clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+
+mv ./out/%x-%j.out $LOGS_PATH/%x-%j.out
+mv ./out/%x-%j.err $LOGS_PATH/%x-%j.err
 
 echo "END TIME: $(date)"

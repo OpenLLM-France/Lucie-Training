@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
 #SBATCH --output=./out/%x-%j.out # STDOUT
-#SBATCH --error=./err/%x-%j.err
+#SBATCH --error=./out/%x-%j.err
 #SBATCH --account=qgz@a100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -15,12 +15,14 @@ set -x -e
 
 echo "START TIME: $(date)"
 
+cd $HOME/Lucie-Training
+
 # ----- load env and variables
-source ~/Lucie-Training/training/set_env.sh
+source training/set_env.sh
 
 # Variables that are set with command-line arguments
 MODEL_CONFIG="" # can be lucie80m, lucie410m
-DATA_CONFIG="" # see the files name (without the .yml ext) in ablation/data_config for options
+DATA_CONFIG=""  # see the files name (without the .yml ext) in ablation/data_config for options
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -36,10 +38,8 @@ echo "Data Config: $DATA_CONFIG"
 
 # Path variables
 VARIANT=ablation_${MODEL_CONFIG}_datamix_${DATA_CONFIG}
-TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
 LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
 mkdir -p $LOGS_PATH
-mkdir -p $TENSORBOARD_PATH
 
 PERPLEXITY_RESULTS_PATH=$OUTPUT_PATH/perplexity/$VARIANT
 mkdir -p $PERPLEXITY_RESULTS_PATH
@@ -53,11 +53,8 @@ DOMAIN_PROPORTIONS_PATH=Lucie-Training/ablation/data_config/config00.yml
 DATASET_ARGS=" \
 	    --domain_proportions $HOME/$DOMAIN_PROPORTIONS_PATH \
 	    "
-DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_ablation.py $TOKENS_DIR $DATASET_ARGS)"
+DATASET="$(python `pwd`/training/collect_data_and_weights_ablation.py $TOKENS_DIR $DATASET_ARGS)"
 TEST_DATA_CACHE=$OUTPUT_PATH/test_data/.cache
-
-# ----- checkpoint path (model should be already trained)
-CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
@@ -66,12 +63,13 @@ MASTER_PORT=6000
 GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
-WOLD_SIZE=$(($GPUS_PER_NODE * $NNODES))
+# ----- model
+source ablation/models_config/${MODEL_CONFIG}.sh
 
-# model
-source ~/Lucie-Training/ablation/models_config/${MODEL_CONFIG}.sh
+# ----- checkpoint path (model should be already trained)
+CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
 
-# optimizer
+# ----- optimizer
 TRAIN_STEPS=30_000 
 LR=3e-4
 MIN_LR=3e-5
@@ -81,7 +79,9 @@ GRAD_CLIP=1
 
 SAVE_INTERVAL=5_000
 
-config_json="./ds_config.$SLURM_JOBID.json"
+DS_CONFIG_PATH=$OUTPUT_PATH/ds_configs/$VARIANT/$SLURM_JOB_NAME
+mkdir -p $DS_CONFIG_PATH
+config_json="$DS_CONFIG_PATNH/$SLURM_JOBID.json"
 
 cat <<EOT > $config_json
 {
@@ -136,18 +136,6 @@ OPTIMIZER_ARGS=" \
        --weight-decay $WEIGHT_DECAY \
        "
 
-LOG_ARGS=" \
-       --log-interval 1 \
-       --tensorboard-dir $TENSORBOARD_PATH \
-       --tensorboard-log-interval 200 \
-       --log-timers-to-tensorboard \
-       --log-batch-size-to-tensorboard \
-       --log-memory-to-tensorboard \
-       --log-world-size-to-tensorboard \
-       --tensorboard-queue-size 1 \
-       --no-log-loss-scale-to-tensorboard \
-       "
-
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
 
@@ -171,28 +159,34 @@ EXIT_OPTS=" \
 # ---- compute perplexity
 export RUN="torchrun $DISTRIBUTED_ARGS \
       `pwd`/ablation/perplexity.py \
-      --data-path $DATASET \
       --tensor-model-parallel-size $TP \
       --pipeline-model-parallel-size $PP \
-      --data-impl mmap \
-      --split 0.99,0.005,0.005 \
-      --seed 42 \
-      --skip-warmup True\
       --micro-batch-size $MICRO_BATCH_SIZE \
-      --datatest-cache-path $TEST_DATA_CACHE \
-      $GPT_ARGS \
-      $OPTIMIZER_ARGS \
+      --global-batch-size $GLOBAL_BATCH_SIZE \
+      --data-path $DATASET \
+      --data-impl mmap \
       --tokenizer-type PretrainedFromHF  \
       --tokenizer-name-or-path $TOKENIZER_PATH \
       --distributed-backend nccl \
+      --split 0.99,0.005,0.005 \
+      --use-flash-attn-v2 \
+      --no-query-key-layer-scaling \
       --load $CHECKPOINT_PATH \
       --inference \
       --finetune \
-      $DEEPSPEED_ARGS \
+      --seed 42 \
+      --skip-warmup True\
+      --datatest-cache-path $TEST_DATA_CACHE \
       --perplexity-results-path $PERPLEXITY_RESULTS_PATH \
+      $GPT_ARGS \
+      $OPTIMIZER_ARGS \
+      $DEEPSPEED_ARGS \
       $EXIT_OPTS \
       "
 
 clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+
+mv ./out/%x-%j.out $LOGS_PATH/
+mv ./out/%x-%j.err $LOGS_PATH/
 
 echo "END TIME: $(date)"
