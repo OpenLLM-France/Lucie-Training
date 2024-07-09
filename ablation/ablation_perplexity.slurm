@@ -156,6 +156,8 @@ EXIT_OPTS=" \
     --exit-duration-in-mins 1190 \
     "
 
+export TOKENIZERS_PARALLELISM=true
+
 # ---- compute perplexity
 export RUN="torchrun $DISTRIBUTED_ARGS \
       `pwd`/ablation/perplexity.py \
