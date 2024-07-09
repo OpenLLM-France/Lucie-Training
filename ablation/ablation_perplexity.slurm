@@ -186,7 +186,7 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
 
 clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
 
-mv ./out/%x-%j.out $LOGS_PATH/
-mv ./out/%x-%j.err $LOGS_PATH/
+mv ./out/$SLURM_JOB_NAME-$SLURM_JOBID.out $LOGS_PATH/$SLURM_JOB_NAME-$SLURM_JOBID.out
+mv ./out/$SLURM_JOB_NAME-$SLURM_JOBID.err $LOGS_PATH/$SLURM_JOB_NAME-$SLURM_JOBID.err
 
 echo "END TIME: $(date)"
