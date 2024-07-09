@@ -1305,8 +1305,20 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 
 class DataIteratorRedPajama(DataIteratorConcat):
-    def __init__(self, language="fr", split="train", streaming=True, **kwargs):
-        repo = os.path.join(_asset_folder, "RedPajama-Data-V2")  # "togethercomputer/RedPajama-Data-V2"
+    def __init__(self, language="fr", split="train", streaming=True, from_huggingface=None, **kwargs):
+        jeanzay_path = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"
+        if from_huggingface is None:
+            from_huggingface = not os.path.isdir(jeanzay_path)
+            logger.info(
+                "Using HuggingFace version for RedPajama-V2"
+                if from_huggingface
+                else "Using local version for RedPajama-V2"
+            )
+        repo = (
+            "togethercomputer/RedPajama-Data-V2"
+            if from_huggingface
+            else os.path.join(_asset_folder, "RedPajama-Data-V2")
+        )
 
         # Get all snapshots, sorted from the most recent one to the oldest one
         file = open(os.path.join(_asset_folder, "RedPajama-Data-V2/_CC_SNAPSHOT_IDS"))
