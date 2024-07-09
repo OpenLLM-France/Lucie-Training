@@ -345,50 +345,50 @@ def get_test_dataset_args(parser):
     group.add_argument('--perplexity-results-path', type=str, default=None)
     return parser
 
-### Keep it as it may be useful later
-# def build_data_loader(dataset, micro_batch_size, num_workers, drop_last,
-#         task_collate_fn=None):
-#     """Data loader. Note that batch-size is the local (per GPU) batch-size."""
+## Keep it as it may be useful later
+def build_data_loader(dataset, micro_batch_size, num_workers, drop_last,
+        task_collate_fn=None):
+    """Data loader. Note that batch-size is the local (per GPU) batch-size."""
 
-#     # Sampler.
-#     world_size = mpu.get_data_parallel_world_size()
-#     rank = mpu.get_data_parallel_rank()
-#     sampler = torch.utils.data.distributed.DistributedSampler(
-#         dataset, num_replicas=world_size, rank=rank)
+    # Sampler.
+    world_size = mpu.get_data_parallel_world_size()
+    rank = mpu.get_data_parallel_rank()
+    sampler = torch.utils.data.distributed.DistributedSampler(
+        dataset, num_replicas=world_size, rank=rank)
 
-#     # Data loader. Note that batch size is the per GPU batch size.
-#     data_loader = torch.utils.data.DataLoader(dataset,
-#                                               batch_size=micro_batch_size,
-#                                               sampler=sampler,
-#                                               shuffle=False,
-#                                               num_workers=num_workers,
-#                                               drop_last=drop_last,
-#                                               pin_memory=True,
-#                                               collate_fn=task_collate_fn)
+    # Data loader. Note that batch size is the per GPU batch size.
+    data_loader = torch.utils.data.DataLoader(dataset,
+                                              batch_size=micro_batch_size,
+                                              sampler=sampler,
+                                              shuffle=False,
+                                              num_workers=num_workers,
+                                              drop_last=drop_last,
+                                              pin_memory=True,
+                                              collate_fn=task_collate_fn)
 
-#     return data_loader
+    return data_loader
 
-def build_pretraining_data_loader(dataset, consumed_samples):
-    """Buld dataloader given an input dataset."""
+# def build_pretraining_data_loader(dataset, consumed_samples):
+#     """Buld dataloader given an input dataset."""
 
-    if dataset is None:
-        return None
-    args = get_args()
+#     if dataset is None:
+#         return None
+#     args = get_args()
 
-    batch_sampler = MegatronPretrainingSampler(
-        total_samples=len(dataset),
-        consumed_samples=consumed_samples,
-        micro_batch_size=args.micro_batch_size,
-        data_parallel_rank=mpu.get_data_parallel_rank(),
-        data_parallel_size=mpu.get_data_parallel_world_size(),
-        drop_last=False
-        )
+#     batch_sampler = MegatronPretrainingSampler(
+#         total_samples=len(dataset),
+#         consumed_samples=consumed_samples,
+#         micro_batch_size=args.micro_batch_size,
+#         data_parallel_rank=mpu.get_data_parallel_rank(),
+#         data_parallel_size=mpu.get_data_parallel_world_size(),
+#         drop_last=False
+#         )
 
-    # Torch dataloader.
-    return torch.utils.data.DataLoader(dataset,
-                                       batch_sampler=batch_sampler,
-                                       num_workers=args.num_workers,
-                                       pin_memory=True)
+#     # Torch dataloader.
+#     return torch.utils.data.DataLoader(dataset,
+#                                        batch_sampler=batch_sampler,
+#                                        num_workers=args.num_workers,
+#                                        pin_memory=True)
 
 # Rewrite the evaluate of megatron.training.py with only the necessary arguments
 def evaluate(data_iterator,
@@ -519,7 +519,8 @@ def main():
     nb_ds = len(test_datasets)
     for idx, ds in enumerate(test_datasets):
         print_rank_0(f"Dataset #{idx}/{nb_ds}")
-        dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
+        # dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
+        dataloader = build_data_loader(ds, args.micro_batch_size, args.num_workers, drop_last=False)
         num_tokenized_tokens = 0
         num_original_tokens = 0
         eval_iters = 0
