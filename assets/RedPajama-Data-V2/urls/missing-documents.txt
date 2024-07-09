@@ -1,0 +1,8 @@
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2014-52/2811/en_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2014-52/3215/en_middle.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2014-52/4251/en_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2015-40/0914/it_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2015-40/0964/it_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2015-40/1315/it_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2015-40/2650/it_head.json.gz
+https://data.together.xyz/redpajama-data-v2/v1.0.0/documents/2017-04/4965/it_middle.json.gz

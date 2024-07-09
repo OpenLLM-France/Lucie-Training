@@ -6,7 +6,6 @@ import os
 import random
 import time
 import types
-import urllib
 import warnings
 
 import datasets
@@ -1307,17 +1306,12 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", split="train", streaming=True, **kwargs):
-        repo = "togethercomputer/RedPajama-Data-V2"
+        repo = os.path.join(_asset_folder, "RedPajama-Data-V2")  # "togethercomputer/RedPajama-Data-V2"
 
         # Get all snapshots, sorted from the most recent one to the oldest one
-        target_url = f"https://huggingface.co/datasets/{repo}/raw/main/_CC_SNAPSHOT_IDS"
-        response = urllib.request.urlopen(target_url)
-        _CC_SNAPSHOT_IDS = response.read().decode("utf-8")
-        _CC_SNAPSHOT_IDS = sorted(
-            [f for f in _CC_SNAPSHOT_IDS.split("\n") if f],
-            reverse=True,
-        )
-        assert len(_CC_SNAPSHOT_IDS) > 0, f"No snapshot found in {target_url}"
+        file = open(os.path.join(_asset_folder, "RedPajama-Data-V2/_CC_SNAPSHOT_IDS"))
+        _CC_SNAPSHOT_IDS = file.read().split("\n")[::-1]
+        assert len(_CC_SNAPSHOT_IDS) > 0, "No snapshot found"
 
         num_to_take = {
             "fr": 10,  # ?
