@@ -27,7 +27,8 @@ from megatron.model.rotary_pos_embedding import RotaryEmbedding
 from megatron.training import setup_model_and_optimizer
 from megatron.core.enums import ModelType
 
-from megatron.data.data_samplers import build_pretraining_data_loader
+# from megatron.data.data_samplers import build_pretraining_data_loader
+from megatron.data.data_samplers import MegatronPretrainingSampler
 
 import deepspeed
 from deepspeed.accelerator.real_accelerator import get_accelerator
@@ -366,6 +367,28 @@ def get_test_dataset_args(parser):
 #                                               collate_fn=task_collate_fn)
 
 #     return data_loader
+
+def build_pretraining_data_loader(dataset, consumed_samples):
+    """Buld dataloader given an input dataset."""
+
+    if dataset is None:
+        return None
+    args = get_args()
+
+    batch_sampler = MegatronPretrainingSampler(
+        total_samples=len(dataset),
+        consumed_samples=consumed_samples,
+        micro_batch_size=args.micro_batch_size,
+        data_parallel_rank=mpu.get_data_parallel_rank(),
+        data_parallel_size=mpu.get_data_parallel_world_size(),
+        drop_last=False
+        )
+
+    # Torch dataloader.
+    return torch.utils.data.DataLoader(dataset,
+                                       batch_sampler=batch_sampler,
+                                       num_workers=args.num_workers,
+                                       pin_memory=True)
 
 # Rewrite the evaluate of megatron.training.py with only the necessary arguments
 def evaluate(data_iterator,
