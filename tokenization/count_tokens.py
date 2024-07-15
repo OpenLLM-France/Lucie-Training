@@ -50,6 +50,8 @@ if __name__ == "__main__":
         path = os.path.join(folder, os.path.splitext(file)[0])
         paths.append(path)
 
+    num_done = 0
+
     for path in tqdm.tqdm(sorted(paths)):
         name = get_name(path)
         json_file = None
@@ -92,6 +94,7 @@ if __name__ == "__main__":
                     open(json_file, "w"),
                     indent=4,
                 )
+            num_done += 1
 
         total_num_tokens["TOTAL"] = total_num_tokens.get("TOTAL", 0) + total_tokens
         total_num_tokens[name] = total_num_tokens.get(name, 0) + total_tokens
@@ -101,4 +104,5 @@ if __name__ == "__main__":
 
     s = json.dumps(total_num_tokens, indent=4)
     print(s)
-    print(s, file=open("total_num_tokens.json", "w"))
+    print(f"Counted tokens for {num_done} files")
+    # print(s, file=open("total_num_tokens.json", "w"))
