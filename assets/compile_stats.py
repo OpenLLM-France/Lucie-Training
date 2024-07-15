@@ -2,6 +2,12 @@ import csv
 import json
 import os
 
+
+# Ignore datasets
+def ignore_datasets(name):
+    return "redpajama" in name.lower() or "subscene" in name.lower()
+
+
 text_types = {
     "ocr": [
         "AmericanStories",
@@ -150,6 +156,14 @@ def to_name_subset(name):
         subset = subset.replace("train", "")
     if subset:
         subset = subset.strip(":_")
+    if "fineweb" in name.lower():
+        assert subset.startswith("cc-main-")
+        subset = subset.replace("cc-main-", "")
+        f = subset.split("-")
+        f[0] = "cc-main-" + f[0]
+        name += "--" + f[0]
+        if len(f) == 1:
+            subset = ""
     return name, subset
 
 
@@ -360,6 +374,8 @@ if __name__ == "__main__":
         for fn in os.listdir(tokencount_folder):
             if not fn.endswith(".json"):
                 continue
+            if ignore_datasets(fn):
+                continue
             data_fullname = os.path.join(tokencount_folder, fn)
             data = json.load(open(data_fullname, encoding="utf8"))
 
@@ -392,6 +408,8 @@ if __name__ == "__main__":
             if not fn.endswith(".json"):
                 continue
             if not fn.startswith("stats_"):
+                continue
+            if ignore_datasets(fn):
                 continue
             data_fullname = os.path.join(stat_folder, fn)
             data = json.load(open(data_fullname, encoding="utf8"))

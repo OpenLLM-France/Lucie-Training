@@ -118,8 +118,9 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
     # name = os.path.splitext(name)[0]
     if name.endswith("_text_document"):
         name = name[: -len("_text_document")]
-    name = re.sub(r"\d+$", "", name)
-    name = name.rstrip("_").rstrip("-.")
+    if name not in possible_names:
+        name = re.sub(r"\d+$", "", name)
+        name = name.rstrip("_").rstrip("-.")
     if name not in possible_names:
         if "--" in name:
             name2 = "--".join(name.split("--")[:-1])
