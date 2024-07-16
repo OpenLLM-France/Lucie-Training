@@ -5,8 +5,8 @@ import math
 import pickle
 import random
 import urllib
+import urllib.parse
 from collections import Counter
-from urllib.parse import urlparse
 
 import regex as re
 
@@ -652,7 +652,15 @@ def is_obscene(text, language):
 
 
 def canonical_url(url):
-    return urlparse(url).netloc
+    url_base = urllib.parse.urlparse(url).netloc.lower()
+    if not url_base and url.strip():
+        if "://" not in url:
+            url = "http://" + url
+        else:
+            # extra // ?
+            url = re.sub(r"://+", "://", url)
+        url_base = urllib.parse.urlparse(url).netloc.lower()
+    return url_base
 
 
 def is_url_duplicated(url, language):
@@ -813,6 +821,7 @@ if __name__ == "__main__":
     import numpy as np
     import pandas as pd
     import tqdm
+
     from data import (
         DataIteratorConcat,
         DataIteratorParquet,
