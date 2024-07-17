@@ -24,7 +24,6 @@ from text import (
     html_unescape,
     is_obscene,
     is_url_duplicated,
-    lucie_rules_pass_for_redpajama,
     string_to_random01,
 )
 
@@ -1304,98 +1303,120 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
         )
 
 
+# class DataIteratorRedPajama(DataIteratorConcat):
+#     def __init__(self, language="fr", split="train", streaming=True, from_huggingface=None, **kwargs):
+#         jeanzay_path = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"
+#         if from_huggingface is None:
+#             from_huggingface = not os.path.isdir(jeanzay_path)
+#             logger.info(
+#                 "Using HuggingFace version for RedPajama-V2"
+#                 if from_huggingface
+#                 else "Using local version for RedPajama-V2"
+#             )
+#         repo = (
+#             "togethercomputer/RedPajama-Data-V2"
+#             if from_huggingface
+#             else os.path.join(_asset_folder, "RedPajama-Data-V2")
+#         )
+
+#         # Get all snapshots, sorted from the most recent one to the oldest one
+#         file = open(os.path.join(_asset_folder, "RedPajama-Data-V2/_CC_SNAPSHOT_IDS"))
+#         _CC_SNAPSHOT_IDS = file.read().split("\n")[::-1]
+#         assert len(_CC_SNAPSHOT_IDS) > 0, "No snapshot found"
+
+#         num_to_take = {
+#             "fr": 10,  # ?
+#             "en": 0,  # ?
+#             "de": 10,
+#             "es": 10,
+#             "it": 10,
+#         }.get(language)
+#         if not num_to_take:
+#             raise ValueError(f"Unsupported language {language}")
+
+#         # snapshots = _CC_SNAPSHOT_IDS[:num_to_take]
+
+#         # DataIteratorConcat.__init__(
+#         #     self,
+#         #     [
+#         #         DataIterator(
+#         #             datasets.load_dataset(
+#         #                 repo,
+#         #                 name="default",
+#         #                 partition=partition,
+#         #                 snapshots=[snapshot],
+#         #                 languages=[language],
+#         #                 streaming=streaming,
+#         #                 split=split,
+#         #             ),
+#         #             name=f"RedPajama:{language}:{snapshot}_{partition}",
+#         #             key="raw_content",
+#         #             filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
+#         #             **kwargs,
+#         #         )
+#         #         for snapshot in snapshots
+#         #         for partition in [
+#         #             "head_middle",
+#         #             # "tail",
+#         #         ]
+#         #     ],
+#         #     name=f"RedPajama:{language}",
+#         # )
+
+#         partition = "head_middle"
+#         selected_datatasets = []
+#         for snapshot in _CC_SNAPSHOT_IDS:
+#             subname = f"RedPajama:{language}:{snapshot}_{partition}"
+#             try:
+#                 ds = DataIterator(
+#                     datasets.load_dataset(
+#                         repo,
+#                         name="default",
+#                         partition=partition,
+#                         snapshots=[snapshot],
+#                         languages=[language],
+#                         streaming=streaming,
+#                         split=split,
+#                     ),
+#                     name=subname,
+#                     key="raw_content",
+#                     filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
+#                     **kwargs,
+#                 )
+#             except Exception as e:
+#                 print(f"Skipping {subname} because of error: {e}")
+#                 continue
+#             print(f"OK for {subname}")
+#             selected_datatasets.append(ds)
+#             if len(selected_datatasets) >= num_to_take:
+#                 break
+
+#         DataIteratorConcat.__init__(
+#             self,
+#             selected_datatasets,
+#             name=f"RedPajama:{language}",
+#         )
+
+
 class DataIteratorRedPajama(DataIteratorConcat):
-    def __init__(self, language="fr", split="train", streaming=True, from_huggingface=None, **kwargs):
-        jeanzay_path = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"
-        if from_huggingface is None:
-            from_huggingface = not os.path.isdir(jeanzay_path)
-            logger.info(
-                "Using HuggingFace version for RedPajama-V2"
-                if from_huggingface
-                else "Using local version for RedPajama-V2"
-            )
-        repo = (
-            "togethercomputer/RedPajama-Data-V2"
-            if from_huggingface
-            else os.path.join(_asset_folder, "RedPajama-Data-V2")
-        )
-
-        # Get all snapshots, sorted from the most recent one to the oldest one
-        file = open(os.path.join(_asset_folder, "RedPajama-Data-V2/_CC_SNAPSHOT_IDS"))
-        _CC_SNAPSHOT_IDS = file.read().split("\n")[::-1]
-        assert len(_CC_SNAPSHOT_IDS) > 0, "No snapshot found"
-
-        num_to_take = {
-            "fr": 10,  # ?
-            "en": 0,  # ?
-            "de": 10,
-            "es": 10,
-            "it": 10,
-        }.get(language)
-        if not num_to_take:
-            raise ValueError(f"Unsupported language {language}")
-
-        # snapshots = _CC_SNAPSHOT_IDS[:num_to_take]
-
-        # DataIteratorConcat.__init__(
-        #     self,
-        #     [
-        #         DataIterator(
-        #             datasets.load_dataset(
-        #                 repo,
-        #                 name="default",
-        #                 partition=partition,
-        #                 snapshots=[snapshot],
-        #                 languages=[language],
-        #                 streaming=streaming,
-        #                 split=split,
-        #             ),
-        #             name=f"RedPajama:{language}:{snapshot}_{partition}",
-        #             key="raw_content",
-        #             filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
-        #             **kwargs,
-        #         )
-        #         for snapshot in snapshots
-        #         for partition in [
-        #             "head_middle",
-        #             # "tail",
-        #         ]
-        #     ],
-        #     name=f"RedPajama:{language}",
-        # )
-
-        partition = "head_middle"
-        selected_datatasets = []
-        for snapshot in _CC_SNAPSHOT_IDS:
-            subname = f"RedPajama:{language}:{snapshot}_{partition}"
-            try:
-                ds = DataIterator(
-                    datasets.load_dataset(
-                        repo,
-                        name="default",
-                        partition=partition,
-                        snapshots=[snapshot],
-                        languages=[language],
-                        streaming=streaming,
-                        split=split,
-                    ),
-                    name=subname,
-                    key="raw_content",
-                    filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
-                    **kwargs,
-                )
-            except Exception as e:
-                print(f"Skipping {subname} because of error: {e}")
-                continue
-            print(f"OK for {subname}")
-            selected_datatasets.append(ds)
-            if len(selected_datatasets) >= num_to_take:
-                break
-
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/base_processing/output/{language}"
         DataIteratorConcat.__init__(
             self,
-            selected_datatasets,
-            name=f"RedPajama:{language}",
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "parquet",
+                        data_files={"train": os.path.join(data_path, snapshot, "*.parquet")},
+                        streaming=streaming,
+                        split="train",
+                    ),
+                    name=f"RedPajama:{language.lower()}:{snapshot.lower()}",
+                    **kwargs,
+                )
+                for snapshot in os.listdir(data_path)
+            ],
+            name=f"RedPajama:{language.lower()}",
         )
 
 
