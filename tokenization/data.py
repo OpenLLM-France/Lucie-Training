@@ -1400,7 +1400,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
-        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/base_processing/output/{language}"
+        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v0/base_processing/output/{language}"
         DataIteratorConcat.__init__(
             self,
             [
