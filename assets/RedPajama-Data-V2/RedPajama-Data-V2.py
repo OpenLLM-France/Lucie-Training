@@ -28,7 +28,7 @@ _DESCRIPTION = """\
 RedPajama V2: an Open Dataset for Training Large Language Models
 """
 
-_URL_BASE = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"  # "https://data.together.xyz/redpajama-data-v2/v1.0.0" #
+_URL_BASE = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"
 _LANGUAGES = ("en", "de", "fr", "es", "it")
 _MISSING_FILES_PATTERN = "urls/missing-{component}.txt"
 _NUM_SHARDS = 5000
@@ -267,19 +267,19 @@ class RedPajamaV2(datasets.GeneratorBasedBuilder):
                         base_tags.append(base_tag)
 
                         # documents
-                        url = "documents/{base_tag}.json.gz"
+                        url = f"documents/{base_tag}.json.gz"
                         if url not in missing_files["documents"]:
-                            documents_urls[base_tag] = f"{_URL_BASE}/" + url
+                            documents_urls[base_tag] = f"{_URL_BASE}/documents/{base_tag}.json.gz"
 
                         # quality signals
-                        url = "quality_signals/{base_tag}.signals.json.gz"
+                        url = f"quality_signals/{base_tag}.signals.json.gz"
                         if url not in missing_files["signals"]:
-                            quality_signals_urls[base_tag] = f"{_URL_BASE}/" + url
+                            quality_signals_urls[base_tag] = f"{_URL_BASE}/quality_signals/{base_tag}.signals.json.gz"
 
                         # duplicates
-                        url = "duplicates/{base_tag}.duplicates.parquet"
+                        url = f"duplicates/{base_tag}.duplicates.parquet"
                         if url not in missing_files["duplicates"]:
-                            duplicates_ids_urls[base_tag] = f"{_URL_BASE}/" + url
+                            duplicates_ids_urls[base_tag] = f"{_URL_BASE}/duplicates/{base_tag}.duplicates.parquet"
 
         # download documents files
         logger.info(f"Downloading {len(documents_urls)} documents files.")
