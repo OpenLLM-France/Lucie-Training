@@ -243,7 +243,7 @@ class RedPajamaV2(datasets.GeneratorBasedBuilder):
         # quality signal files)
         missing_files_paths = dl_manager.download_and_extract(
             {
-                component: _MISSING_FILES_PATTERN.format(component=component)
+                component: _URL_BASE + _MISSING_FILES_PATTERN.format(component=component)
                 for component in ("documents", "signals", "duplicates")
             }
         )
