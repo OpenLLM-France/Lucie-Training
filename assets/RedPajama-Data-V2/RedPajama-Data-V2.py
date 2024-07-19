@@ -17,7 +17,6 @@
 
 import gzip
 import json
-import os
 import traceback
 
 import datasets
@@ -29,7 +28,6 @@ _DESCRIPTION = """\
 RedPajama V2: an Open Dataset for Training Large Language Models
 """
 
-_CURRENT_PATH = os.path.realpath(__file__)
 _URL_BASE = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"  # "https://data.together.xyz/redpajama-data-v2/v1.0.0" #
 _LANGUAGES = ("en", "de", "fr", "es", "it")
 _MISSING_FILES_PATTERN = "urls/missing-{component}.txt"
@@ -245,7 +243,7 @@ class RedPajamaV2(datasets.GeneratorBasedBuilder):
         # quality signal files)
         missing_files_paths = dl_manager.download_and_extract(
             {
-                component: f"{_CURRENT_PATH}/" + _MISSING_FILES_PATTERN.format(component=component)
+                component: _MISSING_FILES_PATTERN.format(component=component)
                 for component in ("documents", "signals", "duplicates")
             }
         )
@@ -269,19 +267,19 @@ class RedPajamaV2(datasets.GeneratorBasedBuilder):
                         base_tags.append(base_tag)
 
                         # documents
-                        url = f"{_URL_BASE}/documents/{base_tag}.json.gz"
+                        url = "documents/{base_tag}.json.gz"
                         if url not in missing_files["documents"]:
-                            documents_urls[base_tag] = url
+                            documents_urls[base_tag] = f"{_URL_BASE}/" + url
 
                         # quality signals
-                        url = f"{_URL_BASE}/quality_signals/{base_tag}.signals.json.gz"
+                        url = "quality_signals/{base_tag}.signals.json.gz"
                         if url not in missing_files["signals"]:
-                            quality_signals_urls[base_tag] = url
+                            quality_signals_urls[base_tag] = f"{_URL_BASE}/" + url
 
                         # duplicates
-                        url = f"{_URL_BASE}/duplicates/{base_tag}.duplicates.parquet"
+                        url = "duplicates/{base_tag}.duplicates.parquet"
                         if url not in missing_files["duplicates"]:
-                            duplicates_ids_urls[base_tag] = url
+                            duplicates_ids_urls[base_tag] = f"{_URL_BASE}/" + url
 
         # download documents files
         logger.info(f"Downloading {len(documents_urls)} documents files.")
