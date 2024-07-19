@@ -17,6 +17,7 @@
 
 import gzip
 import json
+import os
 import traceback
 
 import datasets
@@ -28,6 +29,7 @@ _DESCRIPTION = """\
 RedPajama V2: an Open Dataset for Training Large Language Models
 """
 
+_CURRENT_PATH = os.path.realpath(__file__)
 _URL_BASE = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"  # "https://data.together.xyz/redpajama-data-v2/v1.0.0" #
 _LANGUAGES = ("en", "de", "fr", "es", "it")
 _MISSING_FILES_PATTERN = "urls/missing-{component}.txt"
@@ -243,7 +245,7 @@ class RedPajamaV2(datasets.GeneratorBasedBuilder):
         # quality signal files)
         missing_files_paths = dl_manager.download_and_extract(
             {
-                component: f"{_URL_BASE}/" + _MISSING_FILES_PATTERN.format(component=component)
+                component: f"{_CURRENT_PATH}/" + _MISSING_FILES_PATTERN.format(component=component)
                 for component in ("documents", "signals", "duplicates")
             }
         )
