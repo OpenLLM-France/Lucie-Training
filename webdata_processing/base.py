@@ -3,12 +3,9 @@ import argparse
 from datatrove.data import Document, DocumentsPipeline
 from datatrove.executor import SlurmPipelineExecutor
 from datatrove.pipeline.filters.base_filter import BaseFilter
-from datatrove.pipeline.formatters.base import BaseFormatter
 from datatrove.pipeline.readers import HuggingFaceDatasetReader
 from datatrove.pipeline.writers import ParquetWriter
 from datatrove.pipeline.writers.disk_base import DiskWriter
-from presidio_analyzer import AnalyzerEngine
-from presidio_anonymizer import AnonymizerEngine
 
 
 def extract_url(data: DocumentsPipeline, rank: int = 0, world_size: int = 1) -> DocumentsPipeline:
@@ -224,30 +221,6 @@ class WikipediaQualityFilter(BaseFilter):
         return True
 
 
-class PresidioPIIFormatter(BaseFormatter):
-    name = "🎭 Presidio PII"
-
-    def __init__(
-        self,
-    ):
-        super().__init__()
-        self.analyzer = AnalyzerEngine()
-        self.anonymizer = AnonymizerEngine()
-
-    def format(self, text: str) -> str:
-        analyzer_results = self.analyzer.analyze(
-            text=text,
-            entities=["PHONE_NUMBER", "EMAIL_ADDRESS", "IP_ADDRESS", "CREDIT_CARD", "MEDICAL_LICENSE"],
-            language="en",
-        )
-        anonymized_text = self.anonymizer.anonymize(
-            text=text,
-            analyzer_results=analyzer_results,
-            # operators={"DEFAULT": OperatorConfig("replace", {"new_value": "<phone>"})},
-        )
-        return anonymized_text.text
-
-
 def get_args():
     parser = argparse.ArgumentParser(description="Process some configurations.")
 
@@ -264,7 +237,6 @@ def get_args():
     )
 
     parser.add_argument("--dataset-name", type=str, default="togethercomputer/RedPajama-Data-V2", help="")
-
     return parser.parse_args()
 
 
@@ -306,7 +278,6 @@ if __name__ == "__main__":
             #     )
             # ),
             RedPajamaDuplicatesFilter(),
-            # PresidioPIIFormatter(),
             ParquetWriter(f"{FILTERING_OUTPUT_PATH}/output/{LANGUAGE}/{DUMP_TO_PROCESS}"),
         ],
         sbatch_args={"account": "qgz@cpu"},

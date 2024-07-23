@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH --hint=nomultithread        
 #SBATCH --account=qgz@cpu
-#SBATCH --time 10:00:00             
+#SBATCH --time=1:00:00             
+#SBATCH --qos=qos_cpu-dev
 
 snapchots=(
     2014-15
@@ -89,27 +90,28 @@ snapchots=(
     2023-06
     2023-14)
 
-### BASE
-for snapchot in "${snapchots[@]}"
-do
-    ./base.sh $snapchot fr
-done
+###############
+### BASE PROCESSING
+# snapchots_tail=("${snapchots[@]: -10}")
+# for snapchot in "${snapchots_tail[@]}"
+# do
+#     ./base.sh $snapchot fr
+#     ./base.sh $snapchot es
+#     ./base.sh $snapchot de
+#     ./base.sh $snapchot it
+# done
 
-snapchots_tail=("${snapchots[@]: -10}")
-for snapchot in "${snapchots_tail[@]}"
-do
-    ./base.sh $snapchot fr
-    ./base.sh $snapchot es
-    ./base.sh $snapchot de
-    ./base.sh $snapchot it
-done
+# snapchots_head=("${snapchots[@]:0:${#snapchots[@]}-10}")
+# for snapchot in "${snapchots_head[@]}"
+# do
+#     ./base.sh $snapchot fr
+# done
 
-# missing
-# ./base.sh 2022-21 fr
-# ./base.sh 2022-27 fr
-# ./base.sh 2022-27 fr
-# ./base.sh 2022-27 es
+###############
+### URL FILTERING
+./domains.sh 2023-14 fr
 
+###############
 ### MINHASH
 # for snapchot in "${snapchots[@]}"
 # do

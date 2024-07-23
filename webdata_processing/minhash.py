@@ -3,9 +3,37 @@ import argparse
 from datatrove.executor import SlurmPipelineExecutor
 from datatrove.pipeline.dedup import MinhashDedupCluster, MinhashDedupFilter, MinhashDedupSignature
 from datatrove.pipeline.dedup.minhash import MinhashConfig, MinhashDedupBuckets
-from datatrove.pipeline.formatters import PIIFormatter
+from datatrove.pipeline.formatters.base import BaseFormatter
 from datatrove.pipeline.readers import ParquetReader
 from datatrove.pipeline.writers import ParquetWriter
+
+# from datatrove.pipeline.formatters import PIIFormatter
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+
+class PresidioPIIFormatter(BaseFormatter):
+    name = "🎭 Presidio PII"
+
+    def __init__(
+        self,
+    ):
+        super().__init__()
+        self.analyzer = AnalyzerEngine()
+        self.anonymizer = AnonymizerEngine()
+
+    def format(self, text: str) -> str:
+        analyzer_results = self.analyzer.analyze(
+            text=text,
+            entities=["PHONE_NUMBER", "EMAIL_ADDRESS", "IP_ADDRESS", "CREDIT_CARD", "MEDICAL_LICENSE"],
+            language="en",
+        )
+        anonymized_text = self.anonymizer.anonymize(
+            text=text,
+            analyzer_results=analyzer_results,
+            # operators={"DEFAULT": OperatorConfig("replace", {"new_value": "<phone>"})},
+        )
+        return anonymized_text.text
 
 
 def get_args():
@@ -45,7 +73,7 @@ if __name__ == "__main__":
     LOGS_FOLDER = f"{MAIN_OUTPUT_PATH}/logs/minhash"
     LOCAL_LOGS_FOLDER = "logs/minhash"
 
-    TOTAL_TASKS = 10
+    TOTAL_TASKS = 100
 
     # this is the original data that we want to deduplicate
     INPUT_READER = ParquetReader(
@@ -63,7 +91,7 @@ if __name__ == "__main__":
         ],
         sbatch_args={"account": "qgz@cpu"},
         tasks=TOTAL_TASKS,
-        time="2:00:00",
+        time="5:00:00",
         qos="qos_cpu-t3",
         partition="cpu_p1",
         condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
@@ -82,7 +110,7 @@ if __name__ == "__main__":
             ),
         ],
         sbatch_args={"account": "qgz@cpu"},
-        tasks=1,  # the code supports parallelizing each bucket. here we run 1
+        tasks=minhash_config.num_buckets * 10,  # the code supports parallelizing each bucket. here we run 10
         randomize_start_duration=180,
         logging_dir=f"{LOGS_FOLDER}/buckets",
         slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/buckets/slurm_logs",
@@ -110,7 +138,7 @@ if __name__ == "__main__":
         qos="qos_cpu-t3",
         partition="cpu_p1",
         condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
-        time="5:00:00",  # and can also be quite slow. Usually not this slow though
+        time="20:00:00",  # and can also be quite slow. Usually not this slow though
         cpus_per_task=8,  # if you dedup a full dump, you do need a lot of memory for this one
         depends=stage2,
     )
@@ -122,7 +150,7 @@ if __name__ == "__main__":
         pipeline=[
             INPUT_READER,
             MinhashDedupFilter(input_folder=f"{MINHASH_BASE_PATH}/{LANGUAGE}/{DUMP_TO_PROCESS}/remove_ids"),
-            PIIFormatter(),
+            PresidioPIIFormatter(),
             ParquetWriter(f"{MINHASH_BASE_PATH}/{LANGUAGE}/{DUMP_TO_PROCESS}/deduped_output"),
         ],
         sbatch_args={"account": "qgz@cpu"},
@@ -132,7 +160,7 @@ if __name__ == "__main__":
         qos="qos_cpu-t3",
         partition="cpu_p1",
         condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
-        time="2:00:00",
+        time="5:00:00",
         depends=stage3,
     )
 
