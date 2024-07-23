@@ -19,10 +19,19 @@ class PresidioPIIFormatter(BaseFormatter):
         self,
     ):
         super().__init__()
+        self.analyzer = None
+        self.anonymizer = None
+        self._downloaded = False
+
+    def download_models(self):
+        if self._downloaded:
+            return
         self.analyzer = AnalyzerEngine()
         self.anonymizer = AnonymizerEngine()
+        self._downloaded = True
 
     def format(self, text: str) -> str:
+        self.download_models()
         analyzer_results = self.analyzer.analyze(
             text=text,
             entities=["PHONE_NUMBER", "EMAIL_ADDRESS", "IP_ADDRESS", "CREDIT_CARD", "MEDICAL_LICENSE"],
