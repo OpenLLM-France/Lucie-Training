@@ -29,10 +29,23 @@ class CanFetchFilter(BaseFilter):
         return self._valid_domains
 
     def filter(self, doc: Document) -> bool | tuple[bool, str]:  # noqa # C901
-        if doc.metadata["url"] in self.valid_domains:
+        import re
+        import urllib.parse
+
+        def canonical_url(url):
+            url_base = urllib.parse.urlparse(url).netloc.lower()
+            if not url_base and url.strip():
+                # extra //
+                url = re.sub(r"://+", "://", url)
+                url_base = urllib.parse.urlparse(url).netloc.lower()
+            return url_base
+
+        url = doc.metadata["url"]
+        domain = canonical_url(url)
+        if domain in self.valid_domains:
             return True
         else:
-            return False, "👮: Cannot fetch this domain"
+            return False, "Cannot fetch this domain"
 
 
 def get_args():
