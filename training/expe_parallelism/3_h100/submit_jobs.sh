@@ -15,4 +15,5 @@ submit_job() {
 }
 
 # Best config
-submit_job 32 2 4 1024 4 0
+submit_job 64 2 4 1024 4 0 # 256 GPUs!
+submit_job 256 2 4 1024 4 0 # 1024 GPUs!

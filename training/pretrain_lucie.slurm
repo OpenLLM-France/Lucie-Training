@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --nodes=32
+#SBATCH --nodes=256
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
-#SBATCH --cpus-per-task=64           # number of cores per tasks
+#SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH --gres=gpu:8                 # number of gpus per nodes
-#SBATCH --constraint=a100
+#SBATCH -C h100                      # pour cibler les noeuds H100
+#SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
-#SBATCH --account=qgz@a100
+#SBATCH --account=fwx@h100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --job-name=lucie-test
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -20,6 +20,7 @@ echo "START TIME: $(date)"
 
 # Load env and variables
 source ~/Lucie-Training/training/set_env.sh
+cd $MEGATRON_DEEPSPEED_REPO
 
 VARIANT=pretraining
 CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
@@ -27,11 +28,10 @@ TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
 LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
 mkdir -p $LOGS_PATH
 
-cd $MEGATRON_DEEPSPEED_REPO
-
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
 TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
+DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -41,9 +41,6 @@ fi
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
-
-GPUS_PER_NODE=8
-NNODES=$SLURM_NNODES
 
 # ----- model
 HIDDEN_SIZE=4096 
@@ -73,7 +70,6 @@ RAMPUP_SAMPLES=10_000_000
 SAVE_INTERVAL=1000
 
 config_json="./ds_config.$SLURM_JOBID.json"
-DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
 cat <<EOT > $config_json
 {
@@ -152,8 +148,8 @@ export CUDA_LAUNCH_BLOCKING=1
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
 
 DISTRIBUTED_ARGS=" \
-       --nproc_per_node $GPUS_PER_NODE \
-       --nnodes $NNODES \
+       --nproc_per_node $SBATCH_GPUS_PER_NODE \
+       --nnodes $SLURM_NNODES \
        --node_rank \$SLURM_PROCID \
        --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
        --rdzv_backend c10d \
