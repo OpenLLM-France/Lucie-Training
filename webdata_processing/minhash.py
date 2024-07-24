@@ -8,8 +8,6 @@ from datatrove.pipeline.readers import ParquetReader
 from datatrove.pipeline.writers import ParquetWriter
 
 # from datatrove.pipeline.formatters import PIIFormatter
-from presidio_analyzer import AnalyzerEngine
-from presidio_anonymizer import AnonymizerEngine
 
 
 class PresidioPIIFormatter(BaseFormatter):
@@ -24,6 +22,9 @@ class PresidioPIIFormatter(BaseFormatter):
         self._downloaded = False
 
     def download_models(self):
+        from presidio_analyzer import AnalyzerEngine
+        from presidio_anonymizer import AnonymizerEngine
+
         if self._downloaded:
             return
         self.analyzer = AnalyzerEngine()

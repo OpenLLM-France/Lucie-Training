@@ -2,7 +2,9 @@ import argparse
 
 from datatrove.data import Document
 from datatrove.executor import SlurmPipelineExecutor
+from datatrove.pipeline.filters import URLFilter
 from datatrove.pipeline.filters.base_filter import BaseFilter
+from datatrove.pipeline.formatters import PIIFormatter
 from datatrove.pipeline.readers import ParquetReader
 from datatrove.pipeline.writers import ParquetWriter
 from datatrove.pipeline.writers.disk_base import DiskWriter
@@ -13,18 +15,19 @@ class CanFetchFilter(BaseFilter):
 
     def __init__(
         self,
+        file_path="/gpfsscratch/rech/qgz/uzq54wg/valid_domains_redpajama_4M.json",
         exclusion_writer: DiskWriter = None,
     ):
         super().__init__(exclusion_writer)
         self._valid_domains = None
+        self.file_path = file_path
 
     @property
     def valid_domains(self):
         import json
 
         if self._valid_domains is None:
-            file_path = "/gpfsscratch/rech/qgz/uzq54wg/valid_domains_redpajama_16M.json"
-            with open(file_path) as fp:
+            with open(self.file_path) as fp:
                 self._valid_domains = set(json.load(fp))
         return self._valid_domains
 
@@ -72,21 +75,23 @@ if __name__ == "__main__":
     LANGUAGE = args.language
     MAIN_OUTPUT_PATH = args.main_output_path
     FILTERING_OUTPUT_PATH = f"{MAIN_OUTPUT_PATH}/base_processing"
-    URL_FILTERING_OUTPUT_PATH = f"{MAIN_OUTPUT_PATH}/url_filtering_16M"
+    URL_FILTERING_OUTPUT_PATH = f"{MAIN_OUTPUT_PATH}/url_filtering_4M"
 
     main_processing_executor = SlurmPipelineExecutor(
         job_name=f"{DUMP_TO_PROCESS}--{LANGUAGE}",
         pipeline=[
             ParquetReader(f"{FILTERING_OUTPUT_PATH}/output/{LANGUAGE}/{DUMP_TO_PROCESS}"),
-            CanFetchFilter(),
+            URLFilter(),
+            CanFetchFilter(file_path="/gpfsscratch/rech/qgz/uzq54wg/valid_domains_redpajama_4M.json"),
+            PIIFormatter(email_replacement="<email>", ip_replacement="<ip>"),
             ParquetWriter(f"{URL_FILTERING_OUTPUT_PATH}/output/{LANGUAGE}/{DUMP_TO_PROCESS}"),
         ],
         sbatch_args={"account": "qgz@cpu"},
-        tasks=10,
-        cpus_per_task=2,
-        time="1:00:00",
-        logging_dir=f"{MAIN_OUTPUT_PATH}/logs/url_filtering_16M/{LANGUAGE}/{DUMP_TO_PROCESS}",
-        slurm_logs_folder=f"logs/url_filtering_16M/{LANGUAGE}/{DUMP_TO_PROCESS}",  # must be local
+        tasks=5,
+        cpus_per_task=4,
+        time="2:00:00",
+        logging_dir=f"{MAIN_OUTPUT_PATH}/logs/url_filtering_4M/{LANGUAGE}/{DUMP_TO_PROCESS}",
+        slurm_logs_folder=f"logs/url_filtering_4M/{LANGUAGE}/{DUMP_TO_PROCESS}",  # must be local
         randomize_start_duration=180,  # don't hit the bucket all at once with the list requests
         qos="qos_cpu-t3",
         partition="cpu_p1",

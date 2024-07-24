@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --hint=nomultithread        
 #SBATCH --account=qgz@cpu
-#SBATCH --time=1:00:00             
-#SBATCH --qos=qos_cpu-dev
+#SBATCH --time=10:00:00             
+#SBATCH --qos=qos_cpu-t3
 
 snapchots=(
     2014-15
@@ -108,8 +108,19 @@ snapchots=(
 # done
 
 ###############
-### URL FILTERING
-./domains.sh 2023-14 fr
+### URL FILTERING & PII
+for snapchot in "${snapchots[@]}"
+do
+    ./domains.sh $snapchot fr
+done
+
+snapchots_tail=("${snapchots[@]: -10}")
+for snapchot in "${snapchots_tail[@]}"
+do
+    ./domains.sh $snapchot es
+    ./domains.sh $snapchot de
+    ./domains.sh $snapchot it
+done
 
 ###############
 ### MINHASH
@@ -121,7 +132,6 @@ snapchots=(
 # snapchots_tail=("${snapchots[@]: -10}")
 # for snapchot in "${snapchots_tail[@]}"
 # do
-#     ./minhash.sh $snapchot fr
 #     ./minhash.sh $snapchot es
 #     ./minhash.sh $snapchot de
 #     ./minhash.sh $snapchot it
