@@ -2,7 +2,9 @@ import argparse
 
 from datatrove.data import Document, DocumentsPipeline
 from datatrove.executor import SlurmPipelineExecutor
+from datatrove.pipeline.filters import URLFilter
 from datatrove.pipeline.filters.base_filter import BaseFilter
+from datatrove.pipeline.formatters import PIIFormatter
 from datatrove.pipeline.readers import HuggingFaceDatasetReader
 from datatrove.pipeline.writers import ParquetWriter
 from datatrove.pipeline.writers.disk_base import DiskWriter
@@ -20,8 +22,8 @@ def extract_url(data: DocumentsPipeline, rank: int = 0, world_size: int = 1) -> 
         yield document
 
 
-class LucieQualityFilter(BaseFilter):
-    name = "🙋 Lucie Quality"
+class RedPajamaQualityFilter(BaseFilter):
+    name = "🔴🦙 RedPajama Quality"
 
     def __init__(
         self,
@@ -40,12 +42,12 @@ class LucieQualityFilter(BaseFilter):
         # rule 1: ppl between 10 and 1000
         perplexity = signals["ccnet_perplexity"][0][2]
         if perplexity < 10 or perplexity > 1000:
-            return False, "lucie:perplexity"
+            return False, "ccnet:perplexity"
 
         # rule 2: confidence in language > 0.65
         language_score = signals["ccnet_language_score"][0][2]
         if language_score < 0.65:
-            return False, "lucie:language_score"
+            return False, "ccnet:language_score"
 
         ### C4
         # rule: at least 3 sentences
@@ -96,10 +98,10 @@ class LucieQualityFilter(BaseFilter):
         if lines_end_with_ellipsis_ratio > 0.3:
             return False, "Gopher:lines_end_with_ellipsis_ratio"
 
-        # rule: 80% of words in a document contain at least one alphabetic character
+        # rule: 70% of words in a document contain at least one alphabetic character
         rps_doc_frac_no_alph_words = signals["rps_doc_frac_no_alph_words"][0][2]
-        if rps_doc_frac_no_alph_words > 0.2:
-            return False, "Gopher:rps_doc_frac_no_alph_words"
+        if rps_doc_frac_no_alph_words > 0.3:
+            return False, "Gopher_bis:rps_doc_frac_no_alph_words"
 
         # Gopher repetition removal
         rps_doc_frac_chars_top_2gram = signals["rps_doc_frac_chars_top_2gram"][0][2]
@@ -200,25 +202,45 @@ class RedPajamaDuplicatesFilter(BaseFilter):
         return True
 
 
-class WikipediaQualityFilter(BaseFilter):
-    name = "😇 Wikipedia Quality"
+class CanFetchFilter(BaseFilter):
+    name = "👮 Can Fetch URLs"
 
     def __init__(
         self,
+        file_path=None,
         exclusion_writer: DiskWriter = None,
     ):
         super().__init__(exclusion_writer)
+        self._valid_domains = None
+        self.file_path = file_path
 
-    def filter(self, doc: Document) -> bool | tuple[bool, str]:
+    @property
+    def valid_domains(self):
         import json
 
-        signals = json.loads(doc.metadata["quality_signals"])
+        if self._valid_domains is None:
+            with open(self.file_path) as fp:
+                self._valid_domains = set(json.load(fp))
+        return self._valid_domains
 
-        # Similarity with wikipedia
-        wikipedia_score = signals["rps_doc_ml_wikipedia_score"][0][2]
-        if wikipedia_score < 0.2:
-            return False, "wikipedia_score"
-        return True
+    def filter(self, doc: Document) -> bool | tuple[bool, str]:  # noqa # C901
+        import re
+        import urllib.parse
+
+        def canonical_url(url):
+            url_base = urllib.parse.urlparse(url).netloc.lower()
+            if not url_base and url.strip():
+                # extra //
+                url = re.sub(r"://+", "://", url)
+                url_base = urllib.parse.urlparse(url).netloc.lower()
+            return url_base
+
+        url = doc.metadata["url"]
+        domain = canonical_url(url)
+        if domain in self.valid_domains:
+            return True
+        else:
+            return False, "Cannot fetch this domain"
 
 
 def get_args():
@@ -266,18 +288,16 @@ if __name__ == "__main__":
                 # limit=1000 # for debug
             ),
             extract_url,
+            URLFilter(),
             LucieURLFilter(
                 language=LANGUAGE,
             ),
-            LucieQualityFilter(
+            CanFetchFilter(file_path="/gpfsscratch/rech/qgz/uzq54wg/valid_domains_redpajama_4500k.json"),
+            RedPajamaQualityFilter(
                 language=LANGUAGE,
             ),
-            # WikipediaQualityFilter(
-            #     exclusion_writer=ParquetWriter(
-            #         f"{FILTERING_OUTPUT_PATH}/removed/wikipedia_filter/{LANGUAGE}/{DUMP_TO_PROCESS}",
-            #     )
-            # ),
             RedPajamaDuplicatesFilter(),
+            PIIFormatter(email_replacement="<email>", ip_replacement="<ip>"),
             ParquetWriter(f"{FILTERING_OUTPUT_PATH}/output/{LANGUAGE}/{DUMP_TO_PROCESS}"),
         ],
         sbatch_args={"account": "qgz@cpu"},
