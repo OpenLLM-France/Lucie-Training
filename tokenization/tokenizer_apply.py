@@ -174,6 +174,9 @@ class TokenizationTask:
 
         for key in self.args.json_keys:
             output_bin_files[key] = f"{output_prefix}_{key}_{level}.bin"
+            if output_bin_files[key] and os.path.exists(output_bin_files[key]):
+                # Do not reprocess data that is already here
+                return
             output_idx_files[key] = f"{output_prefix}_{key}_{level}.idx"
             builders[key] = indexed_dataset.make_builder(
                 output_bin_files[key], impl=self.args.dataset_impl, vocab_size=self.vocab_size
@@ -212,7 +215,7 @@ class TokenizationTask:
     def process_dataset(self, dataset_name, use_jsonl_file=False):  # noqa # C901 `...` is too complex
         global error_flag, num_processes
 
-        if error_flag.value:
+        if error_flag.value and self.args.stop_if_failed:
             return
 
         remove_jsonl = self.args.remove_jsonl
@@ -222,7 +225,7 @@ class TokenizationTask:
             global all_datas
             dataset = all_datas[dataset_name]
 
-            expected_file = os.path.join(self.args.output_folder, dataset_name + "_text_document.idx")
+            expected_file = os.path.join(self.args.output_folder, dataset_name + "_text_document.bin")
             if isinstance(dataset, str):
                 jsonl_file = dataset
                 assert os.path.exists(jsonl_file), f"Error: {jsonl_file} does not exist."
@@ -356,6 +359,7 @@ def get_args():
     group.add_argument("--output-folder", type=str, default="tokenized_data", help="Output folder")
     group.add_argument("--jsonl-folder", type=str, default="tmp_to_tokenize", help="Folder with jsonl files")
     group.add_argument("--dataset-impl", type=str, default="mmap", choices=["lazy", "cached", "mmap"])
+    group.add_argument("--stop-if-failed", default=False, action="store_true", help="Stop if an error occurs")
 
     group = parser.add_argument_group(title="runtime")
     group.add_argument(
@@ -439,12 +443,17 @@ def main():
                     # If an error occurred, terminate all processes in the pool
                     print("An error occurred in one of the processes. Terminating all processes.")
                     sys.stdout.flush()
+                    if not args.stop_if_failed:
+                        continue
                     pool.terminate()
                     break
     else:
         for _ in map(task.process_dataset, all_data_names):
             if error_flag.value:
-                break
+                if args.stop_if_failed:
+                    break
+                else:
+                    continue
 
 
 if __name__ == "__main__":
