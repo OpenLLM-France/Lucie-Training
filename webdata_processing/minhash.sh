@@ -7,4 +7,4 @@ conda activate /gpfsscratch/rech/qgz/uzq54wg/datatrove
 
 dataset=$HOME/Lucie-Training/assets/RedPajama-Data-V2 
 
-python minhash.py --dump-to-process $1 --language $2 --main-output-path $SCRATCH/processed_redpajama/v1
+python minhash.py --dump-to-process $1 --language $2 --main-output-path $SCRATCH/processed_redpajama/v2
