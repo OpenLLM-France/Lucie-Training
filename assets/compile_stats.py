@@ -5,7 +5,7 @@ import os
 
 # Ignore datasets
 def ignore_datasets(name):
-    return "redpajama" in name.lower() or "subscene" in name.lower()
+    return "subscene" in name.lower()  # or redpajama" in name.lower()
 
 
 text_types = {
@@ -107,6 +107,17 @@ datasets_categories = {
         "culturax.de",
         "culturax.es",
         "culturax.it",
+        "RedPajama.fr",
+        "RedPajama.en",
+        "RedPajama.de",
+        "RedPajama.es",
+        "RedPajama.it",
+        "FineWebEdu--cc-main-2021",
+        "FineWebEdu--cc-main-2022",
+        "FineWebEdu--cc-main-2023",
+        "FineWebEdu--cc-main-2024",
+        "FineWebEdu--cc-main",
+        "FineWebEdu",
     ],
 }
 
@@ -198,7 +209,17 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
     else:
         language = "fr"
     # Multi-lingual corpora
-    if name in ["Claire", "Wikipedia", "Europarl", "Gutenberg", "Wikiother", "Eurovoc", "EuroparlAligned", "CulturaX"]:
+    if name in [
+        "Claire",
+        "Wikipedia",
+        "Europarl",
+        "Gutenberg",
+        "Wikiother",
+        "Eurovoc",
+        "EuroparlAligned",
+        "CulturaX",
+        "RedPajama",
+    ]:
         language = None
     if name == "CroissantAligned":
         language = "fr-en"
@@ -380,6 +401,7 @@ if __name__ == "__main__":
             data = json.load(open(data_fullname, encoding="utf8"))
 
             language, name, subset = to_language_name_subset(fn)
+
             ground_total_tokens += data["total_tokens"]
             keys = [(language, name, subset)]
             if subset not in ["---", "", None]:
@@ -443,6 +465,7 @@ if __name__ == "__main__":
                     name.lower() in ["americanstories", "parlement", "opendata"] or name.lower().startswith("claire")
                 ) and subset:
                     continue
+
             if subset:
                 row["subset"] = subset
                 has_details[name] = True
