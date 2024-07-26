@@ -13,6 +13,7 @@ import numpy as np
 import regex as re
 import tqdm
 from text import (
+    canonical_url,
     check_language,
     clean_discours,
     clean_eurovoc,
@@ -1282,6 +1283,19 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
         builder_configs = datasets.load_dataset_builder("HuggingFaceFW/fineweb-edu").builder_configs
         target_years = [2024, 2023, 2022, 2021]
         sources = [k for k in builder_configs.keys() for year in target_years if k.startswith(f"CC-MAIN-{year}")]
+        # Set of valid domains
+        valid_domains_path = os.path.join(_asset_folder, "urls_robots/valid_domains_fineweb_edu.json")
+        with open(valid_domains_path) as fp:
+            valid_domains = set(json.load(fp))
+
+        def filter_fineweb_edu(data):
+            url = data["url"]
+            domain = canonical_url(url)
+            if is_url_duplicated(url, "en"):
+                return False
+            if domain not in valid_domains:
+                return False
+            return True
 
         DataIteratorConcat.__init__(
             self,
@@ -1294,7 +1308,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                         split=split,
                     ),
                     name=f"FineWebEdu:{source.lower()}",
-                    filter_fn=lambda data: not is_url_duplicated(data["url"], "en"),
+                    filter_fn=filter_fineweb_edu,
                     **kwargs,
                 )
                 for source in sources
@@ -1400,14 +1414,15 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
-        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v0/base_processing/output/{language}"
+        # data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v0/base_processing/output/{language}"
+        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v3/minhash/{language}"
         DataIteratorConcat.__init__(
             self,
             [
                 DataIterator(
                     datasets.load_dataset(
                         "parquet",
-                        data_files={"train": os.path.join(data_path, snapshot, "*.parquet")},
+                        data_files={"train": os.path.join(data_path, snapshot, "deduped_output/*.parquet")},
                         streaming=streaming,
                         split="train",
                     ),
