@@ -2131,15 +2131,16 @@ def test_iterator(  # noqa # C901 `...` is too complex
         stat_filename = os.path.join(folder, f"stats_{name_slug}.json")
         if os.path.isfile(stat_filename):
             stats = json.load(open(stat_filename, encoding="utf8"))
-            if ignore_if_exists and not only_dump_examples:
-                print(f"Skipping {name_slug} (already computed)")
-                return stats
-            num_billion_words = stats["num words"] / 1_000_000_000
-            to_insert = f"{num_billion_words:06.3f}B"
-            if "--" in prefix_example_files:
-                prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
-            else:
-                prefix_example_files += "--" + to_insert
+            if len(stats):
+                if ignore_if_exists and not only_dump_examples:
+                    print(f"Skipping {name_slug} (already computed)")
+                    return stats
+                # num_billion_words = stats["num words"] / 1_000_000_000
+                # to_insert = f"{num_billion_words:06.3f}B"
+                # if "--" in prefix_example_files:
+                #     prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
+                # else:
+                #     prefix_example_files += "--" + to_insert
         elif ignore_if_exists:
             # Create an empty file to avoid recomputing
             json.dump({}, open(stat_filename, "w", encoding="utf8"))
