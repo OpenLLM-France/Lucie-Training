@@ -1414,15 +1414,14 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
-        # data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v0/base_processing/output/{language}"
-        data_path = f"/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama/v3/minhash/{language}"
+        data_path = f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/v3/pii_removal/{language}"
         DataIteratorConcat.__init__(
             self,
             [
                 DataIterator(
                     datasets.load_dataset(
                         "parquet",
-                        data_files={"train": os.path.join(data_path, snapshot, "deduped_output/*.parquet")},
+                        data_files={"train": os.path.join(data_path, snapshot, "*.parquet")},
                         streaming=streaming,
                         split="train",
                     ),
