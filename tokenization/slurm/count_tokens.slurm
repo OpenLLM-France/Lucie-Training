@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=count_tokens
+#SBATCH --job-name=counttok
 #SBATCH --partition=cpu_p1
 #SBATCH --account=qgz@cpu
 #SBATCH --ntasks=1
