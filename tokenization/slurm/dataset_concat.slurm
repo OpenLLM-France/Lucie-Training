@@ -8,10 +8,12 @@
 #SBATCH --hint=nomultithread
 #SBATCH --time=20:00:00
 
+DATE=`date +"%Y-%m-%d--%H-%M-%S"`
+
 export RUN="python3 /gpfs7kw/linkhome/rech/gendjf01/uov59an/src/Bloom-NG-Training/tokenization/dataset_concat.py \
         /gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k \
         /gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped \
         --verbose --only RedPajama"
 
-srun --output=tmp_slurm_output_concat-$SLURM_JOBID.out --error=tmp_slurm_output_concat-$SLURM_JOBID.out \
+srun --output=tmp_slurm_output_concat-$DATE.out --error=tmp_slurm_output_concat-$DATE.out \
      --jobid $SLURM_JOBID bash -c "$RUN" 2>&1
