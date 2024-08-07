@@ -27,7 +27,8 @@ from megatron.model.rotary_pos_embedding import RotaryEmbedding
 from megatron.training import setup_model_and_optimizer
 from megatron.core.enums import ModelType
 
-from megatron.data.data_samplers import build_pretraining_data_loader
+# from megatron.data.data_samplers import build_pretraining_data_loader
+from megatron.data.data_samplers import MegatronPretrainingSampler
 
 import deepspeed
 from deepspeed.accelerator.real_accelerator import get_accelerator
@@ -212,6 +213,21 @@ def get_test_split_(splits_string, size):
     for index, split in enumerate(splits):
         splits_index.append(splits_index[index] +
                             int(round(split * float(size))))
+    # Adjust the splits index if it includes zero samples
+    if splits[1] > 0 and splits_index[2] - splits_index[1] < 1:
+        if splits_index[1] > 1:
+            splits_index[1] -= 1
+            splits_index[2] = splits_index[1] + 1
+
+    if splits[2] > 0 and splits_index[3] - splits_index[2] < 1:
+        if splits_index[2] - splits_index[1] > 1:
+            splits_index[2] -= 1
+            splits_index[3] = splits_index[2] + 1
+        else:
+            if splits_index[1] > 1:
+                splits_index[1] -= 1
+                splits_index[2] -= 1
+                splits_index[3] = splits_index[2] + 1
     diff = splits_index[-1] - size
     for index in range(1, len(splits_index)):
         splits_index[index] -= diff
@@ -329,28 +345,50 @@ def get_test_dataset_args(parser):
     group.add_argument('--perplexity-results-path', type=str, default=None)
     return parser
 
-### Keep it as it may be useful later
-# def build_data_loader(dataset, micro_batch_size, num_workers, drop_last,
-#         task_collate_fn=None):
-#     """Data loader. Note that batch-size is the local (per GPU) batch-size."""
+## Keep it as it may be useful later
+def build_data_loader(dataset, micro_batch_size, num_workers, drop_last,
+        task_collate_fn=None):
+    """Data loader. Note that batch-size is the local (per GPU) batch-size."""
 
-#     # Sampler.
-#     world_size = mpu.get_data_parallel_world_size()
-#     rank = mpu.get_data_parallel_rank()
-#     sampler = torch.utils.data.distributed.DistributedSampler(
-#         dataset, num_replicas=world_size, rank=rank)
+    # Sampler.
+    world_size = mpu.get_data_parallel_world_size()
+    rank = mpu.get_data_parallel_rank()
+    sampler = torch.utils.data.distributed.DistributedSampler(
+        dataset, num_replicas=world_size, rank=rank)
 
-#     # Data loader. Note that batch size is the per GPU batch size.
-#     data_loader = torch.utils.data.DataLoader(dataset,
-#                                               batch_size=micro_batch_size,
-#                                               sampler=sampler,
-#                                               shuffle=False,
-#                                               num_workers=num_workers,
-#                                               drop_last=drop_last,
-#                                               pin_memory=True,
-#                                               collate_fn=task_collate_fn)
+    # Data loader. Note that batch size is the per GPU batch size.
+    data_loader = torch.utils.data.DataLoader(dataset,
+                                              batch_size=micro_batch_size,
+                                              sampler=sampler,
+                                              shuffle=False,
+                                              num_workers=num_workers,
+                                              drop_last=drop_last,
+                                              pin_memory=True,
+                                              collate_fn=task_collate_fn)
 
-#     return data_loader
+    return data_loader
+
+# def build_pretraining_data_loader(dataset, consumed_samples):
+#     """Buld dataloader given an input dataset."""
+
+#     if dataset is None:
+#         return None
+#     args = get_args()
+
+#     batch_sampler = MegatronPretrainingSampler(
+#         total_samples=len(dataset),
+#         consumed_samples=consumed_samples,
+#         micro_batch_size=args.micro_batch_size,
+#         data_parallel_rank=mpu.get_data_parallel_rank(),
+#         data_parallel_size=mpu.get_data_parallel_world_size(),
+#         drop_last=False
+#         )
+
+#     # Torch dataloader.
+#     return torch.utils.data.DataLoader(dataset,
+#                                        batch_sampler=batch_sampler,
+#                                        num_workers=args.num_workers,
+#                                        pin_memory=True)
 
 # Rewrite the evaluate of megatron.training.py with only the necessary arguments
 def evaluate(data_iterator,
@@ -398,7 +436,6 @@ def evaluate(data_iterator,
                             total_loss_dict[key] = total_loss_dict.get(
                                 key, get_accelerator().FloatTensor([0.0])) + loss_dict[key]
 
-        print_rank_0(f" > Nb of iterations: {iteration}")
     # Move model back to the train mode.
     for model_module in model:
         model_module.train()
@@ -442,16 +479,16 @@ def evaluate_and_print_results(data_loader, model, num_original_tokens, num_toke
 
     # Save in dictionary for one domain
     results = {
-        "loss": val_loss,
-        "ppl": ppl,
-        "adjusted_ppl": adjusted_ppl,
-        "token_ratio": token_ratio
+        "loss": val_loss.detach().cpu().numpy(),
+        "ppl": ppl.detach().cpu().numpy(),
+        "adjusted_ppl": adjusted_ppl.detach().cpu().numpy(),
+        "token_ratio": token_ratio.detach().cpu().numpy()
     }
 
     length = len(string) + 1
-    print('-' * length)
-    print(string)
-    print('-' * length)
+    print_rank_0('-' * length)
+    print_rank_0(string)
+    print_rank_0('-' * length)
 
     return results
 
@@ -479,9 +516,11 @@ def main():
 
     # Use the datasets to evaluate the model
     domain_ppls = {}
-    test_datasets = [test_datasets]  # TODO remove!
-    for ds in test_datasets:
-        dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
+    nb_ds = len(test_datasets)
+    for idx, ds in enumerate(test_datasets):
+        print_rank_0(f"Dataset #{idx}/{nb_ds}")
+        # dataloader = build_pretraining_data_loader(ds, 0) # 0 is the number of consumed samples
+        dataloader = build_data_loader(ds, args.micro_batch_size, args.num_workers, drop_last=False)
         num_tokenized_tokens = 0
         num_original_tokens = 0
         eval_iters = 0

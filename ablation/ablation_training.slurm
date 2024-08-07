@@ -1,17 +1,15 @@
 #!/bin/bash
-#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=64           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
-#SBATCH --time 06:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=./out/%x-%j.out # STDOUT
+#SBATCH --output=./out/%x-%j.out     # STDOUT
+#SBATCH --error=./out/%x-%j.err
 #SBATCH --account=qgz@a100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=lucas.hervier@irt-saintexupery.com
-#SBATCH --job-name=lucie80m-ablation-study-datamix-config0-30ksteps
 
 set -x -e
 
@@ -20,8 +18,24 @@ echo "START TIME: $(date)"
 # Load env and variables
 source ~/Lucie-Training/training/set_env.sh
 
-# VARIANT=test
-VARIANT=ablation_lucie80m_datamix_config0
+# Variables that are set with command-line arguments
+MODEL_CONFIG="" # can be lucie80m, lucie410m
+DATA_CONFIG=""  # see the files name (without the .yml ext) in ablation/data_config for options
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --model_config) MODEL_CONFIG="$2"; shift ;;
+    --data_config) DATA_CONFIG="$2"; shift ;;
+    *) echo "Unknown parameter passed: $1"; exit 1 ;;
+  esac
+  shift
+done
+
+echo "Model Config: $MODEL_CONFIG"
+echo "Data Config: $DATA_CONFIG"
+
+# Path variables
+VARIANT=ablation_${MODEL_CONFIG}_datamix_${DATA_CONFIG}
 CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
 TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
 LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
@@ -33,7 +47,7 @@ cd $MEGATRON_DEEPSPEED_REPO
 # ----- data
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
 TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-DOMAIN_PROPORTIONS_PATH=Lucie-Training/training/domain_proportions.yml
+DOMAIN_PROPORTIONS_PATH=Lucie-Training/ablation/data_config/${DATA_CONFIG}.yml
 DATASET_ARGS=" \
     --domain_proportions $HOME/$DOMAIN_PROPORTIONS_PATH \
     --save_weights_path $OUTPUT_PATH/dataset_weights/$VARIANT \
@@ -49,18 +63,9 @@ GPUS_PER_NODE=8
 NNODES=$SLURM_NNODES
 
 # ----- model
-HIDDEN_SIZE=512 
-FFN_HIDDEN_SIZE=1536 
-NUM_LAYERS=6 
-NUM_HEADS=8
-NUM_KV_HEADS=8 
-SEQ_LENGTH=4096
+source $HOME/Lucie-Training/ablation/models_config/${MODEL_CONFIG}.sh
 
-GLOBAL_BATCH_SIZE=256
-MICRO_BATCH_SIZE=16
-ZERO_STAGE=0
-
-# ------ Optimizer
+# ----- optimizer
 TRAIN_STEPS=30_000 
 LR=3e-4
 MIN_LR=3e-5
@@ -70,7 +75,9 @@ GRAD_CLIP=1
 
 SAVE_INTERVAL=5_000
 
-config_json="./ds_config.$SLURM_JOBID.json"
+DS_CONFIG_PATH=$OUTPUT_PATH/ds_configs/$VARIANT/$SLURM_JOB_NAME
+mkdir -p $DS_CONFIG_PATH
+config_json="$DS_CONFIG_PATH/$SLURM_JOBID.json"
 
 cat <<EOT > $config_json
 {
@@ -160,8 +167,8 @@ EXIT_OPTS=" \
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path $DATA_CACHE_PATH \
-       --tensor-model-parallel-size 1 \
-       --pipeline-model-parallel-size 1 \
+       --tensor-model-parallel-size $TP \
+       --pipeline-model-parallel-size $PP \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
        --train-iters $TRAIN_STEPS \
@@ -186,5 +193,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        "
 
 clear; srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+
+mv ./out/$SLURM_JOB_NAME-$SLURM_JOBID.out $LOGS_PATH/$SLURM_JOB_NAME-$SLURM_JOBID.out
+mv ./out/$SLURM_JOB_NAME-$SLURM_JOBID.err $LOGS_PATH/$SLURM_JOB_NAME-$SLURM_JOBID.err
 
 echo "END TIME: $(date)"
