@@ -9,5 +9,5 @@ module load gcc/12.2.0
 conda activate lucie
 
 # Variables
-export OUTPUT_PATH=/gpfswork/rech/qgz/$USER
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uye67mo/Lucie-Training/Megatron-DeepSpeed
+export OUTPUT_PATH=/gpfsscratch/rech/qgz/ull45hr
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/ull45hr/Lucie-Training/Megatron-DeepSpeed
