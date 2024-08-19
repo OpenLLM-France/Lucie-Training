@@ -47,7 +47,7 @@ conda activate lucie
 
 Install torch:
 ```bash
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install pytorch=2.3.0 torchvision=0.18.0 torchaudio=2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
 ```
 > We recommend to use the latest stable torch from https://pytorch.org/get-started/locally/
 
