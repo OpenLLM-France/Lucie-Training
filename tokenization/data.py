@@ -1280,7 +1280,15 @@ class DataIteratorCulturaX(DataIteratorConcat):
 
 class DataIteratorFineWebEdu(DataIteratorConcat):
     def __init__(self, split="train", streaming=True, **kwargs):
-        builder_configs = datasets.load_dataset_builder("HuggingFaceFW/fineweb-edu").builder_configs
+        repo = "HuggingFaceFW/fineweb-edu"
+        for folder in [
+            "/gpfsscratch/rech/qgz/commun/raw_data/fineweb-edu",
+        ]:
+            if os.path.isdir(folder):
+                repo = folder
+                print(f"Using local FineWebEdu data in {repo}")
+                break
+        builder_configs = datasets.load_dataset_builder(repo).builder_configs
         target_years = [2024, 2023, 2022, 2021]
         sources = [k for k in builder_configs.keys() for year in target_years if k.startswith(f"CC-MAIN-{year}")]
         # Set of valid domains
@@ -1302,7 +1310,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
             [
                 DataIterator(
                     datasets.load_dataset(
-                        "HuggingFaceFW/fineweb-edu",
+                        repo,
                         data_files=f"data/{source}/*.parquet",
                         streaming=streaming,
                         split=split,
@@ -1414,7 +1422,15 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
-        data_path = f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/v3/pii_removal/{language}"
+        data_path = None
+        for path in [
+            f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/v3/pii_removal/{language}",
+            f"/data-storage/storage0/corpus_openllm/redpajama/{language}",
+        ]:
+            if os.path.isdir(path):
+                data_path = path
+                break
+        assert data_path, f"Data path not found for RedPajama in {path}"
         DataIteratorConcat.__init__(
             self,
             [
