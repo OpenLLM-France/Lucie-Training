@@ -1,6 +1,6 @@
 {
-  "total_tokens": 121563820558,
-  "total_sequences": 104280950,
+  "total_tokens": 88443690712,
+  "total_sequences": 76055314,
   "min_tokens": 37,
-  "max_tokens": 340339
+  "max_tokens": 203621
 }

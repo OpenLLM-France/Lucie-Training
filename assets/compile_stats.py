@@ -156,6 +156,7 @@ def get_dataset_category(name, subset):
 
 
 def to_name_subset(name):
+    orig_name = name
     name = name.replace("stats_", "").replace(".json", "").replace("_text_document", "")
     subset = ""
     if "--" in name:
@@ -168,11 +169,15 @@ def to_name_subset(name):
     if subset:
         subset = subset.strip(":_")
     if "fineweb" in name.lower():
-        assert subset.startswith("cc-main-")
+        assert subset.startswith("cc-main-"), f"Invalid FineWeb subset {subset=} {orig_name=}"
         subset = subset.replace("cc-main-", "")
-        f = subset.split("-")
+        f = subset.split(":")[-1].split("-")
         f[0] = "cc-main-" + f[0]
         name += "--" + f[0]
+        if len(f) == 1:
+            subset = ""
+    if "redpajama" in name.lower():
+        f = subset.split("-")
         if len(f) == 1:
             subset = ""
     return name, subset

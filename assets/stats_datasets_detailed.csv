@@ -1,7 +1,7 @@
 language ,name                 ,subset                      ,ocr   ,category     ,  M docs, B words, B chars, #words/doc,#chars/word, B tokens,#tokens/words,#chars/tokens
----      ,---                  ,---                         ,      ,             ,3065.002,1644.905,10627.764,        537,        6.5, 2814.571,        1.71,        3.78
+---      ,---                  ,---                         ,      ,             ,2956.290,1556.978,10086.822,        527,        6.5, 3197.135,            ,            
 fr       ,---                  ,---                         ,      ,             , 376.086, 304.742,1875.253,        810,        6.2,  499.924,        1.64,        3.75
-en       ,---                  ,---                         ,      ,             ,1062.235, 701.350,4286.642,        660,        6.1, 1034.601,        1.48,        4.14
+en       ,---                  ,---                         ,      ,             , 953.523, 613.423,3745.699,        643,        6.1,  910.254,        1.48,        4.12
 es       ,---                  ,---                         ,      ,             , 450.738, 252.470,1537.724,        560,        6.1,  416.487,        1.65,        3.69
 de       ,---                  ,---                         ,      ,             , 421.824, 211.685,1501.573,        502,        7.1,  415.825,        1.96,        3.61
 it       ,---                  ,---                         ,      ,             , 212.665, 106.044, 686.277,        499,        6.5,  192.851,        1.82,        3.56
@@ -13,12 +13,72 @@ code     ,---                  ,---                         ,      ,            
 fr       ,GallicaPress         ,html                        ,true  ,newspaper    ,   1.748,  41.144, 250.982,      23544,        6.1,   74.027,        1.80,        3.39
 fr       ,GallicaPress         ,txt                         ,true  ,newspaper    ,   1.457,  26.352, 157.900,      18083,        6.0,   47.579,        1.81,        3.32
 fr       ,GallicaMonographies  ,                            ,true  ,book         ,   0.278,  15.106,  90.456,      54392,        6.0,   25.169,        1.67,        3.59
+fr       ,RedPajama.fr         ,2023-06                     ,false ,web          ,  19.280,  14.009,  87.341,        727,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2023-14                     ,false ,web          ,  18.358,  13.230,  82.585,        721,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-49                     ,false ,web          ,  18.130,  13.137,  81.940,        725,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-40                     ,false ,web          ,  16.581,  12.147,  75.707,        733,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-21                     ,false ,web          ,  15.911,  11.608,  72.373,        730,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-43                     ,false ,web          ,  15.684,  11.390,  71.002,        726,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-27                     ,false ,web          ,  14.630,  10.749,  67.018,        735,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-31                     ,false ,web          ,  14.630,  10.584,  65.924,        723,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-04                     ,false ,web          ,  13.699,  10.523,  65.673,        768,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-40                     ,false ,web          ,  13.841,  10.264,  64.005,        742,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-17                     ,false ,web          ,  13.881,  10.000,  62.312,        720,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-39                     ,false ,web          ,  13.320,   9.820,  61.259,        737,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-29                     ,false ,web          ,  12.379,   9.548,  59.550,        771,        6.2,         ,            ,            
 fr       ,HAL                  ,                            ,true  ,technical    ,   0.349,   9.356,  58.308,      26811,        6.2,   16.224,        1.73,        3.59
+fr       ,RedPajama.fr         ,2020-05                     ,false ,web          ,  11.437,   9.038,  56.411,        790,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-05                     ,false ,web          ,  12.188,   9.026,  56.311,        741,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-16                     ,false ,web          ,  11.076,   8.648,  54.011,        781,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-10                     ,false ,web          ,  10.635,   8.205,  51.203,        772,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2022-33                     ,false ,web          ,  11.237,   8.199,  51.172,        730,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-43                     ,false ,web          ,  10.796,   8.149,  50.339,        755,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-45                     ,false ,web          ,  10.438,   8.036,  50.196,        770,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-35                     ,false ,web          ,  10.760,   7.944,  49.440,        738,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-50                     ,false ,web          ,  10.249,   7.888,  49.256,        770,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-51                     ,false ,web          ,  10.929,   7.884,  48.973,        721,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-43                     ,false ,web          ,  10.337,   7.706,  47.992,        745,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-21                     ,false ,web          ,  10.625,   7.670,  47.820,        722,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-30                     ,false ,web          ,  10.146,   7.645,  47.296,        754,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-09                     ,false ,web          ,  10.836,   7.584,  47.119,        700,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-34                     ,false ,web          ,  10.159,   7.562,  46.634,        744,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-04                     ,false ,web          ,  10.583,   7.553,  46.829,        714,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-24                     ,false ,web          ,   9.968,   7.552,  47.109,        758,        6.2,         ,            ,            
 fr       ,Theses               ,                            ,true  ,technical    ,   0.102,   7.547,  47.758,      73690,        6.3,   14.060,        1.86,        3.40
+fr       ,RedPajama.fr         ,2020-34                     ,false ,web          ,   9.554,   7.344,  45.868,        769,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-30                     ,false ,web          ,   9.835,   7.287,  45.333,        741,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-49                     ,false ,web          ,   9.822,   7.209,  44.998,        734,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-22                     ,false ,web          ,   9.696,   7.132,  44.364,        736,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-26                     ,false ,web          ,   9.625,   7.131,  44.349,        741,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-39                     ,false ,web          ,   9.435,   7.097,  44.205,        752,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-47                     ,false ,web          ,   8.930,   7.049,  43.998,        789,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2021-25                     ,false ,web          ,   9.722,   7.038,  43.901,        724,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-26                     ,false ,web          ,   8.820,   7.026,  43.833,        797,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-43                     ,false ,web          ,   9.664,   6.943,  43.055,        719,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-39                     ,false ,web          ,   9.353,   6.915,  42.930,        739,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-18                     ,false ,web          ,   9.476,   6.914,  43.014,        730,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-47                     ,false ,web          ,   9.242,   6.879,  42.625,        744,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-09                     ,false ,web          ,   9.130,   6.837,  42.375,        749,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2020-10                     ,false ,web          ,   8.980,   6.823,  42.565,        760,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-05                     ,false ,web          ,   9.277,   6.822,  42.283,        735,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-51                     ,false ,web          ,   8.619,   6.786,  42.340,        787,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2019-13                     ,false ,web          ,   9.418,   6.752,  42.007,        717,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-39                     ,false ,web          ,   8.984,   6.749,  41.741,        751,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-26                     ,false ,web          ,   8.943,   6.715,  41.608,        751,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-13                     ,false ,web          ,   9.051,   6.655,  41.197,        735,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-51                     ,false ,web          ,   8.932,   6.639,  41.102,        743,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-47                     ,false ,web          ,   8.782,   6.608,  41.024,        752,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-17                     ,false ,web          ,   8.642,   6.524,  40.497,        755,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-30                     ,false ,web          ,   8.083,   6.302,  39.370,        780,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-22                     ,false ,web          ,   7.845,   5.983,  37.098,        763,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2018-34                     ,false ,web          ,   7.940,   5.814,  36.094,        732,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2017-22                     ,false ,web          ,   6.579,   5.180,  32.436,        787,        6.3,         ,            ,            
 fr       ,Persee               ,                            ,true  ,technical    ,   1.094,   3.250,  20.314,       2970,        6.2,    5.754,        1.77,        3.53
 fr       ,OpenEdition          ,                            ,false ,technical    ,   0.939,   2.225,  14.459,       2369,        6.5,    3.604,        1.62,        4.01
 fr       ,Wikipedia.fr         ,                            ,false ,wiki         ,   2.648,   1.726,   9.879,        652,        5.7,    2.940,        1.70,        3.36
+fr       ,RedPajama.fr         ,2017-17                     ,false ,web          ,   0.700,   0.557,   3.493,        796,        6.3,         ,            ,            
 fr       ,Wikiother.fr         ,wikisource                  ,false ,wiki         ,   0.186,   0.523,   3.080,       2818,        5.9,    0.795,        1.52,        3.87
+fr       ,RedPajama.fr         ,2016-36                     ,false ,web          ,   0.387,   0.463,   2.943,       1197,        6.4,         ,            ,            
 fr       ,CulturaX.fr          ,215                         ,false ,web          ,   0.707,   0.384,   2.377,        543,        6.2,         ,            ,            
 fr       ,CulturaX.fr          ,437                         ,false ,web          ,   0.707,   0.384,   2.374,        543,        6.2,         ,            ,            
 fr       ,CulturaX.fr          ,77                          ,false ,web          ,   0.707,   0.384,   2.374,        543,        6.2,         ,            ,            
@@ -531,21 +591,45 @@ fr       ,CulturaX.fr          ,71                          ,false ,web         
 fr       ,CulturaX.fr          ,156                         ,false ,web          ,   0.707,   0.380,   2.349,        537,        6.2,         ,            ,            
 fr       ,CulturaX.fr          ,85                          ,false ,web          ,   0.707,   0.380,   2.350,        537,        6.2,         ,            ,            
 fr       ,CulturaX.fr          ,266                         ,false ,web          ,   0.707,   0.380,   2.349,        537,        6.2,         ,            ,            
+fr       ,RedPajama.fr         ,2016-44                     ,false ,web          ,   0.443,   0.318,   2.005,        717,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2017-04                     ,false ,web          ,   0.443,   0.315,   1.982,        711,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2017-09                     ,false ,web          ,   0.406,   0.307,   1.935,        757,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2014-35                     ,false ,web          ,   0.291,   0.292,   1.846,       1004,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2016-22                     ,false ,web          ,   0.242,   0.283,   1.795,       1170,        6.4,         ,            ,            
 fr       ,OpenData             ,inca-1                      ,false ,legi_written ,   0.247,   0.257,   1.547,       1043,        6.0,         ,            ,            
+fr       ,RedPajama.fr         ,2014-42                     ,false ,web          ,   0.251,   0.250,   1.580,        996,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2014-15                     ,false ,web          ,   0.233,   0.228,   1.443,        978,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2016-07                     ,false ,web          ,   0.207,   0.228,   1.447,       1101,        6.4,         ,            ,            
 fr       ,Gutenberg.fr         ,                            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
+fr       ,RedPajama.fr         ,2014-23                     ,false ,web          ,   0.219,   0.216,   1.367,        989,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2015-35                     ,false ,web          ,   0.201,   0.208,   1.320,       1031,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2016-50                     ,false ,web          ,   0.293,   0.199,   1.254,        682,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2015-40                     ,false ,web          ,   0.188,   0.192,   1.223,       1021,        6.4,         ,            ,            
 fr       ,OpenData             ,inca-2                      ,false ,legi_written ,   0.127,   0.192,   1.149,       1512,        6.0,         ,            ,            
+fr       ,RedPajama.fr         ,2016-18                     ,false ,web          ,   0.167,   0.192,   1.215,       1148,        6.3,         ,            ,            
+fr       ,RedPajama.fr         ,2016-30                     ,false ,web          ,   0.159,   0.182,   1.158,       1145,        6.4,         ,            ,            
 fr       ,OpenData             ,balo                        ,false ,legi_written ,   0.136,   0.165,   1.047,       1215,        6.4,    0.291,        1.76,        3.60
 fr       ,DiscoursPublics      ,                            ,false ,legi_spoken  ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
+fr       ,RedPajama.fr         ,2014-41                     ,false ,web          ,   0.149,   0.153,   0.972,       1027,        6.3,         ,            ,            
 fr       ,ValidatedYouTube.fr  ,                            ,false ,dialogue     ,   0.038,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
+fr       ,RedPajama.fr         ,2015-48                     ,false ,web          ,   0.133,   0.136,   0.863,       1021,        6.4,         ,            ,            
 fr       ,Claire.fr            ,AssembleeNationale          ,false ,dialogue     ,   0.004,   0.130,   0.822,      28841,        6.3,    0.187,        1.44,        4.41
+fr       ,RedPajama.fr         ,2014-49                     ,false ,web          ,   0.120,   0.124,   0.787,       1032,        6.3,         ,            ,            
 fr       ,OpenData             ,kali                        ,false ,legi_written ,   0.431,   0.114,   0.727,        265,        6.4,    0.175,        1.53,        4.16
 fr       ,OtherFr              ,questions_ecrites_parlement ,false ,legi_written ,   0.189,   0.108,   0.705,        572,        6.5,    0.156,        1.44,        4.52
 fr       ,OtherFr              ,interventions_parlement     ,false ,legi_spoken  ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
 fr       ,OtherFr              ,LEGI                        ,false ,legi_written ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
+fr       ,RedPajama.fr         ,2016-26                     ,false ,web          ,   0.073,   0.088,   0.558,       1207,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2015-14                     ,false ,web          ,   0.080,   0.087,   0.554,       1087,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2016-40                     ,false ,web          ,   0.078,   0.081,   0.515,       1033,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2015-32                     ,false ,web          ,   0.062,   0.064,   0.408,       1038,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2015-27                     ,false ,web          ,   0.056,   0.060,   0.382,       1065,        6.4,         ,            ,            
+fr       ,RedPajama.fr         ,2014-52                     ,false ,web          ,   0.059,   0.057,   0.362,        967,        6.4,         ,            ,            
 fr       ,Wikiother.fr         ,wiktionary                  ,false ,wiki         ,   0.650,   0.053,   0.347,         82,        6.5,    0.117,        2.20,        2.96
 fr       ,Europarl.fr          ,                            ,false ,legi_dialogue,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
 fr       ,Claire.fr            ,Senat                       ,false ,dialogue     ,   0.001,   0.051,   0.330,      69631,        6.4,    0.076,        1.48,        4.33
 fr       ,OtherFr              ,amendements_parlement       ,false ,legi_written ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
+fr       ,RedPajama.fr         ,2015-22                     ,false ,web          ,   0.028,   0.029,   0.182,       1006,        6.4,         ,            ,            
 fr       ,Claire.fr            ,Theatre                     ,false ,dialogue     ,   0.031,   0.017,   0.096,        538,        5.7,    0.029,        1.73,        3.31
 fr       ,OpenData             ,sarde                       ,false ,legi_written ,   0.224,   0.014,   0.085,         61,        6.2,    0.031,        2.28,        2.72
 fr       ,OpenData             ,dole                        ,false ,legi_written ,   0.004,   0.013,   0.083,       3230,        6.2,    0.022,        1.62,        3.84
@@ -566,28 +650,28 @@ fr       ,Claire.fr            ,Rhapsodie                   ,false ,dialogue    
 fr       ,Claire.fr            ,ParisStories                ,false ,dialogue     ,   0.000,   0.000,   0.000,        502,        5.4,    0.000,        1.54,        3.52
 fr       ,Claire.fr            ,UBS                         ,false ,dialogue     ,   0.000,   0.000,   0.000,        192,        6.3,    0.000,        2.06,        3.04
 en       ,PeS2o                ,s2orc-train                 ,mixed ,technical    ,   8.242,  36.092, 226.904,       4379,        6.3,         ,            ,            
-en       ,FineWebEdu--cc-main-2023,2023-40                     ,false ,web          ,  22.895,  18.840, 116.935,        823,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2023,2023-50                     ,false ,web          ,  22.136,  18.160, 112.852,        820,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2023,2023-23                     ,false ,web          ,  20.290,  16.942, 104.377,        835,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-49                     ,false ,web          ,  20.016,  16.006,  98.567,        800,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2023,2023-06                     ,false ,web          ,  20.067,  16.003,  98.429,        797,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-21                     ,false ,web          ,  20.287,  15.996,  98.375,        788,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2023,2023-14                     ,false ,web          ,  18.894,  15.719,  96.768,        832,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-40                     ,false ,web          ,  19.065,  15.185,  93.368,        796,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-43                     ,false ,web          ,  18.663,  14.520,  89.234,        778,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-27                     ,false ,web          ,  18.207,  14.385,  88.516,        790,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-31                     ,false ,web          ,  18.370,  14.186,  87.104,        772,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-17                     ,false ,web          ,  17.027,  13.271,  81.560,        779,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-04                     ,false ,web          ,  17.204,  13.015,  79.969,        756,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-05                     ,false ,web          ,  16.035,  12.672,  77.904,        790,        6.1,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-39                     ,false ,web          ,  15.849,  12.541,  77.189,        791,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2024,2024-10                     ,false ,web          ,  15.407,  12.189,  75.822,        791,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-21                     ,false ,web          ,  13.782,  10.870,  66.861,        789,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-10                     ,false ,web          ,  13.857,  10.651,  65.509,        769,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2022,2022-33                     ,false ,web          ,  13.119,  10.412,  64.246,        794,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-25                     ,false ,web          ,  12.370,   9.766,  60.119,        790,        6.2,         ,            ,            
-en       ,FineWebEdu--cc-main-2021,2021-49                     ,false ,web          ,  12.281,   9.701,  59.813,        790,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-40                     ,false ,web          ,  16.810,  13.761,  85.411,        819,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-50                     ,false ,web          ,  16.374,  13.326,  82.822,        814,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-23                     ,false ,web          ,  14.803,  12.302,  75.822,        831,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-06                     ,false ,web          ,  14.507,  11.493,  70.692,        792,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-49                     ,false ,web          ,  14.230,  11.305,  69.646,        794,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-14                     ,false ,web          ,  13.561,  11.203,  68.994,        826,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-21                     ,false ,web          ,  14.294,  11.195,  68.920,        783,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-40                     ,false ,web          ,  13.414,  10.596,  65.184,        790,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-27                     ,false ,web          ,  12.772,  10.043,  61.871,        786,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-43                     ,false ,web          ,  12.882,   9.963,  61.281,        773,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-31                     ,false ,web          ,  12.710,   9.716,  59.691,        764,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2024,2024-10                     ,false ,web          ,  11.652,   9.197,  57.223,        789,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-17                     ,false ,web          ,  11.569,   8.946,  55.027,        773,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-04                     ,false ,web          ,  11.705,   8.807,  54.157,        752,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-05                     ,false ,web          ,  11.023,   8.610,  52.970,        781,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-39                     ,false ,web          ,  10.766,   8.433,  51.949,        783,        6.2,         ,            ,            
 en       ,Pile                 ,FreeLaw                     ,false ,legi_written ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
+en       ,FineWebEdu--cc-main-2021,2021-21                     ,false ,web          ,   9.236,   7.191,  44.286,        779,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-10                     ,false ,web          ,   9.352,   7.134,  43.932,        763,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-33                     ,false ,web          ,   8.965,   7.039,  43.487,        785,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-49                     ,false ,web          ,   8.257,   6.460,  39.889,        782,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-25                     ,false ,web          ,   8.229,   6.381,  39.320,        775,        6.2,         ,            ,            
 en       ,PeS2o                ,s2ag-train                  ,mixed ,technical    ,  30.569,   5.926,  40.273,        194,        6.8,         ,            ,            
 en       ,Wikipedia.en         ,                            ,false ,wiki         ,   6.893,   4.708,  26.616,        683,        5.7,    7.898,        1.68,        3.37
 en       ,Pile                 ,StackExchange               ,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,   10.275,        2.27,        3.27
@@ -1293,6 +1377,16 @@ en       ,AmericanStories      ,1800                        ,true  ,newspaper   
 en       ,AmericanStories      ,1811                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        102,        6.0,         ,            ,            
 en       ,AmericanStories      ,1798                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         56,        5.7,         ,            ,            
 en       ,AmericanStories      ,1774                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,          0,        0.0,         ,            ,            
+es       ,RedPajama.es         ,2023-06                     ,false ,web          ,  20.273,  14.823,  90.942,        731,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2023-14                     ,false ,web          ,  19.477,  14.045,  86.238,        721,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-49                     ,false ,web          ,  19.247,  13.912,  85.388,        723,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-21                     ,false ,web          ,  18.056,  12.918,  79.215,        715,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-40                     ,false ,web          ,  17.649,  12.822,  78.664,        727,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2021-43                     ,false ,web          ,  17.354,  12.420,  76.157,        716,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-27                     ,false ,web          ,  16.760,  12.193,  74.803,        728,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-05                     ,false ,web          ,  14.606,  10.640,  65.248,        728,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2022-33                     ,false ,web          ,  13.920,   9.576,  58.775,        688,        6.1,         ,            ,            
+es       ,RedPajama.es         ,2021-49                     ,false ,web          ,  12.107,   8.401,  51.553,        694,        6.1,         ,            ,            
 es       ,Wikipedia.es         ,                            ,false ,wiki         ,   1.947,   1.245,   7.161,        639,        5.8,    2.124,        1.71,        3.37
 es       ,Eurovoc.es           ,                            ,true  ,legi_written ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
 es       ,CulturaX.es          ,474                         ,false ,web          ,   0.876,   0.492,   2.995,        561,        6.1,         ,            ,            
@@ -1809,6 +1903,16 @@ es       ,CulturaX.es          ,428                         ,false ,web         
 es       ,CulturaX.es          ,298                         ,false ,web          ,   0.876,   0.486,   2.962,        555,        6.1,         ,            ,            
 es       ,Europarl.es          ,                            ,false ,legi_dialogue,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
 es       ,Gutenberg.es         ,                            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.092,        1.80,        3.30
+de       ,RedPajama.de         ,2023-06                     ,false ,web          ,  20.412,  12.793,  92.619,        627,        7.2,         ,            ,            
+de       ,RedPajama.de         ,2023-14                     ,false ,web          ,  19.065,  11.911,  86.409,        625,        7.3,         ,            ,            
+de       ,RedPajama.de         ,2022-49                     ,false ,web          ,  19.021,  11.904,  86.310,        626,        7.3,         ,            ,            
+de       ,RedPajama.de         ,2022-40                     ,false ,web          ,  17.835,  11.248,  81.499,        631,        7.2,         ,            ,            
+de       ,RedPajama.de         ,2022-21                     ,false ,web          ,  17.226,  10.979,  79.584,        637,        7.2,         ,            ,            
+de       ,RedPajama.de         ,2021-43                     ,false ,web          ,  17.114,  10.860,  78.740,        635,        7.3,         ,            ,            
+de       ,RedPajama.de         ,2022-27                     ,false ,web          ,  16.225,  10.316,  74.768,        636,        7.2,         ,            ,            
+de       ,RedPajama.de         ,2022-05                     ,false ,web          ,  14.188,   9.195,  66.764,        648,        7.3,         ,            ,            
+de       ,RedPajama.de         ,2022-33                     ,false ,web          ,  11.196,   7.140,  51.920,        638,        7.3,         ,            ,            
+de       ,RedPajama.de         ,2021-49                     ,false ,web          ,  10.496,   6.731,  49.018,        641,        7.3,         ,            ,            
 de       ,Wikipedia.de         ,                            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
 de       ,Eurovoc.de           ,                            ,true  ,legi_written ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
 de       ,CulturaX.de          ,45                          ,false ,web          ,   0.818,   0.411,   2.914,        502,        7.1,         ,            ,            
@@ -2325,6 +2429,16 @@ de       ,CulturaX.de          ,250                         ,false ,web         
 de       ,CulturaX.de          ,197                         ,false ,web          ,   0.818,   0.406,   2.882,        497,        7.1,         ,            ,            
 de       ,Gutenberg.de         ,                            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
 de       ,Europarl.de          ,                            ,false ,legi_dialogue,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
+it       ,RedPajama.it         ,2023-06                     ,false ,web          ,  11.746,   7.305,  47.694,        622,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2023-14                     ,false ,web          ,  11.577,   7.098,  46.372,        613,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-49                     ,false ,web          ,  11.430,   7.052,  46.047,        617,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-40                     ,false ,web          ,  10.152,   6.352,  41.460,        626,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-21                     ,false ,web          ,  10.110,   6.288,  41.037,        622,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2021-43                     ,false ,web          ,   9.817,   6.117,  39.927,        623,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-27                     ,false ,web          ,   9.607,   5.955,  38.887,        620,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-05                     ,false ,web          ,   8.238,   5.198,  33.938,        631,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2022-33                     ,false ,web          ,   7.800,   4.680,  30.549,        600,        6.5,         ,            ,            
+it       ,RedPajama.it         ,2021-49                     ,false ,web          ,   6.846,   4.149,  27.101,        606,        6.5,         ,            ,            
 it       ,Wikipedia.it         ,                            ,false ,wiki         ,   1.870,   1.060,   6.161,        567,        5.8,    1.959,        1.85,        3.14
 it       ,Eurovoc.it           ,                            ,true  ,legi_written ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
 it       ,CulturaX.it          ,106                         ,false ,web          ,   0.822,   0.409,   2.647,        497,        6.5,         ,            ,            
