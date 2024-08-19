@@ -107,18 +107,13 @@ datasets_categories = {
         "culturax.de",
         "culturax.es",
         "culturax.it",
-        "RedPajama.fr",
-        "RedPajama.en",
-        "RedPajama.de",
-        "RedPajama.es",
-        "RedPajama.it",
-        "FineWebEdu--cc-main-2021",
-        "FineWebEdu--cc-main-2022",
-        "FineWebEdu--cc-main-2023",
-        "FineWebEdu--cc-main-2024",
-        "FineWebEdu--cc-main",
-        "FineWebEdu",
-    ],
+    ]
+    + [
+        f"RedPajama--fr--{year}".lower()
+        for year in ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
+    ]
+    + [f"RedPajama--{language}--{year}".lower() for language in ["de", "es", "it"] for year in ["2021", "2022", "2023"]]
+    + [f"FineWebEdu--cc-main-{year}".lower() for year in ["2021", "2022", "2023", "2024"]],
 }
 
 
@@ -177,9 +172,16 @@ def to_name_subset(name):
         if len(f) == 1:
             subset = ""
     if "redpajama" in name.lower():
-        f = subset.split("-")
+        language, f = subset.split(":")
+        name = name + "--" + language
+        f = f.split("-")
         if len(f) == 1:
             subset = ""
+            name = name + "--" + f[0]
+        else:
+            assert len(f) == 2
+            name = name + "--" + f[0]
+            subset = "-".join(f)
     return name, subset
 
 
@@ -285,7 +287,7 @@ def compute_extra_stats(data, tokencount_folder):
             elif key == to_dict_key(("---", "---", "---")):
                 data["B tokens"] = ground_total_tokens / 1_000_000_000
             elif not data.get("subset"):
-                print(f"WARNING: missing {key} in tokens")
+                print(f"WARNING: missing {key} in tokens (possible: {sorted(total_tokens.keys())})")
 
         data.pop("#docs")
         data.pop("#words")
