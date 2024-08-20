@@ -4,12 +4,13 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --gres=gpu:8                 # number of gpus per nodes
 #SBATCH --constraint=a100
+#SBATCH --time=01:00:00               # time limit
 #SBATCH --output=./out/%x-%j.out     # STDOUT
 #SBATCH --error=./out/%x-%j.err
 #SBATCH --account=qgz@a100
-#SBATCH --qos=qos_gpu-t3
+#SBATCH --qos=qos_gpu-dev
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=lucas.hervier@irt-saintexupery.com
+#SBATCH --mail-user=agustin-martin.picard@irt-saintexupery.com
 
 set -x -e
 
@@ -19,8 +20,8 @@ echo "START TIME: $(date)"
 source ~/Lucie-Training/training/set_env.sh
 
 # Variables that are set with command-line arguments
-MODEL_CONFIG="" # can be lucie80m, lucie410m
-DATA_CONFIG=""  # see the files name (without the .yml ext) in ablation/data_config for options
+MODEL_CONFIG="lucie80m" # can be lucie80m, lucie410m
+DATA_CONFIG="config01"  # see the files name (without the .yml ext) in ablation/data_config for options
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
@@ -45,7 +46,7 @@ mkdir -p $TENSORBOARD_PATH
 cd $MEGATRON_DEEPSPEED_REPO
 
 # ----- data
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
+TOKENIZER_PATH="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped/tokenizer"
 TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DOMAIN_PROPORTIONS_PATH=Lucie-Training/ablation/data_config/${DATA_CONFIG}.yml
 DATASET_ARGS=" \
@@ -146,6 +147,7 @@ LOG_ARGS=" \
 
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
+export NCCL_DEBUG=WARN
 
 # hide duplicated errors using this hack - will be properly fixed in pt-1.12
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
