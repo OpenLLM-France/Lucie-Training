@@ -73,6 +73,12 @@ cd ..
 > This compilation is compute intensive. You may encounter some errors here, just rerun this command. If it still don't work, consider lowering the value of MAX_JOBS
 
 
+Some useful checks that can be made (based on the classical errors we saw when using our fork of Megatron-Deepspeed):
+```bash
+python -c "from torch.distributed.elastic.agent.server.api import log"
+python -c "from flash_attn import flash_attn_qkvpacked_func, flash_attn_func"
+```
+
 #### With Docker
 
 In the `Lucie-Training` folder, build the docker image:

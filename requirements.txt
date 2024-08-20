@@ -4,6 +4,9 @@ sentencepiece==0.2.0
 six==1.16.0
 tokenizers==0.15.2
 transformers==4.36.1
-flash-attn==2.5.8
+flash-attn==2.6.3
 zstandard==0.22.0
 tensorboard==2.16.2
+torch==2.3.0
+torchaudio==2.3.0
+torchvision==0.18.0
