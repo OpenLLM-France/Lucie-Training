@@ -23,7 +23,7 @@ cd $MEGATRON_DEEPSPEED_REPO
 VARIANT=pretraining
 CHECKPOINT_PATH=$CHECKPOINT_PATH/$VARIANT
 TENSORBOARD_PATH=$TENSORBOARD_PATH/$VARIANT
-LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT
+LOGS_PATH=$LOGS_PATH/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
 
 TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
