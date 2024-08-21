@@ -1,18 +1,16 @@
 #!/bin/bash
-#SBATCH --nodes=256
+#SBATCH --nodes=128
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH -C h100                      # pour cibler les noeuds H100
+#SBATCH --constraint=h100                      # pour cibler les noeuds H100
 #SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
-#SBATCH --account=fwx@h100
-#SBATCH --qos=qos_gpu-t3
-#SBATCH --job-name=lucie-test
+#SBATCH --job-name=lucie-pretraining
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=ogouvert@linagora.com
-#SBATCH --job-name=lucie7b-pretraining
+#SBATCH --job-name=lucie-pretraining
 
 set -x -e
 
@@ -23,13 +21,13 @@ source ~/Lucie-Training/training/set_env.sh
 cd $MEGATRON_DEEPSPEED_REPO
 
 VARIANT=pretraining
-CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$VARIANT
-TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$VARIANT/$SLURM_JOB_NAME
-LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT/$SLURM_JOB_NAME
+CHECKPOINT_PATH=$CHECKPOINT_PATH/$VARIANT
+TENSORBOARD_PATH=$TENSORBOARD_PATH/$VARIANT
+LOGS_PATH=$OUTPUT_PATH/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
 
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
-TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
+TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
 DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
@@ -42,6 +40,8 @@ fi
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
+GPUS_PER_NODE=4
+
 # ----- model
 HIDDEN_SIZE=4096 
 FFN_HIDDEN_SIZE=12288 
@@ -52,9 +52,9 @@ NUM_KV_HEADS=8
 
 GLOBAL_BATCH_SIZE=1024
 MICRO_BATCH_SIZE=2
-TP=2
+TP=4
 PP=4
-ZERO_STAGE=0
+ZERO_STAGE=1
 
 # ------ Optimizer
 LR=3e-4
@@ -69,7 +69,7 @@ RAMPUP_SAMPLES=10_000_000
 
 SAVE_INTERVAL=1000
 
-config_json="./ds_config.$SLURM_JOBID.json"
+config_json="./ds_config.json"
 
 cat <<EOT > $config_json
 {
@@ -81,6 +81,9 @@ cat <<EOT > $config_json
   "bf16": {
     "enabled": true
   },
+  "data_types": {
+    "grad_accum_dtype": "fp32" 
+  },
   "gradient_clipping": 1.0,
   "steps_per_print": 2000,
   "wall_clock_breakdown": false
@@ -91,6 +94,7 @@ DEEPSPEED_ARGS=" \
     --deepspeed \
     --deepspeed_config ${config_json} \
     --zero-stage ${ZERO_STAGE} \
+    --deepspeed-activation-checkpointing \
     "
 
 GPT_ARGS=" \
@@ -143,12 +147,13 @@ EXIT_OPTS=" \
 
 # do not remove or the training will hang and nodes will be lost w/o this workaround
 export CUDA_LAUNCH_BLOCKING=1
+export OMP_NUM_THREADS=1
 
 # hide duplicated errors using this hack - will be properly fixed in pt-1.12
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
 
 DISTRIBUTED_ARGS=" \
-       --nproc_per_node $SBATCH_GPUS_PER_NODE \
+       --nproc_per_node $GPUS_PER_NODE \
        --nnodes $SLURM_NNODES \
        --node_rank \$SLURM_PROCID \
        --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
