@@ -18,13 +18,16 @@ echo "START TIME: $(date)"
 
 # Load env and variables
 source ~/Lucie-Training/training/set_env.sh
-cd $MEGATRON_DEEPSPEED_REPO
 
+# Variables
 VARIANT=pretraining
-CHECKPOINT_PATH=$CHECKPOINT_PATH/$VARIANT
-TENSORBOARD_PATH=$TENSORBOARD_PATH/$VARIANT
-LOGS_PATH=$LOGS_PATH/lucie-logs/$VARIANT
+CHECKPOINT_PATH=$ALL_CCFRSCRATCH/checkpoints/$VARIANT
+TENSORBOARD_PATH=$ALL_CCFRSCRATCH/tensorboard/$VARIANT
+LOGS_PATH=$ALL_CCFRSCRATCH/lucie-logs/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
+
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+cd $MEGATRON_DEEPSPEED_REPO
 
 TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
