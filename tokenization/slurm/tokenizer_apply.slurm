@@ -16,5 +16,5 @@ export RUN="python3 /gpfs7kw/linkhome/rech/gendjf01/uov59an/src/Bloom-NG-Trainin
         --workers 20 \
         "
 
-srun --output=tmp_slurm_output_tokens-$DATE.out --error=tmp_slurm_output_tokens-$DATE.out \
+srun --output=tmp_slurm_output_tokens-RP-$DATE.out --error=tmp_slurm_output_tokens-RP-$DATE.out \
      --jobid $SLURM_JOBID bash -c "$RUN" 2>&1
