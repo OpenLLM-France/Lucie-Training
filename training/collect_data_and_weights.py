@@ -119,8 +119,10 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
     if name.endswith("_text_document"):
         name = name[: -len("_text_document")]
     if name not in possible_names:
-        name = re.sub(r"\d+$", "", name)
-        name = name.rstrip("_").rstrip("-.")
+        name2 = re.sub(r"\d+$", "", name)
+        name2 = name2.rstrip("_").rstrip("-.")
+        if name2 in possible_names:
+            name = name2
     if name not in possible_names:
         if "--" in name:
             name2 = "--".join(name.split("--")[:-1])
@@ -130,6 +132,10 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
                 name2 = name.split("--")[0]
                 if name2 in possible_names:
                     name = name2
+                elif "RedPajama--de" in name:  # NOCOMMIT
+                    import pdb
+
+                    pdb.set_trace()
         if name not in possible_names:
             name2 = re.sub(r"\.\d+$", "", name)
             if name2 in possible_names:
@@ -155,6 +161,15 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
 if __name__ == "__main__":
     import argparse
 
+    default_path = "/data-storage/storage0/lucie_tokens_65k_grouped"
+    for path in [
+        "/data-storage/storage0/lucie_tokens_65k_grouped",
+        "/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped",
+    ]:
+        if os.path.exists(path):
+            default_path = path
+            break
+
     parser = argparse.ArgumentParser(
         description="Prints a string with all tokenized data files (prefixes) and their respective weights.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -163,7 +178,7 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Path to tokenized data",
-        default="/data-storage/storage0/lucie_tokens_65k_grouped",
+        default=default_path,
         nargs="?",
     )
     parser.add_argument(
@@ -238,7 +253,7 @@ if __name__ == "__main__":
 
         name = prefix_to_canonical_name(prefix, stats_datasets)
         if name not in stats_datasets:
-            raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=})")
+            raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=}, {sorted(stats_datasets.keys())=})")
             continue
         if name in not_tokenized_datasets:
             not_tokenized_datasets.remove(name)
