@@ -126,7 +126,6 @@ GPT_ARGS=" \
        --disable-bias-linear \
        --num-key-value-heads $NUM_KV_HEADS \
        --bf16 \
-       --init-method-std 0.009 \
        "
 
 OPTIMIZER_ARGS=" \
