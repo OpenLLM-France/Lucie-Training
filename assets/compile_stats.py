@@ -213,6 +213,8 @@ def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too comp
         language = "code"
     elif "Pile" in name or "Stac" in name or "FineWebEdu" in name:  # Pile and MathPile
         language = "en"
+    elif name.startswith("RedPajama--"):
+        language = name.split("--")[1]
     else:
         language = "fr"
     # Multi-lingual corpora
