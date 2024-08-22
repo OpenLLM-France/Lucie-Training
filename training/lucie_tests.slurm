@@ -1,108 +1,146 @@
 #!/bin/bash
-#SBATCH --job-name=test-lucie7b-1nodes-tp1-pp2-z0-b256-m1
-#SBATCH --qos=qos_gpu-dev            # Avec ce qos la temps d'attente est moins long. Mais n'est possible qu'avec 32 GPUs maximum, donc à commenter si on lance sur plus de 32 GPUs
-#SBATCH --nodes=1
+#SBATCH --nodes=128
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
-#SBATCH --cpus-per-task=40           # number of cores per tasks
+#SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH --gres=gpu:8                 # number of gpus
-#SBATCH --constraint=a100
-#SBATCH --time 00:15:00              # maximum execution time (HH:MM:SS)
+#SBATCH --constraint=h100                      # pour cibler les noeuds H100
+#SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
+#SBATCH --time 2:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
-#SBATCH --account=qgz@a100
+#SBATCH --job-name=lucie-pretraining
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=ogouvert@linagora.com
+#SBATCH --job-name=lucie-test
 
 set -x -e
 
 echo "START TIME: $(date)"
 
-# Environement Set Up
-module purge
-module load cpuarch/amd 
-module load anaconda-py3/2023.09 # Use this anaconda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
-module load cuda/12.1.0 # Use this cuda version already installed in Jean-Zay. If you're not on Jean-Zay, you have to install it.
-module load gcc/12.2.0
-conda activate lucie
-# module load git/2.39.1
+# Load env and variables
+source ~/Lucie-Training/training/set_env.sh
 
-EXPE_NAME=testestest
-OUTPUT_PATH=/gpfswork/rech/qgz/uzq54wg
-CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints/$EXPE_NAME
-TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$EXPE_NAME
-LOGS_PATH=$OUTPUT_PATH/lucie-logs/$EXPE_NAME
+# Variables
+VARIANT=test
+CHECKPOINT_PATH=$ALL_CCFRSCRATCH/checkpoints/$VARIANT
+TENSORBOARD_PATH=$ALL_CCFRSCRATCH/tensorboard/$VARIANT
+LOGS_PATH=$ALL_CCFRSCRATCH/lucie-logs/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
 
-MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
+export OMP_NUM_THREADS=1
+# do not remove or the training will hang and nodes will be lost w/o this workaround
+export CUDA_LAUNCH_BLOCKING=1
+# hide duplicated errors using this hack - will be properly fixed in pt-1.12
+export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
+# force crashing on nccl issues like hanging broadcast
+export NCCL_ASYNC_ERROR_HANDLING=1
+
+export HF_DATASETS_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
 cd $MEGATRON_DEEPSPEED_REPO
 
-DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
-TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
+# Tokenizer and data
+TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
+TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
+DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
+
+if [ -z "$DATASET" ]; then
+  echo "No data found"
+  exit 1
+fi
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=6000
 
-GPUS_PER_NODE=8
-NNODES=$SLURM_NNODES
-
-TP=1
-PP=2
-
-GLOBAL_BATCH_SIZE=256
-MICRO_BATCH_SIZE=1 # PP=2,TP=2: 6, PP=1,TP=2: 2, PP=2,TP=1: 2
+GPUS_PER_NODE=4
 
 # ----- model
-HIDDEN_SIZE=4096 # e.g. llama-13b: 5120
-FFN_HIDDEN_SIZE=11008 # e.g. llama-13b: 13824
-NUM_LAYERS=32 # e.g. llama-13b: 40
-NUM_HEADS=32 # e.g. llama-13b: 40
-SEQ_LENGTH=4096 # for llama2 it's 4096
-NUM_KV_HEADS=32 # llama2 70B uses GQA but for lucie and for now we use MHA, so NUM_KV_HEADS=NUM_HEADS
+HIDDEN_SIZE=4096 
+FFN_HIDDEN_SIZE=12288 
+NUM_LAYERS=32 
+NUM_HEADS=32
+SEQ_LENGTH=4096 
+NUM_KV_HEADS=8 
+
+GLOBAL_BATCH_SIZE=1024
+MICRO_BATCH_SIZE=2
+TP=4
+PP=4
+ZERO_STAGE=0
 
 # ------ Optimizer
-TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
 LR=3e-4
 MIN_LR=3e-5
-LR_WARMUP_STEPS=2000
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
-SAVE_INTERVAL=100
+TRAIN_SAMPLES=750_000_000 # 3T tokens
+LR_DECAY_SAMPLES=750_000_000 # 3T tokens - not used right now
+LR_WARMUP_SAMPLES=2_000_000
+RAMPUP_SAMPLES=10_000_000
 
-# ----- Deepspeed configuration
-ZERO_STAGE=0
+SAVE_INTERVAL=1000
 
-config_json="./ds_config.$SLURM_JOBID.json"
+config_json="./ds_config.json"
 
 cat <<EOT > $config_json
 {
   "train_batch_size" : $GLOBAL_BATCH_SIZE,
   "train_micro_batch_size_per_gpu": $MICRO_BATCH_SIZE,
-  "steps_per_print": 1,
   "zero_optimization": {
     "stage": $ZERO_STAGE
   },
   "bf16": {
     "enabled": true
-  }
+  },
+  "gradient_clipping": 1.0,
+  "steps_per_print": 2000,
+  "wall_clock_breakdown": false
 }
 EOT
 
-# no activation checkpoint
 DEEPSPEED_ARGS=" \
     --deepspeed \
     --deepspeed_config ${config_json} \
     --zero-stage ${ZERO_STAGE} \
-    "
+    --deepspeed-activation-checkpointing \
+    "  
 
-# activation checkpoint
-# DEEPSPEED_ARGS=" \
-#     --deepspeed \
-#     --deepspeed_config ${config_json} \
-#     --zero-stage ${ZERO_STAGE} \
-#     --deepspeed-activation-checkpointing \
-#     --recompute-granularity full \
-#     --recompute-method uniform \
-#     "
+GPT_ARGS=" \
+       --num-layers $NUM_LAYERS \
+       --hidden-size $HIDDEN_SIZE \
+       --ffn-hidden-size $FFN_HIDDEN_SIZE \
+       --num-attention-heads $NUM_HEADS \
+       --seq-length $SEQ_LENGTH \
+       --max-position-embeddings $SEQ_LENGTH \
+       --attention-dropout 0 \
+       --hidden-dropout 0 \
+       --use-rotary-position-embeddings \
+       --untie-embeddings-and-output-weights \
+       --swiglu \
+       --normalization rmsnorm \
+       --disable-bias-linear \
+       --num-key-value-heads $NUM_KV_HEADS \
+       --bf16 \
+       --init-method-std 0.009 \
+       "
+
+OPTIMIZER_ARGS=" \
+       --lr $LR \
+       --lr-decay-style cosine \
+       --min-lr $MIN_LR \
+       --lr-warmup-samples $LR_WARMUP_SAMPLES \
+       --clip-grad $GRAD_CLIP \
+       --optimizer adam \
+       --adam-beta1 0.9 \
+       --adam-beta2 0.95 \
+       --adam-eps 1e-5 \
+       --weight-decay $WEIGHT_DECAY \
+       "
 
 LOG_ARGS=" \
        --log-interval 1 \
@@ -113,65 +151,61 @@ LOG_ARGS=" \
        --log-memory-to-tensorboard \
        --log-world-size-to-tensorboard \
        --tensorboard-queue-size 5 \
+       --no-log-loss-scale-to-tensorboard \
        "
 
-# do not remove or the training will hang and nodes will be lost w/o this workaround
-export CUDA_LAUNCH_BLOCKING=1
+# for 20h 1190
+EXIT_OPTS=" \
+       --exit-interval 3 \
+    "
 
-# hide duplicated errors using this hack - will be properly fixed in pt-1.12
-export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
+DISTRIBUTED_ARGS=" \
+       --nproc_per_node $GPUS_PER_NODE \
+       --nnodes $SLURM_NNODES \
+       --node_rank \$SLURM_PROCID \
+       --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT \
+       --rdzv_backend c10d \
+       --max_restarts 0 \
+       --tee 3 \
+       "
 
-# --pipeline-model-parallel-size $PP \
-# --no-pipeline-parallel \
-DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank \$SLURM_PROCID --rdzv_endpoint $MASTER_ADDR:$MASTER_PORT --rdzv_backend c10d --max_restarts 0 --tee 3"
-export RUN="torchrun $DISTRIBUTED_ARGS \
+export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path /gpfswork/rech/qgz/uzq54wg/.cache \
+       --data-cache-path $DATA_CACHE_PATH \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
-       --num-layers $NUM_LAYERS \
-       --hidden-size $HIDDEN_SIZE \
-       --ffn-hidden-size $FFN_HIDDEN_SIZE \
-       --num-attention-heads $NUM_HEADS \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
-       --seq-length $SEQ_LENGTH \
-       --max-position-embeddings $SEQ_LENGTH \
-       --train-iters $TRAIN_STEPS \
-       --save $CHECKPOINT_PATH \
-       --load $CHECKPOINT_PATH \
+       --train-samples $TRAIN_SAMPLES \
+       --rampup-batch-size 256 128 $RAMPUP_SAMPLES \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
        --tokenizer-name-or-path $TOKENIZER_PATH \
        --distributed-backend nccl \
-       --lr $LR \
-       --lr-decay-style cosine \
-       --min-lr $MIN_LR \
-       --weight-decay $WEIGHT_DECAY \
-       --clip-grad $GRAD_CLIP \
-       --lr-warmup-iters $LR_WARMUP_STEPS \
-       --optimizer adam \
-       --adam-beta1 0.9 \
-       --adam-beta2 0.95 \
-       --save-interval 100 \
-       --eval-interval 100 \
+       --save-interval $SAVE_INTERVAL \
+       --eval-interval 1000 \
        --eval-iters 0 \
        --split 1,0,0 \
-       --bf16 \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
-       --attention-dropout 0 \
-       --hidden-dropout 0 \
-       --use-rotary-position-embeddings \
-       --untie-embeddings-and-output-weights \
-       --swiglu \
-       --normalization rmsnorm \
-       --disable-bias-linear \
-       --num-key-value-heads $NUM_KV_HEADS \
+       --seed 42 \
+       --init-method-std 0.009 \
+       --checkpoint-activations \
+       --save $CHECKPOINT_PATH \
+       --load $CHECKPOINT_PATH \
+       $GPT_ARGS \
+       $OPTIMIZER_ARGS \
        $DEEPSPEED_ARGS \
        $LOG_ARGS \
        $EXIT_OPTS \
        "
 
-srun --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+SRUN_ARGS=" \
+    --wait=60 \
+    --kill-on-bad-exit=1 \
+    "
+
+clear; srun $SRUN_ARGS --jobid $SLURM_JOBID bash -c "$RUN" 2>&1 | tee -a $LOGS_PATH/main_log.txt
+
+echo "END TIME: $(date)"

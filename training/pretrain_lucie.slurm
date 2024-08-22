@@ -26,9 +26,22 @@ TENSORBOARD_PATH=$ALL_CCFRSCRATCH/tensorboard/$VARIANT
 LOGS_PATH=$ALL_CCFRSCRATCH/lucie-logs/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
 
+export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
+export OMP_NUM_THREADS=1
+# do not remove or the training will hang and nodes will be lost w/o this workaround
+export CUDA_LAUNCH_BLOCKING=1
+# hide duplicated errors using this hack - will be properly fixed in pt-1.12
+export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
+# force crashing on nccl issues like hanging broadcast
+export NCCL_ASYNC_ERROR_HANDLING=1
+
+export HF_DATASETS_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
 export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
 cd $MEGATRON_DEEPSPEED_REPO
 
+# Tokenizer and data
 TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
@@ -57,7 +70,7 @@ GLOBAL_BATCH_SIZE=1024
 MICRO_BATCH_SIZE=2
 TP=4
 PP=4
-ZERO_STAGE=1
+ZERO_STAGE=0
 
 # ------ Optimizer
 LR=3e-4
@@ -83,9 +96,6 @@ cat <<EOT > $config_json
   },
   "bf16": {
     "enabled": true
-  },
-  "data_types": {
-    "grad_accum_dtype": "fp32" 
   },
   "gradient_clipping": 1.0,
   "steps_per_print": 2000,
@@ -116,6 +126,7 @@ GPT_ARGS=" \
        --disable-bias-linear \
        --num-key-value-heads $NUM_KV_HEADS \
        --bf16 \
+       --init-method-std 0.009 \
        "
 
 OPTIMIZER_ARGS=" \
@@ -148,13 +159,6 @@ EXIT_OPTS=" \
     --exit-duration-in-mins 1190 \
     "
 
-# do not remove or the training will hang and nodes will be lost w/o this workaround
-export CUDA_LAUNCH_BLOCKING=1
-export OMP_NUM_THREADS=1
-
-# hide duplicated errors using this hack - will be properly fixed in pt-1.12
-export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
-
 DISTRIBUTED_ARGS=" \
        --nproc_per_node $GPUS_PER_NODE \
        --nnodes $SLURM_NNODES \
@@ -165,7 +169,7 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-export RUN="torchrun $DISTRIBUTED_ARGS \
+export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path $DATA_CACHE_PATH \
        --tensor-model-parallel-size $TP \
@@ -186,6 +190,8 @@ export RUN="torchrun $DISTRIBUTED_ARGS \
        --use-flash-attn-v2 \
        --no-query-key-layer-scaling \
        --seed 42 \
+       --init-method-std 0.009 \
+       --checkpoint-activations \
        --save $CHECKPOINT_PATH \
        --load $CHECKPOINT_PATH \
        $GPT_ARGS \
