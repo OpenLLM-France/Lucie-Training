@@ -1279,7 +1279,7 @@ class DataIteratorCulturaX(DataIteratorConcat):
 
 
 class DataIteratorFineWebEdu(DataIteratorConcat):
-    def __init__(self, split="train", streaming=True, **kwargs):
+    def __init__(self, split="train", target_years=[2024, 2023, 2022, 2021], streaming=True, **kwargs):  # noqa # B006
         repo = "HuggingFaceFW/fineweb-edu"
         for folder in [
             "/gpfsscratch/rech/qgz/commun/raw_data/fineweb-edu",
@@ -1289,7 +1289,6 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                 print(f"Using local FineWebEdu data in {repo}")
                 break
         builder_configs = datasets.load_dataset_builder(repo).builder_configs
-        target_years = [2024, 2023, 2022, 2021]
         sources = [k for k in builder_configs.keys() for year in target_years if k.startswith(f"CC-MAIN-{year}")]
         # Set of valid domains
         valid_domains_path = os.path.join(_asset_folder, "urls_robots/valid_domains_fineweb_edu.json")
