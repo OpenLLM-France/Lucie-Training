@@ -5,6 +5,7 @@ import re
 import warnings
 
 import pandas as pd
+import yaml
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 asset_folder = os.path.join(parent_dir, "assets")
@@ -132,10 +133,6 @@ def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too 
                 name2 = name.split("--")[0]
                 if name2 in possible_names:
                     name = name2
-                elif "RedPajama--de" in name:  # NOCOMMIT
-                    import pdb
-
-                    pdb.set_trace()
         if name not in possible_names:
             name2 = re.sub(r"\.\d+$", "", name)
             if name2 in possible_names:
@@ -188,12 +185,6 @@ if __name__ == "__main__":
         help="What to count",
     )
     parser.add_argument(
-        "--wikipedia_weight",
-        type=float,
-        default=5,
-        help="How much to weight Wikipedia (like duplicating). 1 meaning no change.",
-    )
-    parser.add_argument(
         "--fr_proportion",
         type=float,
         default=0.3,
@@ -226,14 +217,10 @@ if __name__ == "__main__":
         # The rest (10% will be splitted among it/es/de)
     }
 
-    additional_weights = {
-        "Wikipedia": args.wikipedia_weight,
-    }
-
     stats_datasets = read_stats_datasets()
 
-    # import json
-    # print(json.dumps(stats_datasets, indent=4))
+    with open(os.path.join(asset_folder, "dataset_weights.yaml")) as stream:
+        domain_upsampling = yaml.safe_load(stream)
 
     not_tokenized_datasets = list(stats_datasets.keys())
 
@@ -258,19 +245,20 @@ if __name__ == "__main__":
         if name in not_tokenized_datasets:
             not_tokenized_datasets.remove(name)
 
-        json_filename = prefix + ".json"
-        if not os.path.exists(json_filename):
-            raise RuntimeError(f"File {json_filename} does not exist")
-        with open(json_filename) as f:
-            d = json.load(f)
+        def load_data_from_prefix(prefix):
+            json_filename = os.path.join(args.folder, prefix + ".json")
+            if not os.path.exists(json_filename):
+                raise RuntimeError(f"File {json_filename} does not exist")
+            with open(json_filename) as f:
+                d = json.load(f)
+            return d
+
+        d = load_data_from_prefix(prefix)
 
         d.update(stats_datasets[name])
         data[prefix] = d
 
-        additional_weight = 1
-        for content in additional_weights:
-            if re.search(content, prefix):
-                additional_weight *= additional_weights[content]
+        additional_weight = domain_upsampling[d["language"] + "--" + d["category"]]
 
         languages = d["language"].split("-")
         count = d[args.count]
@@ -374,10 +362,7 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
                 prog_language = format_programming_language(prefix)
                 language_weight = programming_language_weights[prog_language]
 
-            additional_weight = 1
-            for content in additional_weights:
-                if re.search(content, prefix):
-                    additional_weight *= additional_weights[content]
+            additional_weight = domain_upsampling[d["language"] + "--" + d["category"]]
 
             weight = all_weights[prefix] = ratio * language_weight * additional_weight
 
