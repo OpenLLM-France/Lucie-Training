@@ -1279,7 +1279,7 @@ class DataIteratorCulturaX(DataIteratorConcat):
 
 
 class DataIteratorFineWebEdu(DataIteratorConcat):
-    def __init__(self, split="train", target_years=[2024, 2023, 2022, 2021], streaming=True, **kwargs):  # noqa # B006
+    def __init__(self, split="train", target_years=[2024, 2023, 2022, 2021, 2020, 2019], streaming=True, **kwargs):  # noqa # B006
         repo = "HuggingFaceFW/fineweb-edu"
         for folder in [
             "/gpfsscratch/rech/qgz/commun/raw_data/fineweb-edu",
