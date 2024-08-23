@@ -372,9 +372,11 @@ before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_toke
 
                 if args.debug:
                     name = os.path.basename(prefix).replace("_text_document", "")
+                    num_epochs = new_ratio * 3 * 1e12 / d[args.count]
                     print(
                         f"{name:40s}: {weight=:12.9f} \
-before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f} {additional_weight=:3.1f})"
+before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f} {additional_weight=:3.1f}) \
+-> num_epochs={num_epochs:.2f}"
                     )
 
                 else:
