@@ -45,7 +45,6 @@ cd $MEGATRON_DEEPSPEED_REPO
 TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
-DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -67,6 +66,8 @@ SEQ_LENGTH=4096
 NUM_KV_HEADS=8 
 
 GLOBAL_BATCH_SIZE=1024
+GLOBAL_BATCH_SIZE_MIN=256
+GLOBAL_BATCH_SIZE_STEP=128
 MICRO_BATCH_SIZE=2
 TP=4
 PP=4
@@ -168,6 +169,8 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
+DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH"_bs-"$GLOBAL_BATCH_SIZE_MIN"-"$GLOBAL_BATCH_SIZE"_ramup-"$GLOBAL_BATCH_SIZE_STEP"-"$RAMPUP_SAMPLES
+
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path $DATA_CACHE_PATH \
@@ -176,7 +179,7 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
        --train-samples $TRAIN_SAMPLES \
-       --rampup-batch-size 256 128 $RAMPUP_SAMPLES \
+       --rampup-batch-size $GLOBAL_BATCH_SIZE_MIN $GLOBAL_BATCH_SIZE_STEP $RAMPUP_SAMPLES \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
