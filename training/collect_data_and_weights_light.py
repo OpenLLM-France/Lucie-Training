@@ -221,13 +221,6 @@ if __name__ == "__main__":
     df["new_ratio"] = df["reweighted_count"] / total_reweighted_count
     df = df.sort_values("reweighted_count", ascending=False)
 
-    # By Language
-    df["language"] = df["language"].apply(lambda x: x if x in ["en", "fr", "code"] else "other")
-    df_lan = df.groupby("language")[["count", "reweighted_count"]].sum().reset_index()
-    df_lan["ratio"] = df_lan["count"] / total_count
-    df_lan["new_ratio"] = df_lan["reweighted_count"] / total_reweighted_count
-    df_lan = df_lan.sort_values("reweighted_count", ascending=False)
-
     if args.debug:
         print("# Weights per sub-corpus\n```")
         for _, row in df.iterrows():
@@ -244,6 +237,12 @@ before={ratio*100:6.3f}% after={new_ratio*100:6.3f}% reweighted_count={reweighte
         print("```\n")
 
         print("# Weights per language\n```")
+        df["language"] = df["language"].apply(lambda x: x if x in ["en", "fr", "de", "es", "it", "code"] else "aligned")
+        df_lan = df.groupby("language")[["count", "reweighted_count"]].sum().reset_index()
+        df_lan["ratio"] = df_lan["count"] / total_count
+        df_lan["new_ratio"] = df_lan["reweighted_count"] / total_reweighted_count
+        df_lan = df_lan.sort_values("reweighted_count", ascending=False)
+
         for _, row in df_lan.iterrows():
             language = row["language"]
             reweighted_count = row["reweighted_count"]
