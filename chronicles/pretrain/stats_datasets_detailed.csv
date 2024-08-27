@@ -1,0 +1,452 @@
+language ,name                 ,subset                      ,ocr   ,category     ,  M docs, B words, B chars, #words/doc,#chars/word, B tokens,#tokens/words,#chars/tokens
+---      ,---                  ,---                         ,      ,             ,2187.656,1359.265,8862.512,        621,        6.5, 2320.617,        1.71,        3.82
+fr       ,---                  ,---                         ,      ,             , 654.904, 586.935,3639.983,        896,        6.2,  934.372,        1.59,        3.90
+en       ,---                  ,---                         ,      ,             , 554.291, 412.202,2553.541,        744,        6.2,  611.894,        1.48,        4.17
+es       ,---                  ,---                         ,      ,             , 171.651, 123.857, 759.457,        722,        6.1,  200.825,        1.62,        3.78
+de       ,---                  ,---                         ,      ,             , 165.916, 105.608, 764.779,        637,        7.2,  206.612,        1.96,        3.70
+it       ,---                  ,---                         ,      ,             ,  99.441,  62.050, 404.454,        624,        6.5,  112.031,        1.81,        3.61
+fr-en    ,---                  ,---                         ,      ,             , 410.032,  17.016, 107.658,         41,        6.3,   25.493,        1.50,        4.22
+es-en    ,---                  ,---                         ,      ,             ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
+it-en    ,---                  ,---                         ,      ,             ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
+de-fr    ,---                  ,---                         ,      ,             ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
+code     ,---                  ,---                         ,      ,             , 125.768,  51.305, 630.749,        408,       12.3,  228.955,        4.46,        2.75
+fr       ,GallicaPress         ,html                        ,true  ,newspaper    ,   1.748,  41.144, 250.982,      23544,        6.1,   74.027,        1.80,        3.39
+fr       ,GallicaPress         ,txt                         ,true  ,newspaper    ,   1.457,  26.352, 157.900,      18083,        6.0,   47.579,        1.81,        3.32
+fr       ,GallicaMonographies  ,                            ,true  ,book         ,   0.278,  15.106,  90.456,      54392,        6.0,   25.169,        1.67,        3.59
+fr       ,RedPajama--fr--2023  ,2023-06                     ,false ,web          ,  19.280,  14.009,  87.341,        727,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2023  ,2023-14                     ,false ,web          ,  18.358,  13.230,  82.585,        721,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-49                     ,false ,web          ,  18.130,  13.137,  81.940,        725,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-40                     ,false ,web          ,  16.581,  12.147,  75.707,        733,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-21                     ,false ,web          ,  15.911,  11.608,  72.373,        730,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-43                     ,false ,web          ,  15.684,  11.390,  71.002,        726,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-27                     ,false ,web          ,  14.630,  10.749,  67.018,        735,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-31                     ,false ,web          ,  14.630,  10.584,  65.924,        723,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-04                     ,false ,web          ,  13.699,  10.523,  65.673,        768,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-40                     ,false ,web          ,  13.841,  10.264,  64.005,        742,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-17                     ,false ,web          ,  13.881,  10.000,  62.312,        720,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-39                     ,false ,web          ,  13.320,   9.820,  61.259,        737,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-29                     ,false ,web          ,  12.379,   9.548,  59.550,        771,        6.2,         ,            ,            
+fr       ,HAL                  ,                            ,true  ,technical    ,   0.349,   9.356,  58.308,      26811,        6.2,   16.224,        1.73,        3.59
+fr       ,RedPajama--fr--2020  ,2020-05                     ,false ,web          ,  11.437,   9.038,  56.411,        790,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-05                     ,false ,web          ,  12.188,   9.026,  56.311,        741,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-16                     ,false ,web          ,  11.076,   8.648,  54.011,        781,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-10                     ,false ,web          ,  10.635,   8.205,  51.203,        772,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2022  ,2022-33                     ,false ,web          ,  11.237,   8.199,  51.172,        730,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-43                     ,false ,web          ,  10.796,   8.149,  50.339,        755,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-45                     ,false ,web          ,  10.438,   8.036,  50.196,        770,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-35                     ,false ,web          ,  10.760,   7.944,  49.440,        738,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-50                     ,false ,web          ,  10.249,   7.888,  49.256,        770,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-51                     ,false ,web          ,  10.929,   7.884,  48.973,        721,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-43                     ,false ,web          ,  10.337,   7.706,  47.992,        745,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-21                     ,false ,web          ,  10.625,   7.670,  47.820,        722,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-30                     ,false ,web          ,  10.146,   7.645,  47.296,        754,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-09                     ,false ,web          ,  10.836,   7.584,  47.119,        700,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-34                     ,false ,web          ,  10.159,   7.562,  46.634,        744,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-04                     ,false ,web          ,  10.583,   7.553,  46.829,        714,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-24                     ,false ,web          ,   9.968,   7.552,  47.109,        758,        6.2,         ,            ,            
+fr       ,Theses               ,                            ,true  ,technical    ,   0.102,   7.547,  47.758,      73690,        6.3,   14.060,        1.86,        3.40
+fr       ,RedPajama--fr--2020  ,2020-34                     ,false ,web          ,   9.554,   7.344,  45.868,        769,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-30                     ,false ,web          ,   9.835,   7.287,  45.333,        741,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-49                     ,false ,web          ,   9.822,   7.209,  44.998,        734,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-22                     ,false ,web          ,   9.696,   7.132,  44.364,        736,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-26                     ,false ,web          ,   9.625,   7.131,  44.349,        741,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-39                     ,false ,web          ,   9.435,   7.097,  44.205,        752,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-47                     ,false ,web          ,   8.930,   7.049,  43.998,        789,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2021  ,2021-25                     ,false ,web          ,   9.722,   7.038,  43.901,        724,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-26                     ,false ,web          ,   8.820,   7.026,  43.833,        797,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-43                     ,false ,web          ,   9.664,   6.943,  43.055,        719,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-39                     ,false ,web          ,   9.353,   6.915,  42.930,        739,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-18                     ,false ,web          ,   9.476,   6.914,  43.014,        730,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-47                     ,false ,web          ,   9.242,   6.879,  42.625,        744,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-09                     ,false ,web          ,   9.130,   6.837,  42.375,        749,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2020  ,2020-10                     ,false ,web          ,   8.980,   6.823,  42.565,        760,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-05                     ,false ,web          ,   9.277,   6.822,  42.283,        735,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-51                     ,false ,web          ,   8.619,   6.786,  42.340,        787,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2019  ,2019-13                     ,false ,web          ,   9.418,   6.752,  42.007,        717,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-39                     ,false ,web          ,   8.984,   6.749,  41.741,        751,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-26                     ,false ,web          ,   8.943,   6.715,  41.608,        751,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-13                     ,false ,web          ,   9.051,   6.655,  41.197,        735,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-51                     ,false ,web          ,   8.932,   6.639,  41.102,        743,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-47                     ,false ,web          ,   8.782,   6.608,  41.024,        752,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-17                     ,false ,web          ,   8.642,   6.524,  40.497,        755,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-30                     ,false ,web          ,   8.083,   6.302,  39.370,        780,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-22                     ,false ,web          ,   7.845,   5.983,  37.098,        763,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2018  ,2018-34                     ,false ,web          ,   7.940,   5.814,  36.094,        732,        6.2,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-22                     ,false ,web          ,   6.579,   5.180,  32.436,        787,        6.3,         ,            ,            
+fr       ,Persee               ,                            ,true  ,technical    ,   1.094,   3.250,  20.314,       2970,        6.2,    5.754,        1.77,        3.53
+fr       ,OpenEdition          ,                            ,false ,technical    ,   0.939,   2.225,  14.459,       2369,        6.5,    3.604,        1.62,        4.01
+fr       ,Wikipedia.fr         ,                            ,false ,wiki         ,   2.648,   1.726,   9.879,        652,        5.7,    2.940,        1.70,        3.36
+fr       ,RedPajama--fr--2017  ,2017-17                     ,false ,web          ,   0.700,   0.557,   3.493,        796,        6.3,         ,            ,            
+fr       ,Wikiother.fr         ,wikisource                  ,false ,wiki         ,   0.186,   0.523,   3.080,       2818,        5.9,    0.795,        1.52,        3.87
+fr       ,RedPajama--fr--2016  ,2016-36                     ,false ,web          ,   0.387,   0.463,   2.943,       1197,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-44                     ,false ,web          ,   0.443,   0.318,   2.005,        717,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-04                     ,false ,web          ,   0.443,   0.315,   1.982,        711,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2017  ,2017-09                     ,false ,web          ,   0.406,   0.307,   1.935,        757,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2014  ,2014-35                     ,false ,web          ,   0.291,   0.292,   1.846,       1004,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-22                     ,false ,web          ,   0.242,   0.283,   1.795,       1170,        6.4,         ,            ,            
+fr       ,OpenData             ,inca-1                      ,false ,legi_written ,   0.247,   0.257,   1.547,       1043,        6.0,         ,            ,            
+fr       ,RedPajama--fr--2014  ,2014-42                     ,false ,web          ,   0.251,   0.250,   1.580,        996,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2014  ,2014-15                     ,false ,web          ,   0.233,   0.228,   1.443,        978,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-07                     ,false ,web          ,   0.207,   0.228,   1.447,       1101,        6.4,         ,            ,            
+fr       ,Gutenberg.fr         ,                            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
+fr       ,RedPajama--fr--2014  ,2014-23                     ,false ,web          ,   0.219,   0.216,   1.367,        989,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2015  ,2015-35                     ,false ,web          ,   0.201,   0.208,   1.320,       1031,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-50                     ,false ,web          ,   0.293,   0.199,   1.254,        682,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2015  ,2015-40                     ,false ,web          ,   0.188,   0.192,   1.223,       1021,        6.4,         ,            ,            
+fr       ,OpenData             ,inca-2                      ,false ,legi_written ,   0.127,   0.192,   1.149,       1512,        6.0,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-18                     ,false ,web          ,   0.167,   0.192,   1.215,       1148,        6.3,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-30                     ,false ,web          ,   0.159,   0.182,   1.158,       1145,        6.4,         ,            ,            
+fr       ,OpenData             ,balo                        ,false ,legi_written ,   0.136,   0.165,   1.047,       1215,        6.4,    0.291,        1.76,        3.60
+fr       ,DiscoursPublics      ,                            ,false ,legi_spoken  ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
+fr       ,RedPajama--fr--2014  ,2014-41                     ,false ,web          ,   0.149,   0.153,   0.972,       1027,        6.3,         ,            ,            
+fr       ,ValidatedYouTube.fr  ,                            ,false ,dialogue     ,   0.038,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
+fr       ,RedPajama--fr--2015  ,2015-48                     ,false ,web          ,   0.133,   0.136,   0.863,       1021,        6.4,         ,            ,            
+fr       ,Claire.fr            ,AssembleeNationale          ,false ,dialogue     ,   0.004,   0.130,   0.822,      28841,        6.3,    0.187,        1.44,        4.41
+fr       ,RedPajama--fr--2014  ,2014-49                     ,false ,web          ,   0.120,   0.124,   0.787,       1032,        6.3,         ,            ,            
+fr       ,OpenData             ,kali                        ,false ,legi_written ,   0.431,   0.114,   0.727,        265,        6.4,    0.175,        1.53,        4.16
+fr       ,OtherFr              ,questions_ecrites_parlement ,false ,legi_written ,   0.189,   0.108,   0.705,        572,        6.5,    0.156,        1.44,        4.52
+fr       ,OtherFr              ,interventions_parlement     ,false ,legi_spoken  ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
+fr       ,OtherFr              ,LEGI                        ,false ,legi_written ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
+fr       ,RedPajama--fr--2016  ,2016-26                     ,false ,web          ,   0.073,   0.088,   0.558,       1207,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2015  ,2015-14                     ,false ,web          ,   0.080,   0.087,   0.554,       1087,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2016  ,2016-40                     ,false ,web          ,   0.078,   0.081,   0.515,       1033,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2015  ,2015-32                     ,false ,web          ,   0.062,   0.064,   0.408,       1038,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2015  ,2015-27                     ,false ,web          ,   0.056,   0.060,   0.382,       1065,        6.4,         ,            ,            
+fr       ,RedPajama--fr--2014  ,2014-52                     ,false ,web          ,   0.059,   0.057,   0.362,        967,        6.4,         ,            ,            
+fr       ,Wikiother.fr         ,wiktionary                  ,false ,wiki         ,   0.650,   0.053,   0.347,         82,        6.5,    0.117,        2.20,        2.96
+fr       ,Europarl.fr          ,                            ,false ,legi_dialogue,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
+fr       ,Claire.fr            ,Senat                       ,false ,dialogue     ,   0.001,   0.051,   0.330,      69631,        6.4,    0.076,        1.48,        4.33
+fr       ,OtherFr              ,amendements_parlement       ,false ,legi_written ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
+fr       ,RedPajama--fr--2015  ,2015-22                     ,false ,web          ,   0.028,   0.029,   0.182,       1006,        6.4,         ,            ,            
+fr       ,Claire.fr            ,Theatre                     ,false ,dialogue     ,   0.031,   0.017,   0.096,        538,        5.7,    0.029,        1.73,        3.31
+fr       ,OpenData             ,sarde                       ,false ,legi_written ,   0.224,   0.014,   0.085,         61,        6.2,    0.031,        2.28,        2.72
+fr       ,OpenData             ,dole                        ,false ,legi_written ,   0.004,   0.013,   0.083,       3230,        6.2,    0.022,        1.62,        3.84
+fr       ,Claire.fr            ,ESLO                        ,false ,dialogue     ,   0.001,   0.005,   0.030,       7811,        5.9,    0.009,        1.73,        3.42
+fr       ,Claire.fr            ,ORFEO                       ,false ,dialogue     ,   0.000,   0.001,   0.008,       3337,        5.7,    0.002,        1.49,        3.80
+fr       ,Claire.fr            ,SUMM                        ,false ,dialogue     ,   0.000,   0.001,   0.007,       4474,        5.6,    0.002,        1.48,        3.79
+fr       ,Claire.fr            ,TCOF                        ,false ,dialogue     ,   0.000,   0.001,   0.005,       3310,        5.8,    0.001,        1.67,        3.46
+fr       ,Claire.fr            ,CFPP                        ,false ,dialogue     ,   0.000,   0.001,   0.004,      15389,        6.0,    0.001,        1.76,        3.39
+fr       ,Claire.fr            ,OFROM                       ,false ,dialogue     ,   0.000,   0.001,   0.003,       3927,        5.8,    0.001,        1.68,        3.44
+fr       ,Claire.fr            ,PFC                         ,false ,dialogue     ,   0.000,   0.001,   0.003,       1585,        5.9,    0.001,        1.82,        3.24
+fr       ,Claire.fr            ,FREDSum                     ,false ,dialogue     ,   0.000,   0.000,   0.002,       2721,        5.9,    0.001,        1.47,        4.03
+fr       ,Claire.fr            ,CLAPI                       ,false ,dialogue     ,   0.000,   0.000,   0.001,      10318,        6.3,    0.000,        2.10,        3.00
+fr       ,Claire.fr            ,CID                         ,false ,dialogue     ,   0.000,   0.000,   0.001,      15041,        6.0,    0.000,        1.95,        3.07
+fr       ,Claire.fr            ,LINAGORA                    ,false ,dialogue     ,   0.000,   0.000,   0.001,       7586,        6.0,    0.000,        1.77,        3.38
+fr       ,Claire.fr            ,ACSYNT                      ,false ,dialogue     ,   0.000,   0.000,   0.000,        425,        5.7,    0.000,        1.57,        3.61
+fr       ,Claire.fr            ,OTG                         ,false ,dialogue     ,   0.000,   0.000,   0.000,         95,        6.5,    0.000,        2.07,        3.14
+fr       ,Claire.fr            ,Rhapsodie                   ,false ,dialogue     ,   0.000,   0.000,   0.000,        669,        6.0,    0.000,        1.72,        3.46
+fr       ,Claire.fr            ,ParisStories                ,false ,dialogue     ,   0.000,   0.000,   0.000,        502,        5.4,    0.000,        1.54,        3.52
+fr       ,Claire.fr            ,UBS                         ,false ,dialogue     ,   0.000,   0.000,   0.000,        192,        6.3,    0.000,        2.06,        3.04
+en       ,PeS2o                ,s2orc-train                 ,mixed ,technical    ,   8.242,  36.092, 226.904,       4379,        6.3,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-40                     ,false ,web          ,  16.810,  13.761,  85.411,        819,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-50                     ,false ,web          ,  16.374,  13.326,  82.822,        814,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-23                     ,false ,web          ,  14.803,  12.302,  75.822,        831,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-06                     ,false ,web          ,  14.507,  11.493,  70.692,        792,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-49                     ,false ,web          ,  14.230,  11.305,  69.646,        794,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2023,2023-14                     ,false ,web          ,  13.561,  11.203,  68.994,        826,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-21                     ,false ,web          ,  14.294,  11.195,  68.920,        783,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-40                     ,false ,web          ,  13.414,  10.596,  65.184,        790,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-27                     ,false ,web          ,  12.772,  10.043,  61.871,        786,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-43                     ,false ,web          ,  12.882,   9.963,  61.281,        773,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-31                     ,false ,web          ,  12.710,   9.716,  59.691,        764,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2024,2024-10                     ,false ,web          ,  11.652,   9.197,  57.223,        789,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-17                     ,false ,web          ,  11.569,   8.946,  55.027,        773,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-04                     ,false ,web          ,  11.705,   8.807,  54.157,        752,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-05                     ,false ,web          ,  11.023,   8.610,  52.970,        781,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-39                     ,false ,web          ,  10.766,   8.433,  51.949,        783,        6.2,         ,            ,            
+en       ,Pile                 ,FreeLaw                     ,false ,legi_written ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
+en       ,FineWebEdu--cc-main-2020,2020-40                     ,false ,web          ,  11.046,   8.175,  50.290,        740,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-29                     ,false ,web          ,   9.974,   7.530,  46.355,        755,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-21                     ,false ,web          ,   9.236,   7.191,  44.286,        779,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-10                     ,false ,web          ,   9.352,   7.134,  43.932,        763,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-05                     ,false ,web          ,   9.367,   7.094,  43.620,        757,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2022,2022-33                     ,false ,web          ,   8.965,   7.039,  43.487,        785,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-16                     ,false ,web          ,   8.990,   6.853,  42.133,        762,        6.1,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-49                     ,false ,web          ,   8.257,   6.460,  39.889,        782,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2021,2021-25                     ,false ,web          ,   8.229,   6.381,  39.320,        775,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-50                     ,false ,web          ,   8.437,   6.345,  39.102,        752,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-45                     ,false ,web          ,   8.485,   6.280,  38.631,        740,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-35                     ,false ,web          ,   7.837,   5.948,  36.627,        759,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-34                     ,false ,web          ,   7.697,   5.927,  36.591,        770,        6.2,         ,            ,            
+en       ,PeS2o                ,s2ag-train                  ,mixed ,technical    ,  30.569,   5.926,  40.273,        194,        6.8,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-43                     ,false ,web          ,   7.643,   5.837,  36.011,        764,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-24                     ,false ,web          ,   7.645,   5.735,  35.347,        750,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-09                     ,false ,web          ,   7.438,   5.642,  34.707,        759,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-22                     ,false ,web          ,   7.135,   5.479,  33.721,        768,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-47                     ,false ,web          ,   7.205,   5.462,  33.641,        758,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-18                     ,false ,web          ,   7.059,   5.449,  33.527,        772,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-30                     ,false ,web          ,   7.091,   5.374,  33.083,        758,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-26                     ,false ,web          ,   7.043,   5.368,  33.035,        762,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-39                     ,false ,web          ,   6.968,   5.313,  32.733,        762,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-13                     ,false ,web          ,   6.796,   5.198,  31.974,        765,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2020,2020-10                     ,false ,web          ,   6.748,   5.137,  31.650,        761,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-51                     ,false ,web          ,   6.677,   5.108,  31.469,        765,        6.2,         ,            ,            
+en       ,FineWebEdu--cc-main-2019,2019-04                     ,false ,web          ,   6.820,   5.096,  31.397,        747,        6.2,         ,            ,            
+en       ,Wikipedia.en         ,                            ,false ,wiki         ,   6.893,   4.708,  26.616,        683,        5.7,    7.898,        1.68,        3.37
+en       ,Pile                 ,StackExchange               ,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,   10.275,        2.27,        3.27
+en       ,Gutenberg.en         ,                            ,false ,book         ,   0.056,   3.544,  20.579,      62936,        5.8,    5.516,        1.56,        3.73
+en       ,Pile                 ,USPTO_Backgrounds           ,false ,technical    ,   5.139,   3.492,  22.309,        680,        6.4,    5.105,        1.46,        4.37
+en       ,MathPile             ,arXiv                       ,false ,math         ,   0.340,   2.750,  22.850,       8086,        8.3,    8.399,        3.05,        2.72
+en       ,Pile                 ,DM_Mathematics              ,false ,math         ,   0.992,   1.746,   8.127,       1760,        4.7,    4.928,        2.82,        1.65
+en       ,Eurovoc.en           ,                            ,true  ,legi_written ,   0.272,   1.523,   9.468,       5594,        6.2,    2.571,        1.69,        3.68
+en       ,Pile                 ,Ubuntu_IRC                  ,false ,forum        ,   0.010,   0.867,   5.610,      83577,        6.5,    2.159,        2.49,        2.60
+en       ,Claire.en            ,MediaSum                    ,false ,dialogue     ,   0.458,   0.738,   4.226,       1611,        5.7,    1.012,        1.37,        4.17
+en       ,MathPile             ,commoncrawl                 ,false ,math         ,   0.074,   0.373,   2.486,       5014,        6.7,    0.691,        1.85,        3.60
+en       ,Pile                 ,PhilPapers                  ,false ,technical    ,   0.031,   0.363,   2.304,      11801,        6.3,    0.618,        1.70,        3.73
+en       ,AmericanStories      ,1922                        ,true  ,newspaper    ,   2.024,   0.314,   1.801,        155,        5.7,         ,            ,            
+en       ,AmericanStories      ,1921                        ,true  ,newspaper    ,   1.972,   0.300,   1.718,        152,        5.7,         ,            ,            
+en       ,Pile                 ,NIH_ExPorter                ,false ,technical    ,   0.914,   0.288,   1.979,        315,        6.9,    0.431,        1.50,        4.59
+en       ,PeS2o                ,validation                  ,mixed ,technical    ,   0.161,   0.279,   1.785,       1734,        6.4,         ,            ,            
+en       ,AmericanStories      ,1920                        ,true  ,newspaper    ,   1.732,   0.252,   1.441,        145,        5.7,         ,            ,            
+en       ,AmericanStories      ,1909                        ,true  ,newspaper    ,   1.642,   0.251,   1.419,        153,        5.7,         ,            ,            
+en       ,AmericanStories      ,1919                        ,true  ,newspaper    ,   1.693,   0.245,   1.401,        145,        5.7,         ,            ,            
+en       ,AmericanStories      ,1918                        ,true  ,newspaper    ,   1.655,   0.244,   1.390,        147,        5.7,         ,            ,            
+en       ,AmericanStories      ,1908                        ,true  ,newspaper    ,   1.563,   0.240,   1.358,        153,        5.7,         ,            ,            
+en       ,AmericanStories      ,1914                        ,true  ,newspaper    ,   1.672,   0.236,   1.338,        141,        5.7,         ,            ,            
+en       ,AmericanStories      ,1915                        ,true  ,newspaper    ,   1.641,   0.231,   1.311,        141,        5.7,         ,            ,            
+en       ,AmericanStories      ,1912                        ,true  ,newspaper    ,   1.531,   0.221,   1.251,        144,        5.7,         ,            ,            
+en       ,AmericanStories      ,1916                        ,true  ,newspaper    ,   1.609,   0.221,   1.258,        137,        5.7,         ,            ,            
+en       ,AmericanStories      ,1906                        ,true  ,newspaper    ,   1.424,   0.221,   1.249,        155,        5.7,         ,            ,            
+en       ,AmericanStories      ,1917                        ,true  ,newspaper    ,   1.589,   0.219,   1.245,        138,        5.7,         ,            ,            
+en       ,AmericanStories      ,1913                        ,true  ,newspaper    ,   1.548,   0.216,   1.221,        139,        5.7,         ,            ,            
+en       ,AmericanStories      ,1910                        ,true  ,newspaper    ,   1.428,   0.213,   1.207,        149,        5.7,         ,            ,            
+en       ,AmericanStories      ,1905                        ,true  ,newspaper    ,   1.393,   0.212,   1.201,        152,        5.7,         ,            ,            
+en       ,AmericanStories      ,1901                        ,true  ,newspaper    ,   1.245,   0.203,   1.150,        163,        5.7,         ,            ,            
+en       ,AmericanStories      ,1898                        ,true  ,newspaper    ,   1.150,   0.181,   1.024,        157,        5.7,         ,            ,            
+en       ,AmericanStories      ,1897                        ,true  ,newspaper    ,   1.077,   0.173,   0.982,        161,        5.7,         ,            ,            
+en       ,AmericanStories      ,1903                        ,true  ,newspaper    ,   1.141,   0.172,   0.972,        151,        5.7,         ,            ,            
+en       ,AmericanStories      ,1896                        ,true  ,newspaper    ,   1.007,   0.172,   0.974,        170,        5.7,         ,            ,            
+en       ,AmericanStories      ,1904                        ,true  ,newspaper    ,   1.147,   0.165,   0.937,        144,        5.7,         ,            ,            
+en       ,AmericanStories      ,1907                        ,true  ,newspaper    ,   0.963,   0.128,   0.726,        133,        5.7,         ,            ,            
+en       ,AmericanStories      ,1895                        ,true  ,newspaper    ,   0.769,   0.124,   0.702,        161,        5.7,         ,            ,            
+en       ,MathPile             ,stackexchange               ,false ,math         ,   0.265,   0.121,   0.826,        459,        6.8,    0.270,        2.23,        3.06
+en       ,AmericanStories      ,1911                        ,true  ,newspaper    ,   0.858,   0.112,   0.636,        131,        5.7,         ,            ,            
+en       ,AmericanStories      ,1923                        ,true  ,newspaper    ,   0.766,   0.110,   0.631,        143,        5.7,         ,            ,            
+en       ,AmericanStories      ,1894                        ,true  ,newspaper    ,   0.677,   0.109,   0.620,        162,        5.7,         ,            ,            
+en       ,AmericanStories      ,1924                        ,true  ,newspaper    ,   0.725,   0.108,   0.621,        149,        5.8,         ,            ,            
+en       ,AmericanStories      ,1902                        ,true  ,newspaper    ,   0.786,   0.106,   0.603,        135,        5.7,         ,            ,            
+en       ,MathPile             ,textbooks                   ,false ,math         ,   0.004,   0.098,   0.647,      24769,        6.6,    0.202,        2.07,        3.20
+en       ,AmericanStories      ,1893                        ,true  ,newspaper    ,   0.558,   0.089,   0.505,        160,        5.7,         ,            ,            
+en       ,AmericanStories      ,1891                        ,true  ,newspaper    ,   0.522,   0.088,   0.499,        168,        5.7,         ,            ,            
+en       ,AmericanStories      ,1933                        ,true  ,newspaper    ,   0.563,   0.086,   0.498,        152,        5.8,         ,            ,            
+en       ,AmericanStories      ,1934                        ,true  ,newspaper    ,   0.560,   0.085,   0.495,        152,        5.8,         ,            ,            
+en       ,AmericanStories      ,1899                        ,true  ,newspaper    ,   0.650,   0.083,   0.474,        128,        5.7,         ,            ,            
+en       ,AmericanStories      ,1935                        ,true  ,newspaper    ,   0.542,   0.081,   0.468,        149,        5.8,         ,            ,            
+en       ,AmericanStories      ,1936                        ,true  ,newspaper    ,   0.556,   0.080,   0.468,        145,        5.8,         ,            ,            
+en       ,AmericanStories      ,1937                        ,true  ,newspaper    ,   0.559,   0.080,   0.464,        142,        5.8,         ,            ,            
+en       ,AmericanStories      ,1938                        ,true  ,newspaper    ,   0.550,   0.079,   0.459,        143,        5.8,         ,            ,            
+en       ,AmericanStories      ,1941                        ,true  ,newspaper    ,   0.512,   0.075,   0.440,        147,        5.8,         ,            ,            
+en       ,AmericanStories      ,1900                        ,true  ,newspaper    ,   0.589,   0.075,   0.427,        127,        5.7,         ,            ,            
+en       ,AmericanStories      ,1926                        ,true  ,newspaper    ,   0.514,   0.073,   0.419,        142,        5.7,         ,            ,            
+en       ,AmericanStories      ,1892                        ,true  ,newspaper    ,   0.451,   0.072,   0.410,        160,        5.7,         ,            ,            
+en       ,AmericanStories      ,1942                        ,true  ,newspaper    ,   0.424,   0.065,   0.380,        154,        5.8,         ,            ,            
+en       ,AmericanStories      ,1927                        ,true  ,newspaper    ,   0.431,   0.061,   0.353,        142,        5.7,         ,            ,            
+en       ,Claire.en            ,DialogStudio                ,false ,dialogue     ,   0.473,   0.061,   0.378,        129,        6.2,    0.118,        1.93,        3.21
+en       ,AmericanStories      ,1940                        ,true  ,newspaper    ,   0.403,   0.060,   0.348,        148,        5.8,         ,            ,            
+en       ,AmericanStories      ,1931                        ,true  ,newspaper    ,   0.442,   0.060,   0.345,        135,        5.8,         ,            ,            
+en       ,AmericanStories      ,1883                        ,true  ,newspaper    ,   0.326,   0.058,   0.331,        179,        5.7,         ,            ,            
+en       ,Europarl.en          ,                            ,false ,legi_dialogue,   0.011,   0.056,   0.339,       5071,        6.0,    0.069,        1.22,        4.92
+en       ,AmericanStories      ,1947                        ,true  ,newspaper    ,   0.311,   0.051,   0.295,        163,        5.8,         ,            ,            
+en       ,AmericanStories      ,1879                        ,true  ,newspaper    ,   0.228,   0.050,   0.282,        218,        5.7,         ,            ,            
+en       ,AmericanStories      ,1948                        ,true  ,newspaper    ,   0.308,   0.049,   0.284,        158,        5.8,         ,            ,            
+en       ,AmericanStories      ,1876                        ,true  ,newspaper    ,   0.223,   0.048,   0.277,        217,        5.7,         ,            ,            
+en       ,AmericanStories      ,1932                        ,true  ,newspaper    ,   0.373,   0.048,   0.283,        130,        5.8,         ,            ,            
+en       ,AmericanStories      ,1929                        ,true  ,newspaper    ,   0.361,   0.048,   0.278,        134,        5.8,         ,            ,            
+en       ,AmericanStories      ,1878                        ,true  ,newspaper    ,   0.236,   0.048,   0.275,        205,        5.7,         ,            ,            
+en       ,AmericanStories      ,1951                        ,true  ,newspaper    ,   0.323,   0.048,   0.278,        147,        5.8,         ,            ,            
+en       ,AmericanStories      ,1949                        ,true  ,newspaper    ,   0.306,   0.046,   0.268,        150,        5.8,         ,            ,            
+en       ,AmericanStories      ,1888                        ,true  ,newspaper    ,   0.299,   0.043,   0.247,        145,        5.7,         ,            ,            
+en       ,AmericanStories      ,1889                        ,true  ,newspaper    ,   0.295,   0.042,   0.241,        144,        5.7,         ,            ,            
+en       ,AmericanStories      ,1925                        ,true  ,newspaper    ,   0.347,   0.042,   0.244,        122,        5.8,         ,            ,            
+en       ,AmericanStories      ,1881                        ,true  ,newspaper    ,   0.223,   0.040,   0.229,        182,        5.7,         ,            ,            
+en       ,AmericanStories      ,1939                        ,true  ,newspaper    ,   0.301,   0.039,   0.230,        131,        5.8,         ,            ,            
+en       ,AmericanStories      ,1880                        ,true  ,newspaper    ,   0.219,   0.039,   0.224,        180,        5.7,         ,            ,            
+en       ,AmericanStories      ,1890                        ,true  ,newspaper    ,   0.279,   0.039,   0.223,        141,        5.7,         ,            ,            
+en       ,AmericanStories      ,1873                        ,true  ,newspaper    ,   0.177,   0.038,   0.217,        215,        5.7,         ,            ,            
+en       ,AmericanStories      ,1874                        ,true  ,newspaper    ,   0.165,   0.037,   0.212,        226,        5.7,         ,            ,            
+en       ,AmericanStories      ,1945                        ,true  ,newspaper    ,   0.280,   0.036,   0.212,        130,        5.8,         ,            ,            
+en       ,AmericanStories      ,1960                        ,true  ,newspaper    ,   0.258,   0.036,   0.211,        140,        5.8,         ,            ,            
+en       ,AmericanStories      ,1887                        ,true  ,newspaper    ,   0.261,   0.036,   0.202,        136,        5.7,         ,            ,            
+en       ,AmericanStories      ,1946                        ,true  ,newspaper    ,   0.244,   0.034,   0.199,        140,        5.8,         ,            ,            
+en       ,AmericanStories      ,1930                        ,true  ,newspaper    ,   0.273,   0.033,   0.190,        120,        5.8,         ,            ,            
+en       ,AmericanStories      ,1954                        ,true  ,newspaper    ,   0.205,   0.031,   0.181,        151,        5.8,         ,            ,            
+en       ,MathPile             ,wikipedia                   ,false ,math         ,   0.023,   0.030,   0.207,       1344,        6.8,    0.066,        2.19,        3.11
+en       ,AmericanStories      ,1928                        ,true  ,newspaper    ,   0.254,   0.030,   0.176,        120,        5.8,         ,            ,            
+en       ,AmericanStories      ,1955                        ,true  ,newspaper    ,   0.197,   0.030,   0.172,        150,        5.8,         ,            ,            
+en       ,AmericanStories      ,1944                        ,true  ,newspaper    ,   0.219,   0.029,   0.171,        134,        5.8,         ,            ,            
+en       ,AmericanStories      ,1886                        ,true  ,newspaper    ,   0.217,   0.029,   0.165,        134,        5.7,         ,            ,            
+en       ,AmericanStories      ,1962                        ,true  ,newspaper    ,   0.209,   0.029,   0.168,        138,        5.8,         ,            ,            
+en       ,AmericanStories      ,1943                        ,true  ,newspaper    ,   0.222,   0.028,   0.165,        128,        5.8,         ,            ,            
+en       ,AmericanStories      ,1861                        ,true  ,newspaper    ,   0.141,   0.028,   0.163,        200,        5.8,         ,            ,            
+en       ,AmericanStories      ,1862                        ,true  ,newspaper    ,   0.119,   0.027,   0.156,        228,        5.7,         ,            ,            
+en       ,AmericanStories      ,1950                        ,true  ,newspaper    ,   0.208,   0.027,   0.158,        130,        5.9,         ,            ,            
+en       ,AmericanStories      ,1867                        ,true  ,newspaper    ,   0.117,   0.026,   0.151,        225,        5.7,         ,            ,            
+en       ,AmericanStories      ,1871                        ,true  ,newspaper    ,   0.111,   0.026,   0.147,        231,        5.7,         ,            ,            
+en       ,AmericanStories      ,1952                        ,true  ,newspaper    ,   0.187,   0.025,   0.147,        134,        5.9,         ,            ,            
+en       ,AmericanStories      ,1963                        ,true  ,newspaper    ,   0.179,   0.025,   0.143,        137,        5.8,         ,            ,            
+en       ,AmericanStories      ,1953                        ,true  ,newspaper    ,   0.176,   0.024,   0.144,        139,        5.9,         ,            ,            
+en       ,AmericanStories      ,1882                        ,true  ,newspaper    ,   0.164,   0.024,   0.138,        148,        5.7,         ,            ,            
+en       ,AmericanStories      ,1885                        ,true  ,newspaper    ,   0.160,   0.024,   0.136,        149,        5.7,         ,            ,            
+en       ,AmericanStories      ,1859                        ,true  ,newspaper    ,   0.134,   0.024,   0.135,        176,        5.7,         ,            ,            
+en       ,AmericanStories      ,1856                        ,true  ,newspaper    ,   0.120,   0.024,   0.136,        197,        5.7,         ,            ,            
+en       ,AmericanStories      ,1884                        ,true  ,newspaper    ,   0.158,   0.023,   0.131,        146,        5.7,         ,            ,            
+en       ,AmericanStories      ,1860                        ,true  ,newspaper    ,   0.122,   0.021,   0.123,        175,        5.7,         ,            ,            
+en       ,AmericanStories      ,1866                        ,true  ,newspaper    ,   0.097,   0.021,   0.122,        220,        5.7,         ,            ,            
+en       ,AmericanStories      ,1875                        ,true  ,newspaper    ,   0.128,   0.019,   0.108,        148,        5.7,         ,            ,            
+en       ,AmericanStories      ,1961                        ,true  ,newspaper    ,   0.160,   0.019,   0.108,        116,        5.8,         ,            ,            
+en       ,AmericanStories      ,1845                        ,true  ,newspaper    ,   0.067,   0.016,   0.095,        246,        5.7,         ,            ,            
+en       ,AmericanStories      ,1877                        ,true  ,newspaper    ,   0.107,   0.016,   0.091,        151,        5.7,         ,            ,            
+en       ,AmericanStories      ,1855                        ,true  ,newspaper    ,   0.084,   0.016,   0.091,        189,        5.7,         ,            ,            
+en       ,AmericanStories      ,1959                        ,true  ,newspaper    ,   0.102,   0.014,   0.082,        138,        5.8,         ,            ,            
+en       ,AmericanStories      ,1872                        ,true  ,newspaper    ,   0.084,   0.013,   0.075,        157,        5.7,         ,            ,            
+en       ,AmericanStories      ,1869                        ,true  ,newspaper    ,   0.072,   0.012,   0.071,        172,        5.7,         ,            ,            
+en       ,AmericanStories      ,1858                        ,true  ,newspaper    ,   0.074,   0.011,   0.065,        154,        5.7,         ,            ,            
+en       ,AmericanStories      ,1846                        ,true  ,newspaper    ,   0.060,   0.011,   0.063,        181,        5.8,         ,            ,            
+en       ,AmericanStories      ,1870                        ,true  ,newspaper    ,   0.067,   0.011,   0.062,        159,        5.8,         ,            ,            
+en       ,Claire.en            ,BNC                         ,false ,dialogue     ,   0.001,   0.011,   0.060,      11760,        5.6,    0.017,        1.58,        3.55
+en       ,AmericanStories      ,1957                        ,true  ,newspaper    ,   0.073,   0.010,   0.059,        140,        5.8,         ,            ,            
+en       ,AmericanStories      ,1868                        ,true  ,newspaper    ,   0.058,   0.010,   0.058,        174,        5.7,         ,            ,            
+en       ,AmericanStories      ,1863                        ,true  ,newspaper    ,   0.061,   0.010,   0.056,        160,        5.7,         ,            ,            
+en       ,AmericanStories      ,1852                        ,true  ,newspaper    ,   0.040,   0.009,   0.051,        223,        5.8,         ,            ,            
+en       ,AmericanStories      ,1857                        ,true  ,newspaper    ,   0.058,   0.009,   0.051,        151,        5.7,         ,            ,            
+en       ,AmericanStories      ,1854                        ,true  ,newspaper    ,   0.055,   0.009,   0.050,        160,        5.8,         ,            ,            
+en       ,AmericanStories      ,1844                        ,true  ,newspaper    ,   0.036,   0.008,   0.048,        234,        5.7,         ,            ,            
+en       ,AmericanStories      ,1851                        ,true  ,newspaper    ,   0.039,   0.008,   0.044,        192,        5.8,         ,            ,            
+en       ,AmericanStories      ,1865                        ,true  ,newspaper    ,   0.039,   0.006,   0.035,        156,        5.7,         ,            ,            
+en       ,AmericanStories      ,1956                        ,true  ,newspaper    ,   0.050,   0.006,   0.035,        120,        5.8,         ,            ,            
+en       ,AmericanStories      ,1958                        ,true  ,newspaper    ,   0.049,   0.006,   0.035,        122,        5.8,         ,            ,            
+en       ,AmericanStories      ,1849                        ,true  ,newspaper    ,   0.027,   0.006,   0.033,        215,        5.7,         ,            ,            
+en       ,AmericanStories      ,1848                        ,true  ,newspaper    ,   0.025,   0.006,   0.032,        228,        5.7,         ,            ,            
+en       ,AmericanStories      ,1864                        ,true  ,newspaper    ,   0.035,   0.005,   0.031,        153,        5.7,         ,            ,            
+en       ,Claire.en            ,OANC                        ,false ,dialogue     ,   0.004,   0.005,   0.027,       1366,        5.6,    0.008,        1.66,        3.36
+en       ,AmericanStories      ,1841                        ,true  ,newspaper    ,   0.020,   0.004,   0.026,        224,        5.8,         ,            ,            
+en       ,AmericanStories      ,1850                        ,true  ,newspaper    ,   0.021,   0.004,   0.025,        202,        5.8,         ,            ,            
+en       ,AmericanStories      ,1847                        ,true  ,newspaper    ,   0.019,   0.004,   0.023,        218,        5.7,         ,            ,            
+en       ,AmericanStories      ,1853                        ,true  ,newspaper    ,   0.025,   0.004,   0.021,        149,        5.8,         ,            ,            
+en       ,MathPile             ,proofwiki                   ,false ,math         ,   0.024,   0.004,   0.021,        154,        5.7,    0.008,        2.19,        2.59
+en       ,AmericanStories      ,1842                        ,true  ,newspaper    ,   0.012,   0.003,   0.015,        219,        5.7,         ,            ,            
+en       ,AmericanStories      ,1843                        ,true  ,newspaper    ,   0.015,   0.002,   0.013,        156,        5.7,         ,            ,            
+en       ,AmericanStories      ,1831                        ,true  ,newspaper    ,   0.007,   0.002,   0.010,        266,        5.8,         ,            ,            
+en       ,AmericanStories      ,1827                        ,true  ,newspaper    ,   0.006,   0.002,   0.010,        268,        5.7,         ,            ,            
+en       ,Claire.en            ,DailyDialog                 ,false ,dialogue     ,   0.013,   0.001,   0.007,         97,        5.9,    0.002,        1.82,        3.24
+en       ,AmericanStories      ,1834                        ,true  ,newspaper    ,   0.004,   0.001,   0.006,        254,        5.7,         ,            ,            
+en       ,AmericanStories      ,1837                        ,true  ,newspaper    ,   0.005,   0.001,   0.006,        226,        5.7,         ,            ,            
+en       ,AmericanStories      ,1833                        ,true  ,newspaper    ,   0.004,   0.001,   0.006,        272,        5.7,         ,            ,            
+en       ,AmericanStories      ,1838                        ,true  ,newspaper    ,   0.004,   0.001,   0.006,        237,        5.7,         ,            ,            
+en       ,AmericanStories      ,1830                        ,true  ,newspaper    ,   0.003,   0.001,   0.006,        323,        5.8,         ,            ,            
+en       ,AmericanStories      ,1825                        ,true  ,newspaper    ,   0.004,   0.001,   0.005,        266,        5.7,         ,            ,            
+en       ,Claire.en            ,ICSI                        ,false ,dialogue     ,   0.000,   0.001,   0.006,      11841,        6.2,    0.002,        2.03,        3.06
+en       ,AmericanStories      ,1840                        ,true  ,newspaper    ,   0.004,   0.001,   0.005,        204,        5.7,         ,            ,            
+en       ,AmericanStories      ,1836                        ,true  ,newspaper    ,   0.004,   0.001,   0.005,        197,        5.8,         ,            ,            
+en       ,AmericanStories      ,1835                        ,true  ,newspaper    ,   0.004,   0.001,   0.005,        202,        5.7,         ,            ,            
+en       ,AmericanStories      ,1832                        ,true  ,newspaper    ,   0.004,   0.001,   0.005,        214,        5.7,         ,            ,            
+en       ,Claire.en            ,AMI                         ,false ,dialogue     ,   0.000,   0.001,   0.005,       5744,        6.3,    0.002,        2.09,        3.03
+en       ,AmericanStories      ,1828                        ,true  ,newspaper    ,   0.003,   0.001,   0.004,        222,        5.8,         ,            ,            
+en       ,AmericanStories      ,1826                        ,true  ,newspaper    ,   0.004,   0.001,   0.004,        190,        5.8,         ,            ,            
+en       ,AmericanStories      ,1829                        ,true  ,newspaper    ,   0.002,   0.001,   0.004,        291,        5.7,         ,            ,            
+en       ,AmericanStories      ,1839                        ,true  ,newspaper    ,   0.003,   0.001,   0.003,        168,        5.7,         ,            ,            
+en       ,AmericanStories      ,1824                        ,true  ,newspaper    ,   0.001,   0.000,   0.001,        184,        5.7,         ,            ,            
+en       ,AmericanStories      ,1806                        ,true  ,newspaper    ,   0.001,   0.000,   0.001,        166,        5.7,         ,            ,            
+en       ,AmericanStories      ,1818                        ,true  ,newspaper    ,   0.001,   0.000,   0.001,        198,        5.7,         ,            ,            
+en       ,AmericanStories      ,1805                        ,true  ,newspaper    ,   0.001,   0.000,   0.001,        164,        5.7,         ,            ,            
+en       ,AmericanStories      ,1819                        ,true  ,newspaper    ,   0.001,   0.000,   0.001,        167,        5.7,         ,            ,            
+en       ,AmericanStories      ,1823                        ,true  ,newspaper    ,   0.000,   0.000,   0.001,        230,        5.7,         ,            ,            
+en       ,AmericanStories      ,1820                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        243,        5.7,         ,            ,            
+en       ,AmericanStories      ,1799                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        231,        5.6,         ,            ,            
+en       ,Stac                 ,                            ,false ,dialogue     ,   0.000,   0.000,   0.000,       1176,        6.2,    0.000,        2.28,        2.71
+en       ,AmericanStories      ,1816                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        216,        5.7,         ,            ,            
+en       ,AmericanStories      ,1821                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        219,        5.8,         ,            ,            
+en       ,AmericanStories      ,1810                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        152,        5.8,         ,            ,            
+en       ,AmericanStories      ,1822                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        188,        5.8,         ,            ,            
+en       ,AmericanStories      ,1814                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        163,        5.7,         ,            ,            
+en       ,AmericanStories      ,1803                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        159,        5.6,         ,            ,            
+en       ,AmericanStories      ,1815                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        218,        5.6,         ,            ,            
+en       ,AmericanStories      ,1817                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        158,        5.8,         ,            ,            
+en       ,AmericanStories      ,1802                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         63,        5.7,         ,            ,            
+en       ,AmericanStories      ,1808                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        288,        5.7,         ,            ,            
+en       ,AmericanStories      ,1809                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         88,        5.7,         ,            ,            
+en       ,AmericanStories      ,1801                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        182,        5.8,         ,            ,            
+en       ,AmericanStories      ,1807                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         85,        5.7,         ,            ,            
+en       ,AmericanStories      ,1813                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        102,        5.7,         ,            ,            
+en       ,AmericanStories      ,1804                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        117,        5.6,         ,            ,            
+en       ,AmericanStories      ,1812                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        155,        5.7,         ,            ,            
+en       ,AmericanStories      ,1800                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        109,        6.0,         ,            ,            
+en       ,AmericanStories      ,1811                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,        102,        6.0,         ,            ,            
+en       ,AmericanStories      ,1798                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,         56,        5.7,         ,            ,            
+en       ,AmericanStories      ,1774                        ,true  ,newspaper    ,   0.000,   0.000,   0.000,          0,        0.0,         ,            ,            
+es       ,RedPajama--es--2023  ,2023-06                     ,false ,web          ,  20.273,  14.823,  90.942,        731,        6.1,         ,            ,            
+es       ,RedPajama--es--2023  ,2023-14                     ,false ,web          ,  19.477,  14.045,  86.238,        721,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-49                     ,false ,web          ,  19.247,  13.912,  85.388,        723,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-21                     ,false ,web          ,  18.056,  12.918,  79.215,        715,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-40                     ,false ,web          ,  17.649,  12.822,  78.664,        727,        6.1,         ,            ,            
+es       ,RedPajama--es--2021  ,2021-43                     ,false ,web          ,  17.354,  12.420,  76.157,        716,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-27                     ,false ,web          ,  16.760,  12.193,  74.803,        728,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-05                     ,false ,web          ,  14.606,  10.640,  65.248,        728,        6.1,         ,            ,            
+es       ,RedPajama--es--2022  ,2022-33                     ,false ,web          ,  13.920,   9.576,  58.775,        688,        6.1,         ,            ,            
+es       ,RedPajama--es--2021  ,2021-49                     ,false ,web          ,  12.107,   8.401,  51.553,        694,        6.1,         ,            ,            
+es       ,Wikipedia.es         ,                            ,false ,wiki         ,   1.947,   1.245,   7.161,        639,        5.8,    2.124,        1.71,        3.37
+es       ,Eurovoc.es           ,                            ,true  ,legi_written ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
+es       ,Europarl.es          ,                            ,false ,legi_dialogue,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
+es       ,Gutenberg.es         ,                            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.092,        1.80,        3.30
+de       ,RedPajama--de--2023  ,2023-06                     ,false ,web          ,  20.412,  12.793,  92.619,        627,        7.2,         ,            ,            
+de       ,RedPajama--de--2023  ,2023-14                     ,false ,web          ,  19.065,  11.911,  86.409,        625,        7.3,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-49                     ,false ,web          ,  19.021,  11.904,  86.310,        626,        7.3,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-40                     ,false ,web          ,  17.835,  11.248,  81.499,        631,        7.2,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-21                     ,false ,web          ,  17.226,  10.979,  79.584,        637,        7.2,         ,            ,            
+de       ,RedPajama--de--2021  ,2021-43                     ,false ,web          ,  17.114,  10.860,  78.740,        635,        7.3,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-27                     ,false ,web          ,  16.225,  10.316,  74.768,        636,        7.2,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-05                     ,false ,web          ,  14.188,   9.195,  66.764,        648,        7.3,         ,            ,            
+de       ,RedPajama--de--2022  ,2022-33                     ,false ,web          ,  11.196,   7.140,  51.920,        638,        7.3,         ,            ,            
+de       ,RedPajama--de--2021  ,2021-49                     ,false ,web          ,  10.496,   6.731,  49.018,        641,        7.3,         ,            ,            
+de       ,Wikipedia.de         ,                            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
+de       ,Eurovoc.de           ,                            ,true  ,legi_written ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
+de       ,Gutenberg.de         ,                            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
+de       ,Europarl.de          ,                            ,false ,legi_dialogue,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
+it       ,RedPajama--it--2023  ,2023-06                     ,false ,web          ,  11.746,   7.305,  47.694,        622,        6.5,         ,            ,            
+it       ,RedPajama--it--2023  ,2023-14                     ,false ,web          ,  11.577,   7.098,  46.372,        613,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-49                     ,false ,web          ,  11.430,   7.052,  46.047,        617,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-40                     ,false ,web          ,  10.152,   6.352,  41.460,        626,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-21                     ,false ,web          ,  10.110,   6.288,  41.037,        622,        6.5,         ,            ,            
+it       ,RedPajama--it--2021  ,2021-43                     ,false ,web          ,   9.817,   6.117,  39.927,        623,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-27                     ,false ,web          ,   9.607,   5.955,  38.887,        620,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-05                     ,false ,web          ,   8.238,   5.198,  33.938,        631,        6.5,         ,            ,            
+it       ,RedPajama--it--2022  ,2022-33                     ,false ,web          ,   7.800,   4.680,  30.549,        600,        6.5,         ,            ,            
+it       ,RedPajama--it--2021  ,2021-49                     ,false ,web          ,   6.846,   4.149,  27.101,        606,        6.5,         ,            ,            
+it       ,Wikipedia.it         ,                            ,false ,wiki         ,   1.870,   1.060,   6.161,        567,        5.8,    1.959,        1.85,        3.14
+it       ,Eurovoc.it           ,                            ,true  ,legi_written ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
+it       ,Gutenberg.it         ,                            ,false ,book         ,   0.001,   0.066,   0.414,      68616,        6.3,    0.129,        1.96,        3.21
+fr-en    ,CroissantAligned     ,                            ,false ,aligned      , 408.029,  16.911, 107.003,         41,        6.3,   25.351,        1.50,        4.22
+fr-en    ,EuroparlAligned.fr-en,                            ,false ,aligned      ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
+es-en    ,EuroparlAligned.es-en,                            ,false ,aligned      ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
+it-en    ,EuroparlAligned.it-en,                            ,false ,aligned      ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
+de-fr    ,EuroparlAligned.de-fr,                            ,false ,aligned      ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
+code     ,TheStack             ,javascript                  ,false ,programming  ,  21.109,   8.526, 141.647,        404,       16.6,   58.609,        6.87,        2.42
+code     ,TheStack             ,java                        ,false ,programming  ,  20.152,   7.421,  89.297,        368,       12.0,   27.680,        3.73,        3.23
+code     ,TheStack             ,c                           ,false ,programming  ,   8.626,   5.916,  57.428,        686,        9.7,   24.092,        4.07,        2.38
+code     ,TheStack             ,python                      ,false ,programming  ,  12.962,   5.434,  64.304,        419,       11.8,   21.683,        3.99,        2.97
+code     ,TheStack             ,php                         ,false ,programming  ,  15.905,   4.865,  66.844,        306,       13.7,   22.883,        4.70,        2.92
+code     ,TheStack             ,c++                         ,false ,programming  ,   6.378,   4.584,  50.892,        719,       11.1,   18.835,        4.11,        2.70
+code     ,TheStack             ,c#                          ,false ,programming  ,  10.839,   3.574,  46.286,        330,       13.0,   13.381,        3.74,        3.46
+code     ,TheStack             ,go                          ,false ,programming  ,   4.730,   2.735,  25.738,        578,        9.4,   10.262,        3.75,        2.51
+code     ,TheStack             ,typescript                  ,false ,programming  ,  10.637,   2.617,  28.815,        246,       11.0,    9.836,        3.76,        2.93
+code     ,TheStack             ,rust                        ,false ,programming  ,   1.387,   0.872,   9.529,        629,       10.9,    3.241,        3.72,        2.94
+code     ,TheStack             ,ruby                        ,false ,programming  ,   3.405,   0.646,   7.139,        190,       11.1,    2.392,        3.70,        2.98
+code     ,TheStack             ,swift                       ,false ,programming  ,   1.756,   0.553,   6.134,        315,       11.1,    1.876,        3.39,        3.27
+code     ,TheStack             ,scala                       ,false ,programming  ,   1.362,   0.457,   4.862,        335,       10.6,    1.587,        3.47,        3.06
+code     ,TheStack             ,kotlin                      ,false ,programming  ,   2.243,   0.454,   5.769,        202,       12.7,    1.758,        3.87,        3.28
+code     ,TheStack             ,tex                         ,false ,programming  ,   0.398,   0.394,   3.805,        989,        9.7,    1.507,        3.83,        2.53
+code     ,TheStack             ,lua                         ,false ,programming  ,   0.559,   0.318,   3.279,        570,       10.3,    1.367,        4.29,        2.40
+code     ,TheStack             ,dart                        ,false ,programming  ,   0.933,   0.308,   3.864,        331,       12.5,    1.242,        4.03,        3.11
+code     ,TheStack             ,haskell                     ,false ,programming  ,   0.545,   0.307,   2.364,        563,        7.7,    0.807,        2.63,        2.93
+code     ,TheStack             ,perl                        ,false ,programming  ,   0.392,   0.297,   2.634,        757,        8.9,    1.149,        3.87,        2.29
+code     ,TheStack             ,assembly                    ,false ,programming  ,   0.248,   0.209,   1.575,        840,        7.5,    0.867,        4.15,        1.82
+code     ,TheStack             ,fortran                     ,false ,programming  ,   0.165,   0.192,   1.843,       1158,        9.6,    0.780,        4.07,        2.36
+code     ,TheStack             ,julia                       ,false ,programming  ,   0.299,   0.152,   1.539,        510,       10.1,    0.660,        4.34,        2.33
+code     ,TheStack             ,ocaml                       ,false ,programming  ,   0.160,   0.130,   1.107,        812,        8.5,    0.430,        3.31,        2.58
+code     ,TheStack             ,mathematica                 ,false ,programming  ,   0.027,   0.120,   1.720,       4454,       14.4,    1.117,        9.32,        1.54
+code     ,TheStack             ,elixir                      ,false ,programming  ,   0.282,   0.073,   0.737,        259,       10.1,    0.258,        3.53,        2.85
+code     ,TheStack             ,erlang                      ,false ,programming  ,   0.099,   0.066,   0.726,        661,       11.0,    0.260,        3.96,        2.79
+code     ,TheStack             ,clojure                     ,false ,programming  ,   0.126,   0.045,   0.492,        355,       11.0,    0.179,        3.98,        2.75
+code     ,TheStack             ,r                           ,false ,programming  ,   0.039,   0.028,   0.305,        711,       10.9,    0.158,        5.67,        1.93
+code     ,TheStack             ,matlab                      ,false ,programming  ,   0.001,   0.009,   0.037,       8940,        4.3,    0.043,        4.94,        0.87
+code     ,TheStack             ,racket                      ,false ,programming  ,   0.004,   0.005,   0.038,       1141,        7.9,    0.015,        3.18,        2.48
