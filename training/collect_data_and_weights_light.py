@@ -256,7 +256,8 @@ before={ratio*100:6.3f}% after={new_ratio*100:6.3f}% reweighted_count={reweighte
         print("```\n")
 
         print("# Total Tokens\n```")
-        print(f"before={total_count*1e-9:.3f} B tokens, after={total_reweighted_count*1e-9:.3f} B tokens\n")
+        print(f"before={total_count*1e-9:.3f} B tokens, after={total_reweighted_count*1e-9:.3f} B tokens")
+        print(f"Number of samples={total_reweighted_count/4096:.2f} with sequence length=4096")
         print("```")
 
     else:
