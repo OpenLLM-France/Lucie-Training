@@ -41,8 +41,8 @@ export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Me
 cd $MEGATRON_DEEPSPEED_REPO
 
 # Tokenizer and data
-TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENIZER_PATH=$TOKENS_DIR/tokenizer # OpenLLM-France/Lucie-tokenizer-65k
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_light.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
