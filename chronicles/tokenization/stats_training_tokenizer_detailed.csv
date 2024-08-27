@@ -1,0 +1,28 @@
+language ,name                ,subset       , M pages, B words, B chars,#words/page,#chars/word
+es       ,Eurovoc.es          ,chars-ssample,   0.071,   0.195,   1.200,       2738,  6.2
+it       ,Eurovoc.it          ,chars-ssample,   0.070,   0.181,   1.200,       2595,  6.6
+de       ,Eurovoc.de          ,chars-ssample,   0.077,   0.164,   1.200,       2133,  7.3
+it       ,Wikipedia.it        ,chars-ssample,   0.314,   0.106,   0.600,        337,  5.7
+es       ,Wikipedia.es        ,chars-ssample,   0.373,   0.103,   0.600,        276,  5.8
+de       ,Wikipedia.de        ,chars-ssample,   0.234,   0.092,   0.600,        392,  6.5
+es       ,Europarl.es         ,ssample      ,   0.005,   0.026,   0.159,       4986,  6.2
+de       ,Europarl.de         ,ssample      ,   0.005,   0.023,   0.169,       4830,  7.2
+---      ,---                 ,---          ,  20.316,  11.056,  68.396,        544,  6.2
+fr       ,Theses              ,6000000000cha,   0.012,   0.957,   6.000,      80436,  6.3
+fr       ,Wikipedia.fr        ,chars-ssample,   1.323,   0.863,   4.943,        652,  5.7
+fr       ,Persee              ,0-1parquet-ss,   0.050,   0.148,   0.927,       2970,  6.3
+fr       ,GallicaMonographies ,0-2parquet-ss,   0.002,   0.094,   0.561,      53463,  6.0
+fr       ,Europarl.fr         ,ssample      ,   0.006,   0.025,   0.161,       4480,  6.4
+fr       ,---                 ,---          ,  13.788,   8.694,  53.079,        631,  6.1
+fr       ,DatasetV2           ,             ,  13.189,   8.306,  50.709,        630,  6.1
+fr       ,OpenData            ,             ,   0.584,   0.379,   2.320,        649,  6.1
+fr       ,Claire.fr           ,             ,   0.016,   0.009,   0.050,        544,  5.7
+en       ,Wikipedia.en        ,chars-ssample,   3.447,   2.357,  13.322,        684,  5.7
+en       ,Eurovoc.en          ,chars-ssample,   0.069,   0.196,   1.210,       2841,  6.2
+en       ,Europarl.en         ,ssample      ,   0.006,   0.028,   0.169,       4835,  6.0
+en       ,---                 ,---          ,   6.113,   2.164,  13.117,        354,  6.1
+en       ,PeS2o               ,             ,   1.241,   1.079,   6.896,        870,  6.4
+en       ,AmericanStories     ,             ,   4.643,   0.715,   4.106,        154,  5.7
+en       ,Claire.en           ,             ,   0.229,   0.370,   2.116,       1612,  5.7
+code     ,---                 ,---          ,   0.414,   0.198,   2.200,        479, 11.1
+code     ,TheStack            ,             ,   0.414,   0.198,   2.200,        479, 11.1
