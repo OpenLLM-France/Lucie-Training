@@ -113,7 +113,7 @@ datasets_categories = {
         for year in ["2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"]
     ]
     + [f"RedPajama--{language}--{year}".lower() for language in ["de", "es", "it"] for year in ["2021", "2022", "2023"]]
-    + [f"FineWebEdu--cc-main-{year}".lower() for year in ["2021", "2022", "2023", "2024"]],
+    + [f"FineWebEdu--cc-main-{year}".lower() for year in ["2019", "2020", "2021", "2022", "2023", "2024"]],
 }
 
 
