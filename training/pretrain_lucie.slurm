@@ -10,7 +10,6 @@
 #SBATCH --job-name=lucie-pretraining
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=ogouvert@linagora.com
-#SBATCH --job-name=lucie-pretraining
 
 set -x -e
 
@@ -86,7 +85,7 @@ RAMPUP_SAMPLES=10_000_000
 
 SAVE_INTERVAL=5000
 
-config_json="./ds_config.json"
+config_json="$LOGS_PATH/ds_config.json"
 
 cat <<EOT > $config_json
 {
@@ -169,7 +168,7 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH"_bs-"$GLOBAL_BATCH_SIZE_MIN"-"$GLOBAL_BATCH_SIZE"_ramup-"$GLOBAL_BATCH_SIZE_STEP"-"$RAMPUP_SAMPLES
+DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH
 
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
