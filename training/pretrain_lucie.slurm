@@ -33,7 +33,7 @@ export CUDA_LAUNCH_BLOCKING=1
 # hide duplicated errors using this hack - will be properly fixed in pt-1.12
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
 # force crashing on nccl issues like hanging broadcast
-export NCCL_ASYNC_ERROR_HANDLING=1
+export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
@@ -44,7 +44,7 @@ cd $MEGATRON_DEEPSPEED_REPO
 # Tokenizer and data
 TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_light.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
