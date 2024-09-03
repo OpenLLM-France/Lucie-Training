@@ -15,8 +15,11 @@ set -x -e
 
 echo "START TIME: $(date)"
 
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+export SRC_DIR=~/Lucie-Training
+
 # Load env and variables
-source ~/Lucie-Training/training/set_env.sh
+source $SRC_DIR/training/set_env.sh
 
 # Variables
 VARIANT=pretraining
@@ -37,13 +40,12 @@ export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
-cd $MEGATRON_DEEPSPEED_REPO
+cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 TOKENIZER_PATH=$TOKENS_DIR/tokenizer # OpenLLM-France/Lucie-tokenizer-65k
-DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_light.py $TOKENS_DIR)"
+DATASET="$(python $SRC_DIR/training/collect_data_and_weights_light.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
