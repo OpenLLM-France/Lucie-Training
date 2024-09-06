@@ -6,7 +6,7 @@
 #SBATCH --constraint=h100                      # pour cibler les noeuds H100
 #SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=%x-%j.out           # output file name
+#SBATCH --output=lucie_slurm_logs/%x-%j.out           # output file name
 #SBATCH --job-name=lucie-pretraining
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=ogouvert@linagora.com
@@ -154,7 +154,7 @@ LOG_ARGS=" \
        --no-log-loss-scale-to-tensorboard \
        "
 
-# for 20h 1180, i.e., 20min for last checkpoint
+# for 20h, exit-duration: 1180min, i.e., 20min for last checkpoint
 EXIT_OPTS=" \
     --exit-duration-in-mins 1180 \ 
     "
