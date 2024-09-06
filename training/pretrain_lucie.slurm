@@ -22,10 +22,9 @@ export SRC_DIR=~/Lucie-Training
 source $SRC_DIR/training/set_env.sh
 
 # Variables
-VARIANT=pretraining
-CHECKPOINT_PATH=$ALL_CCFRSCRATCH/checkpoints/$VARIANT
-TENSORBOARD_PATH=$ALL_CCFRSCRATCH/tensorboard/$VARIANT
-LOGS_PATH=$ALL_CCFRSCRATCH/lucie-logs/lucie-logs/$VARIANT
+CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/checkpoints
+TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/tensorboard/pretraining
+LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/logs
 mkdir -p $LOGS_PATH
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
@@ -44,7 +43,7 @@ cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-TOKENIZER_PATH=$TOKENS_DIR/tokenizer # OpenLLM-France/Lucie-tokenizer-65k
+TOKENIZER_PATH=$TOKENS_DIR/tokenizer 
 DATASET="$(python $SRC_DIR/training/collect_data_and_weights_light.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
@@ -155,9 +154,9 @@ LOG_ARGS=" \
        --no-log-loss-scale-to-tensorboard \
        "
 
-# for 20h 1190, for 100h 5990
+# for 20h 1180, i.e., 20min for last checkpoint
 EXIT_OPTS=" \
-    --exit-duration-in-mins 1190 \
+    --exit-duration-in-mins 1180 \ 
     "
 
 DISTRIBUTED_ARGS=" \
