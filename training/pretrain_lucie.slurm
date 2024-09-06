@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --nodes=128
+#SBATCH --nodes=64
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
@@ -154,9 +154,8 @@ LOG_ARGS=" \
        --no-log-loss-scale-to-tensorboard \
        "
 
-# for 20h, exit-duration: 1180min, i.e., 20min for last checkpoint
 EXIT_OPTS=" \
-    --exit-duration-in-mins 1180 \ 
+    --exit-duration-in-mins 1190 \
     "
 
 DISTRIBUTED_ARGS=" \
