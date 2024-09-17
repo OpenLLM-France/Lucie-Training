@@ -1,4 +1,3 @@
-import tiktoken
 import transformers
 from tokenizer_train import test_tokenizer
 
@@ -91,6 +90,8 @@ if __name__ == "__main__":
 
     for tokenizer_name in tokenizers:
         if tokenizer_name.lower().startswith("gpt"):
+            import tiktoken
+
             tokenizer = tiktoken.encoding_for_model(tokenizer_name.lower())
         else:
             tokenizer = transformers.AutoTokenizer.from_pretrained(tokenizer_name, trust_remote_code=True)
