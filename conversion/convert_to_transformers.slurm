@@ -20,11 +20,15 @@ run_conversion(){
     UNIVERSAL_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/universal_checkpoints/global_step${GLOBAL_STEP}
     TRANSFORMERS_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/transformers_checkpoints/global_step${GLOBAL_STEP}
 
-    # # DS to Universal
-    srun --exclusive -n 1 python tools/convert_checkpoint/ds_to_universal.py --input_folder $MEGATRON_CHECKPOINT_PATH --output_folder $UNIVERSAL_CHECKPOINT_PATH 
+    if [ ! -d $UNIVERSAL_CHECKPOINT_PATH ]; then
+        # DS to Universal
+        srun --exclusive -n 1 python tools/convert_checkpoint/ds_to_universal.py --input_folder $MEGATRON_CHECKPOINT_PATH --output_folder $UNIVERSAL_CHECKPOINT_PATH 
+    fi
 
-    # Universal to Transformer
-    srun --exclusive -n 1 python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT_PATH --output_folder $TRANSFORMERS_CHECKPOINT_PATH 
+    if [ ! -d $TRANSFORMERS_CHECKPOINT_PATH ]; then
+        # Universal to Transformer
+        srun --exclusive -n 1 python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT_PATH --output_folder $TRANSFORMERS_CHECKPOINT_PATH 
+    fi
 }
 
 i=25000
