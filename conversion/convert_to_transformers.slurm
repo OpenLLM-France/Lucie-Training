@@ -14,11 +14,12 @@ cd /lustre/fshomisc/home/rech/gendjf01/uov59an/src/Bloom-NG-Training/Megatron-De
 export PYTHONPATH=/lustre/fshomisc/home/rech/gendjf01/uov59an/src/Bloom-NG-Training/Megatron-DeepSpeed
 
 run_conversion(){
-    local GLOBAL_STEP=$1
+    local MAIN_PATH=$1
+    local GLOBAL_STEP=$2
 
-    MEGATRON_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/checkpoints/global_step${GLOBAL_STEP}
-    UNIVERSAL_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/universal_checkpoints/global_step${GLOBAL_STEP}
-    TRANSFORMERS_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/transformers_checkpoints/global_step${GLOBAL_STEP}
+    MEGATRON_CHECKPOINT_PATH=$MAIN_PATH/checkpoints/global_step${GLOBAL_STEP}
+    UNIVERSAL_CHECKPOINT_PATH=$MAIN_PATH/universal_checkpoints/global_step${GLOBAL_STEP}
+    TRANSFORMERS_CHECKPOINT_PATH=$MAIN_PATH/transformers_checkpoints/global_step${GLOBAL_STEP}
 
     if [ ! -d $UNIVERSAL_CHECKPOINT_PATH ]; then
         # DS to Universal
@@ -31,10 +32,19 @@ run_conversion(){
     fi
 }
 
+### LUCIE PRETRAINED
 i=25000
-while [ $i -le 240000 ]; do
-    run_conversion $i &
+while [ $i -le 350000 ]; do
+    run_conversion $ALL_CCFRSCRATCH/trained_models/Lucie/pretrained $i &
     i=$((i + 25000))
 done
+
+### CRISIS HP
+run_conversion $ALL_CCFRSCRATCH/trained_models/Lucie/ablation_pythia_hp 5000 &
+run_conversion $ALL_CCFRSCRATCH/trained_models/Lucie/ablation_pythia_hp 10000 &
+run_conversion $ALL_CCFRSCRATCH/trained_models/Lucie/ablation_pythia_hp 14204 &
+
+### CRISIS PILE
+run_conversion $ALL_CCFRSCRATCH/trained_models/Lucie/pretrained_on_pile 5000 &
 
 wait
