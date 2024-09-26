@@ -8,8 +8,8 @@
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=lucie_slurm_logs/%x-%j.out           # output file name
 #SBATCH --job-name=lucie-pretraining
-#SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=ogouvert@linagora.com
+#SBATCH --mail-type=ARRAY_TASKS,BEGIN,END,FAIL,REQUEUE
+#SBATCH --mail-user=ogouvert@linagora.com,jlouradour@linagora.com
 
 set -x -e
 
