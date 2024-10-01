@@ -2,6 +2,7 @@
 
 # Environement
 module purge
+module load arch/h100
 module load anaconda-py3/2024.06
 module load cuda/12.1.0
 module load gcc/12.2.0
