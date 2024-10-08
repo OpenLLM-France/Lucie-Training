@@ -49,36 +49,52 @@ as well as several programming languages (14.7%).
 
 ### Sentence completion
 
+Load the model (quantized version on GPU if possible, for efficient inference):
 ```python
 import transformers
-import torch
 
 model_name = "OpenLLM-France/Lucie-7B"
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
 model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
     device_map="auto",
-    torch_dtype=torch.bfloat16,
-    load_in_4bit=True                          # For efficient inference, if quantization is supported by the GPU card
+    load_in_4bit=True       # For efficient inference, if quantization is supported by the GPU card
 )
+```
 
+Wrap the model in a text generation pipeline, and prepare some generation parameters:
+```
 pipeline = transformers.pipeline("text-generation", model=model, tokenizer=tokenizer)
-generation_kwargs = dict(
-    num_return_sequences=1,                    # Number of variants to generate.
-    return_full_text= False,                   # Do not include the prompt in the generated text.
-    max_new_tokens=200,                        # Maximum length for the output text.
-    do_sample=True, top_k=10, temperature=1.0, # Sampling parameters.
-    pad_token_id=tokenizer.eos_token_id,       # Just to avoid a harmless warning.
-)
 
-prompt = "Quelle est la capitale de la France ?"
+generation_kwargs = dict(
+    num_return_sequences=1,             # Number of variants to generate.
+    return_full_text= False,            # Do not include the prompt in the generated text.
+    do_sample=True,
+    top_k=10, top_p=1, temperature=1.0, # Sampling parameters.
+    max_new_tokens=200,                 # Maximum length for the output text (in number of tokens).
+)
+```
+
+Try 1-shot question answering:
+```python
+prompt = """\
+Quelle est la capitale de l'Espagne ? Madrid\n\
+Quelle est la capitale de la France ?\
+"""
 completions = pipeline(prompt, **generation_kwargs)
 for completion in completions:
     print(prompt + " […]" + completion['generated_text'])
 ```
 This will print something like:
 ```
+Quelle est la capitale de l'Espagne ? Madrid
 Quelle est la capitale de la France ? […] Paris
+Quelle est la capitale de l'Italie? Rome
+Quelle est la capitale de la Grande-Bretagne? Londres
+Quelle est la capitale de la Suisse? Berne
+Quelle est la capitale du Portugal? Lisbonne
+Quelle est la capitale de l'Algérie? Alger
+...
 ```
 
 If running on GPU (`cuda` device), you will need at least 6GB of VRAM to run inference using 4bit quantization (16GB of VRAM without 4bit quantization).
@@ -87,13 +103,15 @@ If running on GPU (`cuda` device), you will need at least 6GB of VRAM to run inf
 
 Checkpoints at several training steps are available under revision tags,
 every 5000 steps during the first 25000 steps, and then every 25000 steps.
+
 Intermediate checkpoints can be loaded using the `revision` parameter:
 ```python
 model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
-    revision="step0050000",
+    revision="step50000",
     ...
 )
 ```
+where `revision` can be one of: "`step5000`", "`step10000`", ..., "`step25000`", "`step50000`", "`step75000`", ...
 
 ## Training Details
 
