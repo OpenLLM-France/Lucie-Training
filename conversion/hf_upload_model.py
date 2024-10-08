@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -12,9 +13,13 @@ def upload_to_huggingface_hub(
     input_dir: Path,  # = wd / "hf_files" / "Claire-Falcon-7B-0.1",
     message: Optional[str] = None,
     revision: Optional[str] = None,
+    format_json: Optional[bool] = False,
     create_repo: Optional[bool] = None,
 ):
     repo_url = f"https://huggingface.co/{repo_id}"
+
+    if format_json:
+        format_json_files(input_dir)
 
     print(f"Uploading repository {repo_url} with:\n" + "\n".join(os.listdir(input_dir)))
     if not is_hf_logged_in():
@@ -62,6 +67,30 @@ def is_hf_logged_in():
         return True
     except Exception:
         return False
+
+
+def format_json_files(file_or_folder, verbose=True):
+    if file_or_folder.endswith(".json") and os.path.is_file(file_or_folder):
+        json_file = file_or_folder
+        num_lines = sum(1 for line in open(json_file))
+        if num_lines == 1:
+            # Json file is on one line, so we format it (with "indent=2" to enforce at most 1 attribute per line)
+            if verbose:
+                print(f"Formatting {json_file}...")
+            with open(json_file) as f:
+                data = json.load(f)
+            json_file_tmp = json_file + "_fmt.tmp"
+            with open(json_file_tmp, "w") as f:
+                json.dump(data, json_file_tmp, indent=2)
+            os.rename(json_file_tmp, json_file)
+    elif os.path.isdir(file_or_folder):
+        for root, _, files in os.walk(file_or_folder):
+            for file in files:
+                if file.endswith(".json"):
+                    format_json_files(os.path.join(root, file))
+    else:
+        if verbose:
+            print(f"Ignoring {file_or_folder}...")
 
 
 if __name__ == "__main__":
