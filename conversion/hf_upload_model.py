@@ -10,12 +10,24 @@ wd = Path(__file__).parent.parent.resolve()
 
 def upload_to_huggingface_hub(
     repo_id: str,
-    input_dir: Path,  # = wd / "hf_files" / "Claire-Falcon-7B-0.1",
+    input_dir: Path,
     message: Optional[str] = None,
     revision: Optional[str] = None,
     format_json: Optional[bool] = False,
     create_repo: Optional[bool] = None,
 ):
+    """Uploads a directory to Hugging Face Hub.
+
+    Args:
+        repo_id: The repository ID. For instance, if the URL of the repository is
+            `https://huggingface.co/username/my-model`, the `repo_id` is `username/my-model`.
+        input_dir: The directory to upload.
+        message (Optional[str], optional): The commit message. Defaults to None.
+        revision (Optional[str], optional): The revision to create. Defaults to None.
+        format_json (Optional[bool], optional): Whether to ensure json files are not on one line. Defaults to False.
+        create_repo (Optional[bool], optional): If None, will automatically create the repo if it doesn't exist.
+    """
+
     repo_url = f"https://huggingface.co/{repo_id}"
 
     if format_json:
