@@ -10,7 +10,7 @@ wd = Path(__file__).parent.parent.resolve()
 
 def upload_to_huggingface_hub(
     repo_id: str,
-    input_dir: Path,
+    input: Path,
     message: Optional[str] = None,
     revision: Optional[str] = None,
     format_json: Optional[bool] = False,
@@ -21,19 +21,20 @@ def upload_to_huggingface_hub(
     Args:
         repo_id: The repository ID. For instance, if the URL of the repository is
             `https://huggingface.co/username/my-model`, the `repo_id` is `username/my-model`.
-        input_dir: The directory to upload.
+        input: Directory or file to upload.
         message (Optional[str], optional): The commit message. Defaults to None.
         revision (Optional[str], optional): The revision to create. Defaults to None.
         format_json (Optional[bool], optional): Whether to ensure json files are not on one line. Defaults to False.
         create_repo (Optional[bool], optional): If None, will automatically create the repo if it doesn't exist.
     """
 
+    assert os.path.exists(input), f"Input {input} must be an existing file or directory"
+
     repo_url = f"https://huggingface.co/{repo_id}"
 
     if format_json:
-        format_json_files(input_dir)
+        format_json_files(input)
 
-    print(f"Uploading repository {repo_url} with:\n" + "\n".join(os.listdir(input_dir)))
     if not is_hf_logged_in():
         huggingface_hub.login()
 
@@ -49,7 +50,7 @@ def upload_to_huggingface_hub(
     if create_repo:
         if not message:
             message = "initial commit"
-        print(f"Creating repository {repo_url}")
+        print(f"Create repository {repo_url}")
         api.create_repo(
             repo_id=repo_id,
             private=True,
@@ -58,19 +59,30 @@ def upload_to_huggingface_hub(
         )
 
     if revision:
-        print(f"Creating branch {revision} in {repo_url}")
+        print(f"Create branch {revision} in {repo_url}")
         api.create_branch(repo_id, repo_type="model", branch=revision)
         # api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
 
-    print("Pushing changes")
-    api.upload_folder(
-        folder_path=input_dir,
-        repo_id=repo_id,
-        repo_type="model",
-        ignore_patterns=["lit_*", "pytorch_model.bin", "__pycache__"],
-        revision=revision,
-        commit_message=message,
-    )
+    if os.path.isdir(input):
+        print(f"Update repository {repo_url} with:\n" + "\n".join(os.listdir(input)))
+        api.upload_folder(
+            folder_path=input,
+            repo_id=repo_id,
+            repo_type="model",
+            ignore_patterns=["lit_*", "pytorch_model.bin", "__pycache__"],
+            revision=revision,
+            commit_message=message,
+        )
+    else:
+        print(f"Update repository {repo_url} with: {input}")
+        api.upload_file(
+            path_or_fileobj=input,
+            path_in_repo=os.path.basename(input),
+            repo_id=repo_id,
+            repo_type="model",
+            revision=revision,
+            commit_message=message,
+        )
 
 
 def is_hf_logged_in():
