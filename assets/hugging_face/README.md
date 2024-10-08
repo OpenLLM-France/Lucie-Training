@@ -67,11 +67,11 @@ Wrap the model in a text generation pipeline, and prepare some generation parame
 pipeline = transformers.pipeline("text-generation", model=model, tokenizer=tokenizer)
 
 generation_kwargs = dict(
-    num_return_sequences=1,             # Number of variants to generate.
-    return_full_text= False,            # Do not include the prompt in the generated text.
+    num_return_sequences=1,               # Number of variants to generate.
+    return_full_text= False,              # Do not include the prompt in the generated text.
     do_sample=True,
-    top_k=10, top_p=1, temperature=1.0, # Sampling parameters.
-    max_new_tokens=200,                 # Maximum length for the output text (in number of tokens).
+    temperature=1.0, top_p=1, top_k=None, # Sampling parameters.
+    max_new_tokens=200,                   # Maximum length for the output text (in number of tokens).
 )
 ```
 
