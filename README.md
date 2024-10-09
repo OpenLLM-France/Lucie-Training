@@ -120,12 +120,9 @@ Notes:
 
 Some useful checks that can be made (based on the classical errors we saw when using our fork of Megatron-Deepspeed):
 ```bash
-python -c "from torch.distributed.elastic.agent.server.api import log"
-python -c "from flash_attn import flash_attn_qkvpacked_func, flash_attn_func"
-```
-
-```bash	
-srun --ntasks=1 --gres=gpu:1 -C a100 -A qgz@a100 --qos=qos_gpu-dev --time=00:03:00 python -c "import os, subprocess; os.environ['MASTER_ADDR']= subprocess.run('scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1', shell=True, capture_output=True, text=True).stdout; os.environ['MASTER_PORT'] = '6000'; from megatron.initialize import initialize_megatron; initialize_megatron(); print('ok')" --micro-batch-size 2 --num-layers 2 --use-dataset-only True --seq-length 100 --tokenizer-type PretrainedFromHF --tokenizer-name-or-path OpenLLM-France/Lucie-tokenizer-65k
+python -c "from torch.distributed.elastic.agent.server.api import log" # Check if torch is compatible with Megatron-Deepspeed
+python -c "from flash_attn import flash_attn_qkvpacked_func, flash_attn_func" # Check if flash_attn is correctly installed
+python -c "import amp_C" # Check if apex is correctly installed
 ```
 
 WIP (trying to have minimal command to check the pre-training)
