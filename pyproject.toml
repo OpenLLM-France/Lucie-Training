@@ -36,7 +36,7 @@ select = [
     "B",  # flake8-bugbear
     "UP",  # pyupgrade
 ]
-ignore = ["C408", "B023"]
+ignore = ["C408", "B023", "C901"]
 
 [build-system]
 requires = ["poetry-core"]
