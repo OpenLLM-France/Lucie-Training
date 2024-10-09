@@ -547,6 +547,53 @@ class DataIteratorConcat(DataIteratorBase):
             return self.__next__()
 
 
+class DataIteratorCustom(DataIterator):
+    def __init__(
+        self,
+        text_data=None,
+        repeat=8,
+        insert_special=True,
+        name="Custom",
+        **kwargs,
+    ):
+        if text_data is None:
+            text_data = [
+                """
+- Bonjour Lucie, comment vas-tu ?
+- Et bien moi, ça va très bien, merci. Et toi ?""",
+            ]
+
+        if insert_special is True:
+            insert_special = [
+                (
+                    2,
+                    """\
+    A. Ils parte en vacances en Aout.\n\
+    B. Ils pars en vacances en Aout.\n\
+    C. Ils partent en vacances en Aout.\n\
+    D. Ils partente en vacances en Aout.\n\
+    """,
+                )
+            ]
+
+        if repeat:
+            text_data = [text for text in text_data for _ in range(repeat)]
+
+        for idx, text in insert_special:
+            assert idx < len(text_data)
+            text_data[idx] = text
+
+        DataIterator.__init__(
+            self,
+            datasets.Dataset.from_dict(
+                {"text": text_data},
+                split="train",
+            ),
+            name=name,
+            **kwargs,
+        )
+
+
 class DataIteratorParquet(DataIterator):
     def __init__(
         self,
@@ -1943,6 +1990,35 @@ class DataIteratorPile(DataIteratorConcat):
                 )
 
         DataIteratorConcat.__init__(self, iterators, name=name)
+
+
+class DataIteratorMonologyPile(DataIteratorConcat):
+    def __init__(self, streaming=True, train=True, **kwargs):
+        repo = "monology/pile-uncopyrighted"
+
+        json_files = [f"train/{i:02d}.jsonl.zst" for i in [11, 13, 25]]
+        name = "MonologyPile"
+
+        # json_files = json_files[-27:] + json_files[:-27]
+        # print("NOCOMMIT", json_files[:1])
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        repo,
+                        streaming=streaming,
+                        data_files=json_file,
+                        split="train",
+                    ),
+                    name=f"{name}:{os.path.basename(json_file).split('.')[0]}",
+                    **kwargs,
+                )
+                for json_file in json_files
+            ],
+            name=name,
+        )
 
 
 class DataIteratorMathPile(DataIteratorConcat):
