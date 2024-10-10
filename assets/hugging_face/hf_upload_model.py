@@ -119,7 +119,7 @@ def upload_to_huggingface_hub(
         is_branch_new = False
         revision_info = ""
         if revision:
-            revision_info = " (branch {revision})"
+            revision_info = f" (branch {revision})"
             try:
                 api.create_branch(repo_id, repo_type="model", branch=revision)
                 is_branch_new = True
