@@ -16,7 +16,7 @@ fi
 
 PARENT_FOLDER="/lustre/fsn1/projects/rech/qgz/commun/trained_models/Lucie/pretrained/transformers_checkpoints"
 if [ -d $PARENT_FOLDER ];then
-    STEPS=`ls $PARENT_FOLDER/global_step*000 | awk -F "step" '{print $NF}' | sort -n `
+    STEPS=`ls -d $PARENT_FOLDER/global_step*000 | awk -F "step" '{print $NF}' | sort -n `
 else
     i=5000
     while [ $i -lt 25000 ];do
@@ -29,18 +29,29 @@ else
     done
 fi
 
-# Done the first time, then it shouldn't change anything
+############################################
+# 1. Upload tokenizer and minimal stuff
+
+# python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
+#     $TOKENIZER_FOLDER \
+#     --add_files_in_folder true \
+#     --message "Upload tokenizer, model config and minimal README" \
+
 python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
     $TOKENIZER_FOLDER \
-    --message "Upload tokenizer, model config and minimal README" \
+    --message "Upload tokenizer"
+
+############################################
+# 2. Upload checkpoints
 
 for STEP in $STEPS;do
     FOLDER="$PARENT_FOLDER/global_step$STEP"
 
     if [ ! -d $FOLDER ];then
+        echo "WARNING: $FOLDER does not exist"
         # Hack : need to have an empty folder to update config/READMEs in revisions
         FOLDER=empty
-    fi	
+    fi
 
     # Upload model folder to Hugging Face
     python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
@@ -54,4 +65,4 @@ done
 python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
     $TOKENIZER_FOLDER \
     --training_steps -1 \
-    --message "Upload README" \
+    --message "Update README" \

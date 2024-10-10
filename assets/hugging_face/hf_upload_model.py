@@ -24,6 +24,7 @@ def upload_to_huggingface_hub(
     is_checkpoint: bool = False,
     format_json: bool = False,
     create_repo: Optional[bool] = None,
+    add_files_in_folder: bool = False,
 ):
     """Uploads a directory to Hugging Face Hub.
 
@@ -47,6 +48,8 @@ def upload_to_huggingface_hub(
     repo_url = f"https://huggingface.co/{repo_id}"
 
     tmp_files = []
+    config_and_readme_folder = input if add_files_in_folder else tempfile.gettempdir()
+
     if upload_folder:
         # Create the README.md file
         readme_content = "---\n"
@@ -58,8 +61,9 @@ def upload_to_huggingface_hub(
         if not is_checkpoint and (training_steps is not None):
             with open(_readme_file) as f:
                 readme_content += "\n" + f.read().strip() + "\n"
-        tmp_file = os.path.join(tempfile.gettempdir(), "README.md")
-        upload_files.append(tmp_file)
+        tmp_file = os.path.join(config_and_readme_folder, "README.md")
+        if not add_files_in_folder:
+            upload_files.append(tmp_file)
         with open(tmp_file, "w") as f:
             f.write(readme_content)
 
@@ -67,8 +71,9 @@ def upload_to_huggingface_hub(
         # (add training progress metadata if training_steps is provided)
         for config_file in _config_files:
             config_filename = os.path.basename(config_file)
-            tmp_file = os.path.join(tempfile.gettempdir(), config_filename)
-            upload_files.append(tmp_file)
+            tmp_file = os.path.join(config_and_readme_folder, config_filename)
+            if not add_files_in_folder:
+                upload_files.append(tmp_file)
             if training_steps is not None and training_steps >= 0 and config_filename == "config.json":
                 with open(config_file) as f:
                     config = json.load(f)
@@ -111,32 +116,45 @@ def upload_to_huggingface_hub(
 
         revision = f"step{training_steps:07d}" if (is_checkpoint and training_steps and training_steps >= 0) else None
 
+        is_branch_new = False
+        revision_info = ""
         if revision:
-            is_branch_new = True
+            revision_info = " (branch {revision})"
             try:
                 api.create_branch(repo_id, repo_type="model", branch=revision)
+                is_branch_new = True
             except huggingface_hub.utils._errors.HfHubHTTPError:
-                is_branch_new = False
+                pass
             if is_branch_new:
                 print(f"Create branch {revision} in {repo_url}")
             # api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
 
         if upload_folder:
-            print(f"Update repository {repo_url} with:\n" + "\n".join(os.listdir(input)))
-            api.upload_folder(
-                folder_path=input,
-                repo_id=repo_id,
-                repo_type="model",
-                ignore_patterns=["lit_*", "pytorch_model.bin", "__pycache__"],
-                revision=revision,
-                commit_message=message,
-            )
+            content = sorted(os.listdir(input))
+            if content:
+                print(
+                    f"Update repository {repo_url} with:"
+                    + ("\n├── " if len(content) > 1 else "")
+                    + "\n├── ".join(content[:-1])
+                    + "\n└── "
+                    + content[-1]
+                )
+                api.upload_folder(
+                    folder_path=input,
+                    repo_id=repo_id,
+                    repo_type="model",
+                    ignore_patterns=["lit_*", "pytorch_model.bin", "__pycache__"],
+                    revision=revision,
+                    commit_message=message,
+                )
 
         for upload_file in upload_files:
             filename = os.path.basename(upload_file)
-            print(f"Update repository {repo_url} with file {filename}")
+            print(f"Update repository {repo_url}{revision_info} with file {filename}")
             if not message or upload_folder:
-                message = "{} {}".format("Upload" if create_repo else "Update", filename)
+                message = "{} {}".format(
+                    "Upload" if (create_repo and not is_branch_new) else "Update", os.path.splitext(filename)[0]
+                )
             api.upload_file(
                 path_or_fileobj=upload_file,
                 path_in_repo=filename,
