@@ -34,7 +34,8 @@ class Encoder:
         tokenizer = Encoder.tokenizer.tokenizer.backend_tokenizer
         return tokenizer.normalizer.normalize_str(text)
 
-    def encode(self, text, key=None, max_len_at_once=None):  # noqa # C901 `...` is too complex
+    def encode(self, text, key=None, max_len_at_once=None, use_eod_for_padding=True):  # noqa # C901 `...` is too complex
+        pad_to = self.args.pad_to
         if key is None:
             key = self.args.json_keys[0]
         if isinstance(text, list):
@@ -85,6 +86,8 @@ class Encoder:
                     if len(sentence):
                         part_of_sentence_ids = part_of_sentence_ids[:-1]
                     # Accumulate result
+                    if pad_to:
+                        raise NotImplementedError("pad_to not implemented with max_len_at_once")
                     sentence_ids.extend(part_of_sentence_ids)
                     num_splits += 1
                     # TODO: the following might fail
@@ -95,6 +98,14 @@ class Encoder:
                 #     print(f"Splitted {len_sentence} characters into {num_splits} parts")
             else:
                 sentence_ids = Encoder.tokenizer.tokenize(sentence)
+                if pad_to:
+                    if len(sentence_ids) > pad_to:
+                        print(f"WARNING: Sentence too long: {len(sentence_ids)} > {pad_to} => clipping")
+                        sentence_ids = sentence_ids[:pad_to]
+                    elif len(sentence_ids) < pad_to:
+                        pad_token = Encoder.tokenizer.eod if use_eod_for_padding else Encoder.tokenizer.pad
+                        sentence_ids.extend([pad_token] * (pad_to - len(sentence_ids)))
+                    assert len(sentence_ids) == pad_to
             if len(sentence_ids) > 0:
                 doc_ids.extend(sentence_ids)
                 sentence_lens.append(len(sentence_ids))
@@ -360,6 +371,13 @@ def get_args():
     group.add_argument("--jsonl-folder", type=str, default="tmp_to_tokenize", help="Folder with jsonl files")
     group.add_argument("--dataset-impl", type=str, default="mmap", choices=["lazy", "cached", "mmap"])
     group.add_argument("--stop-if-failed", default=False, action="store_true", help="Stop if an error occurs")
+    group.add_argument(
+        "--pad-to",
+        default=None,
+        type=int,
+        help="If specified, all input sequences will be padded to this length"
+        " (for debugging only : it may fail if sequences are longer)",
+    )
 
     group = parser.add_argument_group(title="runtime")
     group.add_argument(
@@ -441,10 +459,11 @@ def main():
                 # Check if any error occurred
                 if error_flag.value:
                     # If an error occurred, terminate all processes in the pool
-                    print("An error occurred in one of the processes. Terminating all processes.")
+                    print("An error occurred in one of the processes.")
                     sys.stdout.flush()
                     if not args.stop_if_failed:
                         continue
+                    print("Terminating all processes.")
                     pool.terminate()
                     break
     else:
