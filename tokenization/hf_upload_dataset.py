@@ -24,6 +24,26 @@ def get_type(v):
     return str(t)
 
 
+def get_example_preview(v):
+    if isinstance(v, list):
+        if len(v) > 10:
+            v = v[:5] + ["..."] + v[-5:]
+        v = [get_example_preview(x) for x in v]
+        return v
+    if isinstance(v, dict):
+        v = {k: get_example_preview(v) for k, v in sorted(v.items())}
+        return v
+    if isinstance(v, str):
+        if len(v) > 100:
+            v = v[:50] + "..." + v[-50:]
+        return v
+    if isinstance(v, (int, float)):
+        return v
+    if v is None:
+        return None
+    return get_example_preview(str(v))
+
+
 def get_union(metadatas, desc=None):
     union = {}
     for m in metadatas:
@@ -143,8 +163,7 @@ if __name__ == "__main__":
         dataset.SetYieldMetadata(
             uniformize_metadata=args.uniformize_metadata,
             extra_metadata={
-                "source": dataset_pseudo,
-                "source_subset": dataset_name if dataset_name != dataset_pseudo else None,
+                "source": dataset_name,
             },
         )
 
@@ -159,12 +178,12 @@ if __name__ == "__main__":
                 )
                 # Update examples
                 for k, v in sample.items():
-                    if v is None:
+                    if v is None or k in ["text"]:
                         continue
                     if k not in examples[dataset_pseudo]:
-                        examples[dataset_pseudo][k] = v
+                        examples[dataset_pseudo][k] = get_example_preview(v)
                     if k not in examples["UNION"]:
-                        examples["UNION"][k] = v
+                        examples["UNION"][k] = get_example_preview(v)
                 dump_metadata(metadatas)
                 if None not in metadatas[dataset_pseudo].values() or i > 100:
                     break

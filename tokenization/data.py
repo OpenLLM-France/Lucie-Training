@@ -463,37 +463,61 @@ class DataIterator(DataIteratorBase):
             # vvv "id"
             "file_id": "id",
             "article_id": "id",
+            "texteloi_id": "id",
+            "hexsha": "id",
+            "idx": "id",
+            "idx_row": "id",
             # vvv "title"
             "page_title": "title",
             # vvv "date"
             "releasedate": "date",
+            "created": "date",
+            "added": "date",  # created is better : put it before
             # vvv "language"
             "lang": "language",
             # vvv "path"
             "file_path": "path",
             "page_path": "path",
+            "page_index": "page",
             # vvv Contextualization
             "int_score": "educational_int_score",  # FineWebEdu
             "score": "educational_score",  # FineWebEdu
+            "loi": "text_law",
         }
+
+        _fields_to_put_as_tag = [
+            # OtherFr
+            "sujet",
+            "sort",
+            "expose",
+            "topic",
+        ]
 
         _fields_to_remove = [
             # vvv Info that is not useful (index in the original dataset, when there are some unique IDs somewhere)
             "idx_row",  # in HAL, Theses, ...
+            "idx",
             "__index_level_0__",  # in CroissantAligned
             # vvv Info that is maybe non consistent after text processing (and can be recomputed easily)
             "word_count",
             "character_count",
             "token_count",
             "page_count",
+            "avg_line_length",
+            "max_line_length",
+            "alphanum_fraction",
+            "size",
             # vvv Too specific info
             "question",  # This is a dictionary, in MathPile
+            "answers",  # This is a list, in MathPile
             "version",  # Only for PeS2o
             # vvv Info that could not be renamed because of conflict but then we don't care
-            # TODO
+            "added",
             # "file_path", # MathPile
-            # "page_path", # MathPile
-            # TODO (after watching examples)
+            "page_path",  # MathPile (no more information than the title)
+            # vvv Boring or disturbing info
+            "byline",
+            "complete_text",
             # "ocr" # GallicaMono/Press
             # "meta" # HAL
             # "hexsha" # TheStack
@@ -512,14 +536,30 @@ class DataIterator(DataIteratorBase):
         _enforced_types = {
             "id": str,  # can be an int also
             "date": str,  # can be datetime also
+            "page": str,  # can be int also
             "max_issues_count": int,  # can be float ?
             "max_forks_count": int,  # ''
             "max_stars_count": int,  # ''
+            "authoryearofbirth": float,
+            "authoryearofdeath": float,
         }
         # Rename some keys (in the order of renaming)
         for old_key, new_key in _fields_to_rename.items():
             if old_key in data and new_key not in data:
                 data[new_key] = data.pop(old_key)
+
+        # Set some values as tags
+        tags = []
+        for k in list(data.keys()):
+            v = data[k]
+            if k in _fields_to_put_as_tag:
+                if v is None:
+                    v = ""
+                assert isinstance(v, str), f"Cannot convert {k}={v} to str"
+                tags.append(v)
+                del data[k]
+        if tags:
+            data["tags"] = tags
 
         # Remove some keys
         for key in list(data.keys()):
@@ -538,15 +578,21 @@ class DataIterator(DataIteratorBase):
                 except Exception as err:
                     raise ValueError(f"Cannot convert {key}={value} to {_enforced_types[key]}") from err
 
+        # Add extra metadata
         if self.extra_metadata:
             for k, v in self.extra_metadata.items():
                 if k not in data:
                     data[k] = v
                 elif k == "source":
                     assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
-                    data[k] = data[k] + "/" + v
+                    data[k] = v + "/" + data[k]
                 else:
                     raise NotImplementedError(f"Warning: {k} already in metadata. Combination not implemented.")
+
+        # Enforce "id" field
+        # TODO ?
+        # if "id" not in data:
+        #     ...
 
     def __iter__(self):
         return self
@@ -629,9 +675,22 @@ class DataIterator(DataIteratorBase):
                 del data[self.key_init]
 
             # flatten meta
-            if "meta" in data and isinstance(data["meta"], dict):
-                data.update(data["meta"])
-                del data["meta"]
+            if "meta" in data:
+                meta = data["meta"]
+                if isinstance(meta, str):
+                    try:
+                        meta = json.loads(meta)
+                    except json.JSONDecodeError:
+                        try:
+                            meta = json.loads(meta.replace("'", '"'))
+                        except json.JSONDecodeError:
+                            try:
+                                meta = eval(meta)
+                            except Exception:
+                                pass
+                if isinstance(meta, dict):
+                    data.update(meta)
+                    del data["meta"]
 
             if self.do_uniformize_metadata:
                 self.uniformize_metadata(data)
@@ -1182,7 +1241,8 @@ def analyze_bilingual_french_english_data(data, add_language_in_data=False):
         data.pop("text")
         return data
 
-    return create_augmented_text(text1, text2, lan1, lan2)
+    text, lan1, lan2 = create_augmented_text(text1, text2, lan1, lan2)
+    return text
 
 
 def create_augmented_text_from_aligned_data(data):
@@ -1191,9 +1251,11 @@ def create_augmented_text_from_aligned_data(data):
         lan2 = data.pop("lan_2")
         text1 = data.pop("text_1").strip()
         text2 = data.pop("text_2").strip()
-        data["text"] = create_augmented_text(text1, text2, lan1, lan2)
+        data["text"], data["language_1"], data["language_2"] = create_augmented_text(text1, text2, lan1, lan2)
     else:
-        data["text"] = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+        data["text"], data["language_1"], data["language_2"] = create_augmented_text(
+            data.pop("text_en"), data.pop("text_fr"), "en", "fr"
+        )
     return data
 
 
@@ -1232,7 +1294,7 @@ def create_augmented_text(text1, text2, lan1, lan2, separator=None):
 
         text = before_lan + lan1 + after_lan + text1 + separator + before_lan + lan2 + after_lan + text2
 
-    return text
+    return text, lan1, lan2
 
 
 LAN_TO_COMPLETE = {
@@ -1950,6 +2012,7 @@ class DataIteratorPes2o(DataIteratorConcat):
             )
         if force_include_all_metadata:
             from_huggingface = True
+            split_by_type = False
 
         if train is not None:
             splits = ["train"] if train else ["validation"]
