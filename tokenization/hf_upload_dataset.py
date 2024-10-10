@@ -80,6 +80,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--datasets", type=str, default="all", help="Datasets", nargs="+")
     parser.add_argument("--collect_metadata", type=str, help="json file to store all metadata")
+    parser.add_argument("--uniformize_metadata", action="store_true", default=False, help="Uniformize metadata")
     args = parser.parse_args()
 
     all_datas = get_datasets(
@@ -96,9 +97,19 @@ if __name__ == "__main__":
     )
 
     metadatas = {}
-    if args.collect_metadata and os.path.exists(args.collect_metadata):
-        with open(args.collect_metadata) as f:
-            metadatas = json.load(f)
+    examples = {}
+    examples["UNION"] = {}
+    args.collect_metadata_examples = (
+        (os.path.splitext(args.collect_metadata)[0] + "_examples.json") if args.collect_metadata else None
+    )
+    if args.collect_metadata:
+        if os.path.exists(args.collect_metadata):
+            with open(args.collect_metadata) as f:
+                metadatas = json.load(f)
+    if args.collect_metadata_examples:
+        if os.path.exists(args.collect_metadata_examples):
+            with open(args.collect_metadata_examples) as f:
+                examples = json.load(f)
 
     tmpfile = tempfile.mktemp(suffix=".json")
 
@@ -110,6 +121,9 @@ if __name__ == "__main__":
         with open(tmpfile, "w") as f:
             json.dump(metadatas, f, indent=2)
         shutil.move(tmpfile, args.collect_metadata)
+        with open(tmpfile, "w") as f:
+            json.dump(examples, f, indent=2)
+        shutil.move(tmpfile, args.collect_metadata_examples)
 
     progress_bar = tqdm.tqdm(all_datas.items())
     previous_pseudo = None
@@ -123,18 +137,34 @@ if __name__ == "__main__":
         progress_bar.set_description(f"Processing {dataset_name}...")
 
         metadatas[dataset_pseudo] = metadatas.get(dataset_pseudo, {})
+        examples[dataset_pseudo] = examples.get(dataset_pseudo, {})
 
-        # Hack to return dictionary, not just the text
-        dataset.key = None
+        # To yield dictionaries with metadata instead of just the text
+        dataset.SetYieldMetadata(
+            uniformize_metadata=args.uniformize_metadata,
+            extra_metadata={
+                "source": dataset_pseudo,
+                "source_subset": dataset_name if dataset_name != dataset_pseudo else None,
+            },
+        )
 
         for i, sample in enumerate(dataset):
-            assert isinstance(sample, dict)
+            assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
             assert "text" in sample and isinstance(sample["text"], str)
             if args.collect_metadata:
+                # Update types
                 metadatas[dataset_pseudo] = get_union(
                     [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[dataset_pseudo]],
                     desc=dataset_name,
                 )
+                # Update examples
+                for k, v in sample.items():
+                    if v is None:
+                        continue
+                    if k not in examples[dataset_pseudo]:
+                        examples[dataset_pseudo][k] = v
+                    if k not in examples["UNION"]:
+                        examples["UNION"][k] = v
                 dump_metadata(metadatas)
                 if None not in metadatas[dataset_pseudo].values() or i > 100:
                     break

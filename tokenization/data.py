@@ -405,7 +405,6 @@ class DataIterator(DataIteratorBase):
         self.dataset = dataset
         self.dataset_iter = dataset.__iter__()
         self.key = key
-        self.key_init = key
         self.max_docs = max_docs
         self.max_chars = max_chars
         self.max_words = max_words
@@ -418,6 +417,11 @@ class DataIterator(DataIteratorBase):
         self.preprocess = preprocess
         self.postprocess = postprocess
         self.filter_fn = filter_fn
+
+        # Options when getting metadata
+        self.key_init = key
+        self.do_uniformize_metadata = False
+        self.extra_metadata = {}
 
         self.random_generator = random.Random(42)
         self.idx = 0
@@ -439,6 +443,110 @@ class DataIterator(DataIteratorBase):
             name += ":" + suffix.strip("-")
 
         DataIteratorBase.__init__(self, name)
+
+    def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None):
+        if doit:
+            self.key = None
+        else:
+            self.key = self.key_init
+        self.do_uniformize_metadata = uniformize_metadata
+        if extra_metadata:
+            self.extra_metadata = extra_metadata
+
+    def uniformize_metadata(self, data):
+        """
+        Uniformize metadata for sub-datasets (so that we can make a consistent union)
+        data: a dictionary
+        """
+
+        _fields_to_rename = {
+            # vvv "id"
+            "file_id": "id",
+            "article_id": "id",
+            # vvv "title"
+            "page_title": "title",
+            # vvv "date"
+            "releasedate": "date",
+            # vvv "language"
+            "lang": "language",
+            # vvv "path"
+            "file_path": "path",
+            "page_path": "path",
+            # vvv Contextualization
+            "int_score": "educational_int_score",  # FineWebEdu
+            "score": "educational_score",  # FineWebEdu
+        }
+
+        _fields_to_remove = [
+            # vvv Info that is not useful (index in the original dataset, when there are some unique IDs somewhere)
+            "idx_row",  # in HAL, Theses, ...
+            "__index_level_0__",  # in CroissantAligned
+            # vvv Info that is maybe non consistent after text processing (and can be recomputed easily)
+            "word_count",
+            "character_count",
+            "token_count",
+            "page_count",
+            # vvv Too specific info
+            "question",  # This is a dictionary, in MathPile
+            "version",  # Only for PeS2o
+            # vvv Info that could not be renamed because of conflict but then we don't care
+            # TODO
+            # "file_path", # MathPile
+            # "page_path", # MathPile
+            # TODO (after watching examples)
+            # "ocr" # GallicaMono/Press
+            # "meta" # HAL
+            # "hexsha" # TheStack
+        ]
+
+        _fields_suffixes_to_remove = [
+            "_datetime",
+            "_hexsha",
+        ]
+        _fields_prefixes_to_remove = [
+            "max_issues_repo_",
+            "max_forks_repo_",
+            "max_stars_repo_",
+        ]
+
+        _enforced_types = {
+            "id": str,  # can be an int also
+            "date": str,  # can be datetime also
+            "max_issues_count": int,  # can be float ?
+            "max_forks_count": int,  # ''
+            "max_stars_count": int,  # ''
+        }
+        # Rename some keys (in the order of renaming)
+        for old_key, new_key in _fields_to_rename.items():
+            if old_key in data and new_key not in data:
+                data[new_key] = data.pop(old_key)
+
+        # Remove some keys
+        for key in list(data.keys()):
+            if (
+                key in _fields_to_remove
+                or key.endswith(tuple(_fields_suffixes_to_remove))
+                or key.startswith(tuple(_fields_prefixes_to_remove))
+            ):
+                del data[key]
+
+        # Format types
+        for key, value in data.items():
+            if key in _enforced_types and not isinstance(value, _enforced_types[key]) and value is not None:
+                try:
+                    data[key] = _enforced_types[key](value)
+                except Exception as err:
+                    raise ValueError(f"Cannot convert {key}={value} to {_enforced_types[key]}") from err
+
+        if self.extra_metadata:
+            for k, v in self.extra_metadata.items():
+                if k not in data:
+                    data[k] = v
+                elif k == "source":
+                    assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
+                    data[k] = data[k] + "/" + v
+                else:
+                    raise NotImplementedError(f"Warning: {k} already in metadata. Combination not implemented.")
 
     def __iter__(self):
         return self
@@ -524,6 +632,9 @@ class DataIterator(DataIteratorBase):
             if "meta" in data and isinstance(data["meta"], dict):
                 data.update(data["meta"])
                 del data["meta"]
+
+            if self.do_uniformize_metadata:
+                self.uniformize_metadata(data)
 
             return data
 
@@ -1399,101 +1510,6 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
         )
 
 
-# class DataIteratorRedPajama(DataIteratorConcat):
-#     def __init__(self, language="fr", split="train", streaming=True, from_huggingface=None, **kwargs):
-#         jeanzay_path = "/gpfsdswork/dataset/RedPajama-V2/v1.0.0"
-#         if from_huggingface is None:
-#             from_huggingface = not os.path.isdir(jeanzay_path)
-#             logger.info(
-#                 "Using HuggingFace version for RedPajama-V2"
-#                 if from_huggingface
-#                 else "Using local version for RedPajama-V2"
-#             )
-#         repo = (
-#             "togethercomputer/RedPajama-Data-V2"
-#             if from_huggingface
-#             else os.path.join(_asset_folder, "RedPajama-Data-V2")
-#         )
-
-#         # Get all snapshots, sorted from the most recent one to the oldest one
-#         file = open(os.path.join(_asset_folder, "RedPajama-Data-V2/_CC_SNAPSHOT_IDS"))
-#         _CC_SNAPSHOT_IDS = file.read().split("\n")[::-1]
-#         assert len(_CC_SNAPSHOT_IDS) > 0, "No snapshot found"
-
-#         num_to_take = {
-#             "fr": 10,  # ?
-#             "en": 0,  # ?
-#             "de": 10,
-#             "es": 10,
-#             "it": 10,
-#         }.get(language)
-#         if not num_to_take:
-#             raise ValueError(f"Unsupported language {language}")
-
-#         # snapshots = _CC_SNAPSHOT_IDS[:num_to_take]
-
-#         # DataIteratorConcat.__init__(
-#         #     self,
-#         #     [
-#         #         DataIterator(
-#         #             datasets.load_dataset(
-#         #                 repo,
-#         #                 name="default",
-#         #                 partition=partition,
-#         #                 snapshots=[snapshot],
-#         #                 languages=[language],
-#         #                 streaming=streaming,
-#         #                 split=split,
-#         #             ),
-#         #             name=f"RedPajama:{language}:{snapshot}_{partition}",
-#         #             key="raw_content",
-#         #             filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
-#         #             **kwargs,
-#         #         )
-#         #         for snapshot in snapshots
-#         #         for partition in [
-#         #             "head_middle",
-#         #             # "tail",
-#         #         ]
-#         #     ],
-#         #     name=f"RedPajama:{language}",
-#         # )
-
-#         partition = "head_middle"
-#         selected_datatasets = []
-#         for snapshot in _CC_SNAPSHOT_IDS:
-#             subname = f"RedPajama:{language}:{snapshot}_{partition}"
-#             try:
-#                 ds = DataIterator(
-#                     datasets.load_dataset(
-#                         repo,
-#                         name="default",
-#                         partition=partition,
-#                         snapshots=[snapshot],
-#                         languages=[language],
-#                         streaming=streaming,
-#                         split=split,
-#                     ),
-#                     name=subname,
-#                     key="raw_content",
-#                     filter_fn=lambda x: lucie_rules_pass_for_redpajama(x, language)[0],
-#                     **kwargs,
-#                 )
-#             except Exception as e:
-#                 print(f"Skipping {subname} because of error: {e}")
-#                 continue
-#             print(f"OK for {subname}")
-#             selected_datatasets.append(ds)
-#             if len(selected_datatasets) >= num_to_take:
-#                 break
-
-#         DataIteratorConcat.__init__(
-#             self,
-#             selected_datatasets,
-#             name=f"RedPajama:{language}",
-#         )
-
-
 class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
         data_path = None
@@ -1959,6 +1975,7 @@ class DataIteratorPes2o(DataIteratorConcat):
                             repo,
                             streaming=streaming,
                             split=split,
+                            trust_remote_code=True,
                         ),
                         filter_fn=filter_fn,
                         subsample_criteria="id",
