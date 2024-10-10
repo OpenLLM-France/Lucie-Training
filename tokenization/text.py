@@ -137,7 +137,7 @@ def clean_theses(text):
     return text
 
 
-def _repair_cid_character(match):  # noqa # C901 `...` is too complex
+def _repair_cid_character(match):
     i = int(match.group(2))
 
     if i in _cid_correction_double:
@@ -277,7 +277,7 @@ _cid_correction = {
 }
 
 
-def remove_page_numbers(text, verbose=False, pattern=None):  # noqa # C901 `...` is too complex
+def remove_page_numbers(text, verbose=False, pattern=None):
     """
     Try to remove page numbers from a plain text version of a PDF.
 
@@ -413,7 +413,7 @@ def process_supersubscript(match):
     return s
 
 
-def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False):  # noqa # C901 `...` is too complex
+def plaintext_to_markdown(text, website_main="wikipedia", linebreaks=2, add_toc=False, add_urls=False):
     """
     Convert plaintext (extracted by dump_wiki_htmp.py) to markdown.
 
@@ -682,7 +682,7 @@ def is_url_duplicated(url, language):
     return any(keyword in url for keyword in keywords)
 
 
-def lucie_rules_pass_for_redpajama(sample, language) -> bool:  # noqa # C901 `...` is too complex
+def lucie_rules_pass_for_redpajama(sample, language) -> bool:
     """function returns True if the sample complies with Gopher rules"""
     signals = json.loads(sample["quality_signals"])
 
@@ -746,7 +746,7 @@ def lucie_rules_pass_for_redpajama(sample, language) -> bool:  # noqa # C901 `..
 
     # rule 3: 90% of lines need to start without a bullet point
     n_lines = signals["ccnet_nlines"][0][2]
-    n_lines_bulletpoint_start = sum(map(lambda ln: ln[2], signals["rps_lines_start_with_bulletpoint"]))  # noqa # C901 `...` is too complex
+    n_lines_bulletpoint_start = sum(map(lambda ln: ln[2], signals["rps_lines_start_with_bulletpoint"]))
     if n_lines_bulletpoint_start / n_lines > 0.9:
         return False, "Gopher: bulletpoint start"
 

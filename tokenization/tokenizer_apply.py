@@ -34,7 +34,7 @@ class Encoder:
         tokenizer = Encoder.tokenizer.tokenizer.backend_tokenizer
         return tokenizer.normalizer.normalize_str(text)
 
-    def encode(self, text, key=None, max_len_at_once=None, use_eod_for_padding=True):  # noqa # C901 `...` is too complex
+    def encode(self, text, key=None, max_len_at_once=None, use_eod_for_padding=True):
         pad_to = self.args.pad_to
         if key is None:
             key = self.args.json_keys[0]
@@ -151,7 +151,7 @@ class TokenizationTask:
         )
         sys.stdout.flush()
 
-    def process_batch(self, input, output_prefix):  # noqa # C901 `...` is too complex
+    def process_batch(self, input, output_prefix):
         """
         Process a single json file or a list of text
 
@@ -223,7 +223,7 @@ class TokenizationTask:
         if fin is not None:
             fin.close()
 
-    def process_dataset(self, dataset_name, use_jsonl_file=False):  # noqa # C901 `...` is too complex
+    def process_dataset(self, dataset_name, use_jsonl_file=False):
         global error_flag, num_processes
 
         if error_flag.value and self.args.stop_if_failed:

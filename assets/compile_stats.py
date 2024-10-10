@@ -185,7 +185,7 @@ def to_name_subset(name):
     return name, subset
 
 
-def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too complex
+def to_language_name_subset(name, subset=None):
     if subset is None:
         name, subset = to_name_subset(name)
     for lan in "fr", "en", "de", "es", "it":

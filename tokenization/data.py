@@ -177,7 +177,7 @@ def tokenizer_dataset(
     return dataset
 
 
-def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` is too complex
+def get_datasets(name, use_nc=True, scope=None, **kwargs):
     """
     Iterator that yields one or sevaral datasets
 
@@ -299,7 +299,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
         yield python_class(**kwargs)
 
 
-def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possible=False):  # noqa # C901 `...` is too complex
+def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possible=False):
     # For recursive calls
     kwargs = dict(
         parquet_level=parquet_level,
@@ -455,7 +455,7 @@ class DataIterator(DataIteratorBase):
             warnings.warn(f"Got an exception {err}", stacklevel=2)
             return self._get_next()
 
-    def __next__(self):  # noqa # C901 `...` is too complex
+    def __next__(self):
         self.idx += 1
         if self.max_docs and self.idx > self.max_docs:
             raise StopIteration
@@ -801,7 +801,7 @@ class DataIteratorWikiother(DataIteratorConcat):
 
 
 class DataIteratorGutenberg(DataIteratorParquet):
-    def __init__(  # noqa # C901 `...` is too complex
+    def __init__(
         self,
         language="fr",
         filter_legal=True,
@@ -1024,7 +1024,7 @@ class DataIteratorCroissantAligned(DataIteratorConcat):
         )
 
 
-def analyze_bilingual_french_english_data(data, add_language_in_data=False):  # noqa # C901 `...` is too complex
+def analyze_bilingual_french_english_data(data, add_language_in_data=False):
     if add_language_in_data:
         text = data["text"]
     else:
@@ -1164,7 +1164,7 @@ LAN_TO_COMPLETE = {
 
 
 class DataIteratorClaire(DataIteratorConcat):
-    def __init__(self, language="fr", streaming=True, split=None, use_nc=False, subset_regex=None, **kwargs):  # noqa # C901 `...` is too complex
+    def __init__(self, language="fr", streaming=True, split=None, use_nc=False, subset_regex=None, **kwargs):
         path = DATA_PATH + f"/claire_{language}"
         full_files = glob.glob(path + "/*/full.txt")
         train_files = glob.glob(path + "/*/train.txt")
@@ -2253,7 +2253,7 @@ class DataIteratorCode(DataIteratorConcat):
 # Test Helpers
 
 
-def test_iterator(  # noqa # C901 `...` is too complex
+def test_iterator(
     it,
     folder=None,
     name="",

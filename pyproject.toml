@@ -36,7 +36,12 @@ select = [
     "B",  # flake8-bugbear
     "UP",  # pyupgrade
 ]
-ignore = ["C408", "B023", "C901"]
+ignore = [
+    "C408",
+    "B023",
+    "C901", # C901 `...` is too complex
+    "C417"  # C417 Unnecessary `map` usage (rewrite using a generator expression)
+]
 
 [build-system]
 requires = ["poetry-core"]
