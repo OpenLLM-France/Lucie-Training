@@ -199,7 +199,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
                 yield ds
         return
 
-    multilang_corpora = [
+    multilang_corpora_in_training = [
         "wikipedia",
         "wikiother",
         "gutenberg",
@@ -207,10 +207,14 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
         "claire",
         "eurovoc",
         "validated_youtube",
-        "cultura_x",
         "red_pajama",
+    ]
+    multilang_corpora = multilang_corpora_in_training + [
+        # Discarded from "all" (training dataset)
+        "cultura_x",
         "subscene",
-    ]  # "youtube",
+        "youtube",
+    ]
 
     name = name.lower()
 
@@ -219,7 +223,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
 
     if name == "all":
         for name in (
-            multilang_corpora
+            multilang_corpora_in_training
             + [
                 # French
                 "gallica_press",
@@ -245,6 +249,8 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
                 "code",
             ]
         ):
+            if "use_nc" in kwargs:
+                use_nc = kwargs.pop("use_nc")
             for ds in get_datasets(name, use_nc=use_nc, scope=scope, **kwargs):
                 yield ds
 
@@ -269,6 +275,8 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):  # noqa # C901 `...` 
             # "cultura_x": ["fr", "en", "de", "es", "it"],
             "red_pajama": ["fr", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
+        if "use_nc" in kwargs:
+            use_nc = kwargs.pop("use_nc")
         for language in languages:
             for ds in get_datasets(f"{name}_{language}", use_nc=use_nc, scope=scope, **kwargs):
                 yield ds
@@ -372,6 +380,8 @@ class DataIterator(DataIteratorBase):
         postprocess=None,
         filter_fn=None,
         name="",
+        max_parquet_files=None,
+        force_include_all_metadata=None,
     ):
         """
         Args:
@@ -388,10 +398,14 @@ class DataIterator(DataIteratorBase):
             filter_fn: a function to filter the examples
                     (returns True if the example is to be kept, False otherwise)
             name: the name of the dataset
+
+            max_parquet_files: ignored
+            force_include_all_metadata: ignored
         """
         self.dataset = dataset
         self.dataset_iter = dataset.__iter__()
         self.key = key
+        self.key_init = key
         self.max_docs = max_docs
         self.max_chars = max_chars
         self.max_words = max_words
@@ -477,13 +491,14 @@ class DataIterator(DataIteratorBase):
                     criterion = data[self.subsample_criteria]
                     r = string_to_random01(criterion)
 
-        if not self.key:
-            return data
+        if self.key_init not in data and "text" in data:
+            self.key_init = "text"
 
+        text_key = self.key if self.key else self.key_init
         try:
-            text = data[self.key]
-        except KeyError as err:
-            raise KeyError(f"Key {self.key} not found in {data.keys()}.") from err
+            text = data[text_key]
+        except KeyError:
+            raise KeyError(f"Key '{text_key}' not found in {data.keys()}.") from None
 
         if self.postprocess:
             text = self.postprocess(text)
@@ -498,6 +513,19 @@ class DataIterator(DataIteratorBase):
             # Empty text
             self.idx -= 1
             return self.__next__()
+
+        if not self.key:
+            # Normalize text key
+            data["text"] = text
+            if self.key_init != "text" and self.key_init in data:
+                del data[self.key_init]
+
+            # flatten meta
+            if "meta" in data and isinstance(data["meta"], dict):
+                data.update(data["meta"])
+                del data["meta"]
+
+            return data
 
         return text
 
@@ -1793,7 +1821,9 @@ class DataIteratorSubscene(DataIterator):
 
 
 class DataIteratorAmericanStories(DataIteratorConcat):
-    def __init__(self, streaming=True, from_huggingface=False, filter_by_perplexity=True, **kwargs):
+    def __init__(
+        self, streaming=True, from_huggingface=False, filter_by_perplexity=True, max_parquet_files=None, **kwargs
+    ):
         data_path = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", "americanstories", "*.parquet")
 
         if from_huggingface is None:
@@ -1809,7 +1839,6 @@ class DataIteratorAmericanStories(DataIteratorConcat):
         if not from_huggingface:
             data_files = sorted(glob.glob(data_path))
             assert len(data_files), f"Missing parquet files for {data_path}"
-            logger.info(f"Using {len(data_files)} parquet files in {data_path}")
 
             key = "text"
 
@@ -1830,6 +1859,13 @@ class DataIteratorAmericanStories(DataIteratorConcat):
             self.parquet_files = data_files
             data_files = {int(os.path.splitext(os.path.basename(data_file))[0]): data_file for data_file in data_files}
 
+            if max_parquet_files:
+                data_files = {
+                    k: v for i, (k, v) in enumerate(sorted(data_files.items(), reverse=True)) if i < max_parquet_files
+                }
+
+            logger.info(f"Using {len(data_files)} parquet files in {data_path}")
+
             DataIteratorConcat.__init__(
                 self,
                 [
@@ -1840,6 +1876,7 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                         name=f"AmericanStories:{year}",
                         # postprocess=remove_simple_lines,
                         filter_fn=filter_by_perplexity_func(2310) if filter_by_perplexity else None,
+                        max_parquet_files=max_parquet_files,
                         **kwargs,
                     )
                     for year in sorted(data_files.keys())
@@ -1854,6 +1891,9 @@ class DataIteratorAmericanStories(DataIteratorConcat):
                 "all_years",
                 streaming=streaming,
             )
+
+            if max_parquet_files:
+                datas = {k: v for i, (k, v) in enumerate(sorted(datas.items(), reverse=True)) if i < max_parquet_files}
 
             DataIteratorConcat.__init__(
                 self,
@@ -1874,7 +1914,15 @@ class DataIteratorAmericanStories(DataIteratorConcat):
 
 
 class DataIteratorPes2o(DataIteratorConcat):
-    def __init__(self, streaming=True, from_huggingface=False, train=None, split_by_type=True, **kwargs):
+    def __init__(
+        self,
+        streaming=True,
+        from_huggingface=False,
+        train=None,
+        split_by_type=True,
+        force_include_all_metadata=False,
+        **kwargs,
+    ):
         name = "PeS2o"
 
         if from_huggingface is None:
@@ -1884,6 +1932,8 @@ class DataIteratorPes2o(DataIteratorConcat):
                 if from_huggingface
                 else "Using local version for AmericanStories"
             )
+        if force_include_all_metadata:
+            from_huggingface = True
 
         if train is not None:
             splits = ["train"] if train else ["validation"]
@@ -1895,8 +1945,8 @@ class DataIteratorPes2o(DataIteratorConcat):
 
             if split_by_type:
                 filter_fns = {
-                    "s2ag": lambda x: x["source"].startswith("s2ag"),
                     "s2orc": lambda x: not x["source"].startswith("s2ag"),
+                    "s2ag": lambda x: x["source"].startswith("s2ag"),
                 }
             else:
                 filter_fns = {"": None}
@@ -1929,6 +1979,8 @@ class DataIteratorPes2o(DataIteratorConcat):
                 json_files = glob.glob(files_regex)
                 if not len(json_files):
                     raise RuntimeError(f"No json files in {files_regex}")
+                if kwargs.get("max_parquet_files"):
+                    json_files = json_files[: kwargs["max_parquet_files"]]
                 logger.info(f"Using {len(json_files)} json files from {files_regex}")
                 self.json_files.extend(json_files)
                 iterators.append(
@@ -1998,9 +2050,6 @@ class DataIteratorMonologyPile(DataIteratorConcat):
 
         json_files = [f"train/{i:02d}.jsonl.zst" for i in [11, 13, 25]]
         name = "MonologyPile"
-
-        # json_files = json_files[-27:] + json_files[:-27]
-        # print("NOCOMMIT", json_files[:1])
 
         DataIteratorConcat.__init__(
             self,
@@ -2179,6 +2228,8 @@ class DataIteratorCode(DataIteratorConcat):
         else:
             pattern = f"{DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"
             data_files = sorted(glob.glob(pattern))
+            if kwargs.get("max_parquet_files"):
+                data_files = data_files[: kwargs["max_parquet_files"]]
             if not len(data_files):
                 warnings.warn(f"Missing parquet files for {pattern}", stacklevel=2)
                 return None
