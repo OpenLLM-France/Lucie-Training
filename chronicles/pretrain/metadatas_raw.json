@@ -1,0 +1,477 @@
+{
+  "__UNION__": {
+    "id": 11890409,
+    "url": "https://fr.wikipedia.org/wiki/%2810345%29_1992_DC11",
+    "title": "(10345) 1992 DC11",
+    "language": "fr",
+    "author": "Féval, Paul",
+    "authoryearofbirth": 1817.0,
+    "authoryearofdeath": 1887.0,
+    "usagerights": "open",
+    "releasedate": "November 1, 2003 [eBook #10053]",
+    "date": "1996-03-26",
+    "lang": "eng",
+    "ccnet_language_score": [
+      0.8485000133514404
+    ],
+    "ccnet_perplexity": [
+      724.2999877929688
+    ],
+    "fasttext_language": [
+      "en"
+    ],
+    "idx_row": 17,
+    "metadata": {
+      "dataset": "/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/assets/RedPajama-Data-V2",
+      "doc_id": "2023-14/0001/fr_head.json.gz/4",
+      "meta": "{\"url\": \"http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html\", \"partition\": \"head_middle\", \"language\": \"fr\", \"source_domain\": \"defens-aero.com\", \"date_download\": \"2023-03-20T10:07:51Z\", \"digest\": \"sha1:XLYHOH6QZNWEXJS4X66YPUO2WCISFOJZ\"}",
+      "quality_signals": "{\"ccnet_length\": [[0, 3681, 3681.0]], \"ccnet_original_length\": [[0, 3681, 4441.0]], \"ccnet_nlines\": [[0, 3681, 15.0]], \"ccnet_original_nlines\": [[0, 3681, 43.0]], \"ccnet_language_score\": [[0, 3681, 0.99]], \"ccnet_perplexity\": [[0, 3681, 81.5]], \"ccnet_bucket\": [[0, 3681, 0.0]], \"rps_doc_curly_bracket\": [[0, 3681, 0.0]], \"rps_doc_ldnoobw_words\": [[0, 3681, 0.0]], \"rps_doc_lorem_ipsum\": [[0, 3681, 0.0]], \"rps_doc_stop_word_fraction\": [[0, 3681, 0.43505675]], \"rps_doc_ut1_blacklist\": [[0, 3681, null]], \"rps_doc_frac_chars_dupe_10grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_dupe_5grams\": [[0, 3681, 0.03922851]], \"rps_doc_frac_chars_dupe_6grams\": [[0, 3681, 0.02549853]], \"rps_doc_frac_chars_dupe_7grams\": [[0, 3681, 0.02549853]], \"rps_doc_frac_chars_dupe_8grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_dupe_9grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_top_2gram\": [[0, 3681, 0.03661327]], \"rps_doc_frac_chars_top_3gram\": [[0, 3681, 0.00653808]], \"rps_doc_frac_chars_top_4gram\": [[0, 3681, 0.0078457]], \"rps_doc_frac_all_caps_words\": [[0, 3681, 0.03783102]], \"rps_doc_frac_lines_end_with_ellipsis\": [[0, 3681, 0.0]], \"rps_doc_frac_no_alph_words\": [[0, 3681, 0.17654477]], \"rps_doc_frac_unique_words\": [[0, 3681, 0.50830565]], \"rps_doc_mean_word_length\": [[0, 3681, 5.08139535]], \"rps_doc_symbol_to_word_ratio\": [[0, 3681, 0.0]], \"rps_doc_unigram_entropy\": [[0, 3681, 5.21751703]], \"rps_doc_word_count\": [[0, 3681, 602.0]], \"rps_lines_ending_with_terminal_punctution_mark\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 1.0], [544, 919, 1.0], [919, 1439, 1.0], [1439, 1727, 1.0], [1727, 2181, 1.0], [2181, 2599, 1.0], [2599, 2969, 1.0], [2969, 3406, 1.0], [3406, 3504, 1.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 1.0]], \"rps_lines_javascript_counts\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 0.0], [544, 919, 0.0], [919, 1439, 0.0], [1439, 1727, 0.0], [1727, 2181, 0.0], [2181, 2599, 0.0], [2599, 2969, 0.0], [2969, 3406, 0.0], [3406, 3504, 0.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_num_words\": [[0, 94, 17.0], [94, 116, 4.0], [116, 544, 71.0], [544, 919, 54.0], [919, 1439, 87.0], [1439, 1727, 41.0], [1727, 2181, 76.0], [2181, 2599, 66.0], [2599, 2969, 64.0], [2969, 3406, 76.0], [3406, 3504, 15.0], [3504, 3561, 9.0], [3561, 3643, 14.0], [3643, 3654, 2.0], [3654, 3681, 6.0]], \"rps_lines_numerical_chars_fraction\": [[0, 94, 0.02150538], [94, 116, 0.26086957], [116, 544, 0.00473934], [544, 919, 0.00540541], [919, 1439, 0.0038835], [1439, 1727, 0.0], [1727, 2181, 0.00443459], [2181, 2599, 0.00970874], [2599, 2969, 0.01081081], [2969, 3406, 0.01376147], [3406, 3504, 0.02173913], [3504, 3561, 0.03389831], [3561, 3643, 0.02439024], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_start_with_bulletpoint\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 0.0], [544, 919, 0.0], [919, 1439, 0.0], [1439, 1727, 0.0], [1727, 2181, 0.0], [2181, 2599, 0.0], [2599, 2969, 0.0], [2969, 3406, 0.0], [3406, 3504, 0.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_uppercase_letter_fraction\": [[0, 94, 0.05319149], [94, 116, 0.09090909], [116, 544, 0.03271028], [544, 919, 0.02666667], [919, 1439, 0.03653846], [1439, 1727, 0.02430556], [1727, 2181, 0.0154185], [2181, 2599, 0.0215311], [2599, 2969, 0.03783784], [2969, 3406, 0.04805492], [3406, 3504, 0.08163265], [3504, 3561, 0.12280702], [3561, 3643, 0.08536585], [3643, 3654, 0.18181818], [3654, 3681, 0.03703704]], \"rps_doc_ml_palm_score\": [[0, 3681, null]], \"rps_doc_ml_wikipedia_score\": [[0, 3681, 0.14301181]], \"rps_doc_ml_wikiref_score\": [[0, 3681, null]], \"rps_doc_books_importance\": [[0, 3681, null]], \"rps_doc_openwebtext_importance\": [[0, 3681, null]], \"rps_doc_wikipedia_importance\": [[0, 3681, 98.20272505]], \"rps_doc_num_sentences\": [[0, 3681, 15.0]], \"is_duplicate\": false}",
+      "url": "http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html"
+    },
+    "file_id": "bpt6k6506888c",
+    "ocr": "100",
+    "page_count": 28,
+    "word_count": 1414,
+    "character_count": 9302,
+    "complete_text": "Caractérisation de la plaque athérothrombotique à la\nphase aigüe de l’infarctus du myocarde en imagerie\nendocoronaire et marqueurs biologiques thrombotiques\nVincent Roule\n\nTo cite this version:\nVincent Roule. Caractérisation de la plaque athérothrombotique à la phase aigüe de l’infarctus du\nmyocarde en imagerie endocoronaire et marqueurs biologiques thrombotiques. Médecine humaine et\npathologie. Normandie Université, 2019. Français. �NNT : 2019NORMC414�. �tel-02438192�\n\nHAL Id: tel-02438192\nhttps://theses.hal.science/tel-02438192\nSubmitted on 14 Jan 2020\n\nHAL is a multi-disciplinary open access\narchive for the deposit and dissemination of scientific research documents, whether they are published or not. The documents may come from\nteaching and research institutions in France or\nabroad, or from public or private research centers.\n\nL’archive ouverte pluridisciplinaire HAL, est\ndestinée au dépôt et à la diffusion de documents\nscientifiques de niveau recherche, publiés ou non,\némanant des établissements d’enseignement et de\nrecherche français ou étrangers, des laboratoires\npublics ou privés.\n\n\fTHÈSE\nPour obtenir le diplôme de doctorat\nSpécialité RECHERCHE CLINIQUE, INNOVATION TECHNOLOGIQUE, SANTE PUBLIQUE\nPréparée au sein de l'Université de Caen Normandie\n\nCaractérisatiοn de la plaque athérοthrοmbοtique à la phase aigüe\nde l'infarctus du myοcarde en imagerie endοcοrοnaire et\nmarqueurs biοlοgiques thrοmbοtiques.\nPrésentée et soutenue par\nVincent ROULE\nThèse soutenue publiquement le 03/12/2019\ndevant le jury composé de\nM. NICOLAS MENEVEAU\n\nProfesseur des universités PraticienHosp, Université de FrancheRapporteur du jury\nComté\n\nM. GERAUD SOUTEYRAND\n\nProfesseur des universités PraticienHosp, CHU Clermont-Ferrand\nRapporteur du jury\nGabriel-Montpied\n\nMme ANNIE BOREL-DERLON Maître de conférences HDR, Université Caen Normandie\n\nMembre du jury\n\nM. JEAN-PHILIPPE COLLET\n\nProfesseur des universités PraticienHosp, CHU Salpétrière Paris\n\nPrésident du jury\n\nM. FARZIN ESMAIL-BEYGUI\n\nProfesseur des universités PraticienHosp, Université Caen\nNormandie\n\nDirecteur de thèse\n\nThèse dirigée par FARZIN ESMAIL-BEYGUI, Signalisation, électrophysiologie et\nimagerie des lésions d'ischémie-reperfusion myocardique (Caen)\n\n\fRemerciements\n\nA Monsieur le Professeur Farzin BEYGUI\nMerci pour tes précieux conseils et ton accompagnement dans ce travail. C’est un réel plaisir\nd’apprendre à tes côtés en salle de cathétérisme et en dehors. Merci de m’avoir fait confiance\net de transmettre ta passion pour la recherche et l’innovation.\n\nAux\n\nProfesseurs\n\nJean-Philippe\n\nCOLLET,\n\nNicolas\n\nMENEVEAU\n\net\n\nGéraud\n\nSOUTEYRAND et à Madame le ... fibrinolyse; angioplastie primaire\nKeywords: ST-segment elevation myocardial infarction; Optical coherence tomography; thrombus;\nmyocardial reperfusion; platelet reactivity; fibrinolysis; primary-PCI\n\n\f",
+    "chunk_start": [
+      0,
+      "…",
+      214419
+    ],
+    "chunk_end": [
+      1106,
+      "…",
+      218217
+    ],
+    "ccnet_avg_log_prob": [
+      2.9812355041503906,
+      "…",
+      3.0072853565216064
+    ],
+    "ccnet_length": [
+      246,
+      "…",
+      917
+    ],
+    "meta": {
+      "path": "01/hal-hceres.archives-ouvertes.fr-hceres-02039725-document.txt"
+    },
+    "__index_level_0__": 0,
+    "intervenants": "Michel Aurillac",
+    "texteloi_id": "109",
+    "sujet": "Article 6",
+    "sort": "Adopté",
+    "signataires": "le Gouvernement",
+    "expose": "Suppression du gage.",
+    "loi": "Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat",
+    "article_id": "17_1963-05-25_p3_sn83045462_00280609493_1963052501_0269",
+    "newspaper_name": "Evening star.",
+    "edition": "01",
+    "page": "p3",
+    "headline": "5000 Visit Quemoy",
+    "byline": "",
+    "added": "2022-12-11T16:08:35.184Z",
+    "created": "2022-12-08T00:00:00.000Z",
+    "source": "s2ag/valid",
+    "version": "v2",
+    "dump": "CC-MAIN-2024-10",
+    "file_path": "s3://commoncrawl/crawl-data/CC-MAIN-2024-10/segments/1707947473347.0/warc/CC-MAIN-20240220211055-20240221001055-00000.warc.gz",
+    "language_score": 0.9360480904579163,
+    "token_count": 1032,
+    "score": 3.234375,
+    "int_score": 3,
+    "languages": [
+      "it",
+      "en"
+    ],
+    "dataset_id": "UnbabelFrEn",
+    "subset": "arXiv",
+    "question": {
+      "Body": "I have a database from my Facebook application and I am trying to use machine learning to estimate users' age based on what Facebook sites they like.\nThere are three crucial characteristics of my database:\n\nthe age distribution in my training set (12k of users in sum) is skewed towards younger users (i.e. I have 1157 users aged 27, and 23 users aged 65);\nmany sites have no more than 5 likers (I filtered out the FB sites with less than 5 likers).\nthere's many more features than samples.\n\nSo, my questions are: what strategy would you suggest to prepare the data for further analysis? Should I perform some sort of dimensionality reduction? Which ML method would be most appropriate to use in this case?\nI mainly use Python, so Python-specific hints would be greatly appreciated.\n",
+      "ClosedDate": null,
+      "FavoriteCount": null,
+      "Id": "116",
+      "LastEditorDisplayName": null,
+      "OwnerDisplayName": null,
+      "Score": "28",
+      "Tags": "<machine-learning><dimensionality-reduction><python>",
+      "Title": "Machine learning techniques for estimating users' age based on Facebook sites they like",
+      "language_detection_score": 0.965322732925415
+    },
+    "answers": [
+      {
+        "Body": "One thing to start off with would be k-NN.  The idea here is that you have a user/item matrix and for some of the users you have a reported age.  The age for a person in the user item matrix might be well determined by something like the mean or median age of some nearest neighbors in the item space.\nSo you have each user expressed as a vector in item space, find the k nearest neighbors and assign the vector in question some summary stat of the nearest neighbor ages.  You can choose k on a distance cutoff or more realistically by iteratively assigning ages to a train hold out and choosing the k that minimizes the error in that assignment.\nIf the dimensionality is a problem you can easily perform reduction in this setup by single value decomposition choosing the m vectors that capture the most variance across the group.\nIn all cases since each feature is binary it seems that cosine similarity would be your go to distance metric.\nI need to think a bit more about other approaches (regression, rf, etc...) given the narrow focus of your feature space (all variants of the same action, liking) I think the user/item approach might be the best.\nOne note of caution, if the ages you have for train are self reported you might need to correct some of them.  People on facebook tend to report ages in the decade they were born.  Plot a histogram of the birth dates (derived from ages) and see if you have spikes at decades like 70s, 80s, 90s.\n",
+        "Id": "121",
+        "Score": "16",
+        "is_accepted_answer": true,
+        "language_detection_score": 0.9663535952568054
+      },
+      {
+        "Body": "Another suggestion is to test the logistic regression. As an added bonus, the  weights (coefficients) of the model will give you an idea of which sites are age-distriminant.  \nSklearn offers the sklearn.linear_model.LogisticRegression package that is designed to handle sparse data as well.\nAs mentionned in the comments, in the present case, with more input variables than samples, you need to regularize the model (with sklearn.linear_model.LogisticRegression use the penalty='l1' argument).\n",
+        "Id": "174",
+        "Score": "5",
+        "is_accepted_answer": false,
+        "language_detection_score": 0.9166892170906067
+      },
+      {
+        "Body": "I recently did a similar project in Python (predicting opinions using FB like data), and had good results with the following basic process:\n\nRead in the training set (n = N) by iterating over comma-delimited like records line-by-line and use a counter to identify the most popular pages\nFor each of the K most popular pages (I used about 5000, but you can play around with different values), use pandas.DataFrame.isin to test whether each individual in the training set likes each page, then make a N x K dataframe of the results (I'll call it xdata_train)\nCreate a series (I'll call it ydata_train) containing all of the outcome variables (in my case opinions, in yours age) with the same index as xdata_train\nSet up a random forest classifier through scikit-learn to predict\nydata_train based on xdata_train\nUse scikit-learn's cross-validation testing to tweak parameters and\nrefine accuracy (tweaking number of popular pages, number of trees,\nmin leaf size, etc.)\nOutput random forest classifier and list of most popular pages with pickle (or keep in memory if you are doing everything at once)\nLoad in the rest of your data, load the list of popular pages (if necessary), and repeat step 2 to produce xdata_new\nLoad the random forest classifier (if necessary) and use it to predict values for the xdata_new data\nOutput the predicted scores to a new CSV or other output format of your choosing\n\nIn your case, you'd need to swap out the classifier for a regressor (so see sklearn.ensemble.RandomForestRegressor) but otherwise the same process should work without much trouble.\nAlso, you should be aware of the most amazing feature of random forests in Python: instant parallelization! Those of us who started out doing this in R and then moved over are always amazed, especially when you get to work on a machine with a few dozen cores.\nFinally, note that this would be a perfect application for network analysis if you have the data on friends as well as the individuals themselves. If you can analyze the ages of a user's friends, the age of the user will almost certainly be within a year or two of the median among his or her friends, particularly if the users are young enough to have built their friend networks while still in school (since most will be classmates). That prediction would likely trump any you would get from modeling---this is a textbook example of a problem where the right data > the right model every time.\nGood luck!\n",
+        "Id": "204",
+        "Score": "7",
+        "is_accepted_answer": false,
+        "language_detection_score": 0.9192038774490356
+      }
+    ],
+    "hexsha": "266f6e29266a0bf5072bd8e0b6e4d6b13fe5bfa7",
+    "size": 254,
+    "ext": "tex",
+    "max_stars_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_stars_repo_name": "Jwely/thesis-pivpr",
+    "max_stars_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_stars_repo_licenses": [
+      "MIT"
+    ],
+    "max_issues_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_issues_repo_name": "Jwely/thesis-pivpr",
+    "max_issues_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_issues_repo_licenses": [
+      "MIT"
+    ],
+    "max_forks_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_forks_repo_name": "Jwely/thesis-pivpr",
+    "max_forks_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_forks_repo_licenses": [
+      "MIT"
+    ],
+    "avg_line_length": 28.2222222222,
+    "max_line_length": 117,
+    "alphanum_fraction": 0.7086614173,
+    "max_stars_count": 5,
+    "max_stars_repo_stars_event_min_datetime": "2019-05-15T10:35:53.000Z",
+    "max_stars_repo_stars_event_max_datetime": "2021-01-14T21:44:29.000Z",
+    "max_forks_count": 5,
+    "max_forks_repo_forks_event_min_datetime": "2019-05-19T11:38:22.000Z",
+    "max_forks_repo_forks_event_max_datetime": "2021-03-28T13:58:47.000Z",
+    "max_issues_count": 1,
+    "max_issues_repo_issues_event_min_datetime": "2022-02-04T15:43:52.000Z",
+    "max_issues_repo_issues_event_max_datetime": "2022-02-04T16:07:45.000Z"
+  },
+  "AmericanStories": {
+    "article_id": "17_1963-05-25_p3_sn83045462_00280609493_1963052501_0269",
+    "newspaper_name": "Evening star.",
+    "edition": "01",
+    "date": "1963-05-25",
+    "page": "p3",
+    "headline": "5000 Visit Quemoy",
+    "byline": "",
+    "character_count": 304,
+    "word_count": 48,
+    "ccnet_language_score": [
+      0.9505000114440918
+    ],
+    "ccnet_perplexity": [
+      1361.4000244140625
+    ],
+    "fasttext_language": [
+      "en"
+    ],
+    "idx_row": 38
+  },
+  "CroissantAligned": {
+    "id": "-8403949827142368011",
+    "dataset_id": "UnbabelFrEn",
+    "__index_level_0__": 0,
+    "languages": [
+      "en",
+      "fr"
+    ]
+  },
+  "DiscoursPublics": {
+    "id": "http://www.vie-publique.fr/discours/254758-declaration-de-m-michel-aurillac-ministre-de-la-cooperation-sur-la-re",
+    "title": "Déclaration de M. Michel Aurillac, ministre de la coopération, sur la recherche agronomique et l'aide au développement, Montpellier le 18 mai 1987.",
+    "date": "18 mai 1987",
+    "intervenants": "Michel Aurillac"
+  },
+  "Europarl": {},
+  "EuroparlAligned": {
+    "languages": [
+      "it",
+      "en"
+    ]
+  },
+  "Eurovoc": {
+    "title": "Decision of the EEA Joint Committee No 18/96 of 26 March 1996 amending Annex II (Technical regulations, standards, testing and certification) to the EEA Agreement",
+    "date": "1996-03-26",
+    "url": "http://publications.europa.eu/resource/cellar/7b8fc892-09fd-48fd-bc6c-240c70b6571e",
+    "lang": "eng",
+    "ccnet_language_score": [
+      0.8485000133514404
+    ],
+    "ccnet_perplexity": [
+      724.2999877929688
+    ],
+    "fasttext_language": [
+      "en"
+    ],
+    "idx_row": 17
+  },
+  "FineWebEdu": {
+    "id": "<urn:uuid:3792a82e-9e7d-487c-9f73-90e6d9d310a2>",
+    "dump": "CC-MAIN-2024-10",
+    "url": "http://cleanbytes.net/malicious-code-types-and-trends-part-1",
+    "file_path": "s3://commoncrawl/crawl-data/CC-MAIN-2024-10/segments/1707947473347.0/warc/CC-MAIN-20240220211055-20240221001055-00000.warc.gz",
+    "language": "en",
+    "language_score": 0.9360480904579163,
+    "token_count": 1032,
+    "score": 3.234375,
+    "int_score": 3
+  },
+  "GallicaMonographies": {
+    "file_id": "bpt6k98000779",
+    "ocr": "77",
+    "title": "Premiere feuille du catalogue des livres qui sont à vendre chez Née de La Rochelle, libraire, rue du Hurepoix, près du pont Saint-Michel, n° 13.",
+    "date": "1787",
+    "author": "None",
+    "page_count": 10,
+    "word_count": 2858,
+    "character_count": 14732,
+    "ccnet_language_score": [
+      0.7631999850273132,
+      0.7932999730110168
+    ],
+    "ccnet_perplexity": [
+      524.2000122070312,
+      487.70001220703125
+    ],
+    "fasttext_language": [
+      "fr",
+      "fr"
+    ],
+    "idx_row": 4
+  },
+  "GallicaPress": {
+    "file_id": "bpt6k6506888c",
+    "ocr": "100",
+    "title": "Rapport...",
+    "date": "1933",
+    "author": "Paris. Conseil municipal",
+    "page_count": 28,
+    "word_count": 1414,
+    "character_count": 9302,
+    "ccnet_language_score": [
+      0.9912999868392944
+    ],
+    "ccnet_perplexity": [
+      99.5999984741211
+    ],
+    "fasttext_language": [
+      "fr"
+    ],
+    "idx_row": 11
+  },
+  "Gutenberg": {
+    "language": "fr",
+    "id": "10053",
+    "title": "La vampire",
+    "author": "Féval, Paul",
+    "authoryearofbirth": 1817.0,
+    "authoryearofdeath": 1887.0,
+    "usagerights": "open",
+    "releasedate": "November 1, 2003 [eBook #10053]"
+  },
+  "HAL": {
+    "meta": {
+      "path": "01/hal-hceres.archives-ouvertes.fr-hceres-02039725-document.txt"
+    },
+    "character_count": 5437,
+    "word_count": 773,
+    "ccnet_language_score": [
+      0.9890000224113464
+    ],
+    "ccnet_perplexity": [
+      129.3000030517578
+    ],
+    "fasttext_language": [
+      "fr"
+    ],
+    "idx_row": 5
+  },
+  "MathPile": {
+    "subset": "arXiv",
+    "meta": {
+      "id": "1910.03812.tex",
+      "language_detection_score": 0.5796865820884705
+    },
+    "file_path": "arXiv/math_arXiv_v0.2.jsonl",
+    "question": {
+      "Body": "I have a database from my Facebook application and I am trying to use machine learning to estimate users' age based on what Facebook sites they like.\nThere are three crucial characteristics of my database:\n\nthe age distribution in my training set (12k of users in sum) is skewed towards younger users (i.e. I have 1157 users aged 27, and 23 users aged 65);\nmany sites have no more than 5 likers (I filtered out the FB sites with less than 5 likers).\nthere's many more features than samples.\n\nSo, my questions are: what strategy would you suggest to prepare the data for further analysis? Should I perform some sort of dimensionality reduction? Which ML method would be most appropriate to use in this case?\nI mainly use Python, so Python-specific hints would be greatly appreciated.\n",
+      "ClosedDate": null,
+      "FavoriteCount": null,
+      "Id": "116",
+      "LastEditorDisplayName": null,
+      "OwnerDisplayName": null,
+      "Score": "28",
+      "Tags": "<machine-learning><dimensionality-reduction><python>",
+      "Title": "Machine learning techniques for estimating users' age based on Facebook sites they like",
+      "language_detection_score": 0.965322732925415
+    },
+    "answers": [
+      {
+        "Body": "One thing to start off with would be k-NN.  The idea here is that you have a user/item matrix and for some of the users you have a reported age.  The age for a person in the user item matrix might be well determined by something like the mean or median age of some nearest neighbors in the item space.\nSo you have each user expressed as a vector in item space, find the k nearest neighbors and assign the vector in question some summary stat of the nearest neighbor ages.  You can choose k on a distance cutoff or more realistically by iteratively assigning ages to a train hold out and choosing the k that minimizes the error in that assignment.\nIf the dimensionality is a problem you can easily perform reduction in this setup by single value decomposition choosing the m vectors that capture the most variance across the group.\nIn all cases since each feature is binary it seems that cosine similarity would be your go to distance metric.\nI need to think a bit more about other approaches (regression, rf, etc...) given the narrow focus of your feature space (all variants of the same action, liking) I think the user/item approach might be the best.\nOne note of caution, if the ages you have for train are self reported you might need to correct some of them.  People on facebook tend to report ages in the decade they were born.  Plot a histogram of the birth dates (derived from ages) and see if you have spikes at decades like 70s, 80s, 90s.\n",
+        "Id": "121",
+        "Score": "16",
+        "is_accepted_answer": true,
+        "language_detection_score": 0.9663535952568054
+      },
+      {
+        "Body": "Another suggestion is to test the logistic regression. As an added bonus, the  weights (coefficients) of the model will give you an idea of which sites are age-distriminant.  \nSklearn offers the sklearn.linear_model.LogisticRegression package that is designed to handle sparse data as well.\nAs mentionned in the comments, in the present case, with more input variables than samples, you need to regularize the model (with sklearn.linear_model.LogisticRegression use the penalty='l1' argument).\n",
+        "Id": "174",
+        "Score": "5",
+        "is_accepted_answer": false,
+        "language_detection_score": 0.9166892170906067
+      },
+      {
+        "Body": "I recently did a similar project in Python (predicting opinions using FB like data), and had good results with the following basic process:\n\nRead in the training set (n = N) by iterating over comma-delimited like records line-by-line and use a counter to identify the most popular pages\nFor each of the K most popular pages (I used about 5000, but you can play around with different values), use pandas.DataFrame.isin to test whether each individual in the training set likes each page, then make a N x K dataframe of the results (I'll call it xdata_train)\nCreate a series (I'll call it ydata_train) containing all of the outcome variables (in my case opinions, in yours age) with the same index as xdata_train\nSet up a random forest classifier through scikit-learn to predict\nydata_train based on xdata_train\nUse scikit-learn's cross-validation testing to tweak parameters and\nrefine accuracy (tweaking number of popular pages, number of trees,\nmin leaf size, etc.)\nOutput random forest classifier and list of most popular pages with pickle (or keep in memory if you are doing everything at once)\nLoad in the rest of your data, load the list of popular pages (if necessary), and repeat step 2 to produce xdata_new\nLoad the random forest classifier (if necessary) and use it to predict values for the xdata_new data\nOutput the predicted scores to a new CSV or other output format of your choosing\n\nIn your case, you'd need to swap out the classifier for a regressor (so see sklearn.ensemble.RandomForestRegressor) but otherwise the same process should work without much trouble.\nAlso, you should be aware of the most amazing feature of random forests in Python: instant parallelization! Those of us who started out doing this in R and then moved over are always amazed, especially when you get to work on a machine with a few dozen cores.\nFinally, note that this would be a perfect application for network analysis if you have the data on friends as well as the individuals themselves. If you can analyze the ages of a user's friends, the age of the user will almost certainly be within a year or two of the median among his or her friends, particularly if the users are young enough to have built their friend networks while still in school (since most will be classmates). That prediction would likely trump any you would get from modeling---this is a textbook example of a problem where the right data > the right model every time.\nGood luck!\n",
+        "Id": "204",
+        "Score": "7",
+        "is_accepted_answer": false,
+        "language_detection_score": 0.9192038774490356
+      }
+    ]
+  },
+  "OpenData": {
+    "id": "BALO/affaire_28.xml"
+  },
+  "OpenEdition": {
+    "id": "http://cemmc.hypotheses.org/1233",
+    "word_count": 28,
+    "character_count": 181,
+    "__index_level_0__": 0
+  },
+  "OpenLLM-France/Claire-Dialogue-English-0.1": {},
+  "OpenLLM-France/Claire-Dialogue-French-0.1": {},
+  "PeS2o": {
+    "added": "2022-12-11T16:08:35.184Z",
+    "created": "2022-12-08T00:00:00.000Z",
+    "id": "254531610",
+    "source": "s2ag/valid",
+    "version": "v2"
+  },
+  "Persee": {
+    "file_id": "bavf_0244-7002_1884_num_38_1_14135",
+    "date": "1884",
+    "word_count": 1377,
+    "character_count": 8277
+  },
+  "RedPajama": {
+    "id": "/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/assets/RedPajama-Data-V2/00001/4",
+    "metadata": {
+      "dataset": "/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/assets/RedPajama-Data-V2",
+      "doc_id": "2023-14/0001/fr_head.json.gz/4",
+      "meta": "{\"url\": \"http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html\", \"partition\": \"head_middle\", \"language\": \"fr\", \"source_domain\": \"defens-aero.com\", \"date_download\": \"2023-03-20T10:07:51Z\", \"digest\": \"sha1:XLYHOH6QZNWEXJS4X66YPUO2WCISFOJZ\"}",
+      "quality_signals": "{\"ccnet_length\": [[0, 3681, 3681.0]], \"ccnet_original_length\": [[0, 3681, 4441.0]], \"ccnet_nlines\": [[0, 3681, 15.0]], \"ccnet_original_nlines\": [[0, 3681, 43.0]], \"ccnet_language_score\": [[0, 3681, 0.99]], \"ccnet_perplexity\": [[0, 3681, 81.5]], \"ccnet_bucket\": [[0, 3681, 0.0]], \"rps_doc_curly_bracket\": [[0, 3681, 0.0]], \"rps_doc_ldnoobw_words\": [[0, 3681, 0.0]], \"rps_doc_lorem_ipsum\": [[0, 3681, 0.0]], \"rps_doc_stop_word_fraction\": [[0, 3681, 0.43505675]], \"rps_doc_ut1_blacklist\": [[0, 3681, null]], \"rps_doc_frac_chars_dupe_10grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_dupe_5grams\": [[0, 3681, 0.03922851]], \"rps_doc_frac_chars_dupe_6grams\": [[0, 3681, 0.02549853]], \"rps_doc_frac_chars_dupe_7grams\": [[0, 3681, 0.02549853]], \"rps_doc_frac_chars_dupe_8grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_dupe_9grams\": [[0, 3681, 0.0]], \"rps_doc_frac_chars_top_2gram\": [[0, 3681, 0.03661327]], \"rps_doc_frac_chars_top_3gram\": [[0, 3681, 0.00653808]], \"rps_doc_frac_chars_top_4gram\": [[0, 3681, 0.0078457]], \"rps_doc_frac_all_caps_words\": [[0, 3681, 0.03783102]], \"rps_doc_frac_lines_end_with_ellipsis\": [[0, 3681, 0.0]], \"rps_doc_frac_no_alph_words\": [[0, 3681, 0.17654477]], \"rps_doc_frac_unique_words\": [[0, 3681, 0.50830565]], \"rps_doc_mean_word_length\": [[0, 3681, 5.08139535]], \"rps_doc_symbol_to_word_ratio\": [[0, 3681, 0.0]], \"rps_doc_unigram_entropy\": [[0, 3681, 5.21751703]], \"rps_doc_word_count\": [[0, 3681, 602.0]], \"rps_lines_ending_with_terminal_punctution_mark\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 1.0], [544, 919, 1.0], [919, 1439, 1.0], [1439, 1727, 1.0], [1727, 2181, 1.0], [2181, 2599, 1.0], [2599, 2969, 1.0], [2969, 3406, 1.0], [3406, 3504, 1.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 1.0]], \"rps_lines_javascript_counts\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 0.0], [544, 919, 0.0], [919, 1439, 0.0], [1439, 1727, 0.0], [1727, 2181, 0.0], [2181, 2599, 0.0], [2599, 2969, 0.0], [2969, 3406, 0.0], [3406, 3504, 0.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_num_words\": [[0, 94, 17.0], [94, 116, 4.0], [116, 544, 71.0], [544, 919, 54.0], [919, 1439, 87.0], [1439, 1727, 41.0], [1727, 2181, 76.0], [2181, 2599, 66.0], [2599, 2969, 64.0], [2969, 3406, 76.0], [3406, 3504, 15.0], [3504, 3561, 9.0], [3561, 3643, 14.0], [3643, 3654, 2.0], [3654, 3681, 6.0]], \"rps_lines_numerical_chars_fraction\": [[0, 94, 0.02150538], [94, 116, 0.26086957], [116, 544, 0.00473934], [544, 919, 0.00540541], [919, 1439, 0.0038835], [1439, 1727, 0.0], [1727, 2181, 0.00443459], [2181, 2599, 0.00970874], [2599, 2969, 0.01081081], [2969, 3406, 0.01376147], [3406, 3504, 0.02173913], [3504, 3561, 0.03389831], [3561, 3643, 0.02439024], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_start_with_bulletpoint\": [[0, 94, 0.0], [94, 116, 0.0], [116, 544, 0.0], [544, 919, 0.0], [919, 1439, 0.0], [1439, 1727, 0.0], [1727, 2181, 0.0], [2181, 2599, 0.0], [2599, 2969, 0.0], [2969, 3406, 0.0], [3406, 3504, 0.0], [3504, 3561, 0.0], [3561, 3643, 0.0], [3643, 3654, 0.0], [3654, 3681, 0.0]], \"rps_lines_uppercase_letter_fraction\": [[0, 94, 0.05319149], [94, 116, 0.09090909], [116, 544, 0.03271028], [544, 919, 0.02666667], [919, 1439, 0.03653846], [1439, 1727, 0.02430556], [1727, 2181, 0.0154185], [2181, 2599, 0.0215311], [2599, 2969, 0.03783784], [2969, 3406, 0.04805492], [3406, 3504, 0.08163265], [3504, 3561, 0.12280702], [3561, 3643, 0.08536585], [3643, 3654, 0.18181818], [3654, 3681, 0.03703704]], \"rps_doc_ml_palm_score\": [[0, 3681, null]], \"rps_doc_ml_wikipedia_score\": [[0, 3681, 0.14301181]], \"rps_doc_ml_wikiref_score\": [[0, 3681, null]], \"rps_doc_books_importance\": [[0, 3681, null]], \"rps_doc_openwebtext_importance\": [[0, 3681, null]], \"rps_doc_wikipedia_importance\": [[0, 3681, 98.20272505]], \"rps_doc_num_sentences\": [[0, 3681, 15.0]], \"is_duplicate\": false}",
+      "url": "http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html"
+    }
+  },
+  "TheStack": {
+    "hexsha": "266f6e29266a0bf5072bd8e0b6e4d6b13fe5bfa7",
+    "size": 254,
+    "ext": "tex",
+    "lang": "TeX",
+    "max_stars_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_stars_repo_name": "Jwely/thesis-pivpr",
+    "max_stars_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_stars_repo_licenses": [
+      "MIT"
+    ],
+    "max_issues_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_issues_repo_name": "Jwely/thesis-pivpr",
+    "max_issues_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_issues_repo_licenses": [
+      "MIT"
+    ],
+    "max_forks_repo_path": "texdocs/figs/run_23/run_23_tw_contour.tex",
+    "max_forks_repo_name": "Jwely/thesis-pivpr",
+    "max_forks_repo_head_hexsha": "f07a95610cec2a275f9edb2c15cf0f2dfb99a967",
+    "max_forks_repo_licenses": [
+      "MIT"
+    ],
+    "avg_line_length": 28.2222222222,
+    "max_line_length": 117,
+    "alphanum_fraction": 0.7086614173,
+    "max_stars_count": 5,
+    "max_stars_repo_stars_event_min_datetime": "2019-05-15T10:35:53.000Z",
+    "max_stars_repo_stars_event_max_datetime": "2021-01-14T21:44:29.000Z",
+    "max_forks_count": 5,
+    "max_forks_repo_forks_event_min_datetime": "2019-05-19T11:38:22.000Z",
+    "max_forks_repo_forks_event_max_datetime": "2021-03-28T13:58:47.000Z",
+    "max_issues_count": 1,
+    "max_issues_repo_issues_event_min_datetime": "2022-02-04T15:43:52.000Z",
+    "max_issues_repo_issues_event_max_datetime": "2022-02-04T16:07:45.000Z"
+  },
+  "Theses": {
+    "file_id": "2019NORMC414",
+    "date": "2019",
+    "word_count": 29511,
+    "character_count": 202479,
+    "complete_text": "Caractérisation de la plaque athérothrombotique à la\nphase aigüe de l’infarctus du myocarde en imagerie\nendocoronaire et marqueurs biologiques thrombotiques\nVincent Roule\n\nTo cite this version:\nVincent Roule. Caractérisation de la plaque athérothrombotique à la phase aigüe de l’infarctus du\nmyocarde en imagerie endocoronaire et marqueurs biologiques thrombotiques. Médecine humaine et\npathologie. Normandie Université, 2019. Français. �NNT : 2019NORMC414�. �tel-02438192�\n\nHAL Id: tel-02438192\nhttps://theses.hal.science/tel-02438192\nSubmitted on 14 Jan 2020\n\nHAL is a multi-disciplinary open access\narchive for the deposit and dissemination of scientific research documents, whether they are published or not. The documents may come from\nteaching and research institutions in France or\nabroad, or from public or private research centers.\n\nL’archive ouverte pluridisciplinaire HAL, est\ndestinée au dépôt et à la diffusion de documents\nscientifiques de niveau recherche, publiés ou non,\némanant des établissements d’enseignement et de\nrecherche français ou étrangers, des laboratoires\npublics ou privés.\n\n\fTHÈSE\nPour obtenir le diplôme de doctorat\nSpécialité RECHERCHE CLINIQUE, INNOVATION TECHNOLOGIQUE, SANTE PUBLIQUE\nPréparée au sein de l'Université de Caen Normandie\n\nCaractérisatiοn de la plaque athérοthrοmbοtique à la phase aigüe\nde l'infarctus du myοcarde en imagerie endοcοrοnaire et\nmarqueurs biοlοgiques thrοmbοtiques.\nPrésentée et soutenue par\nVincent ROULE\nThèse soutenue publiquement le 03/12/2019\ndevant le jury composé de\nM. NICOLAS MENEVEAU\n\nProfesseur des universités PraticienHosp, Université de FrancheRapporteur du jury\nComté\n\nM. GERAUD SOUTEYRAND\n\nProfesseur des universités PraticienHosp, CHU Clermont-Ferrand\nRapporteur du jury\nGabriel-Montpied\n\nMme ANNIE BOREL-DERLON Maître de conférences HDR, Université Caen Normandie\n\nMembre du jury\n\nM. JEAN-PHILIPPE COLLET\n\nProfesseur des universités PraticienHosp, CHU Salpétrière Paris\n\nPrésident du jury\n\nM. FARZIN ESMAIL-BEYGUI\n\nProfesseur des universités PraticienHosp, Université Caen\nNormandie\n\nDirecteur de thèse\n\nThèse dirigée par FARZIN ESMAIL-BEYGUI, Signalisation, électrophysiologie et\nimagerie des lésions d'ischémie-reperfusion myocardique (Caen)\n\n\fRemerciements\n\nA Monsieur le Professeur Farzin BEYGUI\nMerci pour tes précieux conseils et ton accompagnement dans ce travail. C’est un réel plaisir\nd’apprendre à tes côtés en salle de cathétérisme et en dehors. Merci de m’avoir fait confiance\net de transmettre ta passion pour la recherche et l’innovation.\n\nAux\n\nProfesseurs\n\nJean-Philippe\n\nCOLLET,\n\nNicolas\n\nMENEVEAU\n\net\n\nGéraud\n\nSOUTEYRAND et à Madame le ... fibrinolyse; angioplastie primaire\nKeywords: ST-segment elevation myocardial infarction; Optical coherence tomography; thrombus;\nmyocardial reperfusion; platelet reactivity; fibrinolysis; primary-PCI\n\n\f",
+    "chunk_start": [
+      0,
+      "…",
+      214419
+    ],
+    "chunk_end": [
+      1106,
+      "…",
+      218217
+    ],
+    "ccnet_avg_log_prob": [
+      2.9812355041503906,
+      "…",
+      3.0072853565216064
+    ],
+    "ccnet_length": [
+      246,
+      "…",
+      917
+    ],
+    "ccnet_language_score": [
+      0.7285000085830688,
+      "…",
+      0.7807999849319458
+    ],
+    "fasttext_language": [
+      "fr",
+      "…",
+      "fr"
+    ],
+    "idx_row": 32
+  },
+  "ValidatedYouTube": {},
+  "Wikipedia": {
+    "id": 11890409,
+    "url": "https://fr.wikipedia.org/wiki/%2810345%29_1992_DC11",
+    "title": "(10345) 1992 DC11"
+  },
+  "Wikisource": {
+    "id": 1453238,
+    "url": "https://fr.wikisource.org/wiki/Dictionnaire_de_Tr%C3%A9voux/6e_%C3%A9dition%2C_1771/ADON%C3%89A",
+    "title": "Dictionnaire de Trévoux/6e édition, 1771/ADONÉA"
+  },
+  "Wiktionary": {
+    "id": 1000121,
+    "url": "https://fr.wiktionary.org/wiki/p%C3%AAr",
+    "title": "pêr"
+  },
+  "amendements_parlement": {
+    "texteloi_id": "109",
+    "sujet": "Article 6",
+    "sort": "Adopté",
+    "date": "2007-08-01 00:00:00",
+    "signataires": "le Gouvernement",
+    "expose": "Suppression du gage.",
+    "loi": "Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat",
+    "character_count": 37,
+    "word_count": 6
+  }
+}

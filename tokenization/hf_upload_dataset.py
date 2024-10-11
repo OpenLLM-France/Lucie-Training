@@ -2,12 +2,86 @@ import json
 import os
 import random
 import shutil
+import sys
 import tempfile
 
 import tqdm
 from tokenizer_apply import dataset_to_key_value
 
 from data import decompose_datasets, get_datasets
+
+_UNION_KEY = "__UNION__"
+
+# TODO put this read_stats_datasets code somewhere else
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+asset_folder = os.path.join(parent_dir, "assets")
+sys.path.append(asset_folder)
+from compile_stats import to_language_name_subset  # noqa: E402 Module level import not at top of file
+
+
+def to_language(name, **kwargs):
+    lan, _, __ = to_language_name_subset(name, **kwargs)
+    return lan
+
+
+def to_source_and_id_func(name, **kwargs):
+    lan, main, subset = to_language_name_subset(name, **kwargs)
+    main = main.split(".")[0].split("-")[0]  # Wikipedia.en -> Wikipedia # RedPajama--fr--debug -> RedPajama
+
+    source = None
+    id_func = None
+
+    # Add default id-ing to some datasets that miss "id" field
+    if main in ["Claire", "ValidatedYoutube", "OtherFr", "Europarl", "EuroparlAligned"]:
+
+        def id_func(x, idx, _):
+            return f"{subset or main}/{idx}"
+
+    if source is None:
+        source = {
+            ("Claire", "fr"): "OpenLLM-France/Claire-Dialogue-French-0.1",
+            ("Claire", "en"): "OpenLLM-France/Claire-Dialogue-English-0.1",
+            ("ValidatedYoutube", "fr"): "LeVoiceLab/Youtube.fr",
+        }.get((main, lan))
+    if source is None:
+        source = {
+            ("OtherFr", "questions_ecrites_parlement"): "questions_ecrites_parlement",
+            ("OtherFr", "interventions_parlement"): "interventions_parlement",
+            ("OtherFr", "LEGI"): "LEGI",
+            ("OtherFr", "amendements_parlement"): "amendements_parlement",
+            ("Wikiother", "wikisource"): "Wikisource",
+            ("Wikiother", "wiktionary"): "Wiktionary",
+        }.get((main, subset))
+    if source is None:
+        source = {
+            "AmericanStories": "XXX",
+            "CroissantAligned": "XXX",
+            "DiscoursPublics": "XXX",
+            "Europarl": "XXX",
+            "EuroparlAligned": "XXX",
+            "Eurovoc": "XXX",
+            "FineWebEdu": "XXX",
+            "GallicaMonographies": "XXX",
+            "GallicaPress": "XXX",
+            "Gutenberg": "XXX",
+            "HAL": "XXX",
+            "MathPile": "XXX",
+            "OpenData": "XXX",
+            "OpenEdition": "XXX",
+            "PeS2o": "XXX",
+            "Persee": "XXX",
+            "RedPajama": "XXX",
+            "TheStack": "XXX",
+            "Theses": "XXX",
+            "ValidatedYouTube": "XXX",
+            "Wikiother": "XXX",
+            "Wikipedia": "XXX",
+        }.get(main)
+    if source is None:
+        raise NotImplementedError(f"Missing source for {name=} ({lan=}, {main=}, {subset=})")
+    if source == "XXX":
+        source = main
+    return source, id_func
 
 
 def get_type(v):
@@ -24,18 +98,24 @@ def get_type(v):
     return str(t)
 
 
-def get_example_preview(v):
+def get_example_preview(v, enforce_dict=False, max_string_length=None):
+    if enforce_dict and isinstance(v, str) and v.startswith("{"):
+        try:
+            v = json.loads(v)
+        except json.JSONDecodeError:
+            print(f"WARNING: Failed to parse {v}")
+            pass
     if isinstance(v, list):
-        if len(v) > 10:
-            v = v[:5] + ["..."] + v[-5:]
-        v = [get_example_preview(x) for x in v]
+        if len(v) > 3:
+            v = v[:1] + ["…"] + v[-1:]
+        v = [get_example_preview(x, enforce_dict=enforce_dict) for x in v]
         return v
     if isinstance(v, dict):
-        v = {k: get_example_preview(v) for k, v in sorted(v.items())}
+        v = {k: get_example_preview(v, enforce_dict=enforce_dict) for k, v in sorted(v.items())}
         return v
     if isinstance(v, str):
-        if len(v) > 100:
-            v = v[:50] + "..." + v[-50:]
+        if max_string_length and len(v) > max_string_length:
+            v = v[: max_string_length // 2] + "…" + v[-max_string_length // 2 :]
         return v
     if isinstance(v, (int, float)):
         return v
@@ -118,31 +198,34 @@ if __name__ == "__main__":
 
     metadatas = {}
     examples = {}
-    examples["UNION"] = {}
+    metadatas[_UNION_KEY] = {}
+    examples[_UNION_KEY] = {}
     args.collect_metadata_examples = (
         (os.path.splitext(args.collect_metadata)[0] + "_examples.json") if args.collect_metadata else None
     )
     if args.collect_metadata:
         if os.path.exists(args.collect_metadata):
             with open(args.collect_metadata) as f:
-                metadatas = json.load(f)
+                metadatas.update(json.load(f))
     if args.collect_metadata_examples:
         if os.path.exists(args.collect_metadata_examples):
             with open(args.collect_metadata_examples) as f:
-                examples = json.load(f)
+                examples.update(json.load(f))
 
     tmpfile = tempfile.mktemp(suffix=".json")
 
-    def dump_metadata(metadatas):
-        # Sort keys
-        metadatas = {k: metadatas[k] for k in sorted(metadatas.keys()) if k != "UNION"}
-        # Add union at last
-        metadatas["UNION"] = get_union(list(metadatas.values()) + [metadatas.get("UNION", {})], desc="UNION")
+    def dump_metadata(metadatas, examples):
+        metadatas[_UNION_KEY] = get_union(list(metadatas.values()) + [metadatas.get(_UNION_KEY, {})], desc=_UNION_KEY)
+        # Sort keys (UNION at first)
+        examples = {k: examples[k] for k in sorted(examples.keys(), key=lambda x: "" if x == _UNION_KEY else x)}
+        metadatas = {k: metadatas[k] for k in sorted(metadatas.keys(), key=lambda x: "" if x == _UNION_KEY else x)}
         with open(tmpfile, "w") as f:
-            json.dump(metadatas, f, indent=2)
+            json.dump(metadatas, f, indent=2, ensure_ascii=False)
         shutil.move(tmpfile, args.collect_metadata)
         with open(tmpfile, "w") as f:
-            json.dump(examples, f, indent=2)
+            json.dump(examples, f, indent=2, ensure_ascii=False)
+            # import pprint
+            # print(pprint.pformat(examples), file=f)
         shutil.move(tmpfile, args.collect_metadata_examples)
 
     progress_bar = tqdm.tqdm(all_datas.items())
@@ -151,39 +234,51 @@ if __name__ == "__main__":
         dataset_pseudo = dataset_name.split("-")[0]
         if previous_pseudo != dataset_pseudo:
             previous_pseudo = dataset_pseudo
-            random.seed(1234)  # Try to reproduce same randomness as when tokenizing
-        # if args.collect_metadata and dataset_pseudo in metadatas:
+            random.seed(1234)  # Hack. Try to reproduce same randomness as when tokenizing
+
+        # To yield dictionaries with metadata instead of just the text
+        language = to_language(dataset_name)
+        source, id_func = to_source_and_id_func(dataset_name)
+        dataset.SetYieldMetadata(
+            uniformize_metadata=args.uniformize_metadata,
+            extra_metadata=dict(
+                source=source,
+                language=language,
+            ),
+            id_func=id_func,
+        )
+
+        # if args.collect_metadata and source in metadatas:
         #     continue
         progress_bar.set_description(f"Processing {dataset_name}...")
 
-        metadatas[dataset_pseudo] = metadatas.get(dataset_pseudo, {})
-        examples[dataset_pseudo] = examples.get(dataset_pseudo, {})
+        metadatas[source] = metadatas.get(source, {})
+        examples[source] = examples.get(source, {})
 
-        # To yield dictionaries with metadata instead of just the text
-        dataset.SetYieldMetadata(
-            uniformize_metadata=args.uniformize_metadata,
-            extra_metadata={
-                "source": dataset_name,
-            },
-        )
-
+        has_data = False
         for i, sample in enumerate(dataset):
+            has_data = True
             assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
             assert "text" in sample and isinstance(sample["text"], str)
             if args.collect_metadata:
                 # Update types
-                metadatas[dataset_pseudo] = get_union(
-                    [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[dataset_pseudo]],
+                metadatas[source] = get_union(
+                    [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[source]],
                     desc=dataset_name,
                 )
                 # Update examples
                 for k, v in sample.items():
                     if v is None or k in ["text"]:
                         continue
-                    if k not in examples[dataset_pseudo]:
-                        examples[dataset_pseudo][k] = get_example_preview(v)
-                    if k not in examples["UNION"]:
-                        examples["UNION"][k] = get_example_preview(v)
-                dump_metadata(metadatas)
-                if None not in metadatas[dataset_pseudo].values() or i > 100:
+                    if k not in examples[source]:
+                        examples[source][k] = get_example_preview(
+                            v, enforce_dict=False
+                        )  # True # args.uniformize_metadata)
+                    if k not in examples[_UNION_KEY]:
+                        examples[_UNION_KEY][k] = get_example_preview(v)
+                dump_metadata(metadatas, examples)
+                if None not in metadatas[source].values() or i > 100:
                     break
+
+        if not has_data:
+            raise RuntimeError(f"Dataset {dataset_name} has no data")

@@ -424,7 +424,8 @@ class DataIterator(DataIteratorBase):
         self.extra_metadata = {}
 
         self.random_generator = random.Random(42)
-        self.idx = 0
+        self.idx = -1
+        self.idx_orig = -1
         self.num_chars = 0
         self.num_words = 0
 
@@ -444,7 +445,7 @@ class DataIterator(DataIteratorBase):
 
         DataIteratorBase.__init__(self, name)
 
-    def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None):
+    def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None, id_func=None):
         if doit:
             self.key = None
         else:
@@ -452,6 +453,9 @@ class DataIterator(DataIteratorBase):
         self.do_uniformize_metadata = uniformize_metadata
         if extra_metadata:
             self.extra_metadata = extra_metadata
+        else:
+            self.extra_metadata = {}
+        self.id_func = id_func
 
     def uniformize_metadata(self, data):
         """
@@ -459,11 +463,14 @@ class DataIterator(DataIteratorBase):
         data: a dictionary
         """
 
+        # Note :
+        # - in the following, the order matters
+        # - Existing keys won't be replaced (i.e. renaming is not done in cas of conflict)
         _fields_to_rename = {
             # vvv "id"
             "file_id": "id",
             "article_id": "id",
-            "texteloi_id": "id",
+            "doc_id": "id",
             "hexsha": "id",
             "idx": "id",
             "idx_row": "id",
@@ -472,94 +479,135 @@ class DataIterator(DataIteratorBase):
             # vvv "date"
             "releasedate": "date",
             "created": "date",
-            "added": "date",  # created is better : put it before
+            "added": "date",
+            "date_download": "date",
             # vvv "language"
             "lang": "language",
             # vvv "path"
             "file_path": "path",
             "page_path": "path",
-            "page_index": "page",
-            # vvv Contextualization
-            "int_score": "educational_int_score",  # FineWebEdu
-            "score": "educational_score",  # FineWebEdu
-            "loi": "text_law",
         }
 
-        _fields_to_put_as_tag = [
-            # OtherFr
-            "sujet",
-            "sort",
-            "expose",
-            "topic",
-        ]
+        _fields_to_regroup_under = {
+            "hexsha": "id",
+            r".*id": "id",
+            r"idx.*": "id",  # idx, idx_row
+            # "__index_level_0__":  "id", # Pandas index
+            "author": "author",
+            "authoryearofbirth": "author",
+            "authoryearofdeath": "author",
+            r"ccnet_.*": "quality_signals",
+            r"rps_.*": "quality_signals",
+            r"fasttext_.*": "quality_signals",
+            r"chunk.*": "quality_signals",
+            r".*count": "quality_signals",
+            r".*score": "quality_signals",
+            r".*ratio": "quality_signals",
+            r".*fraction": "quality_signals",
+            r".*length": "quality_signals",
+            "ocr": "quality_signals",  # Gallica
+            "contain_at_least_two_stop_words": "quality_signals",  # MathPile
+            "char_num_after_normalized": "quality_signals",  # MathPile
+            r"page.*": "extra",  # page, page_index
+            r".*name": "extra",  # book_name, newspaper_name, ...
+            r".*path": "extra",  # file_path, page_path, ...
+            r".+date": "extra",
+            r".*time": "extra",  # max_forks_repo_forks_event_max_datetime (in TheStack), ...
+            r".*rights": "extra",  # usagerights, ...
+            "version": "extra",  # in PeS2o
+            "edition": "extra",  # in AmeridanStories
+            "dump": "extra",  # in FineWebEdu
+            "subset": "extra",  # in MathPile
+            "sujet": "extra",  # in adandements.fr
+            "sort": "extra",  # in adandements.fr
+            "expose": "extra",  # in adandements.fr
+            "loi": "extra",  # in adandements.fr
+            "texteloi_id": "extra",  # in adandements.fr
+            "intervenants": "extra",  # in adandements.fr
+            "signataires": "extra",  # in adandements.fr
+            "type": "extra",  # in MathPile
+            "mimetype": "extra",  # in MathPile
+            "ext": "extra",  # in TheStack (file extension)
+            "partition": "extra",  # in RedPajama (it gives the subset)
+            "source_domain": "extra",  # in RedPajama (should be included in the url)
+            "headline": "extra",
+            "size": "extra",  # in TheStack
+            "added": "extra",
+            "dataset": "extra",
+            "digest": "extra",
+            "byline": "extra",
+            "question": "extra",  # in MathPile (a dict)
+            "answers": "extra",  # in MathPile (a list)
+        }
+        _fields_to_regroup_under_exact = {k: v for k, v in _fields_to_regroup_under.items() if "." not in k}
+        _fields_to_regroup_under_fuzzy = {k: v for k, v in _fields_to_regroup_under.items() if "." in k}
 
-        _fields_to_remove = [
-            # vvv Info that is not useful (index in the original dataset, when there are some unique IDs somewhere)
-            "idx_row",  # in HAL, Theses, ...
-            "idx",
-            "__index_level_0__",  # in CroissantAligned
-            # vvv Info that is maybe non consistent after text processing (and can be recomputed easily)
-            "word_count",
-            "character_count",
-            "token_count",
-            "page_count",
-            "avg_line_length",
-            "max_line_length",
-            "alphanum_fraction",
-            "size",
-            # vvv Too specific info
-            "question",  # This is a dictionary, in MathPile
-            "answers",  # This is a list, in MathPile
-            "version",  # Only for PeS2o
-            # vvv Info that could not be renamed because of conflict but then we don't care
-            "added",
-            # "file_path", # MathPile
-            "page_path",  # MathPile (no more information than the title)
-            # vvv Boring or disturbing info
-            "byline",
-            "complete_text",
-            # "ocr" # GallicaMono/Press
-            # "meta" # HAL
-            # "hexsha" # TheStack
-        ]
-
-        _fields_suffixes_to_remove = [
-            "_datetime",
-            "_hexsha",
-        ]
         _fields_prefixes_to_remove = [
+            # Useless stuff in TheStack
             "max_issues_repo_",
             "max_forks_repo_",
             "max_stars_repo_",
         ]
+        _fields_suffixes_to_remove = []
+        _fields_to_remove = [
+            # vvv - Info that became out of context
+            "complete_text",
+            "is_duplicate",
+            "__index_level_0__",  # Pandas index
+            # # vvv - Info that is not useful (index in the original dataset, when there are some unique IDs somewhere)
+            # "idx_row",  # in HAL, Theses, ...
+            # "idx",
+            # "__index_level_0__",  # in CroissantAligned
+            # # vvv - Info that is maybe non consistent after text processing (and can be recomputed easily)
+            # "word_count",
+            # "character_count",
+            # "token_count",
+            # "page_count",
+            # # vvv - Too specific info
+            # "question",  # This is a dictionary, in MathPile
+            # "answers",  # This is a list, in MathPile
+        ]
 
-        _enforced_types = {
-            "id": str,  # can be an int also
-            "date": str,  # can be datetime also
-            "page": str,  # can be int also
-            "max_issues_count": int,  # can be float ?
-            "max_forks_count": int,  # ''
-            "max_stars_count": int,  # ''
-            "authoryearofbirth": float,
-            "authoryearofdeath": float,
-        }
-        # Rename some keys (in the order of renaming)
+        is_programming_language = "hexsha" in data and "ext" in data
+
+        self.conform_metadata(data)
+
+        # Uniformize field names : rename some keys (done in the order of renaming)
         for old_key, new_key in _fields_to_rename.items():
-            if old_key in data and new_key not in data:
+            if old_key in data and (
+                new_key not in data
+                or (new_key == "id" and old_key == "doc_id")  # RedPajama : id was set to an internal file path
+            ):
                 data[new_key] = data.pop(old_key)
 
-        # Set some values as tags
-        tags = []
+        # Enforce types of raw data
+        self.enforce_types(data)
+
+        # - Special thing to get urls
+        if data.get("id", "").startswith("http://") and "url" not in data:
+            data["url"] = data["id"]
+
+        # Set some values under other meta-fields
+        others = {}
         for k in list(data.keys()):
-            v = data[k]
-            if k in _fields_to_put_as_tag:
-                if v is None:
-                    v = ""
-                assert isinstance(v, str), f"Cannot convert {k}={v} to str"
-                tags.append(v)
+            do_match_exactly = k in _fields_to_regroup_under_exact
+            do_match_fuzzy = False
+            if not do_match_exactly:
+                for pattern, new_field in _fields_to_regroup_under_fuzzy.items():
+                    if re.match(pattern, k):
+                        do_match_fuzzy = new_field
+                        break
+            if do_match_exactly or do_match_fuzzy:
+                v = data[k]
+                new_field = _fields_to_regroup_under[k] if do_match_exactly else do_match_fuzzy
+                others[new_field] = others.get(new_field, {}) | {k: v}
                 del data[k]
-        if tags:
-            data["tags"] = tags
+        if others:
+            for k, v in others.items():
+                # avoid "id" : {"id": "value"}
+                if len(v) == 1 and list(v.keys())[0] == k:
+                    v = list(v.values())[0]
+                data[k] = v
 
         # Remove some keys
         for key in list(data.keys()):
@@ -570,15 +618,7 @@ class DataIterator(DataIteratorBase):
             ):
                 del data[key]
 
-        # Format types
-        for key, value in data.items():
-            if key in _enforced_types and not isinstance(value, _enforced_types[key]) and value is not None:
-                try:
-                    data[key] = _enforced_types[key](value)
-                except Exception as err:
-                    raise ValueError(f"Cannot convert {key}={value} to {_enforced_types[key]}") from err
-
-        # Add extra metadata
+        # Add extra metadata (for the whole dataset)
         if self.extra_metadata:
             for k, v in self.extra_metadata.items():
                 if k not in data:
@@ -586,18 +626,99 @@ class DataIterator(DataIteratorBase):
                 elif k == "source":
                     assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
                     data[k] = v + "/" + data[k]
+                elif k in ["language"]:
+                    # Let the original value
+                    pass
                 else:
                     raise NotImplementedError(f"Warning: {k} already in metadata. Combination not implemented.")
 
-        # Enforce "id" field
-        # TODO ?
-        # if "id" not in data:
-        #     ...
+        # - Special stuff for languages
+        if is_programming_language and "language" in data:
+            # Programming languages (not natural)
+            lang = data["language"]
+            data["language"] += f"programming:{lang}"
+        if "languages" in data:
+            assert (
+                not is_programming_language
+            ), "Not Implemented : mixing programming language with natural language information"
+            data["language"] = json.dumps(data.pop("languages"), ensure_ascii=False)
+
+        # - Special stuff: author infos -> author
+        if "authoryearofbirth" in data or "authoryearofdeath" in data:
+            data["author"] = {
+                "name": data.get("author"),
+                "yearofbirth": data.get("authoryearofbirth"),
+                "yearofdeath": data.get("authoryearofdeath"),
+            }
+
+        if self.id_func and "id" not in data:
+            data["id"] = self.id_func(data, self.idx_orig, self.idx)
+
+        # At last, enforce types of final data, avoiding to have embedded dictionaries
+        self.enforce_types(data, no_dict=True)
+
+    @staticmethod
+    def conform_metadata(data, flatten="all"):
+        # Convert json / Flatten meta
+        for metafieldname in "metadata", "meta", "quality_signals":
+            do_flatten = (flatten == "all") or (flatten and metafieldname in flatten)
+            if metafieldname in data:
+                meta = data[metafieldname]
+                if isinstance(meta, str):
+                    try:
+                        meta = json.loads(meta)
+                    except json.JSONDecodeError:
+                        try:
+                            # meta = json.loads(meta.replace("'", '"'))
+                            meta = eval(meta)
+                        except Exception:
+                            pass
+                if isinstance(meta, dict):
+                    if do_flatten:
+                        data.update(meta)
+                        del data[metafieldname]
+                    else:
+                        data[metafieldname] = meta
+
+    @staticmethod
+    def enforce_types(data, no_dict=False):
+        # Enforce types for some values
+        _enforced_types = {
+            "id": str,  # can be an int also
+            "date": str,  # can be datetime also
+            "page": str,  # can be int also
+            "author": str,  # Fix author="None" (Gallica)
+            "authoryearofbirth": int,
+            "authoryearofdeath": int,
+            # "quality_signals": str,  # with no_dict=True to use json.dumps(...)
+            # "extra": str,  # with no_dict=True to use json.dumps(...)
+        }
+
+        for key, val in data.items():
+            target_type = _enforced_types.get(key)
+            if no_dict and isinstance(val, dict):
+                target_type = str
+            if target_type and val is not None:
+                if not isinstance(val, target_type):
+                    if (target_type == str) and isinstance(val, (dict, list)):
+                        val = json.dumps(val, ensure_ascii=False)
+                    else:
+                        try:
+                            val = target_type(val)
+                        except Exception as err:
+                            raise ValueError(f"Cannot convert {key}={val} to {target_type}") from err
+                    data[key] = val
+
+                elif val == "None":  # and target_type == str (from condition above)
+                    data[key] = None
 
     def __iter__(self):
+        self.idx = -1
+        self.idx_orig = -1
         return self
 
     def _get_next(self):
+        self.idx_orig += 1
         try:
             data = next(self.dataset_iter)
             if self.preprocess:
@@ -611,7 +732,7 @@ class DataIterator(DataIteratorBase):
 
     def __next__(self):
         self.idx += 1
-        if self.max_docs and self.idx > self.max_docs:
+        if self.max_docs and self.idx >= self.max_docs:
             raise StopIteration
         if self.max_chars and self.num_chars >= self.max_chars:
             raise StopIteration
@@ -674,26 +795,11 @@ class DataIterator(DataIteratorBase):
             if self.key_init != "text" and self.key_init in data:
                 del data[self.key_init]
 
-            # flatten meta
-            if "meta" in data:
-                meta = data["meta"]
-                if isinstance(meta, str):
-                    try:
-                        meta = json.loads(meta)
-                    except json.JSONDecodeError:
-                        try:
-                            meta = json.loads(meta.replace("'", '"'))
-                        except json.JSONDecodeError:
-                            try:
-                                meta = eval(meta)
-                            except Exception:
-                                pass
-                if isinstance(meta, dict):
-                    data.update(meta)
-                    del data["meta"]
-
             if self.do_uniformize_metadata:
                 self.uniformize_metadata(data)
+            else:
+                # Minimal conversion
+                self.conform_metadata(data, flatten=None)  # flatten="metadata")
 
             return data
 
@@ -949,6 +1055,15 @@ class DataIteratorWikiother(DataIteratorConcat):
 
         postprocess = clean_wikipedia
 
+        def fix_wiki_links(data, source="wiktionary"):
+            # TODO: fix that in the original datasets
+            # (Wiktionary.fr and Wikisource.fr by OpenLLM-France on Hugging Face)
+            data["url"] = data["url"].replace("fr.wikipedia.org", f"fr.{source}.org").replace("--", "/")
+            return data
+
+        def fix_wiki_links_func(source):
+            return lambda x: fix_wiki_links(x, source=source)
+
         DataIteratorConcat.__init__(
             self,
             [
@@ -960,6 +1075,7 @@ class DataIteratorWikiother(DataIteratorConcat):
                         split="train",
                     ),
                     name=f"{name}:{subname}",
+                    preprocess=fix_wiki_links_func(subname),
                     postprocess=postprocess,
                     subsample_criteria="id",
                     **kwargs,
@@ -1251,11 +1367,10 @@ def create_augmented_text_from_aligned_data(data):
         lan2 = data.pop("lan_2")
         text1 = data.pop("text_1").strip()
         text2 = data.pop("text_2").strip()
-        data["text"], data["language_1"], data["language_2"] = create_augmented_text(text1, text2, lan1, lan2)
+        data["text"], lan1, lan2 = create_augmented_text(text1, text2, lan1, lan2)
     else:
-        data["text"], data["language_1"], data["language_2"] = create_augmented_text(
-            data.pop("text_en"), data.pop("text_fr"), "en", "fr"
-        )
+        data["text"], lan1, lan2 = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+    data["languages"] = [lan1, lan2]
     return data
 
 
