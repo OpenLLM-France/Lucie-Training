@@ -6,17 +6,17 @@ import sys
 import tempfile
 
 import tqdm
-from tokenizer_apply import dataset_to_key_value
 
-from data import decompose_datasets, get_datasets
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(parent_dir)
+sys.path.append(os.path.join(parent_dir, "tokenization"))
+
+from tokenizer_apply import dataset_to_key_value  # noqa: E402
+
+from assets.compile_stats import to_language_name_subset  # noqa: E402 Module level import not at top of file
+from data import decompose_datasets, get_datasets  # noqa: E402
 
 _UNION_KEY = "__UNION__"
-
-# TODO put this read_stats_datasets code somewhere else
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-asset_folder = os.path.join(parent_dir, "assets")
-sys.path.append(asset_folder)
-from compile_stats import to_language_name_subset  # noqa: E402 Module level import not at top of file
 
 
 def to_language(name, **kwargs):

@@ -37,9 +37,10 @@ fi
 #     --add_files_in_folder true \
 #     --message "Upload tokenizer, model config and minimal README" \
 
-python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
-    $TOKENIZER_FOLDER \
-    --message "Upload tokenizer"
+# NOCOMMIT
+# python3 hf_upload_model.py OpenLLM-France/Lucie-7B \
+#     $TOKENIZER_FOLDER \
+#     --message "Upload tokenizer"
 
 ############################################
 # 2. Upload checkpoints
@@ -51,6 +52,10 @@ for STEP in $STEPS;do
         echo "WARNING: $FOLDER does not exist"
         # Hack : need to have an empty folder to update config/READMEs in revisions
         FOLDER=empty
+    fi
+
+    if [ $STEP -lt 200000 ];then
+        continue # NOCOMMIT
     fi
 
     # Upload model folder to Hugging Face
