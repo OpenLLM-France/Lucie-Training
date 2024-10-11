@@ -133,7 +133,7 @@ def upload_to_huggingface_hub(
             content = sorted(os.listdir(input))
             if content:
                 print(
-                    f"Update repository {repo_url} with:"
+                    f"Update repository {repo_url}{revision_info} with:"
                     + ("\n├── " if len(content) > 1 else "")
                     + "\n├── ".join(content[:-1])
                     + "\n└── "
