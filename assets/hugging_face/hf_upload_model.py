@@ -1,18 +1,20 @@
 import json
 import os
+import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 import huggingface_hub
 
 wd = Path(__file__).parent.resolve()
 
-_readme_file = wd / "README.md"
+_readme_file_main = wd / "README.md"
+_readme_file_optimizer = wd / "README_optimizer.md"
 _readme_header_file = wd / "README_header.yaml"
-_config_files = [wd / "config.json", wd / "generation_config.json"]
-for fn in [_readme_file, _readme_header_file] + _config_files:
+_model_config_files = [wd / "config.json", wd / "generation_config.json"]
+for fn in [_readme_file_main, _readme_file_optimizer, _readme_header_file] + _model_config_files:
     assert fn.exists(), f"File not found at {fn}"
 
 
@@ -20,8 +22,9 @@ def upload_to_huggingface_hub(
     repo_id: str,
     input: Path,
     message: Optional[str] = None,
-    training_steps: Optional[int] = None,
-    is_checkpoint: bool = False,
+    training_steps: Optional[str] = None,
+    type: Literal["final", "checkpoint", "optimizer", "tokenizer", "init"] = "final",
+    is_optimizer: bool = False,
     format_json: bool = False,
     create_repo: Optional[bool] = None,
     add_files_in_folder: bool = False,
@@ -40,8 +43,18 @@ def upload_to_huggingface_hub(
     """
 
     assert os.path.exists(input), f"Input {input} must be an existing file or directory"
-    if is_checkpoint:
-        assert training_steps is not None and training_steps >= 0, "Training steps must be provided for a checkpoint"
+    try:
+        training_steps = int(training_steps)
+    except (TypeError, ValueError):
+        pass
+    is_checkpoint = type in ["checkpoint", "optimizer"]
+    is_optimizer = type == "optimizer"
+    is_tokenizer = type == "tokenizer"
+    dump_readme = (not is_checkpoint or is_optimizer) and not is_tokenizer
+    if is_checkpoint and not is_optimizer:
+        assert (
+            isinstance(training_steps, int) and training_steps >= 0
+        ), "Training steps must be provided for a checkpoint"
 
     upload_folder = input if os.path.isdir(input) else None
     upload_files = [input] if not upload_folder else []
@@ -55,11 +68,12 @@ def upload_to_huggingface_hub(
         readme_content = "---\n"
         with open(_readme_header_file) as f:
             readme_content += f.read().strip() + "\n"
-        if training_steps and training_steps >= 0:
+        if isinstance(training_steps, int) and training_steps >= 0:
             readme_content += model_yaml_footer(training_steps).strip() + "\n"
         readme_content += "---\n"
-        if not is_checkpoint and (training_steps is not None):
-            with open(_readme_file) as f:
+        if dump_readme:
+            readme_model_file = _readme_file_optimizer if is_optimizer else _readme_file_main
+            with open(readme_model_file) as f:
                 readme_content += "\n" + f.read().strip() + "\n"
         tmp_file = os.path.join(config_and_readme_folder, "README.md")
         if not add_files_in_folder:
@@ -69,20 +83,23 @@ def upload_to_huggingface_hub(
 
         # Copy config files
         # (add training progress metadata if training_steps is provided)
-        for config_file in _config_files:
-            config_filename = os.path.basename(config_file)
-            tmp_file = os.path.join(config_and_readme_folder, config_filename)
-            if not add_files_in_folder:
-                upload_files.append(tmp_file)
-            if training_steps is not None and training_steps >= 0 and config_filename == "config.json":
-                with open(config_file) as f:
-                    config = json.load(f)
-                config["training_steps"] = training_steps
-                config["training_tokens"] = training_step_to_tokens(training_steps)
-                with open(tmp_file, "w") as f:
-                    json.dump(config, f, indent=2)
-            else:
-                shutil.copy2(config_file, tmp_file)
+        if not is_tokenizer:
+            for config_file in _model_config_files:
+                config_filename = os.path.basename(config_file)
+                if is_optimizer and config_filename in ["generation_config.json"]:
+                    continue
+                tmp_file = os.path.join(config_and_readme_folder, config_filename)
+                if not add_files_in_folder:
+                    upload_files.append(tmp_file)
+                if isinstance(training_steps, int) and training_steps >= 0 and config_filename == "config.json":
+                    with open(config_file) as f:
+                        config = json.load(f)
+                    config["training_steps"] = training_steps
+                    config["training_tokens"] = training_step_to_tokens(training_steps)
+                    with open(tmp_file, "w") as f:
+                        json.dump(config, f, indent=2)
+                else:
+                    shutil.copy2(config_file, tmp_file)
 
         # Will remove files that were temporary created
         tmp_files = upload_files
@@ -114,7 +131,11 @@ def upload_to_huggingface_hub(
                 exist_ok=False,
             )
 
-        revision = f"step{training_steps:07d}" if (is_checkpoint and training_steps and training_steps >= 0) else None
+        revision = None
+        if isinstance(training_steps, int):
+            revision = f"step{training_steps:07d}" if (is_checkpoint and training_steps >= 0) else None
+        elif training_steps:
+            revision = training_steps
 
         is_branch_new = False
         revision_info = ""
@@ -131,22 +152,48 @@ def upload_to_huggingface_hub(
 
         if upload_folder:
             content = sorted(os.listdir(input))
+            uploaded_something = False
             if content:
-                print(
-                    f"Update repository {repo_url}{revision_info} with:"
-                    + ("\n├── " if len(content) > 1 else "")
-                    + "\n├── ".join(content[:-1])
-                    + "\n└── "
-                    + content[-1]
-                )
-                api.upload_folder(
+                kwargs = dict(
                     folder_path=input,
                     repo_id=repo_id,
                     repo_type="model",
-                    ignore_patterns=["lit_*", "pytorch_model.bin", "__pycache__"],
                     revision=revision,
                     commit_message=message,
                 )
+                ignore_patterns_list = [
+                    ["__pycache__"]  # , "pytorch_model.bin" ?
+                ]
+                if is_optimizer:
+                    # Send in several parts (because there are many big files)
+                    all_patterns = ["layer*", "bf16*", "mp_rank*", "*weight", "optimizer_state.pt"]
+                    ignore_patterns_list = [
+                        ignore_patterns_list[0] + list(set(all_patterns) - {keep_pattern})
+                        for keep_pattern in all_patterns
+                    ]
+                for ignore_patterns in ignore_patterns_list:
+                    content_filtered = []
+                    for root, _, files in os.walk(input):
+                        for file in files:
+                            if not any(re.match(p.replace("*", ".*") + r"$", file) for p in ignore_patterns):
+                                content_filtered.append(os.path.relpath(os.path.join(root, file), input))
+                    content_filtered = sorted(content_filtered)
+                    if not content_filtered:
+                        print(f"Nothing to upload in {input} with {ignore_patterns=}")
+                        continue
+                    if len(content_filtered) > 20:
+                        content_filtered = content_filtered[:10] + ["..."] + content_filtered[-10:]
+                    print(
+                        f"Update repository {repo_url}{revision_info} with containt of {os.path.realpath(input)}:"
+                        + ("\n├── " if len(content_filtered) > 1 else "")
+                        + "\n├── ".join(content_filtered[:-1])
+                        + "\n└── "
+                        + content_filtered[-1]
+                    )
+                    api.upload_folder(**kwargs, ignore_patterns=ignore_patterns)
+                    uploaded_something = True
+
+            upload_folder = uploaded_something
 
         for upload_file in upload_files:
             filename = os.path.basename(upload_file)
