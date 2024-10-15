@@ -10,9 +10,9 @@ import huggingface_hub
 
 wd = Path(__file__).parent.resolve()
 
-_readme_file_main = wd / "README.md"
+_readme_file_main = wd / "README_model.md"
 _readme_file_optimizer = wd / "README_optimizer.md"
-_readme_header_file = wd / "README_header.yaml"
+_readme_header_file = wd / "README_model_header.yaml"
 _model_config_files = [wd / "config.json", wd / "generation_config.json"]
 for fn in [_readme_file_main, _readme_file_optimizer, _readme_header_file] + _model_config_files:
     assert fn.exists(), f"File not found at {fn}"
@@ -108,28 +108,9 @@ def upload_to_huggingface_hub(
         if format_json:
             format_json_files(input)
 
-        if not is_hf_logged_in():
-            huggingface_hub.login()
-
-        api = huggingface_hub.HfApi()
-
-        if create_repo is None:
-            create_repo = False
-            try:
-                api.repo_info(repo_id)
-            except huggingface_hub.utils.RepositoryNotFoundError:
-                create_repo = True
-
-        if create_repo:
-            if not message:
-                message = "initial commit"
-            print(f"Create repository {repo_url}")
-            api.create_repo(
-                repo_id=repo_id,
-                private=True,
-                repo_type="model",
-                exist_ok=False,
-            )
+        hf_api, repo_created = connect_to_huggingface(repo_id, create_repo)
+        if not message and repo_created:
+            message = "initial commit"
 
         revision = None
         if isinstance(training_steps, int):
@@ -142,13 +123,13 @@ def upload_to_huggingface_hub(
         if revision:
             revision_info = f" (branch {revision})"
             try:
-                api.create_branch(repo_id, repo_type="model", branch=revision)
+                hf_api.create_branch(repo_id, repo_type="model", branch=revision)
                 is_branch_new = True
             except huggingface_hub.utils._errors.HfHubHTTPError:
                 pass
             if is_branch_new:
                 print(f"Create branch {revision} in {repo_url}")
-            # api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
+            # hf_api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
 
         if upload_folder:
             content = sorted(os.listdir(input))
@@ -166,7 +147,14 @@ def upload_to_huggingface_hub(
                 ]
                 if is_optimizer:
                     # Send in several parts (because there are many big files)
-                    all_patterns = ["layer*", "bf16*", "mp_rank*", "*weight", "optimizer_state.pt"]
+                    all_patterns = [
+                        "layer*",
+                        "bf16*",
+                        "mp_rank*",
+                        "**/**/fp32*",
+                        "**/**/exp_avg*",
+                        "**/optimizer_state.pt",
+                    ]
                     ignore_patterns_list = [
                         ignore_patterns_list[0] + list(set(all_patterns) - {keep_pattern})
                         for keep_pattern in all_patterns
@@ -175,7 +163,9 @@ def upload_to_huggingface_hub(
                     content_filtered = []
                     for root, _, files in os.walk(input):
                         for file in files:
-                            if not any(re.match(p.replace("*", ".*") + r"$", file) for p in ignore_patterns):
+                            if not any(
+                                re.match(p.split("/")[-1].replace("*", ".*") + r"$", file) for p in ignore_patterns
+                            ):
                                 content_filtered.append(os.path.relpath(os.path.join(root, file), input))
                     content_filtered = sorted(content_filtered)
                     if not content_filtered:
@@ -190,7 +180,7 @@ def upload_to_huggingface_hub(
                         + "\n└── "
                         + content_filtered[-1]
                     )
-                    api.upload_folder(**kwargs, ignore_patterns=ignore_patterns)
+                    hf_api.upload_folder(**kwargs, ignore_patterns=ignore_patterns)
                     uploaded_something = True
 
             upload_folder = uploaded_something
@@ -200,9 +190,9 @@ def upload_to_huggingface_hub(
             print(f"Update repository {repo_url}{revision_info} with file {filename}")
             if not message or upload_folder:
                 message = "{} {}".format(
-                    "Upload" if (create_repo and not is_branch_new) else "Update", os.path.splitext(filename)[0]
+                    "Upload" if (repo_created and not is_branch_new) else "Update", os.path.splitext(filename)[0]
                 )
-            api.upload_file(
+            hf_api.upload_file(
                 path_or_fileobj=upload_file,
                 path_in_repo=filename,
                 repo_id=repo_id,
@@ -222,6 +212,32 @@ def is_hf_logged_in():
         return True
     except Exception:
         return False
+
+
+def connect_to_huggingface(repo_id, create_repo=None, repo_type="model"):
+    if not is_hf_logged_in():
+        huggingface_hub.login()
+
+    hf_api = huggingface_hub.HfApi()
+
+    if create_repo is None:
+        create_repo = False
+        try:
+            hf_api.repo_info(repo_id, repo_type=repo_type)
+        except huggingface_hub.utils.RepositoryNotFoundError:
+            create_repo = True
+
+    if create_repo:
+        repo_url = f"https://huggingface.co/{repo_id}"
+        print(f"Create repository {repo_url}")
+        hf_api.create_repo(
+            repo_id=repo_id,
+            private=True,
+            repo_type=repo_type,
+            exist_ok=False,
+        )
+
+    return hf_api, create_repo
 
 
 def format_json_files(file_or_folder, verbose=True):

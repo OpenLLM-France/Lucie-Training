@@ -21,6 +21,7 @@ for UPLOAD_OPTIMIZER in 0 1;do
 
     if [ $UPLOAD_OPTIMIZER -eq 0 ];then
         echo "Upload checkpoints"
+        REPO_NAME=$REPO_BASE
         PARENT_FOLDER="$LUCIE_MODEL_FOLDER/transformers_checkpoints"
         if [ -d $PARENT_FOLDER ];then
             STEPS=`ls -d $PARENT_FOLDER/global_step*000 | awk -F "step" '{print $NF}' | sort -nr `
@@ -38,7 +39,13 @@ for UPLOAD_OPTIMIZER in 0 1;do
         fi
     else
         echo "Upload optimizer states"
-        PARENT_FOLDER="$LUCIE_MODEL_FOLDER/universal_checkpoints"
+        if [ $UPLOAD_OPTIMIZER -eq 1 ];then
+            PARENT_FOLDER="$LUCIE_MODEL_FOLDER/universal_checkpoints"
+            REPO_NAME=$REPO_BASE"-optimizer-states"
+        else
+            PARENT_FOLDER="$LUCIE_MODEL_FOLDER/checkpoints"
+            REPO_NAME=$REPO_BASE"-optimizer-states-512GPU"
+        fi
         STEPS=""
         i=25000
         while [ -d "$PARENT_FOLDER/global_step$i" ];do
@@ -50,10 +57,8 @@ for UPLOAD_OPTIMIZER in 0 1;do
     ############################################
     # 1. Upload tokenizer and minimal stuff
 
-
     if [ $UPLOAD_OPTIMIZER -eq 0 ];then
 
-        REPO_NAME=$REPO_BASE
         UPLOAD_OPTION=""
 
         python3 hf_upload_model.py $REPO_NAME \
@@ -64,7 +69,6 @@ for UPLOAD_OPTIMIZER in 0 1;do
 
     else
 
-        REPO_NAME=$REPO_BASE"-optimizer-states"
         UPLOAD_OPTION="--type optimizer"
 
         rm -Rf empty
@@ -83,6 +87,16 @@ for UPLOAD_OPTIMIZER in 0 1;do
 
     for STEP in $STEPS;do
         FOLDER="$PARENT_FOLDER/global_step$STEP"
+
+        # if [ $UPLOAD_OPTIMIZER -eq 0 ];then
+        #     if [ $STEP -le 475000 ];then
+        #         continue
+        #     fi
+        # else
+        #     if [ $STEP -eq 550000 ];then
+        #         continue
+        #     fi
+        # fi
 
         if [ ! -d $FOLDER ];then
             echo "ERROR: $FOLDER does not exist"

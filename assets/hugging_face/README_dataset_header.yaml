@@ -1,0 +1,49 @@
+pretty_name: Lucie Training Dataset
+license: cc-by-nc-sa-4.0
+language:
+  - en
+  - fr
+  - de
+  - es
+  - it
+  - code
+multilinguality:
+  - multilingual
+task_categories:
+  - text-generation
+  - text2text-generation
+task_ids:
+  - language-modeling
+tags:
+  - text-generation
+  - conditional-text-generation
+viewer: true
+configs:
+  - config_name: default
+    data_files:
+      - split: train
+        path: data/*/*/*parquet
+  - config_name: en
+    data_files:
+      - split: train
+        path: data/*/en/*parquet
+  - config_name: fr
+    data_files:
+      - split: train
+        path: data/*/fr/*parquet
+  - config_name: de
+    data_files:
+      - split: train
+        path: data/*/de/*parquet
+  - config_name: es
+    data_files:
+      - split: train
+        path: data/*/es/*parquet
+  - config_name: it
+    data_files:
+      - split: train
+        path: data/*/it/*parquet
+  - config_name: code
+    data_files:
+      - split: train
+        path: data/*/code/*parquet

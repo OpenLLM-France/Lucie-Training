@@ -156,6 +156,17 @@
     "max_issues_repo_issues_event_min_datetime": "2022-02-04T15:43:52.000Z",
     "max_issues_repo_issues_event_max_datetime": "2022-02-04T16:07:45.000Z"
   },
+  "AmendementsParlement": {
+    "texteloi_id": "109",
+    "sujet": "Article 6",
+    "sort": "Adopté",
+    "date": "2007-08-01 00:00:00",
+    "signataires": "le Gouvernement",
+    "expose": "Suppression du gage.",
+    "loi": "Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat",
+    "character_count": 37,
+    "word_count": 6
+  },
   "AmericanStories": {
     "article_id": "17_1963-05-25_p3_sn83045462_00280609493_1963052501_0269",
     "newspaper_name": "Evening star.",
@@ -177,6 +188,7 @@
     ],
     "idx_row": 38
   },
+  "Claire": {},
   "CroissantAligned": {
     "id": "-8403949827142368011",
     "dataset_id": "UnbabelFrEn",
@@ -348,8 +360,6 @@
     "character_count": 181,
     "__index_level_0__": 0
   },
-  "OpenLLM-France/Claire-Dialogue-English-0.1": {},
-  "OpenLLM-France/Claire-Dialogue-French-0.1": {},
   "PeS2o": {
     "added": "2022-12-11T16:08:35.184Z",
     "created": "2022-12-08T00:00:00.000Z",
@@ -373,6 +383,7 @@
       "url": "http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html"
     }
   },
+  "Stac": {},
   "TheStack": {
     "hexsha": "266f6e29266a0bf5072bd8e0b6e4d6b13fe5bfa7",
     "size": 254,
@@ -447,7 +458,6 @@
     ],
     "idx_row": 32
   },
-  "ValidatedYouTube": {},
   "Wikipedia": {
     "id": 11890409,
     "url": "https://fr.wikipedia.org/wiki/%2810345%29_1992_DC11",
@@ -463,15 +473,5 @@
     "url": "https://fr.wiktionary.org/wiki/p%C3%AAr",
     "title": "pêr"
   },
-  "amendements_parlement": {
-    "texteloi_id": "109",
-    "sujet": "Article 6",
-    "sort": "Adopté",
-    "date": "2007-08-01 00:00:00",
-    "signataires": "le Gouvernement",
-    "expose": "Suppression du gage.",
-    "loi": "Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat",
-    "character_count": 37,
-    "word_count": 6
-  }
+  "YouTube": {}
 }

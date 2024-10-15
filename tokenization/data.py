@@ -241,6 +241,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
                 "american_stories",
                 "pes2o",
                 "fine_web_edu",
+                "stac",
                 # Multi-language (with switching)
                 "europarl_aligned",
                 "croissant_aligned",
@@ -321,6 +322,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
 
     elif isinstance(dataset, DataIterator):
         if parquet_level and hasattr(dataset, "parquet_files"):
+            use_suffix = len(dataset.parquet_files) > 1
             for i, parquet_file in enumerate(sorted(dataset.parquet_files)):
                 assert not dataset.max_docs
                 assert not dataset.max_words
@@ -334,7 +336,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
                         streaming=True,
                         split="train",
                     ),
-                    name=f"{dataset.name}:{i:03d}",
+                    name=f"{dataset.name}" + (f"{i:03d}" if use_suffix else ""),
                     key=dataset.key,
                     preprocess=dataset.preprocess,
                     postprocess=dataset.postprocess,
@@ -445,7 +447,7 @@ class DataIterator(DataIteratorBase):
 
         DataIteratorBase.__init__(self, name)
 
-    def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None, id_func=None):
+    def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None, update_dict_func=None):
         if doit:
             self.key = None
         else:
@@ -455,7 +457,7 @@ class DataIterator(DataIteratorBase):
             self.extra_metadata = extra_metadata
         else:
             self.extra_metadata = {}
-        self.id_func = id_func
+        self.update_dict_func = update_dict_func
 
     def uniformize_metadata(self, data):
         """
@@ -476,6 +478,7 @@ class DataIterator(DataIteratorBase):
             "idx_row": "id",
             # vvv "title"
             "page_title": "title",
+            "headline": "title",
             # vvv "date"
             "releasedate": "date",
             "created": "date",
@@ -486,6 +489,7 @@ class DataIterator(DataIteratorBase):
             # vvv "path"
             "file_path": "path",
             "page_path": "path",
+            "source": "subset",  # PeS2o
         }
 
         _fields_to_regroup_under = {
@@ -517,6 +521,7 @@ class DataIterator(DataIteratorBase):
             "version": "extra",  # in PeS2o
             "edition": "extra",  # in AmeridanStories
             "dump": "extra",  # in FineWebEdu
+            # "source": "extra",  # in PeS2o
             "subset": "extra",  # in MathPile
             "sujet": "extra",  # in adandements.fr
             "sort": "extra",  # in adandements.fr
@@ -587,6 +592,23 @@ class DataIterator(DataIteratorBase):
         if data.get("id", "").startswith("http://") and "url" not in data:
             data["url"] = data["id"]
 
+        # Add extra metadata (for the whole dataset)
+        if self.extra_metadata:
+            for k, v in self.extra_metadata.items():
+                if k not in data:
+                    data[k] = v
+                elif k in ["language"]:
+                    # Let the original value
+                    pass
+                # elif k in ["source", "subset"]:
+                #     assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
+                #     data[k] = v + "/" + data[k]
+                else:
+                    raise NotImplementedError(f"Warning: {k} already in metadata. Combination not implemented.")
+
+        if self.update_dict_func and "id" not in data:  # a bit hacky to update only if "id" is not set
+            data.update(self.update_dict_func(data, self.idx_orig, self.idx))
+
         # Set some values under other meta-fields
         others = {}
         for k in list(data.keys()):
@@ -618,41 +640,16 @@ class DataIterator(DataIteratorBase):
             ):
                 del data[key]
 
-        # Add extra metadata (for the whole dataset)
-        if self.extra_metadata:
-            for k, v in self.extra_metadata.items():
-                if k not in data:
-                    data[k] = v
-                elif k == "source":
-                    assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
-                    data[k] = v + "/" + data[k]
-                elif k in ["language"]:
-                    # Let the original value
-                    pass
-                else:
-                    raise NotImplementedError(f"Warning: {k} already in metadata. Combination not implemented.")
-
         # - Special stuff for languages
         if is_programming_language and "language" in data:
             # Programming languages (not natural)
             lang = data["language"]
-            data["language"] += f"programming:{lang}"
+            data["language"] += f"code:{lang}"
         if "languages" in data:
             assert (
                 not is_programming_language
             ), "Not Implemented : mixing programming language with natural language information"
-            data["language"] = json.dumps(data.pop("languages"), ensure_ascii=False)
-
-        # - Special stuff: author infos -> author
-        if "authoryearofbirth" in data or "authoryearofdeath" in data:
-            data["author"] = {
-                "name": data.get("author"),
-                "yearofbirth": data.get("authoryearofbirth"),
-                "yearofdeath": data.get("authoryearofdeath"),
-            }
-
-        if self.id_func and "id" not in data:
-            data["id"] = self.id_func(data, self.idx_orig, self.idx)
+            data["language"] = ",".join(data.pop("languages"))  # json.dumps(data.pop("languages"), ensure_ascii=False)
 
         # At last, enforce types of final data, avoiding to have embedded dictionaries
         self.enforce_types(data, no_dict=True)
@@ -1021,6 +1018,8 @@ class DataIteratorWikipedia(DataIterator):
             repo = "parquet"
             pattern = f"{data_path}/*.parquet"
             self.parquet_files = sorted(glob.glob(pattern))
+            if kwargs.get("max_parquet_files"):
+                self.parquet_files = self.parquet_files[: kwargs["max_parquet_files"]]
             assert len(self.parquet_files), f"Missing parquet files for {pattern}"
             logger.info(f"Found {len(self.parquet_files)} parquet files in {os.path.dirname(pattern)}")
             kwargs_dataset = dict(data_files=self.parquet_files)
@@ -1067,18 +1066,19 @@ class DataIteratorWikiother(DataIteratorConcat):
         DataIteratorConcat.__init__(
             self,
             [
-                DataIterator(
-                    datasets.load_dataset(
-                        "parquet",
-                        data_files={"train": filenames},
-                        streaming=streaming,
-                        split="train",
-                    ),
+                DataIteratorConcat(
+                    [
+                        DataIteratorParquet(
+                            filename,
+                            name=f"{name}:{subname}:{os.path.splitext(os.path.basename(filename))[0]}",
+                            preprocess=fix_wiki_links_func(subname),
+                            postprocess=postprocess,
+                            subsample_criteria="id",
+                            **kwargs,
+                        )
+                        for filename in filenames
+                    ],
                     name=f"{name}:{subname}",
-                    preprocess=fix_wiki_links_func(subname),
-                    postprocess=postprocess,
-                    subsample_criteria="id",
-                    **kwargs,
                 )
                 for subname, filenames in parquet_per_subfolder.items()
             ],
