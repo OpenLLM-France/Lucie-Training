@@ -36,17 +36,60 @@ with open(_readme_header_file) as f:
 
 
 def dump_dataset_config():
+    # Trick to dump OrderedDict
     def represent_ordereddict(dumper, data):
         return dumper.represent_dict(data.items())
 
     yaml.add_representer(OrderedDict, represent_ordereddict, Dumper=yaml.SafeDumper)
+
+    # TODO: reload the original file and merge it (in case it was modified in the meantime) ?
+
     with open(_readme_header_file, "w") as f:
         yaml.dump(OrderedDict(_dataset_header), f, Dumper=yaml.SafeDumper, default_flow_style=False)
 
 
+def sort_config_key(name):
+    """
+    return a tuple where the name is prefixed by an index, indicating the order (among several configs).
+
+    example use:
+        sorted(..., key=lambda config: sort_config_key(config["config_name"]))
+
+    # 1. (0)       default
+    # 2. (1 ... N) en, fr, de, ... # natural languages
+    # 3. (N + 1)  multi-lingual
+    # 4. (N + 2)  code
+    # 5. (N + 3)  python, c++, ... # programming languages
+    # 6. (N + 4)  individual subsets
+    """
+    _languages = ["en", "fr", "de", "es", "it"]
+    N = len(_languages)
+    if any(name.startswith(f"{language},") for language in ["en", "fr", "de", "es", "it"]):
+        # Bilingual settings
+        order_idx = N + 1
+    elif name.startswith("code-"):
+        # Programming languages
+        order_idx = N + 3
+        name = name.split("-")[1]
+    else:
+        order_idx = (
+            {lang: i + 1 for i, lang in enumerate(_languages)}
+            | {
+                "default": 0,
+                "code": N + 2,
+            }
+        ).get(name, N + 4)  # individual subsets will come at the end
+
+    return (order_idx, name)
+
+
 def to_language(name, **kwargs):
-    lan, _, __ = to_language_name_subset(name, **kwargs)
-    return lan
+    lan, _, sub = to_language_name_subset(name, **kwargs)
+    lan_type = "natural"
+    if lan == "code":
+        lan_type = "code"  # "programming"
+        lan = sub
+    return lan_type, lan
 
 
 def to_source_and_id_func(name, **kwargs):
@@ -221,6 +264,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--clean", default=False, action="store_true", help="Clean the parquet after they have been uploaded"
     )
+    parser.add_argument(
+        "--update_each", type=int, default=20, help="Update each N parquet files (to avoid too frequent uploads)"
+    )
     args = parser.parse_args()
 
     metadata_fields = {
@@ -258,6 +304,7 @@ if __name__ == "__main__":
         (os.path.splitext(args.collect_metadata)[0] + "_types.json") if args.collect_metadata else None
     )
     do_upload = args.repository and not args.collect_metadata
+    must_update_readme = False
 
     if args.collect_metadata:
         if os.path.exists(args.collect_metadata):
@@ -287,49 +334,75 @@ if __name__ == "__main__":
     progress_bar = tqdm.tqdm(all_datas.items())
     previous_pseudo = None
     hf_api = None
-    for dataset_name, dataset in progress_bar:
-        dataset_pseudo = dataset_name.split("-")[0]
-        if previous_pseudo != dataset_pseudo:
-            previous_pseudo = dataset_pseudo
-            random.seed(1234)  # Hack. Try to reproduce same randomness as when tokenizing
+    parquet_finished, parquet_filename = True, None
+    parquet_files_created = []
+    lock_files = []
+    try:
+        for dataset_name, dataset in progress_bar:
+            progress_bar.set_description(f"Processing {dataset_name}...")
+            dataset_pseudo = dataset_name.split("-")[0]
+            if previous_pseudo != dataset_pseudo:
+                previous_pseudo = dataset_pseudo
+                random.seed(1234)  # Hack. Try to reproduce same randomness as when tokenizing
 
-        # To yield dictionaries with metadata instead of just the text
-        language = to_language(dataset_name)
-        source, source_pseudo, update_dict_func = to_source_and_id_func(dataset_name)
-        assert source_pseudo and language and dataset_name
-        path_in_repo = f"{source_pseudo}/{language}/{dataset_name}.parquet"
+            # To yield dictionaries with metadata instead of just the text
+            language_category, language = to_language(dataset_name)
+            source, source_pseudo, update_dict_func = to_source_and_id_func(dataset_name)
+            assert (
+                source_pseudo and language_category and language and dataset_name
+            ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
+            path_in_repo = f"data/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
 
-        multi_lingual_configs[source_pseudo] = multi_lingual_configs.get(source_pseudo, {}) | {
-            language: {
-                "config_name": f"{source_pseudo}/{language}",
-                "data_files": [{"split": "train", "path": f"data/{source_pseudo}/{language}/*.parquet"}],
-            }
-        }
+            language_configname = language.replace("-", ",")  # fr-en -> fr,en
 
-        config_names = [c["config_name"] for c in _dataset_header["configs"]]
-        for config in [
-            {
-                "config_name": source_pseudo,
-                "data_files": [{"split": "train", "path": f"data/{source_pseudo}/*/*.parquet"}],
-            },
-            {"config_name": language, "data_files": [{"split": "train", "path": f"data/*/{language}/*.parquet"}]},
-        ] + (
-            multi_lingual_configs.get(source_pseudo).values() if len(multi_lingual_configs[source_pseudo]) > 1 else []
-        ):
-            if config["config_name"] not in config_names:
-                _dataset_header["configs"].append(config)
+            if source != "TheStack":  # This one is already under code-*
+                multi_lingual_configs[source] = multi_lingual_configs.get(source, {}) | {
+                    language: {
+                        "config_name": f"{source}-{language_configname}",
+                        "data_files": [
+                            {"split": "train", "path": f"data/{language_category}/{language}/{source_pseudo}/*.parquet"}
+                        ],
+                    }
+                }
+
+            config_names = [c["config_name"] for c in _dataset_header["configs"]]
+            for config in [
+                {
+                    "config_name": source,
+                    "data_files": [{"split": "train", "path": f"data/{language_category}/*/{source_pseudo}/*.parquet"}],
+                },
+                {
+                    "config_name": language_configname
+                    if (language_category == "natural")
+                    else f"{language_category}-{language_configname}",
+                    "data_files": [{"split": "train", "path": f"data/{language_category}/{language}/*/*.parquet"}],
+                },
+            ] + (
+                list(multi_lingual_configs.get(source).values())
+                if len(multi_lingual_configs.get(source, [])) > 1
+                else []
+            ):
+                if config["config_name"] not in config_names:
+                    _dataset_header["configs"].append(config)
+                    _dataset_header["configs"] = sorted(
+                        _dataset_header["configs"], key=lambda x: sort_config_key(x["config_name"])
+                    )
+                    must_update_readme = True
+
+            if must_update_readme:
                 dump_dataset_config()
 
-        parquet_filename = os.path.join(args.folder, path_in_repo)
-        os.makedirs(os.path.dirname(parquet_filename), exist_ok=True)
+            parquet_filename = os.path.join(args.folder, path_in_repo)
+            os.makedirs(os.path.dirname(parquet_filename), exist_ok=True)
 
-        lock_file = parquet_filename + ".lock"
-        if os.path.exists(lock_file):
-            continue
-        with open(lock_file, "w") as f:
-            f.write("lock")
+            lock_file = parquet_filename + ".lock"
+            if do_upload:
+                if os.path.exists(lock_file):
+                    continue
+                with open(lock_file, "w") as f:
+                    f.write("lock")
+                lock_files.append(lock_file)
 
-        try:
             dataset.SetYieldMetadata(
                 uniformize_metadata=args.uniformize_metadata,
                 extra_metadata=dict(
@@ -338,10 +411,6 @@ if __name__ == "__main__":
                 ),
                 update_dict_func=update_dict_func,
             )
-
-            # if args.collect_metadata and source in metadatas:
-            #     continue
-            progress_bar.set_description(f"Processing {dataset_name}...")
 
             metadatas[source] = metadatas.get(source, {})
             examples[source] = examples.get(source, {})
@@ -352,92 +421,143 @@ if __name__ == "__main__":
                     all_data[k] = []
 
             has_data = False
-            for i, sample in enumerate(dataset):
-                has_data = True
-                assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
-                assert "text" in sample and isinstance(sample["text"], str)
+            parquet_finished = do_upload and os.path.isfile(parquet_filename)
+            if parquet_finished:
+                print(f"Warning: Using existing parquet file {parquet_filename}")
+            else:
+                for i, sample in enumerate(dataset):
+                    has_data = True
+                    assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
+                    assert "text" in sample and isinstance(sample["text"], str)
 
-                # Update metadata
-                if args.collect_metadata:
-                    # Update types
-                    metadatas[source] = get_union(
-                        [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[source]],
-                        desc=dataset_name,
-                    )
-                    # Update examples
-                    for k, v in sample.items():
-                        if v is None or k in ["text"]:
-                            continue
-                        if k not in examples[source]:
-                            examples[source][k] = get_example_preview(
-                                v, enforce_dict=False
-                            )  # True # args.uniformize_metadata)
-                        if k not in examples[_UNION_KEY]:
-                            examples[_UNION_KEY][k] = get_example_preview(v)
-                    dump_metadata(metadatas, examples)
-                    if None not in metadatas[source].values() or i > 100:
-                        break
+                    # Update metadata
+                    if args.collect_metadata:
+                        # Update types
+                        metadatas[source] = get_union(
+                            [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[source]],
+                            desc=dataset_name,
+                        )
+                        # Update examples
+                        for k, v in sample.items():
+                            if v is None or k in ["text"]:
+                                continue
+                            if k not in examples[source]:
+                                examples[source][k] = get_example_preview(
+                                    v, enforce_dict=False
+                                )  # True # args.uniformize_metadata)
+                            if k not in examples[_UNION_KEY]:
+                                examples[_UNION_KEY][k] = get_example_preview(v)
+                        dump_metadata(metadatas, examples)
+                        if None not in metadatas[source].values() or i > 100:
+                            break
 
-                # Add sample data to (parquet) dataset
+                    # Add sample data to (parquet) dataset
+                    if do_upload:
+                        if not all_data:
+                            all_data = {k: [] for k in sample.keys()}
+                        for k, v in sample.items():
+                            if k not in all_data:
+                                assert all_data
+                                num_samples = len(all_data[list(all_data.keys())[0]])
+                                all_data[k] = [_DEFAULT_VALUE] * num_samples
+                            if v is None:
+                                v = _DEFAULT_VALUE
+                            all_data[k].append(v)
+                        for k in all_data:
+                            if k not in sample:
+                                all_data[k].append(_DEFAULT_VALUE)
+
+                if not has_data:
+                    raise RuntimeError(f"Dataset {dataset_name} has no data")
+                parquet_finished = True
+
                 if do_upload:
-                    if not all_data:
-                        all_data = {k: [] for k in sample.keys()}
-                    for k, v in sample.items():
-                        if k not in all_data:
-                            assert all_data
-                            num_samples = len(all_data[list(all_data.keys())[0]])
-                            all_data[k] = [_DEFAULT_VALUE] * num_samples
-                        all_data[k].append(v)
-                    for k in all_data:
-                        if k not in sample:
-                            all_data[k].append(_DEFAULT_VALUE)
-
-            if not has_data:
-                raise RuntimeError(f"Dataset {dataset_name} has no data")
+                    # Dump parquet file
+                    pd.DataFrame(all_data).to_parquet(parquet_filename)
 
             if do_upload:
-                # Dump parquet file
-                pd.DataFrame(all_data).to_parquet(parquet_filename)
+                parquet_files_created.append(parquet_filename)
+                if len(parquet_files_created) >= args.update_each:
+                    # Dump to Hugging Face
+                    if hf_api is None:
+                        hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
 
-                # Dump to Hugging Face
-                if hf_api is None:
-                    hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+                    if len(parquet_files_created) == 1:
+                        hf_api.upload_file(
+                            path_or_fileobj=parquet_filename,
+                            path_in_repo=path_in_repo,
+                            commit_message=f"Upload {source}",
+                            repo_id=args.repository,
+                            repo_type="dataset",
+                            revision=None,
+                        )
+                    else:
+                        hf_api.upload_folder(
+                            folder_path=args.folder,
+                            commit_message="Upload data",
+                            ignore_patterns=["*.lock"],
+                            repo_id=args.repository,
+                            repo_type="dataset",
+                            revision=None,
+                        )
 
-                hf_api.upload_file(
-                    path_or_fileobj=parquet_filename,
-                    path_in_repo=f"data/{path_in_repo}",
-                    commit_message=f"Upload {os.path.splitext(path_in_repo)[0]}",
-                    repo_id=args.repository,
-                    repo_type="dataset",
-                    revision=None,
-                )
+                    if args.clean:
+                        for f in parquet_files_created:
+                            os.remove(f)
 
-                if args.clean:
-                    os.remove(parquet_filename)
+                    parquet_files_created = []
+                    lock_files = []
 
-        except Exception as err:
-            os.remove(lock_file)
-            raise err
+    except Exception as err:
+        if not parquet_finished and os.path.exists(parquet_filename):
+            os.remove(parquet_filename)
+        for f in lock_files:
+            os.remove(f)
+        raise err
 
-        if do_upload:
-            # Create the README.md file
-            readme_content = "---\n"
-            with open(_readme_header_file) as f:
-                readme_content += f.read().strip() + "\n"
-            readme_content += "---\n"
-            with open(_readme_file_main) as f:
-                readme_content += "\n" + f.read().strip() + "\n"
-            tmp_file = os.path.join(tempfile.gettempdir(), "README.md")
-            with open(tmp_file, "w") as f:
-                f.write(readme_content)
+    if len(parquet_files_created):
+        # Dump the last ones
 
-            hf_api.upload_file(
-                path_or_fileobj=tmp_file,
-                path_in_repo="README.md",
-                commit_message="Upload README.md",
-                repo_id=args.repository,
-                repo_type="dataset",
-                revision=None,
-            )
+        if hf_api is None:
+            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
 
-            os.remove(tmp_file)
+        hf_api.upload_folder(
+            folder_path=args.folder,
+            commit_message="Upload data",
+            ignore_patterns=["*.lock"],
+            repo_id=args.repository,
+            repo_type="dataset",
+            revision=None,
+        )
+
+        if args.clean:
+            for f in parquet_files_created:
+                os.remove(f)
+
+    # # TODO ??? for now we don't automatically update the README.md (too dangerous)
+    # if must_update_readme:
+    if False:
+        if hf_api is None:
+            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+
+        # Create the README.md file
+        readme_content = "---\n"
+        with open(_readme_header_file) as f:
+            readme_content += f.read().strip() + "\n"
+        readme_content += "---\n"
+        with open(_readme_file_main) as f:
+            readme_content += "\n" + f.read().strip() + "\n"
+        tmp_file = os.path.join(tempfile.gettempdir(), "README.md")
+        with open(tmp_file, "w") as f:
+            f.write(readme_content)
+
+        hf_api.upload_file(
+            path_or_fileobj=tmp_file,
+            path_in_repo="README.md",
+            commit_message="Update README.md",
+            repo_id=args.repository,
+            repo_type="dataset",
+            revision=None,
+        )
+
+        os.remove(tmp_file)

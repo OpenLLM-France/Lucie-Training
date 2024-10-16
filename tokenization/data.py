@@ -336,7 +336,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
                         streaming=True,
                         split="train",
                     ),
-                    name=f"{dataset.name}" + (f"{i:03d}" if use_suffix else ""),
+                    name=f"{dataset.name}:" + (f"{i:03d}" if use_suffix else ""),
                     key=dataset.key,
                     preprocess=dataset.preprocess,
                     postprocess=dataset.postprocess,

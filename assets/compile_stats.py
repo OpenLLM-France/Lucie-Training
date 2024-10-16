@@ -186,13 +186,15 @@ def to_name_subset(name):
 
 
 def to_language_name_subset(name, subset=None):
+    _languages = ["fr", "en", "de", "es", "it"]
     if subset is None:
         name, subset = to_name_subset(name)
-    for lan in "fr", "en", "de", "es", "it":
+    for lan in _languages:
         subset2 = subset.rstrip(":.0123456789")
         if subset.startswith(lan) and (len(subset) == len(lan) or subset[len(lan)] in ".:-"):
-            if "-" in subset and len(subset2) == 5:
-                subset = subset2
+            if len(subset2) >= 5 and subset[len(lan)] in ".:-" and subset2[3:5] in _languages:
+                # multi-lingual
+                subset = subset2[:5]
                 lan = subset
             subset = subset[len(lan) :].strip(":.")
             subset = subset.strip(":_")
