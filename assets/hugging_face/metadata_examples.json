@@ -48,7 +48,7 @@
         "extra": "{\"subset\": \"-en:0-1parquet\"}"
     },
     "Eurovoc": {
-        "language": "eng",
+        "language": "en",
         "source": "Eurovoc",
         "id": "17",
         "url": "http://publications.europa.eu/resource/cellar/7b8fc892-09fd-48fd-bc6c-240c70b6571e",

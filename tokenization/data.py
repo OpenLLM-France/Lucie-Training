@@ -641,10 +641,18 @@ class DataIterator(DataIteratorBase):
                 del data[key]
 
         # - Special stuff for languages
-        if is_programming_language and "language" in data:
-            # Programming languages (not natural)
-            lang = data["language"]
-            data["language"] += f"code:{lang}"
+        if "language" in data:
+            if is_programming_language:
+                # Programming languages (not natural)
+                lang = data["language"]
+                data["language"] += f"code:{lang}"
+            else:
+                lang = data["language"]
+                if len(lang) == 3:
+                    # Used in Eurovoc
+                    assert lang in ["ita", "fra", "eng", "deu", "spa"], f"Unknown language {lang}"
+                    lang = lang[:2]
+                    data["language"] = lang
         if "languages" in data:
             assert (
                 not is_programming_language

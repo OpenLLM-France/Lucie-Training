@@ -62,7 +62,7 @@
     "title": "Decision of the EEA Joint Committee No 18/96 of 26 March 1996 amending Annex II (Technical regulations, standards, testing and certification) to the EEA Agreement",
     "date": "1996-03-26",
     "url": "http://publications.europa.eu/resource/cellar/7b8fc892-09fd-48fd-bc6c-240c70b6571e",
-    "language": "eng",
+    "language": "en",
     "source": "Eurovoc",
     "quality_signals": "{\"ccnet_language_score\": [0.8485000133514404], \"ccnet_perplexity\": [724.2999877929688], \"fasttext_language\": [\"en\"]}",
     "id": "17"
