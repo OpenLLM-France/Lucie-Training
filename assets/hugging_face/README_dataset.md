@@ -17,6 +17,7 @@ with the following motivations in mind:
 * Data mix:
     * French is as well represented as English
     (Lucie Training Dataset is one of the biggest of collection of French text data with a minimum of quality),
+    to avoid that the LLM is culturally biased towards English.
     * German, Spanish and Italian are also represented to some extend,
     * Code is also included to boost the reasoning capabilities of LLM.
 * Data filtering and deduplication:
@@ -66,27 +67,27 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", **kwargs)
 
 Several configurations are available to select a language, a source, or both, illustrated in the following examples.
 
-Only load data in French:
+Load data in French:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "fr", **kwargs)
 ```
-Load data that is aligned in French and English:
+Load data where French and English are aligned:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "fr,en", **kwargs)
 ```
-Only load data corresponding to programming languages:
+Load data corresponding to files with programming languages:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "code", **kwargs)
 ```
-Only load data in python:
+Load data in Python:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "code:python", **kwargs)
 ```
-Only load data from Wikipedia:
+Load data from Wikipedia (in available languages):
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Wikipedia", **kwargs)
 ```
-Only load data from Wikipedia in French:
+Load data from French pages of Wikipedia ([wikipedia.fr](https://www.wikipedia.fr/)):
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Wikipedia-fr", **kwargs)
 ```

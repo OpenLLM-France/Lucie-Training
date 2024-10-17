@@ -508,7 +508,7 @@ if __name__ == "__main__":
                     parquet_files_created = []
                     lock_files = []
 
-    except Exception as err:
+    except (Exception, KeyboardInterrupt) as err:
         if not parquet_finished and os.path.exists(parquet_filename):
             os.remove(parquet_filename)
         for f in lock_files:
