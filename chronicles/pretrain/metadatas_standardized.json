@@ -193,6 +193,7 @@
   },
   "YouTube": {
     "source": "YouTube",
-    "language": "fr"
+    "language": "fr",
+    "id": "{\"idx_row\": 0}"
   }
 }

@@ -100,7 +100,7 @@ def to_source_and_id_func(name, **kwargs):
     update_dict_func = None
 
     # Add default id-ing to some datasets that miss "id" field
-    if main in ["Claire", "ValidatedYoutube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
+    if main in ["Claire", "ValidatedYoutube", "YouTube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
 
         def update_dict_func(x, idx, _):
             out = {}
