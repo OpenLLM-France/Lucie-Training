@@ -61,6 +61,10 @@ configs:
   data_files:
   - path: data/natural/it-en/*/*.parquet
     split: train
+- config_name: natural
+  data_files:
+  - path: data/natural/*/*/*.parquet
+    split: train
 - config_name: code
   data_files:
   - path: data/code/*/*/*parquet
