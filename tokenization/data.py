@@ -225,6 +225,18 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         for name in (
             multilang_corpora_in_training
             + [
+                # Multi-language (with switching)
+                "croissant_aligned",
+                "europarl_aligned",
+            ]
+            + [
+                # English
+                "american_stories",
+                "pes2o",
+                "fine_web_edu",
+                "stac",
+            ]
+            + [
                 # French
                 "gallica_press",
                 "gallica_mono",
@@ -237,14 +249,6 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
             ]
             + (["persee"] if use_nc else [])
             + [
-                # English
-                "american_stories",
-                "pes2o",
-                "fine_web_edu",
-                "stac",
-                # Multi-language (with switching)
-                "europarl_aligned",
-                "croissant_aligned",
                 # Code, tex, math...
                 "math_pile",
                 "code",
@@ -651,6 +655,7 @@ class DataIterator(DataIteratorBase):
                 if len(lang) == 3:
                     # Used in Eurovoc
                     assert lang in ["ita", "fra", "eng", "deu", "spa"], f"Unknown language {lang}"
+                    lang = {"spa": "es"}[lang]
                     lang = lang[:2]
                     data["language"] = lang
         if "languages" in data:
@@ -2430,14 +2435,30 @@ class DataIteratorCode(DataIteratorConcat):
             kwargs_dataset = dict(data_dir=data_dir)
         else:
             pattern = f"{DATA_PATH}/the-stack-dedup/{data_dir}/*.parquet"
-            data_files = sorted(glob.glob(pattern))
-            if kwargs.get("max_parquet_files"):
-                data_files = data_files[: kwargs["max_parquet_files"]]
-            if not len(data_files):
-                warnings.warn(f"Missing parquet files for {pattern}", stacklevel=2)
-                return None
-            logger.info(f"Found {len(data_files)} parquet files in {os.path.dirname(pattern)}")
-            kwargs_dataset = dict(data_files=data_files)
+            kwargs_dataset = dict()
+            # data_files = sorted(glob.glob(pattern))
+            # if kwargs.get("max_parquet_files"):
+            #     data_files = data_files[: kwargs["max_parquet_files"]]
+            # if not len(data_files):
+            #     warnings.warn(f"Missing parquet files for {pattern}", stacklevel=2)
+            #     return None
+            # logger.info(f"Found {len(data_files)} parquet files in {os.path.dirname(pattern)}")
+            # kwargs_dataset = dict(data_files=data_files)
+
+        if dataset_name == "parquet":
+            data_files = os.path.dirname(pattern)
+            return DataIteratorParquet(
+                data_files,
+                streaming=streaming,
+                key="content",
+                subsample_criteria="hexsha",
+                max_chars=max_chars_per_language,
+                filter_fn=(
+                    (lambda x: x["ext"].lower() == "tex") if lan == "tex" else None
+                ),  # Exclude bbl, bib, ... from LaTeX
+                name=f"TheStack:{lan}",
+                **kwargs_dataset,
+            )
 
         return DataIterator(
             datasets.load_dataset(dataset_name, streaming=streaming, split="train", **kwargs_dataset),

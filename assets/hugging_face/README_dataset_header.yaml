@@ -317,6 +317,14 @@ configs:
   data_files:
   - path: data/natural/*/HAL/*.parquet
     split: train
+- config_name: InterventionsParlement
+  data_files:
+  - path: data/natural/*/InterventionsParlement/*.parquet
+    split: train
+- config_name: LEGI
+  data_files:
+  - path: data/natural/*/LEGI/*.parquet
+    split: train
 - config_name: MathPile
   data_files:
   - path: data/natural/*/MathPile/*.parquet
@@ -336,6 +344,10 @@ configs:
 - config_name: Persee
   data_files:
   - path: data/natural/*/Persee/*.parquet
+    split: train
+- config_name: QuestionsEcritesParlement
+  data_files:
+  - path: data/natural/*/QuestionsEcritesParlement/*.parquet
     split: train
 - config_name: RedPajama
   data_files:

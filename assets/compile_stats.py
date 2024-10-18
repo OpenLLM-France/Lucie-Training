@@ -163,6 +163,8 @@ def to_name_subset(name):
         subset = subset.replace("train", "")
     if subset:
         subset = subset.strip(":_")
+    if "thestack" in name.lower():
+        subset = subset.rstrip("-0123456789")
     if "fineweb" in name.lower():
         assert subset.startswith("cc-main-"), f"Invalid FineWeb subset {subset=} {orig_name=}"
         subset = subset.replace("cc-main-", "")

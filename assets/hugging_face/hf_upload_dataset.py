@@ -100,7 +100,7 @@ def to_source_and_id_func(name, **kwargs):
     update_dict_func = None
 
     # Add default id-ing to some datasets that miss "id" field
-    if main in ["Claire", "ValidatedYoutube", "YouTube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
+    if main in ["Claire", "ValidatedYouTube", "YouTube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
 
         def update_dict_func(x, idx, _):
             out = {}
@@ -267,6 +267,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--update_each", type=int, default=20, help="Update each N parquet files (to avoid too frequent uploads)"
     )
+    parser.add_argument("--message", type=str, default="Upload data", help="Commit message for the upload")
     args = parser.parse_args()
 
     metadata_fields = {
@@ -339,7 +340,7 @@ if __name__ == "__main__":
     lock_files = []
     try:
         for dataset_name, dataset in progress_bar:
-            progress_bar.set_description(f"Processing {dataset_name}...")
+            progress_bar.set_description(f"Processing {dataset_name}")
             dataset_pseudo = dataset_name.split("-")[0]
             if previous_pseudo != dataset_pseudo:
                 previous_pseudo = dataset_pseudo
@@ -352,6 +353,8 @@ if __name__ == "__main__":
                 source_pseudo and language_category and language and dataset_name
             ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
             path_in_repo = f"data/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
+
+            progress_bar.set_description(f"Generating {path_in_repo}")
 
             language_configname = language.replace("-", ",")  # fr-en -> fr,en
 
@@ -468,12 +471,16 @@ if __name__ == "__main__":
                                 all_data[k].append(_DEFAULT_VALUE)
 
                 if not has_data:
-                    raise RuntimeError(f"Dataset {dataset_name} has no data")
+                    print(f"Dataset {dataset_name} has no data")
+                    continue
+                    # raise RuntimeError(f"Dataset {dataset_name} has no data")
                 parquet_finished = True
 
                 if do_upload:
                     # Dump parquet file
                     pd.DataFrame(all_data).to_parquet(parquet_filename)
+
+            del all_data
 
             if do_upload:
                 parquet_files_created.append(parquet_filename)
@@ -486,7 +493,7 @@ if __name__ == "__main__":
                         hf_api.upload_file(
                             path_or_fileobj=parquet_filename,
                             path_in_repo=path_in_repo,
-                            commit_message=f"Upload {source}",
+                            commit_message=args.message if args.message else f"Upload {source}",
                             repo_id=args.repository,
                             repo_type="dataset",
                             revision=None,
@@ -494,7 +501,7 @@ if __name__ == "__main__":
                     else:
                         hf_api.upload_folder(
                             folder_path=args.folder,
-                            commit_message="Upload data",
+                            commit_message=args.message if args.message else "Upload data",
                             ignore_patterns=["*.lock"],
                             repo_id=args.repository,
                             repo_type="dataset",
@@ -523,7 +530,7 @@ if __name__ == "__main__":
 
         hf_api.upload_folder(
             folder_path=args.folder,
-            commit_message="Upload data",
+            commit_message=args.message if args.message else "Upload data",
             ignore_patterns=["*.lock"],
             repo_id=args.repository,
             repo_type="dataset",
