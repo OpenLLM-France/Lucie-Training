@@ -142,6 +142,11 @@
     "quality_signals": "{\"word_count\": 1377, \"character_count\": 8277}",
     "id": "bavf_0244-7002_1884_num_38_1_14135"
   },
+  "Pile": {
+    "source": "Pile",
+    "language": "en",
+    "extra": "{\"pile_set_name\": \"DM Mathematics\"}"
+  },
   "RedPajama": {
     "url": "http://defens-aero.com/2014/12/l-etat-islamique-a-capture-un-pilote-de-chasse-jordanien-de-f-16a-apres-le-crash-de-son-avion.html",
     "language": "fr",

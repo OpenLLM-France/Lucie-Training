@@ -345,6 +345,38 @@ configs:
   data_files:
   - path: data/natural/*/Persee/*.parquet
     split: train
+- config_name: Pile
+  data_files:
+  - path: data/natural/*/Pile/*.parquet
+    split: train
+- config_name: Pile-DM_Mathematics
+  data_files:
+  - path: data/natural/*/Pile/*DM_Mathematics.parquet
+    split: train
+- config_name: Pile-FreeLaw
+  data_files:
+  - path: data/natural/*/Pile/*FreeLaw.parquet
+    split: train
+- config_name: Pile-NIH_ExPorter
+  data_files:
+  - path: data/natural/*/Pile/*NIH_ExPorter.parquet
+    split: train
+- config_name: Pile-PhilPapers
+  data_files:
+  - path: data/natural/*/Pile/*PhilPapers.parquet
+    split: train
+- config_name: Pile-StackExchange
+  data_files:
+  - path: data/natural/*/Pile/*StackExchange.parquet
+    split: train
+- config_name: Pile-USPTO_Backgrounds
+  data_files:
+  - path: data/natural/*/Pile/*USPTO_Backgrounds.parquet
+    split: train
+- config_name: Pile-Ubuntu_IRC
+  data_files:
+  - path: data/natural/*/Pile/*Ubuntu_IRC.parquet
+    split: train
 - config_name: QuestionsEcritesParlement
   data_files:
   - path: data/natural/*/QuestionsEcritesParlement/*.parquet

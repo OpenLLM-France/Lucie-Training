@@ -234,6 +234,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
                 "american_stories",
                 "pes2o",
                 "fine_web_edu",
+                "pile",
                 "stac",
             ]
             + [

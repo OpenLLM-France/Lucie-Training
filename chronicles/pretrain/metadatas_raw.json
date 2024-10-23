@@ -373,6 +373,11 @@
     "word_count": 1377,
     "character_count": 8277
   },
+  "Pile": {
+      "meta": {
+        "pile_set_name": "DM Mathematics"
+      }
+  },
   "RedPajama": {
     "id": "/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/assets/RedPajama-Data-V2/00001/4",
     "metadata": {
