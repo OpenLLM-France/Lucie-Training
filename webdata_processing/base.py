@@ -254,8 +254,8 @@ def get_args():
     parser.add_argument(
         "--main-output-path",
         type=str,
-        default="/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama",
-        help="Specify the main output path. Default is '/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama'.",
+        default="/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama",
+        help="Specify the main output path. Default is '/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama'.",
     )
 
     parser.add_argument("--dataset-name", type=str, default="togethercomputer/RedPajama-Data-V2", help="")
@@ -282,6 +282,7 @@ if __name__ == "__main__":
                     "snapshots": [DUMP_TO_PROCESS],
                     "partition": "head_middle",
                     "split": "train",
+                    "trust_remote_code": True,
                 },
                 streaming=True,
                 text_key="raw_content",
@@ -292,7 +293,7 @@ if __name__ == "__main__":
             LucieURLFilter(
                 language=LANGUAGE,
             ),
-            CanFetchFilter(file_path="/gpfsscratch/rech/qgz/uzq54wg/valid_domains_redpajama_4500k.json"),
+            CanFetchFilter(file_path="/lustre/fsn1/projects/rech/qgz/uzq54wg/valid_domains_redpajama_4500k.json"),
             RedPajamaQualityFilter(
                 language=LANGUAGE,
             ),
@@ -309,7 +310,7 @@ if __name__ == "__main__":
         randomize_start_duration=180,  # don't hit the bucket all at once with the list requests
         qos="qos_cpu-t3",
         partition="cpu_p1",
-        condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
+        condaenv="/lustre/fsn1/projects/rech/qgz/uzq54wg/envs/datatrove",
     )
 
     main_processing_executor.run()

@@ -1,10 +1,37 @@
 import argparse
 
+import regex as re
 from datatrove.executor import SlurmPipelineExecutor
 from datatrove.pipeline.dedup import MinhashDedupCluster, MinhashDedupFilter, MinhashDedupSignature
 from datatrove.pipeline.dedup.minhash import MinhashConfig, MinhashDedupBuckets
+from datatrove.pipeline.formatters.base import BaseFormatter
 from datatrove.pipeline.readers import ParquetReader
 from datatrove.pipeline.writers import ParquetWriter
+
+
+class CorrectPII(BaseFormatter):
+    name = "🤒 Correct PII"
+
+    def __init__(
+        self,
+    ):
+        super().__init__()
+
+    def format(self, text: str) -> str:
+        import random
+
+        list_ips = [
+            "22.214.171.124",
+            "126.96.36.199",
+            "188.8.131.52",
+            "184.108.40.206",
+            "220.127.116.11",
+            "18.104.22.168",
+        ]
+        list_emails = ["email@example.com", "firstname.lastname@example.org"]
+        text = re.sub("<email>", random.choice(list_emails), text)
+        text = re.sub("<ip>", random.choice(list_ips), text)
+        return text
 
 
 def get_args():
@@ -18,8 +45,8 @@ def get_args():
     parser.add_argument(
         "--main-output-path",
         type=str,
-        default="/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama",
-        help="Specify the main output path. Default is '/gpfsscratch/rech/qgz/uzq54wg/processed_redpajama'.",
+        default="/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama",
+        help="Specify the main output path. Default is '/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama'.",
     )
 
     return parser.parse_args()
@@ -44,7 +71,7 @@ if __name__ == "__main__":
     LOGS_FOLDER = f"{MAIN_OUTPUT_PATH}/logs/minhash"
     LOCAL_LOGS_FOLDER = "logs/minhash"
 
-    TOTAL_TASKS = 10
+    TOTAL_TASKS = 50
 
     # this is the original data that we want to deduplicate
     INPUT_READER = ParquetReader(
@@ -65,9 +92,9 @@ if __name__ == "__main__":
         time="5:00:00",
         qos="qos_cpu-t3",
         partition="cpu_p1",
-        condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
-        logging_dir=f"{LOGS_FOLDER}/signatures",
-        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/signatures/slurm_logs",
+        condaenv="/lustre/fsn1/projects/rech/qgz/uzq54wg/envs/datatrove",
+        logging_dir=f"{LOGS_FOLDER}/signatures/{LANGUAGE}/{DUMP_TO_PROCESS}",
+        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/signatures/{LANGUAGE}/{DUMP_TO_PROCESS}",
         randomize_start_duration=180,
     )
 
@@ -81,13 +108,13 @@ if __name__ == "__main__":
             ),
         ],
         sbatch_args={"account": "qgz@cpu"},
-        tasks=minhash_config.num_buckets * 1,  # the code supports parallelizing each bucket. here we run 10
+        tasks=minhash_config.num_buckets * 2,  # the code supports parallelizing each bucket.
         randomize_start_duration=180,
-        logging_dir=f"{LOGS_FOLDER}/buckets",
-        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/buckets/slurm_logs",
+        logging_dir=f"{LOGS_FOLDER}/buckets/{LANGUAGE}/{DUMP_TO_PROCESS}",
+        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/buckets/{LANGUAGE}/{DUMP_TO_PROCESS}",
         qos="qos_cpu-t3",
         partition="cpu_p1",
-        condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
+        condaenv="/lustre/fsn1/projects/rech/qgz/uzq54wg/envs/datatrove",
         time="02:00:00",
         cpus_per_task=1,  # you can add run more (smaller) tasks if you do not have a lot of memory
         depends=stage1,
@@ -104,34 +131,34 @@ if __name__ == "__main__":
         ],
         sbatch_args={"account": "qgz@cpu"},
         tasks=1,  # this step runs on a single task
-        logging_dir=f"{LOGS_FOLDER}/clustering",
-        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/clustering/slurm_logs",
+        logging_dir=f"{LOGS_FOLDER}/clustering/{LANGUAGE}/{DUMP_TO_PROCESS}",
+        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/clustering/{LANGUAGE}/{DUMP_TO_PROCESS}",
         qos="qos_cpu-t3",
         partition="cpu_p1",
-        condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
+        condaenv="/lustre/fsn1/projects/rech/qgz/uzq54wg/envs/datatrove",
         time="20:00:00",  # and can also be quite slow. Usually not this slow though
         cpus_per_task=8,  # if you dedup a full dump, you do need a lot of memory for this one
         depends=stage2,
     )
-
-    # stage3.run()
 
     stage4 = SlurmPipelineExecutor(
         job_name=f"mh4_{DUMP_TO_PROCESS}--{LANGUAGE}",
         pipeline=[
             INPUT_READER,
             MinhashDedupFilter(input_folder=f"{MINHASH_BASE_PATH}/{LANGUAGE}/{DUMP_TO_PROCESS}/remove_ids"),
+            CorrectPII(),
             ParquetWriter(f"{MINHASH_BASE_PATH}/{LANGUAGE}/{DUMP_TO_PROCESS}/deduped_output"),
         ],
         sbatch_args={"account": "qgz@cpu"},
         tasks=TOTAL_TASKS,
-        logging_dir=f"{LOGS_FOLDER}/filtering",
-        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/filtering/slurm_logs",
+        logging_dir=f"{LOGS_FOLDER}/filtering_v2/{LANGUAGE}/{DUMP_TO_PROCESS}",
+        slurm_logs_folder=f"{LOCAL_LOGS_FOLDER}/filtering_v2/{LANGUAGE}/{DUMP_TO_PROCESS}",
         qos="qos_cpu-t3",
         partition="cpu_p1",
-        condaenv="/gpfsscratch/rech/qgz/uzq54wg/datatrove",
-        time="5:00:00",
-        depends=stage3,
+        cpus_per_task=2,
+        randomize_start_duration=180,  # don't hit the bucket all at once with the list requests
+        condaenv="/lustre/fsn1/projects/rech/qgz/uzq54wg/envs/datatrove",
+        time="1:00:00",
     )
 
     # launch dedup pipelines
