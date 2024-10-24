@@ -89,7 +89,7 @@ class RedPajamaQualityFilter(BaseFilter):
 
         # rule: 90% of lines need to start without a bullet point
         n_lines = signals["ccnet_nlines"][0][2]
-        n_lines_bulletpoint_start = sum(map(lambda ln: ln[2], signals["rps_lines_start_with_bulletpoint"]))  # noqa # C901 `...` is too complex
+        n_lines_bulletpoint_start = sum(map(lambda ln: ln[2], signals["rps_lines_start_with_bulletpoint"]))
         if n_lines_bulletpoint_start / n_lines > 0.9:
             return False, "Gopher:bulletpoint_start"
 

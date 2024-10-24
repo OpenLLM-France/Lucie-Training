@@ -114,7 +114,7 @@ def canonical_name(name, subset=""):
     return key
 
 
-def prefix_to_canonical_name(name, possible_names):  # noqa # C901 `...` is too complex
+def prefix_to_canonical_name(name, possible_names):
     name = os.path.basename(name)
     # name = os.path.splitext(name)[0]
     if name.endswith("_text_document"):

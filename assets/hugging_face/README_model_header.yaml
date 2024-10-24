@@ -1,0 +1,26 @@
+license: apache-2.0
+pipeline_tag: text-generation
+language:
+- fr
+- en
+- it
+- de
+- es
+tags:
+- pretrained
+- llama-3
+- openllm-france
+datasets:
+  - OpenLLM-France/Lucie-Training-Dataset
+widget:
+  - text: |-
+      Quelle est la capitale de l'Espagne ? Madrid.
+      Quelle est la capitale de la France ?
+    example_title: Capital cities in French
+    group: 1-shot Question Answering
+# inference:
+#     parameters:
+#         temperature: 1.0
+#         top_p: 1.0
+#         top_k: null
+#         max_new_tokens: null

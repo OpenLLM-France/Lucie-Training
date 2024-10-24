@@ -401,7 +401,7 @@ def set_infinite_length(tokenizer):
     return tokenizer
 
 
-def add_consecutive_spaces(  # noqa # C901 `...` is too complex
+def add_consecutive_spaces(
     tokenizer_file,
     consecutive_spaces=8,
     consecutive_tabs=4,

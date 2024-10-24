@@ -163,6 +163,8 @@ def to_name_subset(name):
         subset = subset.replace("train", "")
     if subset:
         subset = subset.strip(":_")
+    if "thestack" in name.lower():
+        subset = subset.rstrip("-0123456789")
     if "fineweb" in name.lower():
         assert subset.startswith("cc-main-"), f"Invalid FineWeb subset {subset=} {orig_name=}"
         subset = subset.replace("cc-main-", "")
@@ -185,14 +187,16 @@ def to_name_subset(name):
     return name, subset
 
 
-def to_language_name_subset(name, subset=None):  # noqa # C901 `...` is too complex
+def to_language_name_subset(name, subset=None):
+    _languages = ["fr", "en", "de", "es", "it"]
     if subset is None:
         name, subset = to_name_subset(name)
-    for lan in "fr", "en", "de", "es", "it":
+    for lan in _languages:
         subset2 = subset.rstrip(":.0123456789")
         if subset.startswith(lan) and (len(subset) == len(lan) or subset[len(lan)] in ".:-"):
-            if "-" in subset and len(subset2) == 5:
-                subset = subset2
+            if len(subset2) >= 5 and subset[len(lan)] in ".:-" and subset2[3:5] in _languages:
+                # multi-lingual
+                subset = subset2[:5]
                 lan = subset
             subset = subset[len(lan) :].strip(":.")
             subset = subset.strip(":_")
