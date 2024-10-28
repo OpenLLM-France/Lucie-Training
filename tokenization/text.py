@@ -96,6 +96,37 @@ def clean_gutenberg(text):
     return text
 
 
+### Pile / Ubuntu
+_cheap_encoding_errors = [
+    ("\xc3\x83\xc2\x87", "Ç"),  # "Ã\u0087"
+    ("\xc3\x83\xc2\x80", "À"),  # "Ã\u0080"
+    ("Ã‰", "É"),
+    ("Ãˆ", "È"),
+    ("ÃŠ", "Ê"),
+    ("Ã”", "Ô"),
+    ("Ãœ", "Ü"),
+    ("Ã�", "Ï"),
+    ("Ã§", "ç"),
+    ("Ã©", "é"),
+    ("Ã¨", "è"),
+    ("Ãª", "ê"),
+    ("Ã«", "ë"),
+    ("Ã´", "ô"),
+    ("Ã¹", "ù"),
+    ("Ã®", "î"),
+    ("Ã¯", "ï"),
+    ("Ã¢", "â"),
+    ("Ã ", "à "),  # WTF
+    ("Â ", " "),  # WTF
+]
+
+
+def recover_encoding_errors_cheap(text):
+    for input, replacement in _cheap_encoding_errors:
+        text = re.sub(input, replacement, text)
+    return text
+
+
 ### Theses
 def clean_theses(text):
     control_char_pattern_except_page_break = r"[\x00-\x08\x0B\x0E-\x1F\x7F�]"
