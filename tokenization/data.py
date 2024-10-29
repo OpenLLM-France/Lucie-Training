@@ -1705,7 +1705,7 @@ class DataIteratorRedPajama(DataIteratorConcat):
     def __init__(self, language="fr", streaming=True, **kwargs):
         data_path = None
         for path in [
-            f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/v3/pii_removal/{language}",
+            f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/minhash/{language}",
             f"/data-storage/storage0/corpus_openllm/redpajama/{language}",
         ]:
             if os.path.isdir(path):
@@ -1718,7 +1718,7 @@ class DataIteratorRedPajama(DataIteratorConcat):
                 DataIterator(
                     datasets.load_dataset(
                         "parquet",
-                        data_files={"train": os.path.join(data_path, snapshot, "*.parquet")},
+                        data_files={"train": os.path.join(data_path, snapshot, "deduped_output", "*.parquet")},
                         streaming=streaming,
                         split="train",
                     ),
