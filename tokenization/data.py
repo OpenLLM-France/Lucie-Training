@@ -18,6 +18,7 @@ from text import (
     clean_discours,
     clean_eurovoc,
     clean_gutenberg,
+    clean_pile_ubuntu,
     clean_theses,
     clean_wikipedia,
     fix_legi,
@@ -581,6 +582,13 @@ class DataIterator(DataIteratorBase):
         is_programming_language = "hexsha" in data and "ext" in data
 
         self.conform_metadata(data)
+
+        # - Special stuff for RedPajama
+        if "dataset" in data:
+            data.pop("dataset")
+            id = data["id"]
+            if "RedPajama-Data-V2/" in id:
+                data["id"] = id.split("RedPajama-Data-V2/")[-1]
 
         # Uniformize field names : rename some keys (done in the order of renaming)
         for old_key, new_key in _fields_to_rename.items():
@@ -2246,6 +2254,7 @@ class DataIteratorPile(DataIteratorConcat):
                             if is_train
                             else f":{type}"
                         ),
+                        postprocess=clean_pile_ubuntu if "Ubuntu" in json_file else None,
                         **kwargs,
                     )
                 )
