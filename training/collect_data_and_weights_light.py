@@ -154,6 +154,12 @@ if __name__ == "__main__":
         default=False,
         help="To print debug output",
     )
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        help="Output path of the df info (useful for extension)",
+        nargs="?",
+    )
     args = parser.parse_args()
 
     stats_datasets = read_stats_datasets()
@@ -220,6 +226,9 @@ if __name__ == "__main__":
     df["ratio"] = df["count"] / total_count
     df["new_ratio"] = df["reweighted_count"] / total_reweighted_count
     df = df.sort_values("reweighted_count", ascending=False)
+
+    if args.output_path is not None:
+        df.to_csv(args.output_path)
 
     if args.debug:
         print("# Weights per sub-corpus\n```")
