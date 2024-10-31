@@ -316,6 +316,35 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
         for i, jsonl_file in enumerate(tqdm.tqdm(sorted(dataset.json_files), desc="Preparing dataset (jsonl files)")):
             yield (f"{dataset.name}--{i:04d}", jsonl_file)
 
+    elif parquet_level and hasattr(dataset, "parquet_files") or hasattr(dataset, "json_files"):
+        is_parquet = hasattr(dataset, "parquet_files")
+        if is_parquet:
+            files = dataset.parquet_files
+        else:
+            files = dataset.json_files
+        use_suffix = len(files) > 1
+        for i, parquet_file in enumerate(
+            sorted(tqdm.tqdm(files, desc=f"Preparing dataset ({'parquet' if is_parquet else 'jsonl'} files)"))
+        ):
+            assert not dataset.max_docs
+            assert not dataset.max_words
+            assert not dataset.max_chars
+            assert dataset.subsample_rate == 1
+            assert not dataset.subsample_invert
+            yield DataIterator(
+                datasets.load_dataset(
+                    "parquet" if is_parquet else "json",
+                    data_files=[parquet_file],
+                    streaming=True,
+                    split="train",
+                ),
+                name=f"{dataset.name}:" + (f"{i:03d}" if use_suffix else ""),
+                key=dataset.key,
+                preprocess=dataset.preprocess,
+                postprocess=dataset.postprocess,
+                filter_fn=dataset.filter_fn,
+            )
+
     elif isinstance(dataset, (list, types.GeneratorType)):
         for d in tqdm.tqdm(dataset, desc="Preparing dataset (list)"):
             for ds in decompose_datasets(d, **kwargs):
@@ -327,31 +356,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
                 yield ds
 
     elif isinstance(dataset, DataIterator):
-        if parquet_level and hasattr(dataset, "parquet_files"):
-            use_suffix = len(dataset.parquet_files) > 1
-            for i, parquet_file in enumerate(
-                sorted(tqdm.tqdm(dataset.parquet_files, desc="Preparing dataset (parquet files)"))
-            ):
-                assert not dataset.max_docs
-                assert not dataset.max_words
-                assert not dataset.max_chars
-                assert dataset.subsample_rate == 1
-                assert not dataset.subsample_invert
-                yield DataIterator(
-                    datasets.load_dataset(
-                        "parquet",
-                        data_files=[parquet_file],
-                        streaming=True,
-                        split="train",
-                    ),
-                    name=f"{dataset.name}:" + (f"{i:03d}" if use_suffix else ""),
-                    key=dataset.key,
-                    preprocess=dataset.preprocess,
-                    postprocess=dataset.postprocess,
-                    filter_fn=dataset.filter_fn,
-                )
-        else:
-            yield dataset
+        yield dataset
     else:
         raise ValueError(f"Unknown type {type(dataset)}")
 
@@ -1828,8 +1833,17 @@ def preproc_gallica(data):
     return data
 
 
+def filter_by_ocr_func(threshold):
+    return lambda x: filter_by_ocr(x, threshold)
+
+
+def filter_by_ocr(x, threshold):
+    ocr = int(x["ocr"])
+    return ocr >= threshold
+
+
 class DataIteratorGallicaMono(DataIteratorParquet):
-    def __init__(self, filter_by_perplexity=True, **kwargs):
+    def __init__(self, high_quality=True, **kwargs):
         folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", "gallica_mono_parquet")
         DataIteratorParquet.__init__(
             self,
@@ -1837,14 +1851,15 @@ class DataIteratorGallicaMono(DataIteratorParquet):
             key="complete_text",
             name="GallicaMonographies",
             preprocess=preproc_gallica,
-            postprocess=html_unescape,  # clean_pdf_extraction_and_html
-            # filter_fn=filter_by_perplexity_func(815) if filter_by_perplexity else None,
+            postprocess=html_unescape,
+            # filter_fn=filter_by_perplexity_func(815),  # We switched to chunkwise filtering (by perplexity)
+            filter_fn=filter_by_ocr_func(90) if high_quality else None,
             **kwargs,
         )
 
 
 class DataIteratorGallicaPress(DataIteratorConcat):
-    def __init__(self, filter_by_perplexity=True, **kwargs):
+    def __init__(self, high_quality=True, **kwargs):
         folder = os.path.join(
             DATA_PATH,
             "perplexity_corpus_open_llm",
@@ -1857,11 +1872,15 @@ class DataIteratorGallicaPress(DataIteratorConcat):
                     key="complete_text",
                     name=f"GallicaPress:{source}",
                     preprocess=preproc_gallica,
-                    postprocess=html_unescape,  # clean_pdf_extraction
-                    # filter_fn=filter_by_perplexity_func(690) if filter_by_perplexity else None,
+                    postprocess=html_unescape,
+                    # filter_fn=filter_by_perplexity_func(690),  # We switched to chunkwise filtering (by perplexity)
+                    filter_fn=filter_by_ocr_func(90) if high_quality else None,
                     **kwargs,
                 )
-                for source in ("html", "txt")
+                for source in (
+                    "html",
+                    "txt",
+                )
             ],
             name="GallicaPress",
         )
@@ -2176,23 +2195,28 @@ class DataIteratorPes2o(DataIteratorConcat):
             else:
                 filter_fns = {"": None}
 
+            splits_kwargs = {
+                "train": [
+                    (f"{i:02d}", {"data_files": [f"data/v2/train-000{i:02d}-of-00020.json.gz"]}) for i in range(20)
+                ]
+            }
+
             DataIteratorConcat.__init__(
                 self,
                 [
                     DataIterator(
                         datasets.load_dataset(
-                            repo,
-                            streaming=streaming,
-                            split=split,
-                            trust_remote_code=True,
+                            repo, streaming=streaming, split=split, trust_remote_code=True, **split_kwargs
                         ),
                         filter_fn=filter_fn,
                         subsample_criteria="id",
-                        name=f"{name}:{subset_name+':' if subset_name else ''}{split}",
+                        name=f"{name}:{subset_name+':' if subset_name else ''}{split}"
+                        + (f":{subsubset_name}" if subsubset_name else ""),
                         **kwargs,
                     )
                     for split in splits
                     for subset_name, filter_fn in filter_fns.items()
+                    for subsubset_name, split_kwargs in splits_kwargs.get(split, [(None, {})])
                 ],
                 name=name,
             )
@@ -2226,7 +2250,7 @@ class DataIteratorPes2o(DataIteratorConcat):
 
 
 class DataIteratorPile(DataIteratorConcat):
-    def __init__(self, streaming=True, train=True, **kwargs):
+    def __init__(self, streaming=True, train=True, high_quality=True, **kwargs):
         if train is not None:
             splits = ["train"] if train else ["val"]
         else:
@@ -2263,7 +2287,7 @@ class DataIteratorPile(DataIteratorConcat):
                             if is_train
                             else f":{type}"
                         ),
-                        postprocess=clean_pile_ubuntu if "Ubuntu" in json_file else None,
+                        postprocess=clean_pile_ubuntu if (high_quality and "Ubuntu" in json_file) else None,
                         **kwargs,
                     )
                 )
