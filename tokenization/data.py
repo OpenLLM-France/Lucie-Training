@@ -313,23 +313,25 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
         return_json_file_if_possible=return_json_file_if_possible,
     )
     if return_json_file_if_possible and hasattr(dataset, "json_files"):
-        for i, jsonl_file in enumerate(sorted(dataset.json_files)):
+        for i, jsonl_file in enumerate(tqdm.tqdm(sorted(dataset.json_files), desc="Preparing dataset (jsonl files)")):
             yield (f"{dataset.name}--{i:04d}", jsonl_file)
 
     elif isinstance(dataset, (list, types.GeneratorType)):
-        for d in dataset:
+        for d in tqdm.tqdm(dataset, desc="Preparing dataset (list)"):
             for ds in decompose_datasets(d, **kwargs):
                 yield ds
 
     elif isinstance(dataset, DataIteratorConcat):
-        for d in dataset.datasets:
+        for d in tqdm.tqdm(dataset.datasets, desc="Preparing dataset (concat)"):
             for ds in decompose_datasets(d, **kwargs):
                 yield ds
 
     elif isinstance(dataset, DataIterator):
         if parquet_level and hasattr(dataset, "parquet_files"):
             use_suffix = len(dataset.parquet_files) > 1
-            for i, parquet_file in enumerate(sorted(dataset.parquet_files)):
+            for i, parquet_file in enumerate(
+                sorted(tqdm.tqdm(dataset.parquet_files, desc="Preparing dataset (parquet files)"))
+            ):
                 assert not dataset.max_docs
                 assert not dataset.max_words
                 assert not dataset.max_chars
@@ -1710,7 +1712,7 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
 
 
 class DataIteratorRedPajama(DataIteratorConcat):
-    def __init__(self, language="fr", streaming=True, **kwargs):
+    def __init__(self, language="fr", streaming=True, split_parquets=True, **kwargs):
         data_path = None
         for path in [
             f"/lustre/fsn1/projects/rech/qgz/uzq54wg/processed_redpajama/minhash/{language}",
@@ -1723,7 +1725,14 @@ class DataIteratorRedPajama(DataIteratorConcat):
         DataIteratorConcat.__init__(
             self,
             [
-                DataIterator(
+                DataIteratorParquet(
+                    os.path.join(data_path, snapshot, "deduped_output"),
+                    name=f"RedPajama:{language.lower()}:{snapshot.lower()}",
+                    streaming=streaming,
+                    **kwargs,
+                )
+                if split_parquets
+                else DataIterator(
                     datasets.load_dataset(
                         "parquet",
                         data_files={"train": os.path.join(data_path, snapshot, "deduped_output", "*.parquet")},
