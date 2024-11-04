@@ -265,7 +265,7 @@ if __name__ == "__main__":
         "--clean", default=False, action="store_true", help="Clean the parquet after they have been uploaded"
     )
     parser.add_argument(
-        "--update_each", type=int, default=20, help="Update each N parquet files (to avoid too frequent uploads)"
+        "--update_each", type=int, default=10, help="Update each N parquet files (to avoid too frequent uploads)"
     )
     parser.add_argument("--message", type=str, default="Upload data", help="Commit message for the upload")
     args = parser.parse_args()
@@ -485,9 +485,17 @@ if __name__ == "__main__":
             if do_upload:
                 parquet_files_created.append(parquet_filename)
                 if len(parquet_files_created) >= args.update_each:
+                    parquet_files_created = list(set(parquet_files_created))
+
                     # Dump to Hugging Face
                     if hf_api is None:
                         hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+
+                    common_path = (
+                        os.path.commonpath(parquet_files_created)
+                        if len(parquet_files_created) > 1
+                        else os.path.dirname(parquet_files_created[0])
+                    )
 
                     if len(parquet_files_created) == 1:
                         hf_api.upload_file(
@@ -500,7 +508,8 @@ if __name__ == "__main__":
                         )
                     else:
                         hf_api.upload_folder(
-                            folder_path=args.folder,
+                            folder_path=common_path,
+                            path_in_repo=os.path.relpath(common_path, args.folder),
                             commit_message=args.message if args.message else "Upload data",
                             ignore_patterns=["*.lock"],
                             repo_id=args.repository,
@@ -510,7 +519,8 @@ if __name__ == "__main__":
 
                     if args.clean:
                         for f in parquet_files_created:
-                            os.remove(f)
+                            if os.path.exists(f):
+                                os.remove(f)
 
                     parquet_files_created = []
                     lock_files = []
@@ -528,8 +538,15 @@ if __name__ == "__main__":
         if hf_api is None:
             hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
 
+        common_path = (
+            os.path.commonpath(parquet_files_created)
+            if len(parquet_files_created) > 1
+            else os.path.dirname(parquet_files_created[0])
+        )
+
         hf_api.upload_folder(
-            folder_path=args.folder,
+            folder_path=common_path,
+            path_in_repo=os.path.relpath(common_path, args.folder),
             commit_message=args.message if args.message else "Upload data",
             ignore_patterns=["*.lock"],
             repo_id=args.repository,
@@ -539,7 +556,8 @@ if __name__ == "__main__":
 
         if args.clean:
             for f in parquet_files_created:
-                os.remove(f)
+                if os.path.exists(f):
+                    os.remove(f)
 
     # # TODO ??? for now we don't automatically update the README.md (too dangerous)
     # if must_update_readme:

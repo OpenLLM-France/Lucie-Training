@@ -174,9 +174,9 @@ def to_name_subset(name):
         if len(f) == 1:
             subset = ""
     if "redpajama" in name.lower():
-        language, f = subset.split(":")
+        language, f = subset.split(":", 1)
         name = name + "--" + language
-        f = f.split("-")
+        f = f.replace(":", "_").split("-")
         if len(f) == 1:
             subset = ""
             name = name + "--" + f[0]

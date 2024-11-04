@@ -97,34 +97,148 @@ def clean_gutenberg(text):
 
 
 ### Pile / Ubuntu
+def simulate_encoding_issue(
+    text,
+    encoding="latin-1",  # 'iso-8859-1'
+):
+    # Encode the text in UTF-8
+    utf8_encoded = text.encode("utf-8")
+
+    # Decode the bytes as ISO-8859-1 (Latin-1)
+    misinterpreted_text = utf8_encoded.decode(encoding)
+
+    assert len(misinterpreted_text) > 1, f"Encoding issue simulation failed for text: '{text}'"
+
+    return misinterpreted_text
+
+
 _cheap_encoding_errors = [
-    ("\xc3\x83\xc2\x87", "Ç"),  # "Ã\u0087"
-    ("\xc3\x83\xc2\x80", "À"),  # "Ã\u0080"
-    ("Ã‰", "É"),
-    ("Ãˆ", "È"),
-    ("ÃŠ", "Ê"),
-    ("Ã”", "Ô"),
-    ("Ãœ", "Ü"),
-    ("Ã�", "Ï"),
-    ("Ã§", "ç"),
-    ("Ã©", "é"),
-    ("Ã¨", "è"),
-    ("Ãª", "ê"),
-    ("Ã«", "ë"),
-    ("Ã´", "ô"),
-    ("Ã¹", "ù"),
-    ("Ã®", "î"),
-    ("Ã¯", "ï"),
-    ("Ã¢", "â"),
-    ("Ã ", "à "),  # WTF
-    ("Â ", " "),  # WTF
+    (simulate_encoding_issue(char), char)
+    for char in sorted(
+        [
+            "¡",
+            "¿",
+            "À",
+            "Â",
+            "Ã",
+            "Ä",
+            "Æ",
+            "Ç",
+            "È",
+            "É",
+            "Ê",
+            "Ë",
+            "Î",
+            "Ï",
+            "Ñ",
+            "Ô",
+            "Õ",
+            "Ö",
+            "Ø",
+            "Ù",
+            "Û",
+            "Ü",
+            "ẞ",
+            "ß",
+            "à",
+            "â",
+            "ã",
+            "ä",
+            "ç",
+            "è",
+            "é",
+            "ê",
+            "ë",
+            "î",
+            "ï",
+            "ñ",
+            "ô",
+            "õ",
+            "ö",
+            "ø",
+            "û",
+            "ü",
+            "ÿ",
+            "Œ",
+            "Ÿ",
+            " ",
+        ]
+    )
 ]
+
+_suspect_characters = {c[0] for c, _ in _cheap_encoding_errors}
+_suspect_characters_pattern = re.compile(f"[{''.join(_suspect_characters)}]")
 
 
 def recover_encoding_errors_cheap(text):
-    for input, replacement in _cheap_encoding_errors:
-        text = re.sub(input, replacement, text)
+    if _suspect_characters_pattern.search(text):
+        for input, replacement in _cheap_encoding_errors:
+            text = re.sub(input, replacement, text)
     return text
+
+
+_pile_channels_excluded = set()
+
+
+def clean_pile_ubuntu(text):
+    # Filter out documents in languages we don't care about
+
+    # Filter out documents starting with "#ubuntu-cn", "#kubuntu-cn", ...
+    ubuntu_prefix = text.startswith("#ubuntu-")
+    kubuntu_prefix = not ubuntu_prefix and text.startswith("#kubuntu-")
+    pos_after_dot = 9 if kubuntu_prefix else 8
+    if (ubuntu_prefix or kubuntu_prefix) and " " in text[pos_after_dot + 2 : pos_after_dot + 4]:
+        # Get the 2 or 3 characters language code
+        lan = text[pos_after_dot : pos_after_dot + 3].strip()
+
+        # Filter out documents in non-supported languages (Chinese, Russian, Arabic, ...)
+
+        # if lan not in [
+        #     "de",
+        #     "fr", "qc",
+        #     "it", "es",
+        #     "uk", "doc", ...
+        #     ]:
+
+        if lan in [
+            "cn",
+            "zh",  # Chinese
+            "ko",  # Korean
+            "vn",  # Vietnamese
+            "gr",  # Greek
+            "il",  # Hebrew
+            "ru",  # Russian
+            "cz",  # Czech
+            "dk",  # Danish
+            "ch",  # Chamorro
+            "si",  # Sinhala
+            "se",
+            "sv",  # Swedish
+            "tw",  # Twi
+            "ir",  # Irish
+            "ro",  # Romanian
+            "pt",
+            "br",  # Portuguese
+            "lt",  # Lithuanian
+            "rs",  # Serbian
+            "hr",  # Croatian
+            "ps",  # Pashto
+            "sa",  # Sanskrit
+            "cy",  # Welsh
+            # Note: there are some English and French posts in the Turkish/North African channels
+            "dz",
+            "eg",  # Arabic (Algerian, Egyptian)
+            "tr",  # Turkish
+        ]:
+            ubuntu_channel = text[: pos_after_dot + 3].strip()
+            if ubuntu_channel not in _pile_channels_excluded:
+                _pile_channels_excluded.add(ubuntu_channel)
+                example = text[pos_after_dot + 3 : pos_after_dot + 203].replace("\n", " ")
+                print(f"Excluding channel {ubuntu_channel} (ex: ''{example}'')")
+
+            return ""
+
+    return recover_encoding_errors_cheap(text)
 
 
 ### Theses
