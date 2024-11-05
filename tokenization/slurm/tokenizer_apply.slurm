@@ -10,9 +10,16 @@
 
 DATE=`date +"%Y-%m-%d--%H-%M-%S"`
 
+# export RUN="python3 /gpfs7kw/linkhome/rech/gendjf01/uov59an/src/Bloom-NG-Training/tokenization/tokenizer_apply.py  \
+#         --datasets red_pajama \
+#         --output /gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k \
+#         --workers 20 \
+#         "
+
 export RUN="python3 /gpfs7kw/linkhome/rech/gendjf01/uov59an/src/Bloom-NG-Training/tokenization/tokenizer_apply.py  \
-        --datasets red_pajama \
-        --output /gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k \
+        --datasets pile \
+        --output /lustre/fsn1/projects/rech/fwx/commun/preprocessed_data/Lucie/lucie_tokens_65k_v2 \
+        --high-quality \
         --workers 20 \
         "
 
