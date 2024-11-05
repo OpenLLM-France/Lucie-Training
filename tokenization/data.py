@@ -395,6 +395,7 @@ class DataIterator(DataIteratorBase):
         postprocess=None,
         filter_fn=None,
         name="",
+        high_quality=False,
         max_parquet_files=None,
         force_include_all_metadata=None,
     ):
@@ -1838,12 +1839,12 @@ def filter_by_ocr_func(threshold):
 
 
 def filter_by_ocr(x, threshold):
-    ocr = int(x["ocr"])
+    ocr = int(x.get("ocr", 100))
     return ocr >= threshold
 
 
 class DataIteratorGallicaMono(DataIteratorParquet):
-    def __init__(self, high_quality=True, **kwargs):
+    def __init__(self, high_quality=False, **kwargs):
         folder = os.path.join(DATA_PATH, "perplexity_corpus_open_llm", "gallica_mono_parquet")
         DataIteratorParquet.__init__(
             self,
@@ -1859,7 +1860,7 @@ class DataIteratorGallicaMono(DataIteratorParquet):
 
 
 class DataIteratorGallicaPress(DataIteratorConcat):
-    def __init__(self, high_quality=True, **kwargs):
+    def __init__(self, high_quality=False, **kwargs):
         folder = os.path.join(
             DATA_PATH,
             "perplexity_corpus_open_llm",
@@ -2250,7 +2251,7 @@ class DataIteratorPes2o(DataIteratorConcat):
 
 
 class DataIteratorPile(DataIteratorConcat):
-    def __init__(self, streaming=True, train=True, high_quality=True, **kwargs):
+    def __init__(self, streaming=True, train=True, high_quality=False, **kwargs):
         if train is not None:
             splits = ["train"] if train else ["val"]
         else:
@@ -2647,6 +2648,7 @@ if __name__ == "__main__":
         default=["all"],
         help="Which dataset to test",
     )
+    parser.add_argument("--high-quality", default=False, action="store_true", help="Use high quality data only")
     parser.add_argument(
         "--folder",
         type=str,
@@ -2700,7 +2702,7 @@ if __name__ == "__main__":
                 global_stats[k] = 0
             global_stats[k] += v
 
-    all_datasets = [get_datasets(name) for name in args.dataset]
+    all_datasets = [get_datasets(name, high_quality=args.high_quality) for name in args.dataset]
     all_datasets = [it for sublist in all_datasets for it in sublist]
 
     # Early checks to avoid failure in the middle

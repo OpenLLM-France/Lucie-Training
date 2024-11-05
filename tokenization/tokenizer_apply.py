@@ -334,6 +334,7 @@ def get_args():
     )
     group = parser.add_argument_group(title="input data")
     group.add_argument("--datasets", type=str, default="all", help="Datasets", nargs="+")
+    group.add_argument("--high-quality", default=False, action="store_true", help="Use high quality data only")
     group.add_argument(
         "--json-keys", nargs="+", default=["text"], help="space separate listed of keys to extract from json"
     )
@@ -430,7 +431,7 @@ def main():
     args.remove_jsonl = "tmp" in args.jsonl_folder
 
     global all_datas
-    all_datas = get_datasets(args.datasets)
+    all_datas = get_datasets(args.datasets, high_quality=args.high_quality)
     all_datas = dict(
         dataset_to_key_value(dataset)
         for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
