@@ -160,6 +160,12 @@ if __name__ == "__main__":
         help="Output path of the df info (useful for extension)",
         nargs="?",
     )
+    parser.add_argument(
+        "--start_path",
+        type=str,
+        help="Start path for relative path",
+        nargs="?",
+    )
     args = parser.parse_args()
 
     stats_datasets = read_stats_datasets()
@@ -228,6 +234,7 @@ if __name__ == "__main__":
     df = df.sort_values("reweighted_count", ascending=False)
 
     if args.output_path is not None:
+        df["prefix"] = df["prefix"].apply(lambda x: os.path.relpath(x, args.start_path))
         df.to_csv(args.output_path)
 
     if args.debug:

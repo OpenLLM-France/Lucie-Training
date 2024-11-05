@@ -17,6 +17,15 @@ def load_df(path):
 
 
 if __name__ == "__main__":
+    default_path = "/data-storage/storage0"
+    for path in [
+        "/data-storage/storage0",
+        "/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie",
+    ]:
+        if os.path.exists(path):
+            default_path = path
+            break
+
     parser = argparse.ArgumentParser(
         description="Prints a string with all tokenized data files (prefixes) and their respective weights.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -24,8 +33,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "folder",
         type=str,
-        help="Path to tokenized data",
+        help="Path to weights csv",
         default=_csv_weights_folder,
+        nargs="?",
+    )
+    parser.add_argument(
+        "--start_path",
+        type=str,
+        help="Path to tokenized data",
+        default=default_path,
         nargs="?",
     )
     parser.add_argument(
@@ -138,7 +154,7 @@ if __name__ == "__main__":
         return color
 
     for _, row in cat_df.iterrows():
-        prefix = row["prefix"]
+        prefix = os.path.join(args.start_path, row["prefix"])
         new_ratio = row["new_ratio"]
         ratios[norm_name(prefix)] = float(new_ratio)
         colors[norm_name(prefix)] = color(prefix)
