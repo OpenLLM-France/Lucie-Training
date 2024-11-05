@@ -1,6 +1,7 @@
 import argparse
 import os
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import regex as re
 
@@ -32,6 +33,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False,
         help="To print debug output",
+    )
+    parser.add_argument(
+        "--plot-pie",
+        action="store_true",
+        default=False,
+        help="To plot a pie chart with distribution of each dataset (in amount of tokens)",
     )
     args = parser.parse_args()
 
@@ -102,9 +109,39 @@ if __name__ == "__main__":
     if args.verbose:
         print(f"Prop docs longer than 4k: {df_long['new_ratio'].sum()}")
 
+    num_colors = 20
+    # chosen_colors = [plt.cm.rainbow(i / num_colors) for i in range(num_colors)]
+    chosen_colors = [plt.cm.tab20(i / num_colors) for i in range(num_colors)]
+    prefix_to_color = {}
+
+    ratios = {}
+    colors = {}
+
+    def norm_name(f):
+        short = "length-0-4096" in f
+        f = f.split("/")[-1]
+        f = f.replace("_text_document", "")
+        return f + (" (short)" if short else " (long)")
+
+    def color(f):
+        f = norm_name(f)
+        short = f.endswith(" (short)")
+        f = f.split(" (")[0]
+        if f not in prefix_to_color:
+            prefix_to_color[f] = len(prefix_to_color)
+        color = chosen_colors[prefix_to_color[f] % len(chosen_colors)]
+        if short:
+            assert len(color) == 4
+            color = list(color)
+            color[-1] = 0.5
+            color = tuple(color)
+        return color
+
     for _, row in cat_df.iterrows():
         prefix = row["prefix"]
         new_ratio = row["new_ratio"]
+        ratios[norm_name(prefix)] = float(new_ratio)
+        colors[norm_name(prefix)] = color(prefix)
         # Print the weight (expected output)
         sweight = f"{new_ratio:11.9f}"
         # Check that nothing was rounded to weight=0
@@ -112,3 +149,7 @@ if __name__ == "__main__":
             pass
         else:
             print(f"{sweight} {prefix} ", end="")
+
+    if args.plot_pie:
+        plt.pie(ratios.values(), labels=ratios.keys(), autopct="%1.1f%%", colors=[colors[k] for k in ratios.keys()])
+        plt.show()
