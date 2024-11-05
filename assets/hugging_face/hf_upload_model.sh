@@ -88,15 +88,17 @@ for UPLOAD_OPTIMIZER in 0 1;do
     for STEP in $STEPS;do
         FOLDER="$PARENT_FOLDER/global_step$STEP"
 
-        # if [ $UPLOAD_OPTIMIZER -eq 0 ];then
-        #     if [ $STEP -le 475000 ];then
-        #         continue
-        #     fi
-        # else
-        #     if [ $STEP -eq 550000 ];then
-        #         continue
-        #     fi
-        # fi
+        # Do not upload again what's already on Hugging Face
+        # Ugly: to be modified
+        if [ $UPLOAD_OPTIMIZER -eq 0 ];then
+            if [ $STEP -le 700000 ];then
+                continue
+            fi
+        else
+            if [ $STEP -le 700000 ];then
+                continue
+            fi
+        fi
 
         if [ ! -d $FOLDER ];then
             echo "ERROR: $FOLDER does not exist"
