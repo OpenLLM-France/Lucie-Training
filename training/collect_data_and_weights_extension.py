@@ -4,6 +4,9 @@ import os
 import pandas as pd
 import regex as re
 
+_parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_csv_weights_folder = os.path.join(_parent_folder, "chronicles", "pretrain")
+
 
 def load_df(path):
     df = pd.read_csv(path)
@@ -21,7 +24,7 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Path to tokenized data",
-        default="~/Lucie-Training/training/weights_output/",
+        default=os.path.join(_csv_weights_folder, "weights_output"),
         nargs="?",
     )
     parser.add_argument(
@@ -33,7 +36,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ### Load main and process Web data
-    df_main = load_df(os.path.join(args.folder, "stats_main.csv"))
+    df_main = load_df(os.path.join(args.folder, "training_weights.csv"))
     if args.verbose:
         print(df_main)
 
@@ -56,11 +59,11 @@ if __name__ == "__main__":
         print(f"Main length: {len(df_main_pro)}")
 
     ### load short and long context
-    df_long = load_df(os.path.join(args.folder, "stats_long.csv"))
+    df_long = load_df(os.path.join(args.folder, "training_weights_long.csv"))
     if args.verbose:
         print(f"Long length: {len(df_long)}")
 
-    df_short = load_df(os.path.join(args.folder, "stats_short.csv"))
+    df_short = load_df(os.path.join(args.folder, "training_weights_short.csv"))
     if args.verbose:
         print(f"Short length: {len(df_short)}")
 
