@@ -6,7 +6,7 @@ import pandas as pd
 import regex as re
 
 _parent_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_csv_weights_folder = os.path.join(_parent_folder, "chronicles", "pretrain")
+_csv_weights_folder = os.path.join(_parent_folder, "assets")
 
 
 def load_df(path):
