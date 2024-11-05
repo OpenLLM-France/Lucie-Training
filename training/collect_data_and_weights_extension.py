@@ -25,7 +25,7 @@ if __name__ == "__main__":
         "folder",
         type=str,
         help="Path to tokenized data",
-        default=os.path.join(_csv_weights_folder, "weights_output"),
+        default=_csv_weights_folder,
         nargs="?",
     )
     parser.add_argument(
