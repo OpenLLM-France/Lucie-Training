@@ -121,11 +121,15 @@ def load_stats():
                     break
         if subset:
             info = f"**{subset}**"
-            if round(row2[_show_fields_in_details[0]], 3) > 0:
+            if True:  # round(row2[_show_fields_in_details[0]], 3) > 0:
                 info += " ("
                 info += ", ".join([f"{row2[k]} {k}" for k in _show_fields_in_details])
                 info += ")"
-            sort_criterion = -row2[_sorting_field] if sort_by_count else subset
+            try:
+                subset_int = int(subset)
+            except ValueError:
+                subset_int = None
+            sort_criterion = -row2[_sorting_field] if sort_by_count else (subset if subset_int is None else subset_int)
             extra[subset] = (sort_criterion, info)
         for k, v in row2.items():
             assert k in merged
@@ -199,7 +203,7 @@ def to_str(f, x, header=None):
 
     if isinstance(x, float):
         # Not too many decimals
-        return str(round(x, 3))
+        return precision_at_least(x)
     elif f == x and x == "extra":
         x = ""
         # bold
@@ -213,6 +217,14 @@ def to_str(f, x, header=None):
             x = f"[{x}](#{internal_link})"
 
     return str(x)
+
+
+def precision_at_least(x, prec=3, length=""):
+    if x == 0:
+        return f"{0:{length}.{prec}f}"
+    if round(x, prec) >= 100 * (10**-prec):
+        return f"{x:{length}.{prec}f}"
+    return precision_at_least(x, prec + 1)
 
 
 def to_link(x):

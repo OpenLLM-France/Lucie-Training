@@ -257,6 +257,10 @@ KEYS = {
 SORT_BY = "#words"
 
 
+def must_be_skipped(data):
+    return data["B words"] == 0
+
+
 def compute_extra_stats(data, tokencount_folder):
     if "B words" in data:
         return data
@@ -310,6 +314,18 @@ def get_stat_names(compute_token_stats=True):
     return list(dummy.keys())
 
 
+def precision_at_least(x, prec=3, length=8):
+    if x == 0:
+        return f"{0:{length}.{prec}f}"
+    if round(x, prec) >= 100 * (10**-prec):
+        return f"{x:{length}.{prec}f}"
+    return precision_at_least(x, prec + 1)
+
+
+def precision_at_least_func(prec=3, length=8):
+    return lambda x: precision_at_least(x, prec, length)
+
+
 def format_stats_display(data, main=True):
     for name, format in [
         ("language", "{:<9s}"),
@@ -317,31 +333,33 @@ def format_stats_display(data, main=True):
         ("subset", "{:<12s}" if main else "{:<28s}"),
         ("ocr", "{:<6s}"),
         ("category", "{:<13s}"),
-        ("M docs", "{:8.3f}"),
-        ("B words", "{:8.3f}"),
-        ("B chars", "{:8.3f}"),
-        ("B tokens", "{:9.3f}"),
+        ("M docs", precision_at_least_func()),  # "{:8.3f}"),
+        ("B words", precision_at_least_func()),  # "{:8.3f}"),
+        ("B chars", precision_at_least_func()),  # "{:8.3f}"),
+        ("B tokens", precision_at_least_func(length=9)),  # "{:9.3f}"),
         ("#words/doc", "{:11.0f}"),
         ("#chars/page", "{:11.0f}"),
         ("#chars/word", "{:11.1f}"),
         ("#tokens/words", "{:12.2f}"),
         ("#chars/tokens", "{:12.2f}"),
     ]:
+        format_func = format.format if isinstance(format, str) else format
+        format_str = format if isinstance(format, str) else "{:" + str(len(format(1))) + ".3f}"
         if name in data.keys():
             val = data[name]
             if isinstance(val, str) or val is None:
                 if val is None:
                     val = " "
-                if format.endswith("f}"):
-                    length = int(format[2:-2].split(".")[0])
-                    format = f"{{:>{length}s}}"
-                elif format.endswith("}"):
-                    length = int(format[2:-1].strip("<>s"))
+                if format_str.endswith("f}"):
+                    length = int(format_str[2:-2].split(".")[0])
+                    format_func = f"{{:>{length}s}}".format
+                elif format_str.endswith("}"):
+                    length = int(format_str[2:-1].strip("<>s"))
                     if len(val) > length:
                         # val = val[:length]
                         val = val.strip("_ ")
             try:
-                data[name] = format.format(val)
+                data[name] = format_func(val)
             except Exception as err:
                 raise RuntimeError(f"Error formatting {name}={val} with {format=}") from err
     return data
@@ -576,6 +594,8 @@ if __name__ == "__main__":
                 writer.writerow(header_with_spaces)
                 for row in rows:
                     row = compute_extra_stats(row, tokencount_folder)
+                    if must_be_skipped(row):
+                        continue
                     row = format_stats_display(row, ONLY_DETAILED)
                     writer.writerow(row)
 
@@ -584,5 +604,7 @@ if __name__ == "__main__":
             writer.writerow(header_with_spaces)
             for row in rows_detailed:
                 row = compute_extra_stats(row, tokencount_folder)
+                if must_be_skipped(row):
+                    continue
                 row = format_stats_display(row, ONLY_DETAILED)
                 writer.writerow(row)
