@@ -478,7 +478,8 @@ if __name__ == "__main__":
 
                 if do_upload:
                     # Dump parquet file
-                    pd.DataFrame(all_data).to_parquet(parquet_filename)
+                    all_data = pd.DataFrame(all_data)
+                    all_data.to_parquet(parquet_filename)
 
             del all_data
 
