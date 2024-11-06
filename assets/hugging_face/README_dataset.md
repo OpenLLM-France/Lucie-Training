@@ -75,910 +75,914 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
 
 ### Dataset Composition
 
+The following table provides an overview of the dataset composition, broken down by source and language.
+
+<!-- The following is automatically generated. Do not update manually. -->
+<!-- TABLE START -->
 <table>
 <thead>
 <tr>
-  <th><a href="#subset"><strong>subset</strong></a></th>
-  <th><strong>language</strong></th>
-  <th><strong>M docs</strong></th>
-  <th><strong>B words</strong></th>
-  <th><strong>B tokens</strong></th>
-  <th><strong>B chars</strong></th>
-  <th></th>
+<th><a href="#subset"><strong>subset</strong></a></th>
+<th><strong>language</strong></th>
+<th><strong>M docs</strong></th>
+<th><strong>B words</strong></th>
+<th><strong>B tokens</strong></th>
+<th><strong>B chars</strong></th>
+<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td><strong>Total</strong></td>
-  <td></td>
-  <td>2186.562</td>
-  <td>1356.021</td>
-  <td>2314.862</td>
-  <td>8842.200</td>
-  <td></td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>fr</strong></td>
-  <td>653.812</td>
-  <td>583.687</td>
-  <td>928.618</td>
-  <td>3619.672</td>
-  <td><strong>RedPajama</strong> (477.8 B words), <strong>GallicaPress</strong> (67.5 B words), <strong>GallicaMonographies</strong> (15.1 B words), <strong>HAL</strong> (9.36 B words), <strong>Theses</strong> (7.55 B words), <strong>OpenEdition</strong> (2.23 B words), <strong>Wikipedia</strong> (1.73 B words), <strong>OpenData</strong> (0.755 B words), <strong>wikisource</strong> (0.523 B words), <strong>Gutenberg</strong> (0.227 B words), <strong>Claire</strong> (0.210 B words), <strong>DiscoursPublics</strong> (0.163 B words), <strong>YouTube</strong> (0.145 B words), <strong>QuestionsEcritesParlement</strong> (0.108 B words), <strong>InterventionsParlement</strong> (0.104 B words), <strong>LEGI</strong> (0.0878 B words), <strong>wiktionary</strong> (0.0531 B words), <strong>Europarl</strong> (0.0528 B words), <strong>AmendementsParlement</strong> (0.0452 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>en</strong></td>
-  <td>554.289</td>
-  <td>412.202</td>
-  <td>611.894</td>
-  <td>2553.541</td>
-  <td><strong>FineWebEdu</strong> (327.5 B words), <strong>PeS2o</strong> (42.3 B words), <strong>AmericanStories</strong> (8.90 B words), <strong>Pile (FreeLaw)</strong> (8.20 B words), <strong>Wikipedia</strong> (4.71 B words), <strong>Pile (StackExchange)</strong> (4.53 B words), <strong>Gutenberg</strong> (3.54 B words), <strong>Pile (USPTO_Backgrounds)</strong> (3.49 B words), <strong>MathPile</strong> (3.41 B words), <strong>Pile (DM_Mathematics)</strong> (1.75 B words), <strong>Eurovoc</strong> (1.52 B words), <strong>Pile (Ubuntu_IRC)</strong> (0.867 B words), <strong>Claire</strong> (0.818 B words), <strong>Pile (PhilPapers)</strong> (0.363 B words), <strong>Pile (NIH_ExPorter)</strong> (0.288 B words), <strong>Europarl</strong> (0.0563 B words), <strong>Stac</strong> (0.0000529 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>code</strong></td>
-  <td>125.769</td>
-  <td>51.306</td>
-  <td>228.954</td>
-  <td>630.749</td>
-  <td><strong>JAVASCRIPT</strong> (8.53 B words), <strong>JAVA</strong> (7.42 B words), <strong>C</strong> (5.92 B words), <strong>PYTHON</strong> (5.43 B words), <strong>PHP</strong> (4.87 B words), <strong>C++</strong> (4.58 B words), <strong>C#</strong> (3.57 B words), <strong>GO</strong> (2.73 B words), <strong>TYPESCRIPT</strong> (2.62 B words), <strong>RUST</strong> (0.872 B words), <strong>RUBY</strong> (0.646 B words), <strong>SWIFT</strong> (0.553 B words), <strong>SCALA</strong> (0.457 B words), <strong>KOTLIN</strong> (0.454 B words), <strong>TEX</strong> (0.394 B words), <strong>LUA</strong> (0.318 B words), <strong>DART</strong> (0.308 B words), <strong>HASKELL</strong> (0.307 B words), <strong>PERL</strong> (0.297 B words), <strong>ASSEMBLY</strong> (0.209 B words), <strong>FORTRAN</strong> (0.192 B words), <strong>JULIA</strong> (0.152 B words), <strong>OCAML</strong> (0.130 B words), <strong>MATHEMATICA</strong> (0.120 B words), <strong>ELIXIR</strong> (0.0731 B words), <strong>ERLANG</strong> (0.0657 B words), <strong>CLOJURE</strong> (0.0448 B words), <strong>R</strong> (0.0278 B words), <strong>MATLAB</strong> (0.00865 B words), <strong>RACKET</strong> (0.00479 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>de</strong></td>
-  <td>165.915</td>
-  <td>105.609</td>
-  <td>206.610</td>
-  <td>764.779</td>
-  <td><strong>RedPajama</strong> (103.1 B words), <strong>Wikipedia</strong> (1.71 B words), <strong>Eurovoc</strong> (0.678 B words), <strong>Gutenberg</strong> (0.0987 B words), <strong>Europarl</strong> (0.0451 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>es</strong></td>
-  <td>171.651</td>
-  <td>123.857</td>
-  <td>200.825</td>
-  <td>759.457</td>
-  <td><strong>RedPajama</strong> (121.8 B words), <strong>Wikipedia</strong> (1.25 B words), <strong>Eurovoc</strong> (0.757 B words), <strong>Europarl</strong> (0.0524 B words), <strong>Gutenberg</strong> (0.0512 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>it</strong></td>
-  <td>99.440</td>
-  <td>62.051</td>
-  <td>112.031</td>
-  <td>404.454</td>
-  <td><strong>RedPajama</strong> (60.2 B words), <strong>Wikipedia</strong> (1.06 B words), <strong>Eurovoc</strong> (0.731 B words), <strong>Gutenberg</strong> (0.0657 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>fr-en</strong></td>
-  <td>410.032</td>
-  <td>17.016</td>
-  <td>25.494</td>
-  <td>107.658</td>
-  <td><strong>CroissantAligned</strong> (16.9 B words), <strong>EuroparlAligned</strong> (0.105 B words)</td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>it-en</strong></td>
-  <td>1.901</td>
-  <td>0.100</td>
-  <td>0.151</td>
-  <td>0.638</td>
-  <td></td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>es-en</strong></td>
-  <td>1.961</td>
-  <td>0.103</td>
-  <td>0.143</td>
-  <td>0.631</td>
-  <td></td>
-</tr>
-<tr>
-  <td></td>
-  <td><strong>de-fr</strong></td>
-  <td>1.792</td>
-  <td>0.0908</td>
-  <td>0.141</td>
-  <td>0.621</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-web>Category: Web</h4></td></tr>
-<tr>
-  <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>640.770</td>
-  <td>477.758</td>
-  <td>741.023</td>
-  <td>2974.596</td>
-  <td><strong>2023</strong> (27.2 B words), <strong>2022</strong> (64.9 B words), <strong>2021</strong> (82.4 B words), <strong>2020</strong> (75.1 B words), <strong>2019</strong> (86.9 B words), <strong>2018</strong> (81.3 B words), <strong>2017</strong> (55.7 B words), <strong>2016</strong> (2.03 B words), <strong>2015</strong> (0.776 B words), <strong>2014</strong> (1.32 B words)</td>
-</tr>
-<tr>
-  <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>162.779</td>
-  <td>103.078</td>
-  <td>201.371</td>
-  <td>747.631</td>
-  <td><strong>2023</strong> (24.7 B words), <strong>2022</strong> (60.8 B words), <strong>2021</strong> (17.6 B words)</td>
-</tr>
-<tr>
-  <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>169.447</td>
-  <td>121.751</td>
-  <td>197.125</td>
-  <td>746.984</td>
-  <td><strong>2023</strong> (28.9 B words), <strong>2022</strong> (72.1 B words), <strong>2021</strong> (20.8 B words)</td>
-</tr>
-<tr>
-  <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
-  <td><strong>it</strong></td>
-  <td>97.324</td>
-  <td>60.194</td>
-  <td>108.416</td>
-  <td>393.012</td>
-  <td><strong>2023</strong> (14.4 B words), <strong>2022</strong> (35.5 B words), <strong>2021</strong> (10.3 B words)</td>
-</tr>
-<tr>
-  <td><a href="#finewebedu"><strong>FineWebEdu</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>421.209</td>
-  <td>327.453</td>
-  <td>467.837</td>
-  <td>2018.215</td>
-  <td><strong>2024</strong> (9.20 B words), <strong>2023</strong> (62.1 B words), <strong>2022</strong> (58.8 B words), <strong>2021</strong> (73.0 B words), <strong>2020</strong> (59.1 B words), <strong>2019</strong> (65.3 B words)</td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-newspaper>Category: Newspaper</h4></td></tr>
-<tr>
-  <td><a href="#gallicapress"><strong>GallicaPress</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>3.205</td>
-  <td>67.496</td>
-  <td>121.606</td>
-  <td>408.882</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#americanstories"><strong>AmericanStories</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>59.420</td>
-  <td>8.902</td>
-  <td>14.313</td>
-  <td>50.844</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-technical>Category: Technical</h4></td></tr>
-<tr>
-  <td><a href="#pes2o"><strong>PeS2o</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>38.972</td>
-  <td>42.296</td>
-  <td>65.365</td>
-  <td>268.963</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#hal"><strong>HAL</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.349</td>
-  <td>9.356</td>
-  <td>16.224</td>
-  <td>58.308</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#theses"><strong>Theses</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.102</td>
-  <td>7.547</td>
-  <td>14.060</td>
-  <td>47.758</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (USPTO_Backgrounds)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>5.139</td>
-  <td>3.492</td>
-  <td>5.105</td>
-  <td>22.309</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#openedition"><strong>OpenEdition</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.939</td>
-  <td>2.225</td>
-  <td>3.604</td>
-  <td>14.459</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (PhilPapers)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0308</td>
-  <td>0.363</td>
-  <td>0.618</td>
-  <td>2.304</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (NIH_ExPorter)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.914</td>
-  <td>0.288</td>
-  <td>0.431</td>
-  <td>1.979</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-book>Category: Book</h4></td></tr>
-<tr>
-  <td><a href="#gallicamonographies"><strong>GallicaMonographies</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.278</td>
-  <td>15.106</td>
-  <td>25.169</td>
-  <td>90.456</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0563</td>
-  <td>3.544</td>
-  <td>5.516</td>
-  <td>20.579</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.00345</td>
-  <td>0.227</td>
-  <td>0.383</td>
-  <td>1.392</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>0.00188</td>
-  <td>0.0987</td>
-  <td>0.193</td>
-  <td>0.654</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
-  <td><strong>it</strong></td>
-  <td>0.000958</td>
-  <td>0.0657</td>
-  <td>0.129</td>
-  <td>0.414</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>0.000735</td>
-  <td>0.0512</td>
-  <td>0.0920</td>
-  <td>0.303</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-multilingual-parallel-corpora>Category: Multilingual Parallel Corpora</h4></td></tr>
-<tr>
-  <td><a href="#croissantaligned"><strong>CroissantAligned</strong></a></td>
-  <td><strong>fr-en</strong></td>
-  <td>408.029</td>
-  <td>16.911</td>
-  <td>25.351</td>
-  <td>107.003</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
-  <td><strong>it-en</strong></td>
-  <td>1.901</td>
-  <td>0.100</td>
-  <td>0.151</td>
-  <td>0.638</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
-  <td><strong>fr-en</strong></td>
-  <td>2.003</td>
-  <td>0.105</td>
-  <td>0.143</td>
-  <td>0.655</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
-  <td><strong>es-en</strong></td>
-  <td>1.961</td>
-  <td>0.103</td>
-  <td>0.143</td>
-  <td>0.631</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
-  <td><strong>de-fr</strong></td>
-  <td>1.792</td>
-  <td>0.0908</td>
-  <td>0.141</td>
-  <td>0.621</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-legislative-texts>Category: Legislative Texts</h4></td></tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (FreeLaw)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>3.415</td>
-  <td>8.204</td>
-  <td>14.011</td>
-  <td>52.580</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#eurovoc"><strong>Eurovoc</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.272</td>
-  <td>1.523</td>
-  <td>2.571</td>
-  <td>9.468</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#eurovoc"><strong>Eurovoc</strong></a></td>
-  <td><strong>it</strong></td>
-  <td>0.245</td>
-  <td>0.731</td>
-  <td>1.527</td>
-  <td>4.867</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#eurovoc"><strong>Eurovoc</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>0.247</td>
-  <td>0.678</td>
-  <td>1.497</td>
-  <td>4.915</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#eurovoc"><strong>Eurovoc</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>0.246</td>
-  <td>0.757</td>
-  <td>1.411</td>
-  <td>4.684</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#opendata"><strong>OpenData</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>1.169</td>
-  <td>0.755</td>
-  <td>1.209</td>
-  <td>4.638</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#questionsecritesparlement"><strong>QuestionsEcritesParlement</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.189</td>
-  <td>0.108</td>
-  <td>0.156</td>
-  <td>0.705</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#legi"><strong>LEGI</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.621</td>
-  <td>0.0878</td>
-  <td>0.145</td>
-  <td>0.563</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#amendementsparlement"><strong>AmendementsParlement</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.673</td>
-  <td>0.0452</td>
-  <td>0.0738</td>
-  <td>0.274</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-legislative-transcripts>Category: Legislative Transcripts</h4></td></tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>0.0102</td>
-  <td>0.0451</td>
-  <td>0.0734</td>
-  <td>0.327</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>0.0103</td>
-  <td>0.0524</td>
-  <td>0.0733</td>
-  <td>0.325</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.0103</td>
-  <td>0.0528</td>
-  <td>0.0717</td>
-  <td>0.339</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0111</td>
-  <td>0.0563</td>
-  <td>0.0690</td>
-  <td>0.339</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#discourspublics"><strong>DiscoursPublics</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.110</td>
-  <td>0.163</td>
-  <td>0.238</td>
-  <td>1.025</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#interventionsparlement"><strong>InterventionsParlement</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>1.832</td>
-  <td>0.104</td>
-  <td>0.157</td>
-  <td>0.654</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-wiki>Category: Wiki</h4></td></tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>6.893</td>
-  <td>4.708</td>
-  <td>7.898</td>
-  <td>26.616</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>2.877</td>
-  <td>1.709</td>
-  <td>3.476</td>
-  <td>11.252</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>2.648</td>
-  <td>1.726</td>
-  <td>2.940</td>
-  <td>9.879</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>1.947</td>
-  <td>1.245</td>
-  <td>2.124</td>
-  <td>7.161</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
-  <td><strong>it</strong></td>
-  <td>1.870</td>
-  <td>1.060</td>
-  <td>1.959</td>
-  <td>6.161</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>wikisource</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.186</td>
-  <td>0.523</td>
-  <td>0.795</td>
-  <td>3.080</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#wikipedia-wikisource-wiktionary"><strong>wiktionary</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.650</td>
-  <td>0.0531</td>
-  <td>0.117</td>
-  <td>0.347</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-math>Category: Math</h4></td></tr>
-<tr>
-  <td><a href="#mathpile"><strong>MathPile</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.737</td>
-  <td>3.408</td>
-  <td>9.637</td>
-  <td>27.290</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (DM_Mathematics)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.992</td>
-  <td>1.746</td>
-  <td>4.928</td>
-  <td>8.127</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-forum>Category: Forum</h4></td></tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (StackExchange)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>15.269</td>
-  <td>4.534</td>
-  <td>10.275</td>
-  <td>33.609</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#pile-uncopyrighted"><strong>Pile (Ubuntu_IRC)</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0104</td>
-  <td>0.867</td>
-  <td>2.159</td>
-  <td>5.610</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-dialogue>Category: Dialogue</h4></td></tr>
-<tr>
-  <td><a href="#claire-french-and-english"><strong>Claire</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.949</td>
-  <td>0.818</td>
-  <td>1.161</td>
-  <td>4.709</td>
-  <td><strong>MediaSum</strong> (0.738 B words), <strong>DialogStudio</strong> (0.0611 B words), <strong>BNC</strong> (0.0107 B words), <strong>OANC</strong> (0.00483 B words), <strong>DailyDialog</strong> (0.00127 B words), <strong>ICSI</strong> (0.000888 B words), <strong>AMI</strong> (0.000798 B words)</td>
-</tr>
-<tr>
-  <td><a href="#claire-french-and-english"><strong>Claire</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.0393</td>
-  <td>0.210</td>
-  <td>0.311</td>
-  <td>1.314</td>
-  <td><strong>AssembleeNationale</strong> (0.130 B words), <strong>Senat</strong> (0.0515 B words), <strong>Theatre</strong> (0.0168 B words), <strong>ESLO</strong> (0.00510 B words), <strong>ORFEO</strong> (0.00147 B words), <strong>SUMM</strong> (0.00127 B words), <strong>TCOF</strong> (0.000784 B words), <strong>CFPP</strong> (0.000646 B words), <strong>OFROM</strong> (0.000593 B words), <strong>PFC</strong> (0.000506 B words), <strong>FREDSum</strong> (0.000392 B words), <strong>CLAPI</strong> (0.000144 B words), <strong>CID</strong> (0.000120 B words), <strong>LINAGORA</strong> (0.000106 B words), <strong>ACSYNT</strong> (0.0000612 B words), <strong>OTG</strong> (0.0000301 B words), <strong>Rhapsodie</strong> (0.0000274 B words), <strong>ParisStories</strong> (0.0000271 B words), <strong>UBS</strong> (0.00000787 B words)</td>
-</tr>
-<tr>
-  <td><a href="#youtube"><strong>YouTube</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.0375</td>
-  <td>0.145</td>
-  <td>0.336</td>
-  <td>1.003</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#stac"><strong>Stac</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0000450</td>
-  <td>0.0000529</td>
-  <td>0.000121</td>
-  <td>0.000327</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=category-programming>Category: Programming</h4></td></tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>JAVASCRIPT</strong></td>
-  <td>21.109</td>
-  <td>8.526</td>
-  <td>58.609</td>
-  <td>141.647</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>JAVA</strong></td>
-  <td>20.152</td>
-  <td>7.421</td>
-  <td>27.680</td>
-  <td>89.297</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>C</strong></td>
-  <td>8.626</td>
-  <td>5.916</td>
-  <td>24.092</td>
-  <td>57.428</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>PHP</strong></td>
-  <td>15.905</td>
-  <td>4.865</td>
-  <td>22.883</td>
-  <td>66.844</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>PYTHON</strong></td>
-  <td>12.962</td>
-  <td>5.434</td>
-  <td>21.683</td>
-  <td>64.304</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>C++</strong></td>
-  <td>6.378</td>
-  <td>4.584</td>
-  <td>18.835</td>
-  <td>50.892</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>C#</strong></td>
-  <td>10.839</td>
-  <td>3.574</td>
-  <td>13.381</td>
-  <td>46.286</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>GO</strong></td>
-  <td>4.730</td>
-  <td>2.735</td>
-  <td>10.262</td>
-  <td>25.738</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>TYPESCRIPT</strong></td>
-  <td>10.637</td>
-  <td>2.617</td>
-  <td>9.836</td>
-  <td>28.815</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>RUST</strong></td>
-  <td>1.387</td>
-  <td>0.872</td>
-  <td>3.241</td>
-  <td>9.529</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>RUBY</strong></td>
-  <td>3.405</td>
-  <td>0.646</td>
-  <td>2.392</td>
-  <td>7.139</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>SWIFT</strong></td>
-  <td>1.756</td>
-  <td>0.553</td>
-  <td>1.876</td>
-  <td>6.134</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>KOTLIN</strong></td>
-  <td>2.243</td>
-  <td>0.454</td>
-  <td>1.758</td>
-  <td>5.769</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>SCALA</strong></td>
-  <td>1.362</td>
-  <td>0.457</td>
-  <td>1.587</td>
-  <td>4.862</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>TEX</strong></td>
-  <td>0.398</td>
-  <td>0.394</td>
-  <td>1.507</td>
-  <td>3.805</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>LUA</strong></td>
-  <td>0.559</td>
-  <td>0.318</td>
-  <td>1.367</td>
-  <td>3.279</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>DART</strong></td>
-  <td>0.933</td>
-  <td>0.308</td>
-  <td>1.242</td>
-  <td>3.864</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>PERL</strong></td>
-  <td>0.392</td>
-  <td>0.297</td>
-  <td>1.149</td>
-  <td>2.634</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>MATHEMATICA</strong></td>
-  <td>0.0269</td>
-  <td>0.120</td>
-  <td>1.117</td>
-  <td>1.720</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>ASSEMBLY</strong></td>
-  <td>0.248</td>
-  <td>0.209</td>
-  <td>0.867</td>
-  <td>1.575</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>HASKELL</strong></td>
-  <td>0.545</td>
-  <td>0.307</td>
-  <td>0.807</td>
-  <td>2.364</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>FORTRAN</strong></td>
-  <td>0.165</td>
-  <td>0.192</td>
-  <td>0.780</td>
-  <td>1.843</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>JULIA</strong></td>
-  <td>0.299</td>
-  <td>0.152</td>
-  <td>0.660</td>
-  <td>1.539</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>OCAML</strong></td>
-  <td>0.160</td>
-  <td>0.130</td>
-  <td>0.430</td>
-  <td>1.107</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>ERLANG</strong></td>
-  <td>0.0994</td>
-  <td>0.0657</td>
-  <td>0.260</td>
-  <td>0.726</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>ELIXIR</strong></td>
-  <td>0.282</td>
-  <td>0.0731</td>
-  <td>0.258</td>
-  <td>0.737</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>CLOJURE</strong></td>
-  <td>0.126</td>
-  <td>0.0448</td>
-  <td>0.179</td>
-  <td>0.492</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>R</strong></td>
-  <td>0.0392</td>
-  <td>0.0278</td>
-  <td>0.158</td>
-  <td>0.305</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>MATLAB</strong></td>
-  <td>0.000967</td>
-  <td>0.00865</td>
-  <td>0.0427</td>
-  <td>0.0372</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#thestack"><strong>TheStack</strong></a></td>
-  <td><strong>RACKET</strong></td>
-  <td>0.00420</td>
-  <td>0.00479</td>
-  <td>0.0153</td>
-  <td>0.0378</td>
-  <td></td>
+<td rowspan="11" style="vertical-align: top;"><strong>TOTAL</strong></td>
+<td></td>
+<td>2186.562</td>
+<td>1356.021</td>
+<td>2314.862</td>
+<td>8842.200</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>fr</strong></td>
+<td>653.812</td>
+<td>583.687</td>
+<td>928.618</td>
+<td>3619.672</td>
+<td><strong>RedPajama</strong> (477.8 B words), <strong>GallicaPress</strong> (67.5 B words), <strong>GallicaMonographies</strong> (15.1 B words), <strong>HAL</strong> (9.36 B words), <strong>Theses</strong> (7.55 B words), <strong>OpenEdition</strong> (2.23 B words), <strong>Wikipedia</strong> (1.73 B words), <strong>OpenData</strong> (0.755 B words), <strong>wikisource</strong> (0.523 B words), <strong>Gutenberg</strong> (0.227 B words), <strong>Claire</strong> (0.210 B words), <strong>DiscoursPublics</strong> (0.163 B words), <strong>YouTube</strong> (0.145 B words), <strong>QuestionsEcritesParlement</strong> (0.108 B words), <strong>InterventionsParlement</strong> (0.104 B words), <strong>LEGI</strong> (0.0878 B words), <strong>wiktionary</strong> (0.0531 B words), <strong>Europarl</strong> (0.0528 B words), <strong>AmendementsParlement</strong> (0.0452 B words)</td>
+</tr>
+<tr>
+
+<td><strong>en</strong></td>
+<td>554.289</td>
+<td>412.202</td>
+<td>611.894</td>
+<td>2553.541</td>
+<td><strong>FineWebEdu</strong> (327.5 B words), <strong>PeS2o</strong> (42.3 B words), <strong>AmericanStories</strong> (8.90 B words), <strong>Pile (FreeLaw)</strong> (8.20 B words), <strong>Wikipedia</strong> (4.71 B words), <strong>Pile (StackExchange)</strong> (4.53 B words), <strong>Gutenberg</strong> (3.54 B words), <strong>Pile (USPTO_Backgrounds)</strong> (3.49 B words), <strong>MathPile</strong> (3.41 B words), <strong>Pile (DM_Mathematics)</strong> (1.75 B words), <strong>Eurovoc</strong> (1.52 B words), <strong>Pile (Ubuntu_IRC)</strong> (0.867 B words), <strong>Claire</strong> (0.818 B words), <strong>Pile (PhilPapers)</strong> (0.363 B words), <strong>Pile (NIH_ExPorter)</strong> (0.288 B words), <strong>Europarl</strong> (0.0563 B words), <strong>Stac</strong> (0.0000529 B words)</td>
+</tr>
+<tr>
+
+<td><strong>code</strong></td>
+<td>125.769</td>
+<td>51.306</td>
+<td>228.954</td>
+<td>630.749</td>
+<td><strong>JAVASCRIPT</strong> (8.53 B words), <strong>JAVA</strong> (7.42 B words), <strong>C</strong> (5.92 B words), <strong>PYTHON</strong> (5.43 B words), <strong>PHP</strong> (4.87 B words), <strong>C++</strong> (4.58 B words), <strong>C#</strong> (3.57 B words), <strong>GO</strong> (2.73 B words), <strong>TYPESCRIPT</strong> (2.62 B words), <strong>RUST</strong> (0.872 B words), <strong>RUBY</strong> (0.646 B words), <strong>SWIFT</strong> (0.553 B words), <strong>SCALA</strong> (0.457 B words), <strong>KOTLIN</strong> (0.454 B words), <strong>TEX</strong> (0.394 B words), <strong>LUA</strong> (0.318 B words), <strong>DART</strong> (0.308 B words), <strong>HASKELL</strong> (0.307 B words), <strong>PERL</strong> (0.297 B words), <strong>ASSEMBLY</strong> (0.209 B words), <strong>FORTRAN</strong> (0.192 B words), <strong>JULIA</strong> (0.152 B words), <strong>OCAML</strong> (0.130 B words), <strong>MATHEMATICA</strong> (0.120 B words), <strong>ELIXIR</strong> (0.0731 B words), <strong>ERLANG</strong> (0.0657 B words), <strong>CLOJURE</strong> (0.0448 B words), <strong>R</strong> (0.0278 B words), <strong>MATLAB</strong> (0.00865 B words), <strong>RACKET</strong> (0.00479 B words)</td>
+</tr>
+<tr>
+
+<td><strong>de</strong></td>
+<td>165.915</td>
+<td>105.609</td>
+<td>206.610</td>
+<td>764.779</td>
+<td><strong>RedPajama</strong> (103.1 B words), <strong>Wikipedia</strong> (1.71 B words), <strong>Eurovoc</strong> (0.678 B words), <strong>Gutenberg</strong> (0.0987 B words), <strong>Europarl</strong> (0.0451 B words)</td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>171.651</td>
+<td>123.857</td>
+<td>200.825</td>
+<td>759.457</td>
+<td><strong>RedPajama</strong> (121.8 B words), <strong>Wikipedia</strong> (1.25 B words), <strong>Eurovoc</strong> (0.757 B words), <strong>Europarl</strong> (0.0524 B words), <strong>Gutenberg</strong> (0.0512 B words)</td>
+</tr>
+<tr>
+
+<td><strong>it</strong></td>
+<td>99.440</td>
+<td>62.051</td>
+<td>112.031</td>
+<td>404.454</td>
+<td><strong>RedPajama</strong> (60.2 B words), <strong>Wikipedia</strong> (1.06 B words), <strong>Eurovoc</strong> (0.731 B words), <strong>Gutenberg</strong> (0.0657 B words)</td>
+</tr>
+<tr>
+
+<td><strong>fr-en</strong></td>
+<td>410.032</td>
+<td>17.016</td>
+<td>25.494</td>
+<td>107.658</td>
+<td><strong>CroissantAligned</strong> (16.9 B words), <strong>EuroparlAligned</strong> (0.105 B words)</td>
+</tr>
+<tr>
+
+<td><strong>it-en</strong></td>
+<td>1.901</td>
+<td>0.100</td>
+<td>0.151</td>
+<td>0.638</td>
+<td><strong>EuroparlAligned</strong></td>
+</tr>
+<tr>
+
+<td><strong>es-en</strong></td>
+<td>1.961</td>
+<td>0.103</td>
+<td>0.143</td>
+<td>0.631</td>
+<td><strong>EuroparlAligned</strong></td>
+</tr>
+<tr>
+
+<td><strong>de-fr</strong></td>
+<td>1.792</td>
+<td>0.0908</td>
+<td>0.141</td>
+<td>0.621</td>
+<td><strong>EuroparlAligned</strong></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-web">Category: Web</h4></td></tr>
+<tr>
+<td rowspan="4" style="vertical-align: top;"><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
+<td><strong>fr</strong></td>
+<td>640.770</td>
+<td>477.758</td>
+<td>741.023</td>
+<td>2974.596</td>
+<td><strong>2023</strong> (27.2 B words), <strong>2022</strong> (64.9 B words), <strong>2021</strong> (82.4 B words), <strong>2020</strong> (75.1 B words), <strong>2019</strong> (86.9 B words), <strong>2018</strong> (81.3 B words), <strong>2017</strong> (55.7 B words), <strong>2016</strong> (2.03 B words), <strong>2015</strong> (0.776 B words), <strong>2014</strong> (1.32 B words)</td>
+</tr>
+<tr>
+
+<td><strong>de</strong></td>
+<td>162.779</td>
+<td>103.078</td>
+<td>201.371</td>
+<td>747.631</td>
+<td><strong>2023</strong> (24.7 B words), <strong>2022</strong> (60.8 B words), <strong>2021</strong> (17.6 B words)</td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>169.447</td>
+<td>121.751</td>
+<td>197.125</td>
+<td>746.984</td>
+<td><strong>2023</strong> (28.9 B words), <strong>2022</strong> (72.1 B words), <strong>2021</strong> (20.8 B words)</td>
+</tr>
+<tr>
+
+<td><strong>it</strong></td>
+<td>97.324</td>
+<td>60.194</td>
+<td>108.416</td>
+<td>393.012</td>
+<td><strong>2023</strong> (14.4 B words), <strong>2022</strong> (35.5 B words), <strong>2021</strong> (10.3 B words)</td>
+</tr>
+<tr>
+<td><a href="#finewebedu"><strong>FineWebEdu</strong></a></td>
+<td><strong>en</strong></td>
+<td>421.209</td>
+<td>327.453</td>
+<td>467.837</td>
+<td>2018.215</td>
+<td><strong>2024</strong> (9.20 B words), <strong>2023</strong> (62.1 B words), <strong>2022</strong> (58.8 B words), <strong>2021</strong> (73.0 B words), <strong>2020</strong> (59.1 B words), <strong>2019</strong> (65.3 B words)</td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-newspaper">Category: Newspaper</h4></td></tr>
+<tr>
+<td><a href="#gallicapress"><strong>GallicaPress</strong></a></td>
+<td><strong>fr</strong></td>
+<td>3.205</td>
+<td>67.496</td>
+<td>121.606</td>
+<td>408.882</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#americanstories"><strong>AmericanStories</strong></a></td>
+<td><strong>en</strong></td>
+<td>59.420</td>
+<td>8.902</td>
+<td>14.313</td>
+<td>50.844</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-technical">Category: Technical</h4></td></tr>
+<tr>
+<td><a href="#pes2o"><strong>PeS2o</strong></a></td>
+<td><strong>en</strong></td>
+<td>38.972</td>
+<td>42.296</td>
+<td>65.365</td>
+<td>268.963</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#hal"><strong>HAL</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.349</td>
+<td>9.356</td>
+<td>16.224</td>
+<td>58.308</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#theses"><strong>Theses</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.102</td>
+<td>7.547</td>
+<td>14.060</td>
+<td>47.758</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (USPTO_Backgrounds)</strong></a></td>
+<td><strong>en</strong></td>
+<td>5.139</td>
+<td>3.492</td>
+<td>5.105</td>
+<td>22.309</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#openedition"><strong>OpenEdition</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.939</td>
+<td>2.225</td>
+<td>3.604</td>
+<td>14.459</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (PhilPapers)</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.0308</td>
+<td>0.363</td>
+<td>0.618</td>
+<td>2.304</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (NIH_ExPorter)</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.914</td>
+<td>0.288</td>
+<td>0.431</td>
+<td>1.979</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-book">Category: Book</h4></td></tr>
+<tr>
+<td><a href="#gallicamonographies"><strong>GallicaMonographies</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.278</td>
+<td>15.106</td>
+<td>25.169</td>
+<td>90.456</td>
+<td></td>
+</tr>
+<tr>
+<td rowspan="5" style="vertical-align: top;"><a href="#gutenberg"><strong>Gutenberg</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.0563</td>
+<td>3.544</td>
+<td>5.516</td>
+<td>20.579</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>fr</strong></td>
+<td>0.00345</td>
+<td>0.227</td>
+<td>0.383</td>
+<td>1.392</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>de</strong></td>
+<td>0.00188</td>
+<td>0.0987</td>
+<td>0.193</td>
+<td>0.654</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>it</strong></td>
+<td>0.000958</td>
+<td>0.0657</td>
+<td>0.129</td>
+<td>0.414</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>0.000735</td>
+<td>0.0512</td>
+<td>0.0920</td>
+<td>0.303</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-multilingual-parallel-corpora">Category: Multilingual Parallel Corpora</h4></td></tr>
+<tr>
+<td><a href="#croissantaligned"><strong>CroissantAligned</strong></a></td>
+<td><strong>fr-en</strong></td>
+<td>408.029</td>
+<td>16.911</td>
+<td>25.351</td>
+<td>107.003</td>
+<td></td>
+</tr>
+<tr>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
+<td><strong>it-en</strong></td>
+<td>1.901</td>
+<td>0.100</td>
+<td>0.151</td>
+<td>0.638</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>fr-en</strong></td>
+<td>2.003</td>
+<td>0.105</td>
+<td>0.143</td>
+<td>0.655</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>es-en</strong></td>
+<td>1.961</td>
+<td>0.103</td>
+<td>0.143</td>
+<td>0.631</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>de-fr</strong></td>
+<td>1.792</td>
+<td>0.0908</td>
+<td>0.141</td>
+<td>0.621</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-legislative-texts">Category: Legislative Texts</h4></td></tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (FreeLaw)</strong></a></td>
+<td><strong>en</strong></td>
+<td>3.415</td>
+<td>8.204</td>
+<td>14.011</td>
+<td>52.580</td>
+<td></td>
+</tr>
+<tr>
+<td rowspan="4" style="vertical-align: top;"><a href="#eurovoc"><strong>Eurovoc</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.272</td>
+<td>1.523</td>
+<td>2.571</td>
+<td>9.468</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>it</strong></td>
+<td>0.245</td>
+<td>0.731</td>
+<td>1.527</td>
+<td>4.867</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>de</strong></td>
+<td>0.247</td>
+<td>0.678</td>
+<td>1.497</td>
+<td>4.915</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>0.246</td>
+<td>0.757</td>
+<td>1.411</td>
+<td>4.684</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#opendata"><strong>OpenData</strong></a></td>
+<td><strong>fr</strong></td>
+<td>1.169</td>
+<td>0.755</td>
+<td>1.209</td>
+<td>4.638</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#questionsecritesparlement"><strong>QuestionsEcritesParlement</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.189</td>
+<td>0.108</td>
+<td>0.156</td>
+<td>0.705</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#legi"><strong>LEGI</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.621</td>
+<td>0.0878</td>
+<td>0.145</td>
+<td>0.563</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#amendementsparlement"><strong>AmendementsParlement</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.673</td>
+<td>0.0452</td>
+<td>0.0738</td>
+<td>0.274</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-legislative-transcripts">Category: Legislative Transcripts</h4></td></tr>
+<tr>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+<td><strong>de</strong></td>
+<td>0.0102</td>
+<td>0.0451</td>
+<td>0.0734</td>
+<td>0.327</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>0.0103</td>
+<td>0.0524</td>
+<td>0.0733</td>
+<td>0.325</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>fr</strong></td>
+<td>0.0103</td>
+<td>0.0528</td>
+<td>0.0717</td>
+<td>0.339</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>en</strong></td>
+<td>0.0111</td>
+<td>0.0563</td>
+<td>0.0690</td>
+<td>0.339</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#discourspublics"><strong>DiscoursPublics</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.110</td>
+<td>0.163</td>
+<td>0.238</td>
+<td>1.025</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#interventionsparlement"><strong>InterventionsParlement</strong></a></td>
+<td><strong>fr</strong></td>
+<td>1.832</td>
+<td>0.104</td>
+<td>0.157</td>
+<td>0.654</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-wiki">Category: Wiki</h4></td></tr>
+<tr>
+<td rowspan="5" style="vertical-align: top;"><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
+<td><strong>en</strong></td>
+<td>6.893</td>
+<td>4.708</td>
+<td>7.898</td>
+<td>26.616</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>de</strong></td>
+<td>2.877</td>
+<td>1.709</td>
+<td>3.476</td>
+<td>11.252</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>fr</strong></td>
+<td>2.648</td>
+<td>1.726</td>
+<td>2.940</td>
+<td>9.879</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>es</strong></td>
+<td>1.947</td>
+<td>1.245</td>
+<td>2.124</td>
+<td>7.161</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>it</strong></td>
+<td>1.870</td>
+<td>1.060</td>
+<td>1.959</td>
+<td>6.161</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#wikipedia-wikisource-wiktionary"><strong>wikisource</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.186</td>
+<td>0.523</td>
+<td>0.795</td>
+<td>3.080</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#wikipedia-wikisource-wiktionary"><strong>wiktionary</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.650</td>
+<td>0.0531</td>
+<td>0.117</td>
+<td>0.347</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-math">Category: Math</h4></td></tr>
+<tr>
+<td><a href="#mathpile"><strong>MathPile</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.737</td>
+<td>3.408</td>
+<td>9.637</td>
+<td>27.290</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (DM_Mathematics)</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.992</td>
+<td>1.746</td>
+<td>4.928</td>
+<td>8.127</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-forum">Category: Forum</h4></td></tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (StackExchange)</strong></a></td>
+<td><strong>en</strong></td>
+<td>15.269</td>
+<td>4.534</td>
+<td>10.275</td>
+<td>33.609</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#pile-uncopyrighted"><strong>Pile (Ubuntu_IRC)</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.0104</td>
+<td>0.867</td>
+<td>2.159</td>
+<td>5.610</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-dialogue">Category: Dialogue</h4></td></tr>
+<tr>
+<td rowspan="2" style="vertical-align: top;"><a href="#claire-french-and-english"><strong>Claire</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.949</td>
+<td>0.818</td>
+<td>1.161</td>
+<td>4.709</td>
+<td><strong>MediaSum</strong> (0.738 B words), <strong>DialogStudio</strong> (0.0611 B words), <strong>BNC</strong> (0.0107 B words), <strong>OANC</strong> (0.00483 B words), <strong>DailyDialog</strong> (0.00127 B words), <strong>ICSI</strong> (0.000888 B words), <strong>AMI</strong> (0.000798 B words)</td>
+</tr>
+<tr>
+
+<td><strong>fr</strong></td>
+<td>0.0393</td>
+<td>0.210</td>
+<td>0.311</td>
+<td>1.314</td>
+<td><strong>AssembleeNationale</strong> (0.130 B words), <strong>Senat</strong> (0.0515 B words), <strong>Theatre</strong> (0.0168 B words), <strong>ESLO</strong> (0.00510 B words), <strong>ORFEO</strong> (0.00147 B words), <strong>SUMM</strong> (0.00127 B words), <strong>TCOF</strong> (0.000784 B words), <strong>CFPP</strong> (0.000646 B words), <strong>OFROM</strong> (0.000593 B words), <strong>PFC</strong> (0.000506 B words), <strong>FREDSum</strong> (0.000392 B words), <strong>CLAPI</strong> (0.000144 B words), <strong>CID</strong> (0.000120 B words), <strong>LINAGORA</strong> (0.000106 B words), <strong>ACSYNT</strong> (0.0000612 B words), <strong>OTG</strong> (0.0000301 B words), <strong>Rhapsodie</strong> (0.0000274 B words), <strong>ParisStories</strong> (0.0000271 B words), <strong>UBS</strong> (0.00000787 B words)</td>
+</tr>
+<tr>
+<td><a href="#youtube"><strong>YouTube</strong></a></td>
+<td><strong>fr</strong></td>
+<td>0.0375</td>
+<td>0.145</td>
+<td>0.336</td>
+<td>1.003</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#stac"><strong>Stac</strong></a></td>
+<td><strong>en</strong></td>
+<td>0.0000450</td>
+<td>0.0000529</td>
+<td>0.000121</td>
+<td>0.000327</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="7"><h4 id="category-programming">Category: Programming</h4></td></tr>
+<tr>
+<td rowspan="30" style="vertical-align: top;"><a href="#thestack"><strong>TheStack</strong></a></td>
+<td><strong>JAVASCRIPT</strong></td>
+<td>21.109</td>
+<td>8.526</td>
+<td>58.609</td>
+<td>141.647</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>JAVA</strong></td>
+<td>20.152</td>
+<td>7.421</td>
+<td>27.680</td>
+<td>89.297</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>C</strong></td>
+<td>8.626</td>
+<td>5.916</td>
+<td>24.092</td>
+<td>57.428</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>PHP</strong></td>
+<td>15.905</td>
+<td>4.865</td>
+<td>22.883</td>
+<td>66.844</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>PYTHON</strong></td>
+<td>12.962</td>
+<td>5.434</td>
+<td>21.683</td>
+<td>64.304</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>C++</strong></td>
+<td>6.378</td>
+<td>4.584</td>
+<td>18.835</td>
+<td>50.892</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>C#</strong></td>
+<td>10.839</td>
+<td>3.574</td>
+<td>13.381</td>
+<td>46.286</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>GO</strong></td>
+<td>4.730</td>
+<td>2.735</td>
+<td>10.262</td>
+<td>25.738</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>TYPESCRIPT</strong></td>
+<td>10.637</td>
+<td>2.617</td>
+<td>9.836</td>
+<td>28.815</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>RUST</strong></td>
+<td>1.387</td>
+<td>0.872</td>
+<td>3.241</td>
+<td>9.529</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>RUBY</strong></td>
+<td>3.405</td>
+<td>0.646</td>
+<td>2.392</td>
+<td>7.139</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>SWIFT</strong></td>
+<td>1.756</td>
+<td>0.553</td>
+<td>1.876</td>
+<td>6.134</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>KOTLIN</strong></td>
+<td>2.243</td>
+<td>0.454</td>
+<td>1.758</td>
+<td>5.769</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>SCALA</strong></td>
+<td>1.362</td>
+<td>0.457</td>
+<td>1.587</td>
+<td>4.862</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>TEX</strong></td>
+<td>0.398</td>
+<td>0.394</td>
+<td>1.507</td>
+<td>3.805</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>LUA</strong></td>
+<td>0.559</td>
+<td>0.318</td>
+<td>1.367</td>
+<td>3.279</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>DART</strong></td>
+<td>0.933</td>
+<td>0.308</td>
+<td>1.242</td>
+<td>3.864</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>PERL</strong></td>
+<td>0.392</td>
+<td>0.297</td>
+<td>1.149</td>
+<td>2.634</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>MATHEMATICA</strong></td>
+<td>0.0269</td>
+<td>0.120</td>
+<td>1.117</td>
+<td>1.720</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>ASSEMBLY</strong></td>
+<td>0.248</td>
+<td>0.209</td>
+<td>0.867</td>
+<td>1.575</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>HASKELL</strong></td>
+<td>0.545</td>
+<td>0.307</td>
+<td>0.807</td>
+<td>2.364</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>FORTRAN</strong></td>
+<td>0.165</td>
+<td>0.192</td>
+<td>0.780</td>
+<td>1.843</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>JULIA</strong></td>
+<td>0.299</td>
+<td>0.152</td>
+<td>0.660</td>
+<td>1.539</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>OCAML</strong></td>
+<td>0.160</td>
+<td>0.130</td>
+<td>0.430</td>
+<td>1.107</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>ERLANG</strong></td>
+<td>0.0994</td>
+<td>0.0657</td>
+<td>0.260</td>
+<td>0.726</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>ELIXIR</strong></td>
+<td>0.282</td>
+<td>0.0731</td>
+<td>0.258</td>
+<td>0.737</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>CLOJURE</strong></td>
+<td>0.126</td>
+<td>0.0448</td>
+<td>0.179</td>
+<td>0.492</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>R</strong></td>
+<td>0.0392</td>
+<td>0.0278</td>
+<td>0.158</td>
+<td>0.305</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>MATLAB</strong></td>
+<td>0.000967</td>
+<td>0.00865</td>
+<td>0.0427</td>
+<td>0.0372</td>
+<td></td>
+</tr>
+<tr>
+
+<td><strong>RACKET</strong></td>
+<td>0.00420</td>
+<td>0.00479</td>
+<td>0.0153</td>
+<td>0.0378</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-
+<!-- TABLE END -->
 
 ### Details on Data Sources
 

@@ -5,6 +5,7 @@ import re
 import mistune
 import pandas as pd
 import slugify
+from bs4 import BeautifulSoup
 
 _parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 _stats_filename = os.path.join(_parent_folder, "assets", "stats_datasets.csv")
@@ -162,7 +163,11 @@ def to_generic_language(lang):
 
 
 def postprocess_extra(extra):
-    return ", ".join([info for _, info in sorted(extra.values())]) if len(extra) > 1 else ""
+    if len(extra) > 1:
+        return ", ".join([info for _, info in sorted(extra.values())])
+    if len(extra) == 1 and list(extra.keys())[0].startswith("EuroparlAligned"):
+        return list(extra.values())[0][1].split("(")[0].strip()
+    return ""
 
 
 def load_stats():
@@ -220,7 +225,7 @@ def load_stats():
     }
     for language in sorted(languages):
         data[("", language)] = {
-            "name": "",  # "Total",
+            "name": "TOTAL",
             "language": language,
             "category": "",
             "M docs": sum_docs_per_lang[language],
@@ -234,7 +239,7 @@ def load_stats():
             },
         }
     data[("", "")] = {
-        "name": "Total",
+        "name": "TOTAL",
         "language": "",
         "category": "",
         "M docs": sum_docs,
@@ -326,7 +331,7 @@ def convert_markdown_table_to_html(
 ):
     generated_html = mistune.html(markdown)
 
-    # Fix multi-rows
+    # Fix multi-Columns
     for num_columns in list(range(10, 1, -1)):
         regex_to = rf'\1<td colspan="{num_columns}" style="text-align: center;"><u>\2</u></td></tr>'
         # if not center_title:
@@ -344,7 +349,42 @@ def convert_markdown_table_to_html(
             rf"(<tr>\s*)<td>(.+)</td>\s*(<td>\s*</td>\s*){{{num_columns-1}}}</tr>", regex_to, generated_html
         )
 
+    # Add multi-rows when cell name is the same
+    generated_html = add_rowspan_to_table(generated_html)
+
     html_doc.write(generated_html)
+
+
+def add_rowspan_to_table(html):
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table")
+
+    rows = table.find_all("tr")
+    if not rows:
+        return html
+
+    first_column_cells = [row.find_all("td")[0] if row.find_all("td") else None for row in rows[1:]]  # Skip header row
+    rowspan_map = {}
+
+    for i, cell in enumerate(first_column_cells):
+        if cell:
+            cell_text = cell.get_text()
+            if cell_text in rowspan_map:
+                rowspan_map[cell_text]["count"] += 1
+                rowspan_map[cell_text]["rows"].append(i + 1)
+            else:
+                rowspan_map[cell_text] = {"count": 1, "rows": [i + 1]}
+
+    for _, data in rowspan_map.items():
+        if data["count"] > 1:
+            first_row_index = data["rows"][0]
+            first_row_cell = rows[first_row_index].find_all("td")[0]
+            first_row_cell["rowspan"] = data["count"]
+            first_row_cell["style"] = "vertical-align: top;"  # Add CSS for vertical alignment
+            for row_index in data["rows"][1:]:
+                rows[row_index].find_all("td")[0].decompose()
+
+    return str(soup)
 
 
 if __name__ == "__main__":
@@ -354,11 +394,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "output_md",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "README_dataset_table.md"),
+        help="Output markdown file",
         nargs="?",
     )
     parser.add_argument(
         "output_html",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "README_dataset_table.html"),
+        help="Output HTML file",
+        nargs="?",
+    )
+    parser.add_argument(
+        "output_main",
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "README_dataset.md"),
+        help="Output main markdown file (with the HTML table included in it)",
         nargs="?",
     )
     parser.add_argument(
@@ -429,3 +477,19 @@ if __name__ == "__main__":
                 # headers="h4",
                 headers=args.headers,
             )
+
+    if args.output_main:
+        assert args.output_html, "Need to generate the HTML table first"
+        assert os.path.isfile(args.output_main), f"File '{args.output_main}' does not exist"
+        with open(args.output_main) as f_in:
+            main_content = f_in.read()
+
+        tag_start = "\n<!-- TABLE START -->\n"
+        tag_end = "\n<!-- TABLE END -->\n"
+
+        table_start = re.search(tag_start, main_content).end()
+        table_end = re.search(tag_end, main_content).start()
+
+        new_content = main_content[:table_start] + open(args.output_html).read().strip() + main_content[table_end:]
+        with open(args.output_main, "w") as f_out:
+            f_out.write(new_content)
