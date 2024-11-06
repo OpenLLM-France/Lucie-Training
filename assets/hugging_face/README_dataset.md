@@ -15,13 +15,13 @@ Table of Contents:
     * [Newspaper](#newspaper)
     * [Technical](#technical)
     * [Book](#book)
-    * [Parallel Corpora](#parallel-corpora)
+    * [Multilingual Parallel Corpora](#multilingual-parallel-corpora)
     * [Legislative Texts](#legislative-texts)
+    * [Legislative Transcripts](#legislative-transcripts)
     * [Wiki](#wiki)
     * [Math](#math)
     * [Forum](#forum)
     * [Dialogue](#dialogue)
-    * [Legislative Transcripts](#legislative-transcripts)
     * [Programming](#programming)
   * [Details on Data Sources](#details-on-data-sources)
     <!-- * [RedPajama (v2)](#redpajama-v2) -->
@@ -97,7 +97,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>477.758</td>
   <td>741.023</td>
   <td>2974.596</td>
-  <td><strong>2014</strong> (1.32 B words), <strong>2015</strong> (0.776 B words), <strong>2016</strong> (2.033 B words), <strong>2017</strong> (55.665 B words), <strong>2018</strong> (81.345 B words), <strong>2020</strong> (75.141 B words), <strong>2021</strong> (82.439 B words), <strong>2022</strong> (64.866 B words), <strong>2023</strong> (27.239 B words)</td>
+  <td><strong>2023</strong> (27.239 B words), <strong>2022</strong> (64.866 B words), <strong>2021</strong> (82.439 B words), <strong>2020</strong> (75.141 B words), <strong>2019</strong> (86.934 B words), <strong>2018</strong> (81.345 B words), <strong>2017</strong> (55.665 B words), <strong>2016</strong> (2.033 B words), <strong>2015</strong> (0.776 B words), <strong>2014</strong> (1.32 B words)</td>
 </tr>
 <tr>
   <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
@@ -106,7 +106,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>103.078</td>
   <td>201.371</td>
   <td>747.631</td>
-  <td><strong>2021</strong> (17.591 B words), <strong>2023</strong> (24.704 B words)</td>
+  <td><strong>2023</strong> (24.704 B words), <strong>2022</strong> (60.783 B words), <strong>2021</strong> (17.591 B words)</td>
 </tr>
 <tr>
   <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
@@ -115,7 +115,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>121.751</td>
   <td>197.125</td>
   <td>746.984</td>
-  <td><strong>2021</strong> (20.821 B words), <strong>2023</strong> (28.868 B words)</td>
+  <td><strong>2023</strong> (28.868 B words), <strong>2022</strong> (72.062 B words), <strong>2021</strong> (20.821 B words)</td>
 </tr>
 <tr>
   <td><a href="#redpajama-v2"><strong>RedPajama</strong></a></td>
@@ -124,7 +124,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>60.194</td>
   <td>108.416</td>
   <td>393.012</td>
-  <td><strong>2021</strong> (10.266 B words), <strong>2023</strong> (14.403 B words)</td>
+  <td><strong>2023</strong> (14.403 B words), <strong>2022</strong> (35.525 B words), <strong>2021</strong> (10.266 B words)</td>
 </tr>
 <tr>
   <td><a href="#finewebedu"><strong>FineWebEdu</strong></a></td>
@@ -133,7 +133,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>327.453</td>
   <td>467.837</td>
   <td>2018.215</td>
-  <td><strong>2019</strong> (65.275 B words), <strong>2020</strong> (59.076 B words), <strong>2022</strong> (58.788 B words), <strong>2023</strong> (62.085 B words), <strong>2024</strong> (9.197 B words)</td>
+  <td><strong>2024</strong> (9.197 B words), <strong>2023</strong> (62.085 B words), <strong>2022</strong> (58.788 B words), <strong>2021</strong> (73.032 B words), <strong>2020</strong> (59.076 B words), <strong>2019</strong> (65.275 B words)</td>
 </tr>
 <tr>
   <td colspan="7"><h4 id=newspaper>Newspaper</h4></td></tr>
@@ -286,7 +286,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td></td>
 </tr>
 <tr>
-  <td colspan="7"><h4 id=parallel-corpora>Parallel Corpora</h4></td></tr>
+  <td colspan="7"><h4 id=multilingual-parallel-corpora>Multilingual Parallel Corpora</h4></td></tr>
 <tr>
   <td><a href="#croissantaligned"><strong>CroissantAligned</strong></a></td>
   <td><strong>fr-en</strong></td>
@@ -416,6 +416,62 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td></td>
 </tr>
 <tr>
+  <td colspan="7"><h4 id=legislative-transcripts>Legislative Transcripts</h4></td></tr>
+<tr>
+  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+  <td><strong>de</strong></td>
+  <td>0.0102</td>
+  <td>0.0451</td>
+  <td>0.0734</td>
+  <td>0.327</td>
+  <td></td>
+</tr>
+<tr>
+  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+  <td><strong>es</strong></td>
+  <td>0.0103</td>
+  <td>0.0524</td>
+  <td>0.0733</td>
+  <td>0.325</td>
+  <td></td>
+</tr>
+<tr>
+  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+  <td><strong>fr</strong></td>
+  <td>0.0103</td>
+  <td>0.0528</td>
+  <td>0.0717</td>
+  <td>0.339</td>
+  <td></td>
+</tr>
+<tr>
+  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+  <td><strong>en</strong></td>
+  <td>0.0111</td>
+  <td>0.0563</td>
+  <td>0.0690</td>
+  <td>0.339</td>
+  <td></td>
+</tr>
+<tr>
+  <td><a href="#discourspublics"><strong>DiscoursPublics</strong></a></td>
+  <td><strong>fr</strong></td>
+  <td>0.110</td>
+  <td>0.163</td>
+  <td>0.238</td>
+  <td>1.025</td>
+  <td></td>
+</tr>
+<tr>
+  <td><a href="#interventionsparlement"><strong>InterventionsParlement</strong></a></td>
+  <td><strong>fr</strong></td>
+  <td>1.832</td>
+  <td>0.104</td>
+  <td>0.157</td>
+  <td>0.654</td>
+  <td></td>
+</tr>
+<tr>
   <td colspan="7"><h4 id=wiki>Wiki</h4></td></tr>
 <tr>
   <td><a href="#wikipedia-wikisource-wiktionary"><strong>Wikipedia</strong></a></td>
@@ -463,7 +519,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td></td>
 </tr>
 <tr>
-  <td><a href="#wikisource"><strong>wikisource</strong></a></td>
+  <td><a href="#wikipedia-wikisource-wiktionary"><strong>wikisource</strong></a></td>
   <td><strong>fr</strong></td>
   <td>0.186</td>
   <td>0.523</td>
@@ -472,7 +528,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td></td>
 </tr>
 <tr>
-  <td><a href="#wiktionary"><strong>wiktionary</strong></a></td>
+  <td><a href="#wikipedia-wikisource-wiktionary"><strong>wiktionary</strong></a></td>
   <td><strong>fr</strong></td>
   <td>0.650</td>
   <td>0.0531</td>
@@ -529,7 +585,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>0.818</td>
   <td>1.161</td>
   <td>4.709</td>
-  <td><strong>DialogStudio</strong> (0.0611 B words), <strong>BNC</strong> (0.0107 B words), <strong>OANC</strong> (0.00483 B words), <strong>DailyDialog</strong> (0.00127 B words), <strong>ICSI</strong> (0.000888 B words), <strong>AMI</strong> (0.000798 B words)</td>
+  <td><strong>MediaSum</strong> (0.738 B words), <strong>DialogStudio</strong> (0.0611 B words), <strong>BNC</strong> (0.0107 B words), <strong>OANC</strong> (0.00483 B words), <strong>DailyDialog</strong> (0.00127 B words), <strong>ICSI</strong> (0.000888 B words), <strong>AMI</strong> (0.000798 B words)</td>
 </tr>
 <tr>
   <td><a href="#claire-french-and-english"><strong>Claire</strong></a></td>
@@ -538,7 +594,7 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>0.210</td>
   <td>0.311</td>
   <td>1.314</td>
-  <td><strong>Senat</strong> (0.0515 B words), <strong>Theatre</strong> (0.0168 B words), <strong>ESLO</strong> (0.0051 B words), <strong>ORFEO</strong> (0.00147 B words), <strong>SUMM</strong> (0.00127 B words), <strong>TCOF</strong> (0.000784 B words), <strong>CFPP</strong> (0.000646 B words), <strong>OFROM</strong> (0.000593 B words), <strong>PFC</strong> (0.000506 B words), <strong>FREDSum</strong> (0.000392 B words), <strong>CLAPI</strong> (0.000144 B words), <strong>CID</strong> (0.00012 B words), <strong>LINAGORA</strong> (0.000106 B words), <strong>ACSYNT</strong> (6.12e-05 B words), <strong>OTG</strong> (3.01e-05 B words), <strong>Rhapsodie</strong> (2.74e-05 B words), <strong>ParisStories</strong> (2.71e-05 B words), <strong>UBS</strong> (7.87e-06 B words)</td>
+  <td><strong>AssembleeNationale</strong> (0.13 B words), <strong>Senat</strong> (0.0515 B words), <strong>Theatre</strong> (0.0168 B words), <strong>ESLO</strong> (0.0051 B words), <strong>ORFEO</strong> (0.00147 B words), <strong>SUMM</strong> (0.00127 B words), <strong>TCOF</strong> (0.000784 B words), <strong>CFPP</strong> (0.000646 B words), <strong>OFROM</strong> (0.000593 B words), <strong>PFC</strong> (0.000506 B words), <strong>FREDSum</strong> (0.000392 B words), <strong>CLAPI</strong> (0.000144 B words), <strong>CID</strong> (0.00012 B words), <strong>LINAGORA</strong> (0.000106 B words), <strong>ACSYNT</strong> (6.12e-05 B words), <strong>OTG</strong> (3.01e-05 B words), <strong>Rhapsodie</strong> (2.74e-05 B words), <strong>ParisStories</strong> (2.71e-05 B words), <strong>UBS</strong> (7.87e-06 B words)</td>
 </tr>
 <tr>
   <td><a href="#youtube"><strong>YouTube</strong></a></td>
@@ -556,62 +612,6 @@ Examples of metadata (except from `text`) are shown for each source in [metadata
   <td>0.0000529</td>
   <td>0.000121</td>
   <td>0.000327</td>
-  <td></td>
-</tr>
-<tr>
-  <td colspan="7"><h4 id=legislative-transcripts>Legislative Transcripts</h4></td></tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>de</strong></td>
-  <td>0.0102</td>
-  <td>0.0451</td>
-  <td>0.0734</td>
-  <td>0.327</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>es</strong></td>
-  <td>0.0103</td>
-  <td>0.0524</td>
-  <td>0.0733</td>
-  <td>0.325</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.0103</td>
-  <td>0.0528</td>
-  <td>0.0717</td>
-  <td>0.339</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
-  <td><strong>en</strong></td>
-  <td>0.0111</td>
-  <td>0.0563</td>
-  <td>0.0690</td>
-  <td>0.339</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#discourspublics"><strong>DiscoursPublics</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>0.110</td>
-  <td>0.163</td>
-  <td>0.238</td>
-  <td>1.025</td>
-  <td></td>
-</tr>
-<tr>
-  <td><a href="#interventionsparlement"><strong>InterventionsParlement</strong></a></td>
-  <td><strong>fr</strong></td>
-  <td>1.832</td>
-  <td>0.104</td>
-  <td>0.157</td>
-  <td>0.654</td>
   <td></td>
 </tr>
 <tr>

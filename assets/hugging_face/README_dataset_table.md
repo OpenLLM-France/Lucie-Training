@@ -1,11 +1,11 @@
 | [**subset**](#subset) | **language** | **M docs** | **B words** | **B tokens** | **B chars** |  |
 | - | - | - | - | - | - | - |
 | ***Web*** |||||||
-| [**RedPajama**](#redpajama-v2) | **fr** | 640.770 | 477.758 | 741.023 | 2974.596 | **2014** (1.32 B words), **2015** (0.776 B words), **2016** (2.033 B words), **2017** (55.665 B words), **2018** (81.345 B words), **2020** (75.141 B words), **2021** (82.439 B words), **2022** (64.866 B words), **2023** (27.239 B words) |
-| [**RedPajama**](#redpajama-v2) | **de** | 162.779 | 103.078 | 201.371 | 747.631 | **2021** (17.591 B words), **2023** (24.704 B words) |
-| [**RedPajama**](#redpajama-v2) | **es** | 169.447 | 121.751 | 197.125 | 746.984 | **2021** (20.821 B words), **2023** (28.868 B words) |
-| [**RedPajama**](#redpajama-v2) | **it** | 97.324 | 60.194 | 108.416 | 393.012 | **2021** (10.266 B words), **2023** (14.403 B words) |
-| [**FineWebEdu**](#finewebedu) | **en** | 421.209 | 327.453 | 467.837 | 2018.215 | **2019** (65.275 B words), **2020** (59.076 B words), **2022** (58.788 B words), **2023** (62.085 B words), **2024** (9.197 B words) |
+| [**RedPajama**](#redpajama-v2) | **fr** | 640.770 | 477.758 | 741.023 | 2974.596 | **2023** (27.239 B words), **2022** (64.866 B words), **2021** (82.439 B words), **2020** (75.141 B words), **2019** (86.934 B words), **2018** (81.345 B words), **2017** (55.665 B words), **2016** (2.033 B words), **2015** (0.776 B words), **2014** (1.32 B words) |
+| [**RedPajama**](#redpajama-v2) | **de** | 162.779 | 103.078 | 201.371 | 747.631 | **2023** (24.704 B words), **2022** (60.783 B words), **2021** (17.591 B words) |
+| [**RedPajama**](#redpajama-v2) | **es** | 169.447 | 121.751 | 197.125 | 746.984 | **2023** (28.868 B words), **2022** (72.062 B words), **2021** (20.821 B words) |
+| [**RedPajama**](#redpajama-v2) | **it** | 97.324 | 60.194 | 108.416 | 393.012 | **2023** (14.403 B words), **2022** (35.525 B words), **2021** (10.266 B words) |
+| [**FineWebEdu**](#finewebedu) | **en** | 421.209 | 327.453 | 467.837 | 2018.215 | **2024** (9.197 B words), **2023** (62.085 B words), **2022** (58.788 B words), **2021** (73.032 B words), **2020** (59.076 B words), **2019** (65.275 B words) |
 | ***Newspaper*** |||||||
 | [**GallicaPress**](#gallicapress) | **fr** | 3.205 | 67.496 | 121.606 | 408.882 |  |
 | [**AmericanStories**](#americanstories) | **en** | 59.420 | 8.902 | 14.313 | 50.844 |  |
@@ -25,7 +25,7 @@
 | [**Gutenberg**](#gutenberg) | **de** | 0.00188 | 0.0987 | 0.193 | 0.654 |  |
 | [**Gutenberg**](#gutenberg) | **it** | 0.000958 | 0.0657 | 0.129 | 0.414 |  |
 | [**Gutenberg**](#gutenberg) | **es** | 0.000735 | 0.0512 | 0.0920 | 0.303 |  |
-| ***Parallel Corpora*** |||||||
+| ***Multilingual Parallel Corpora*** |||||||
 | [**CroissantAligned**](#croissantaligned) | **fr-en** | 408.029 | 16.911 | 25.351 | 107.003 |  |
 | [**EuroparlAligned**](#europarl-monolingual-and-parallel) | **it-en** | 1.901 | 0.100 | 0.151 | 0.638 |  |
 | [**EuroparlAligned**](#europarl-monolingual-and-parallel) | **fr-en** | 2.003 | 0.105 | 0.143 | 0.655 |  |
@@ -41,25 +41,6 @@
 | [**QuestionsEcritesParlement**](#questionsecritesparlement) | **fr** | 0.189 | 0.108 | 0.156 | 0.705 |  |
 | [**LEGI**](#legi) | **fr** | 0.621 | 0.0878 | 0.145 | 0.563 |  |
 | [**AmendementsParlement**](#amendementsparlement) | **fr** | 0.673 | 0.0452 | 0.0738 | 0.274 |  |
-| ***Wiki*** |||||||
-| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **en** | 6.893 | 4.708 | 7.898 | 26.616 |  |
-| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **de** | 2.877 | 1.709 | 3.476 | 11.252 |  |
-| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **fr** | 2.648 | 1.726 | 2.940 | 9.879 |  |
-| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **es** | 1.947 | 1.245 | 2.124 | 7.161 |  |
-| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **it** | 1.870 | 1.060 | 1.959 | 6.161 |  |
-| [**wikisource**](#wikisource) | **fr** | 0.186 | 0.523 | 0.795 | 3.080 |  |
-| [**wiktionary**](#wiktionary) | **fr** | 0.650 | 0.0531 | 0.117 | 0.347 |  |
-| ***Math*** |||||||
-| [**MathPile**](#mathpile) | **en** | 0.737 | 3.408 | 9.637 | 27.290 |  |
-| [**Pile (DM_Mathematics)**](#pile-uncopyrighted) | **en** | 0.992 | 1.746 | 4.928 | 8.127 |  |
-| ***Forum*** |||||||
-| [**Pile (StackExchange)**](#pile-uncopyrighted) | **en** | 15.269 | 4.534 | 10.275 | 33.609 |  |
-| [**Pile (Ubuntu_IRC)**](#pile-uncopyrighted) | **en** | 0.0104 | 0.867 | 2.159 | 5.610 |  |
-| ***Dialogue*** |||||||
-| [**Claire**](#claire-french-and-english) | **en** | 0.949 | 0.818 | 1.161 | 4.709 | **DialogStudio** (0.0611 B words), **BNC** (0.0107 B words), **OANC** (0.00483 B words), **DailyDialog** (0.00127 B words), **ICSI** (0.000888 B words), **AMI** (0.000798 B words) |
-| [**Claire**](#claire-french-and-english) | **fr** | 0.0393 | 0.210 | 0.311 | 1.314 | **Senat** (0.0515 B words), **Theatre** (0.0168 B words), **ESLO** (0.0051 B words), **ORFEO** (0.00147 B words), **SUMM** (0.00127 B words), **TCOF** (0.000784 B words), **CFPP** (0.000646 B words), **OFROM** (0.000593 B words), **PFC** (0.000506 B words), **FREDSum** (0.000392 B words), **CLAPI** (0.000144 B words), **CID** (0.00012 B words), **LINAGORA** (0.000106 B words), **ACSYNT** (6.12e-05 B words), **OTG** (3.01e-05 B words), **Rhapsodie** (2.74e-05 B words), **ParisStories** (2.71e-05 B words), **UBS** (7.87e-06 B words) |
-| [**YouTube**](#youtube) | **fr** | 0.0375 | 0.145 | 0.336 | 1.003 |  |
-| [**Stac**](#stac) | **en** | 0.0000450 | 0.0000529 | 0.000121 | 0.000327 |  |
 | ***Legislative Transcripts*** |||||||
 | [**Europarl**](#europarl-monolingual-and-parallel) | **de** | 0.0102 | 0.0451 | 0.0734 | 0.327 |  |
 | [**Europarl**](#europarl-monolingual-and-parallel) | **es** | 0.0103 | 0.0524 | 0.0733 | 0.325 |  |
@@ -67,6 +48,25 @@
 | [**Europarl**](#europarl-monolingual-and-parallel) | **en** | 0.0111 | 0.0563 | 0.0690 | 0.339 |  |
 | [**DiscoursPublics**](#discourspublics) | **fr** | 0.110 | 0.163 | 0.238 | 1.025 |  |
 | [**InterventionsParlement**](#interventionsparlement) | **fr** | 1.832 | 0.104 | 0.157 | 0.654 |  |
+| ***Wiki*** |||||||
+| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **en** | 6.893 | 4.708 | 7.898 | 26.616 |  |
+| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **de** | 2.877 | 1.709 | 3.476 | 11.252 |  |
+| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **fr** | 2.648 | 1.726 | 2.940 | 9.879 |  |
+| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **es** | 1.947 | 1.245 | 2.124 | 7.161 |  |
+| [**Wikipedia**](#wikipedia-wikisource-wiktionary) | **it** | 1.870 | 1.060 | 1.959 | 6.161 |  |
+| [**wikisource**](#wikipedia-wikisource-wiktionary) | **fr** | 0.186 | 0.523 | 0.795 | 3.080 |  |
+| [**wiktionary**](#wikipedia-wikisource-wiktionary) | **fr** | 0.650 | 0.0531 | 0.117 | 0.347 |  |
+| ***Math*** |||||||
+| [**MathPile**](#mathpile) | **en** | 0.737 | 3.408 | 9.637 | 27.290 |  |
+| [**Pile (DM_Mathematics)**](#pile-uncopyrighted) | **en** | 0.992 | 1.746 | 4.928 | 8.127 |  |
+| ***Forum*** |||||||
+| [**Pile (StackExchange)**](#pile-uncopyrighted) | **en** | 15.269 | 4.534 | 10.275 | 33.609 |  |
+| [**Pile (Ubuntu_IRC)**](#pile-uncopyrighted) | **en** | 0.0104 | 0.867 | 2.159 | 5.610 |  |
+| ***Dialogue*** |||||||
+| [**Claire**](#claire-french-and-english) | **en** | 0.949 | 0.818 | 1.161 | 4.709 | **MediaSum** (0.738 B words), **DialogStudio** (0.0611 B words), **BNC** (0.0107 B words), **OANC** (0.00483 B words), **DailyDialog** (0.00127 B words), **ICSI** (0.000888 B words), **AMI** (0.000798 B words) |
+| [**Claire**](#claire-french-and-english) | **fr** | 0.0393 | 0.210 | 0.311 | 1.314 | **AssembleeNationale** (0.13 B words), **Senat** (0.0515 B words), **Theatre** (0.0168 B words), **ESLO** (0.0051 B words), **ORFEO** (0.00147 B words), **SUMM** (0.00127 B words), **TCOF** (0.000784 B words), **CFPP** (0.000646 B words), **OFROM** (0.000593 B words), **PFC** (0.000506 B words), **FREDSum** (0.000392 B words), **CLAPI** (0.000144 B words), **CID** (0.00012 B words), **LINAGORA** (0.000106 B words), **ACSYNT** (6.12e-05 B words), **OTG** (3.01e-05 B words), **Rhapsodie** (2.74e-05 B words), **ParisStories** (2.71e-05 B words), **UBS** (7.87e-06 B words) |
+| [**YouTube**](#youtube) | **fr** | 0.0375 | 0.145 | 0.336 | 1.003 |  |
+| [**Stac**](#stac) | **en** | 0.0000450 | 0.0000529 | 0.000121 | 0.000327 |  |
 | ***Programming*** |||||||
 | [**TheStack**](#thestack) | **JAVASCRIPT** | 21.109 | 8.526 | 58.609 | 141.647 |  |
 | [**TheStack**](#thestack) | **JAVA** | 20.152 | 7.421 | 27.680 | 89.297 |  |

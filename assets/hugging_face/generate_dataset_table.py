@@ -68,7 +68,7 @@ def load_stats():
             "legi_written": "Legislative Texts",
             "legi_spoken": "Legislative Transcripts",
             "legi_dialogue": "Legislative Transcripts",
-            "aligned": "Parallel Corpora",
+            "aligned": "Multilingual Parallel Corpora",
         }.get(category, category)
         category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
         row["category"] = category
@@ -85,7 +85,9 @@ def load_stats():
         name = row["name"]
         for ds in _web_datasets:
             if name.startswith(ds):
+                subset = name.split("-")[-1]
                 name = name[: len(ds)]
+                row["subset"] = subset
                 break
         for ds in _meta_datasets:
             if name.startswith(ds):
@@ -111,26 +113,29 @@ def load_stats():
     def merge_stats(row1, row2, orig_name):
         extra = row1.get("extra", {})
         merged = row1.copy()
-        subset = row2.get("subset")
         sort_by_count = True
-        if not subset:
-            for ds in _web_datasets:
-                if orig_name.startswith(ds):
-                    subset = orig_name.split("-")[-1]
-                    sort_by_count = False
-                    break
-        if subset:
-            info = f"**{subset}**"
-            if True:  # round(row2[_show_fields_in_details[0]], 3) > 0:
-                info += " ("
-                info += ", ".join([f"{row2[k]} {k}" for k in _show_fields_in_details])
-                info += ")"
-            try:
-                subset_int = int(subset)
-            except ValueError:
-                subset_int = None
-            sort_criterion = -row2[_sorting_field] if sort_by_count else (subset if subset_int is None else subset_int)
-            extra[subset] = (sort_criterion, info)
+        for ds in _web_datasets:
+            if orig_name.startswith(ds):
+                sort_by_count = False
+                break
+        if row2.get("subset"):
+            for row in row1, row2:
+                subset = row.get("subset")
+                if not subset:
+                    continue
+                info = f"**{subset}**"
+                if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
+                    info += " ("
+                    info += ", ".join([f"{row[k]} {k}" for k in _show_fields_in_details])
+                    info += ")"
+                try:
+                    subset_int = int(subset)
+                except ValueError:
+                    subset_int = None
+                sort_criterion = (
+                    -row[_sorting_field] if sort_by_count else (subset if subset_int is None else -subset_int)
+                )
+                extra[subset] = (sort_criterion, info)
         for k, v in row2.items():
             assert k in merged
             if isinstance(v, (float, int)):
@@ -177,9 +182,11 @@ def load_stats():
                 data[key] = row
 
     df = pd.DataFrame(data.values())
-    df["extra"] = df["extra"].apply(
-        lambda extra: ", ".join([info for _, info in sorted(extra.values())]) if len(extra) > 1 else ""
-    )
+
+    def postprocess_extra(extra):
+        return ", ".join([info for _, info in sorted(extra.values())]) if len(extra) > 1 else ""
+
+    df["extra"] = df["extra"].apply(postprocess_extra)
 
     return df
 
@@ -234,7 +241,7 @@ def to_link(x):
     }.get(x, x)
     if x.startswith("Pile"):
         x = "Pile (Uncopyrighted)"
-    if x.startswith("Wiki"):
+    if x.lower().startswith("wik"):
         x = "Wikipedia, Wikisource, Wiktionary"
     if x.startswith("Europarl"):
         x = "Europarl (monolingual and parallel)"
@@ -323,6 +330,13 @@ if __name__ == "__main__":
         if "code" in category.lower() or "programming" in category.lower():
             return 0
         num_tokens = df[df["category"] == category]["B tokens"].sum()
+        if category.startswith("Legislative"):
+            num_tokens = sum(
+                df[df["category"] == subcat]["B tokens"].sum()
+                for subcat in ["Legislative Texts", "Legislative Transcripts"]
+            )
+        else:
+            num_tokens = df[df["category"] == category]["B tokens"].sum()
         return -num_tokens
 
     if args.output_md:
