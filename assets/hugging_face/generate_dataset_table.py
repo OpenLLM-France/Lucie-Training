@@ -41,113 +41,131 @@ _show_fields_in_details = [
 _sorting_field = _show_fields_in_details[0]  # "B chars"
 
 
+def norm_field(key, val, trace_error=None):
+    key = key.strip()
+    val = val.strip()
+    try:
+        if "#" in key:
+            val = float(val)
+        elif key.startswith("M "):
+            val = float(val)  # * 1_000_000
+        elif key.startswith("K "):
+            val = float(val)  # * 1_000
+        elif key.startswith("B "):
+            val = float(val)  # * 1_000_000_000
+    except ValueError:
+        return key, None
+        # raise ValueError(f"Error parsing '{key}' : '{val}' ({trace_error})") from err
+    return key, val
+
+
+def compile_stats(row):
+    if row["language"] == "code":
+        row["language"] = f"{row['subset']}".upper()
+
+    category = row["category"]
+    category = {
+        "legi_written": "Legislative Texts",
+        "legi_spoken": "Legislative Transcripts",
+        "legi_dialogue": "Legislative Transcripts",
+        "aligned": "Multilingual Parallel Corpora",
+    }.get(category, category)
+    category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
+    row["category"] = category
+
+    subset = row["subset"]
+    subset = {
+        "questions_ecrites_parlement": "QuestionsEcritesParlement",
+        "interventions_parlement": "InterventionsParlement",
+        "LEGI": "LEGI",
+        "amendements_parlement": "AmendementsParlement",
+    }.get(subset, subset)
+    row["subset"] = subset
+
+    name = row["name"]
+    for ds in _web_datasets:
+        if name.startswith(ds):
+            subset = name.split("-")[-1]
+            name = name[: len(ds)]
+            row["subset"] = subset
+            break
+    for ds in _meta_datasets:
+        if name.startswith(ds):
+            name = row.get("subset", "")
+            if not name:
+                name = ds
+            assert name, f"Missing subset for {row['name']}"
+            if "other" not in ds.lower():
+                name = f"{ds} ({name})"
+            break
+    if name.endswith("." + row["language"]):
+        name = name[: -(1 + len(row["language"]))]
+    name = {
+        "ValidatedYouTube": "YouTube",
+    }.get(name, name)
+    row["name"] = name
+
+    if "extra" not in row:
+        row["extra"] = {}
+
+    return row
+
+
+def info_string(subset, row, sort_by_count=True):
+    info = f"**{subset}**"
+    if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
+        info += " ("
+        info += ", ".join([f"{precision_at_least(row[k], 1)} {k}" for k in _show_fields_in_details])
+        info += ")"
+    try:
+        subset_int = int(subset)
+    except ValueError:
+        subset_int = None
+    sort_criterion = -row[_sorting_field] if sort_by_count else (subset if subset_int is None else -subset_int)
+    return (sort_criterion, info)
+
+
+def merge_stats(row1, row2, orig_name):
+    extra = row1.get("extra", {})
+    merged = row1.copy()
+    sort_by_count = True
+    for ds in _web_datasets:
+        if orig_name.startswith(ds):
+            sort_by_count = False
+            break
+    if row2.get("subset"):
+        for row in row1, row2:
+            subset = row.get("subset")
+            if not subset:
+                continue
+            sort_criterion, info = info_string(subset, row, sort_by_count)
+            extra[subset] = (sort_criterion, info)
+    for k, v in row2.items():
+        assert k in merged
+        if isinstance(v, (float, int)):
+            merged[k] += v
+        elif isinstance(v, str):
+            if v != row1[k]:
+                assert k in ["subset"], f"'{k}' : {v} != {row1[k]} for {merged.get('name', row2['name'])}"
+                merged[k] = ""  # f"{row1[k]} / {v}"
+    if extra:
+        merged["extra"] = extra
+    return merged
+
+
+def to_generic_language(lang):
+    if lang.isupper():
+        return "code"
+    if not lang:
+        return "(any)"
+    return lang
+
+
+def postprocess_extra(extra):
+    return ", ".join([info for _, info in sorted(extra.values())]) if len(extra) > 1 else ""
+
+
 def load_stats():
-    def norm_field(key, val, trace_error=None):
-        key = key.strip()
-        val = val.strip()
-        try:
-            if "#" in key:
-                val = float(val)
-            elif key.startswith("M "):
-                val = float(val)  # * 1_000_000
-            elif key.startswith("K "):
-                val = float(val)  # * 1_000
-            elif key.startswith("B "):
-                val = float(val)  # * 1_000_000_000
-        except ValueError:
-            return key, None
-            # raise ValueError(f"Error parsing '{key}' : '{val}' ({trace_error})") from err
-        return key, val
-
-    def compile_stats(row):
-        if row["language"] == "code":
-            row["language"] = f"{row['subset']}".upper()
-
-        category = row["category"]
-        category = {
-            "legi_written": "Legislative Texts",
-            "legi_spoken": "Legislative Transcripts",
-            "legi_dialogue": "Legislative Transcripts",
-            "aligned": "Multilingual Parallel Corpora",
-        }.get(category, category)
-        category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
-        row["category"] = category
-
-        subset = row["subset"]
-        subset = {
-            "questions_ecrites_parlement": "QuestionsEcritesParlement",
-            "interventions_parlement": "InterventionsParlement",
-            "LEGI": "LEGI",
-            "amendements_parlement": "AmendementsParlement",
-        }.get(subset, subset)
-        row["subset"] = subset
-
-        name = row["name"]
-        for ds in _web_datasets:
-            if name.startswith(ds):
-                subset = name.split("-")[-1]
-                name = name[: len(ds)]
-                row["subset"] = subset
-                break
-        for ds in _meta_datasets:
-            if name.startswith(ds):
-                name = row.get("subset", "")
-                if not name:
-                    name = ds
-                assert name, f"Missing subset for {row['name']}"
-                if "other" not in ds.lower():
-                    name = f"{ds} ({name})"
-                break
-        if name.endswith("." + row["language"]):
-            name = name[: -(1 + len(row["language"]))]
-        name = {
-            "ValidatedYouTube": "YouTube",
-        }.get(name, name)
-        row["name"] = name
-
-        if "extra" not in row:
-            row["extra"] = {}
-
-        return row
-
-    def merge_stats(row1, row2, orig_name):
-        extra = row1.get("extra", {})
-        merged = row1.copy()
-        sort_by_count = True
-        for ds in _web_datasets:
-            if orig_name.startswith(ds):
-                sort_by_count = False
-                break
-        if row2.get("subset"):
-            for row in row1, row2:
-                subset = row.get("subset")
-                if not subset:
-                    continue
-                info = f"**{subset}**"
-                if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
-                    info += " ("
-                    info += ", ".join([f"{row[k]} {k}" for k in _show_fields_in_details])
-                    info += ")"
-                try:
-                    subset_int = int(subset)
-                except ValueError:
-                    subset_int = None
-                sort_criterion = (
-                    -row[_sorting_field] if sort_by_count else (subset if subset_int is None else -subset_int)
-                )
-                extra[subset] = (sort_criterion, info)
-        for k, v in row2.items():
-            assert k in merged
-            if isinstance(v, (float, int)):
-                merged[k] += v
-            elif isinstance(v, str):
-                if v != row1[k]:
-                    assert k in ["subset"], f"'{k}' : {v} != {row1[k]} for {merged.get('name', row2['name'])}"
-                    merged[k] = ""  # f"{row1[k]} / {v}"
-        if extra:
-            merged["extra"] = extra
-        return merged
-
     data = {}
     for stat_filename, only_names, excluded_names in [
         (_stats_filename, None, _detail_datasets),
@@ -162,13 +180,9 @@ def load_stats():
                 orig_name = row["name"]
                 row = compile_stats(row)
                 name = row["name"]
-                # NOCOMMIT
-                # if "Wikiother" in orig_name:
-                #     if only_names:
-                #         print(f"{name=} {only_names=} => {name not in only_names}")
-                #     if excluded_names:
-                #         print(f"{name=} {excluded_names=} => {name in excluded_names}")
-                #     import pdb; pdb.set_trace()
+                if name in ["Persee"]:
+                    # Exclude from released data
+                    continue
                 if only_names and name not in only_names:
                     continue
                 if excluded_names and name in excluded_names:
@@ -181,10 +195,56 @@ def load_stats():
 
                 data[key] = row
 
-    df = pd.DataFrame(data.values())
+    # Add totals
+    sum_docs = sum(row["M docs"] for row in data.values())
+    sum_words = sum(row["B words"] for row in data.values())
+    sum_tokens = sum(row["B tokens"] for row in data.values())
+    sum_chars = sum(row["B chars"] for row in data.values())
 
-    def postprocess_extra(extra):
-        return ", ".join([info for _, info in sorted(extra.values())]) if len(extra) > 1 else ""
+    languages = {to_generic_language(row["language"]) for row in data.values()}
+    sum_docs_per_lang = {
+        lang: sum(row["M docs"] for row in data.values() if to_generic_language(row["language"]) == lang)
+        for lang in languages
+    }
+    sum_words_per_lang = {
+        lang: sum(row["B words"] for row in data.values() if to_generic_language(row["language"]) == lang)
+        for lang in languages
+    }
+    sum_tokens_per_lang = {
+        lang: sum(row["B tokens"] for row in data.values() if to_generic_language(row["language"]) == lang)
+        for lang in languages
+    }
+    sum_chars_per_lang = {
+        lang: sum(row["B chars"] for row in data.values() if to_generic_language(row["language"]) == lang)
+        for lang in languages
+    }
+    for language in sorted(languages):
+        data[("", language)] = {
+            "name": "",  # "Total",
+            "language": language,
+            "category": "",
+            "M docs": sum_docs_per_lang[language],
+            "B words": sum_words_per_lang[language],
+            "B tokens": sum_tokens_per_lang[language],
+            "B chars": sum_chars_per_lang[language],
+            "extra": {
+                lang if language == "code" else subset: info_string(lang if language == "code" else subset, row)
+                for (subset, lang), row in data.items()
+                if to_generic_language(row["language"]) == language
+            },
+        }
+    data[("", "")] = {
+        "name": "Total",
+        "language": "",
+        "category": "",
+        "M docs": sum_docs,
+        "B words": sum_words,
+        "B tokens": sum_tokens,
+        "B chars": sum_chars,
+        "extra": {},
+    }
+
+    df = pd.DataFrame(data.values())
 
     df["extra"] = df["extra"].apply(postprocess_extra)
 
@@ -205,7 +265,11 @@ def write_md_table_row(fields, row=None, header=None):
 
 
 def to_str(f, x, header=None):
+    x_orig = x
     if isinstance(x, str):
+        x = x.strip()
+        if not x:
+            return ""
         internal_link = to_link(x)
 
     if isinstance(x, float):
@@ -219,7 +283,7 @@ def to_str(f, x, header=None):
 
     # Add internal link
     if isinstance(x, str):
-        if f == "name" and x not in ["name", "-"]:
+        if f == "name" and x and x_orig.lower() not in ["name", "-", "total"]:
             # x=f"<a href=\"#{internal_link}\">{x}</a>"
             x = f"[{x}](#{internal_link})"
 
@@ -343,7 +407,11 @@ if __name__ == "__main__":
         with open(args.output_md, "w") as f:
             f.write(write_md_table_row(fields) + "\n")
             for category in sorted(categories, key=lambda x: key_category(x, df)):
-                f.write(f"| ***{category}*** " + ("|" * len(fields)) + "\n")
+                category_str = category
+                # if not category:
+                #     category_str = "All"
+                if category_str:
+                    f.write(f"| ***Category: {category_str}*** " + ("|" * len(fields)) + "\n")
                 df_cat = df[df["category"] == category]
                 rows = [row for irow, row in df_cat.iterrows()]
                 for row in sorted(rows, key=lambda x: key_row(x, df_cat)):
