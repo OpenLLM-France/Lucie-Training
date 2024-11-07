@@ -2,10 +2,11 @@ import csv
 import os
 import re
 
+import bs4
+import matplotlib.pyplot as plt
 import mistune
 import pandas as pd
 import slugify
-from bs4 import BeautifulSoup
 
 _parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 _stats_filename = os.path.join(_parent_folder, "assets", "stats_datasets.csv")
@@ -37,7 +38,7 @@ _shown_fields = [
 ]
 
 _show_fields_in_details = [
-    "B words",
+    "B tokens",  # "B words",
 ]
 _sorting_field = _show_fields_in_details[0]  # "B chars"
 
@@ -70,7 +71,7 @@ def compile_stats(row):
         "legi_spoken": "Legislative Transcripts",
         "legi_dialogue": "Legislative Transcripts",
         "aligned": "Multilingual Parallel Corpora",
-    }.get(category, category)
+    }.get(category.lower(), category)
     category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
     row["category"] = category
 
@@ -112,18 +113,20 @@ def compile_stats(row):
     return row
 
 
-def info_string(subset, row, sort_by_count=True):
+def format_extra_info_string(subset, row, sort_by_count=True):
+    assert len(_show_fields_in_details) == 1
+    count = row[_show_fields_in_details[0]]
     info = f"**{subset}**"
-    if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
-        info += " ("
-        info += ", ".join([f"{precision_at_least(row[k], 1)} {k}" for k in _show_fields_in_details])
-        info += ")"
+    # if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
+    #     info += " ("
+    #     info += ", ".join([f"{precision_at_least(row[k], 1)} {k}" for k in _show_fields_in_details])
+    #     info += ")"
     try:
         subset_int = int(subset)
     except ValueError:
         subset_int = None
     sort_criterion = -row[_sorting_field] if sort_by_count else (subset if subset_int is None else -subset_int)
-    return (sort_criterion, info)
+    return (sort_criterion, count, info)
 
 
 def merge_stats(row1, row2, orig_name):
@@ -139,8 +142,7 @@ def merge_stats(row1, row2, orig_name):
             subset = row.get("subset")
             if not subset:
                 continue
-            sort_criterion, info = info_string(subset, row, sort_by_count)
-            extra[subset] = (sort_criterion, info)
+            extra[subset] = format_extra_info_string(subset, row, sort_by_count)
     for k, v in row2.items():
         assert k in merged
         if isinstance(v, (float, int)):
@@ -154,9 +156,11 @@ def merge_stats(row1, row2, orig_name):
     return merged
 
 
-def to_generic_language(lang):
+def to_generic_language(lang, parallel=False):
     if lang.isupper():
         return "code"
+    if "-" in lang and parallel:
+        return "parallel"
     if not lang:
         return "(any)"
     return lang
@@ -164,9 +168,12 @@ def to_generic_language(lang):
 
 def postprocess_extra(extra):
     if len(extra) > 1:
-        return ", ".join([info for _, info in sorted(extra.values())])
+        sum_count = sum(count for _, count, _ in extra.values())
+        return ", ".join(
+            [f"{name} ({precision_at_least(count*100./sum_count, 1)} %)" for _, count, name in sorted(extra.values())]
+        )
     if len(extra) == 1 and list(extra.keys())[0].startswith("EuroparlAligned"):
-        return list(extra.values())[0][1].split("(")[0].strip()
+        return list(extra.values())[0][2]
     return ""
 
 
@@ -233,7 +240,9 @@ def load_stats():
             "B tokens": sum_tokens_per_lang[language],
             "B chars": sum_chars_per_lang[language],
             "extra": {
-                lang if language == "code" else subset: info_string(lang if language == "code" else subset, row)
+                lang if language == "code" else subset: format_extra_info_string(
+                    lang if language == "code" else subset, row
+                )
                 for (subset, lang), row in data.items()
                 if to_generic_language(row["language"]) == language
             },
@@ -265,17 +274,20 @@ def write_md_table_row(fields, row=None, header=None):
                 ({f: "-" * 1 for f in fields}, False),
             ]
         )
-    cells = [to_str(f, row[f], header=header) for f in fields]
+    cells = [format_str(f, row[f], header=header) for f in fields]
     return "| " + " | ".join(cells) + " |"
 
 
-def to_str(f, x, header=None):
+def format_str(f, x, header=None):
     x_orig = x
     if isinstance(x, str):
         x = x.strip()
         if not x:
             return ""
         internal_link = to_link(x)
+
+    if f == "language":
+        x = format_language(x, include_lang_code=True)
 
     if isinstance(x, float):
         # Not too many decimals
@@ -323,6 +335,21 @@ def to_header(x):
     return x
 
 
+def format_language(lang_code, include_lang_code=True):
+    lang = {
+        "fr": "French",
+        "en": "English",
+        "de": "German",
+        "es": "Spanish",
+        "it": "Italian",
+        "code": "Programming Languages",
+        "parallel": "Multilingual Parallel",
+    }.get(lang_code, lang_code)
+    if include_lang_code and lang != lang_code:
+        lang = f"{lang} ({lang_code})"
+    return lang
+
+
 def convert_markdown_table_to_html(
     markdown,
     html_doc,
@@ -356,7 +383,7 @@ def convert_markdown_table_to_html(
 
 
 def add_rowspan_to_table(html):
-    soup = BeautifulSoup(html, "html.parser")
+    soup = bs4.BeautifulSoup(html, "html.parser")
     table = soup.find("table")
 
     rows = table.find_all("tr")
@@ -493,3 +520,148 @@ if __name__ == "__main__":
         new_content = main_content[:table_start] + open(args.output_html).read().strip() + main_content[table_end:]
         with open(args.output_main, "w") as f_out:
             f_out.write(new_content)
+
+    if True:
+        # Plot pie
+
+        def more_dense_hatch(hatch):
+            if hatch in ["o"]:
+                return hatch
+            if hatch in ["-", "+"]:
+                return hatch * 3
+            return hatch * 2
+
+        def format_percentage(pct):
+            return f"{pct:.1f}%" if pct > min_percent_for_label else ""
+
+        hatch_styles = {
+            "fr": "/",
+            "en": "*",
+            "de": ".",
+            "es": "-",
+            "it": "|",
+            "code": "o",
+            "parallel": "+",
+        }
+
+        min_percent_for_label = 0.6
+
+        categories = [c for c in categories if c]
+        categories = sorted(categories, key=lambda x: key_category(x, df))
+        num_colors = len(categories)
+        rainbow_colors = [plt.cm.gist_rainbow(i / num_colors) for i in range(num_colors)]
+        # rainbow_colors_1 = rainbow_colors[: len(rainbow_colors) // 2]
+        # rainbow_colors_2 = rainbow_colors[len(rainbow_colors) // 2 :]
+        # rainbow_colors = [color for pair in zip(rainbow_colors_1, rainbow_colors_2) for color in pair]
+
+        for STAT_NAME in ("B tokens",):  # "B words", "B chars":
+            pie_values = []
+            pie_labels = []
+            pie_colors = []
+            pie_hatches = []
+            for _, row in df.iterrows():
+                category = row["category"]
+                language = to_generic_language(row["language"], parallel=True)
+                subset = row["name"]
+                if language == "code":
+                    subset = row["language"]
+                if not category or not subset or not language or subset.lower() in ["total", "name"]:
+                    continue
+                if subset == "RedPajama":
+                    subset += f"-{row['language']}"
+                pie_values.append(row[STAT_NAME])
+                pie_labels.append(subset)
+                pie_colors.append(rainbow_colors[categories.index(category)])
+                pie_hatches.append(hatch_styles.get(language, ""))
+
+            new_labels = []
+            for lab, v in zip(pie_labels, pie_values):
+                percentage = v / sum(pie_values) * 100
+                sep = "\n" if percentage > 2.6 else " "
+                label = f"{lab}{sep}({percentage:.1f}%)"
+                new_labels.append(label)
+            pie_labels = new_labels
+
+            pie_data = list(
+                zip(
+                    pie_values,
+                    pie_labels,
+                    pie_colors,
+                    pie_hatches,
+                )
+            )
+
+            def get_counts(x):
+                value_subset = x[0]
+                value_dataset = sum(p[0] for p in pie_data if p[1] == x[1])
+                value_category = sum(p[0] for p in pie_data if p[2] == x[2])
+                value_language = sum(p[0] for p in pie_data if p[3] == x[3])
+                # if x[3] == hatch_styles["code"]:
+                #     value_category = 0
+                # if x[3] == hatch_styles["parallel"]:
+                #     value_category = 1
+                value_category = -rainbow_colors.index(x[2])
+                value_language = -list(hatch_styles.values()).index(x[3])
+                return (value_category, value_language, value_dataset, value_subset)
+
+            pie_data = sorted(pie_data, key=get_counts, reverse=True)
+
+            pie_values, pie_labels, pie_colors, pie_hatches = zip(*pie_data)
+            pie_labels = list(pie_labels)
+            pie_hatches = list(pie_hatches)
+
+            sum_values = sum(pie_values)
+            pie_values = [v / sum_values * 100 for v in pie_values]
+            for i, v in enumerate(pie_values):
+                if v < min_percent_for_label:
+                    pie_labels[i] = ""  # "other"
+                    pie_hatches[i] = pie_hatches[i] * 2  # more_dense_hatch(pie_hatches[i])
+            # Remove duplicates
+            reference = None
+            for i, v in enumerate(pie_labels):
+                if reference is not None and v == pie_labels[reference]:
+                    pie_labels[i] = ""
+                else:
+                    reference = i
+
+            plt.figure()
+            plt.pie(
+                pie_values,
+                labels=pie_labels,
+                colors=pie_colors,
+                hatch=pie_hatches,
+                # autopct=format_percentage, #"%1.1f%%",
+                shadow=False,
+                startangle=90 * 2,
+                counterclock=False,
+                labeldistance=1.05,
+                explode=[0.05 if lab else 0 for lab in pie_labels],
+            )
+            plt.axis("equal")
+
+            # Custom legend
+            labels, hatches, colors = [], [], []
+            labels += categories
+            hatches += ["" for i in categories]
+            colors += rainbow_colors
+            labels += list(hatch_styles.keys())
+            hatches += list(hatch_styles.values())
+            colors += ["white"] * len(hatch_styles)
+            hatches[labels.index("Multilingual Parallel Corpora")] = hatch_styles["parallel"]
+            hatches[labels.index("Programming")] = hatch_styles["code"]
+            for label in "code", "parallel":
+                i = labels.index(label)
+                labels.pop(i)
+                hatches.pop(i)
+                colors.pop(i)
+            hatches = [more_dense_hatch(c) for c in hatches]
+            labels = [format_language(lab) for lab in labels]
+
+            legend = [
+                plt.Rectangle((0, 0), 1, 1, fc=colors[i], hatch=hatches[i], edgecolor="black")
+                for i in range(len(labels))
+            ]
+            plt.legend(legend, labels, title_fontsize="large")
+            plt.title(STAT_NAME)
+
+        plt.show()
