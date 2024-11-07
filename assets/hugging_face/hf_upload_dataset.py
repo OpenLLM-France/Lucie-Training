@@ -2,6 +2,7 @@ import json
 import os
 import random
 import shutil
+import signal
 import sys
 import tempfile
 from collections import OrderedDict
@@ -247,6 +248,34 @@ def get_union(metadatas, desc=None):
     return union
 
 
+class TimeoutException(Exception):
+    pass
+
+
+class TimeOut:
+    def __init__(self, seconds, final_action=None):
+        self.seconds = seconds
+        self.final_action = final_action
+        if self.seconds:
+            assert self.seconds >= 0, f"Invalid timeout: {self.seconds}"
+
+    def handle_timeout(self, signum, frame):
+        msg = f"Timeout after {self.seconds} seconds"
+        print("WARNING:" + msg)
+        raise TimeoutException(msg)
+
+    def __enter__(self):
+        if self.seconds:
+            signal.signal(signal.SIGALRM, self.handle_timeout)
+            signal.alarm(self.seconds)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        signal.alarm(0)  # Disable the alarm
+        if self.final_action:
+            self.final_action()
+        return exc_type is TimeoutException  # Suppress TimeoutException if handled
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -258,6 +287,9 @@ if __name__ == "__main__":
     parser.add_argument("--collect_metadata", type=str, help="json file to store all metadata")
     parser.add_argument("--uniformize_metadata", action="store_true", default=False, help="Uniformize metadata")
     parser.add_argument("--folder", type=str, default="tmp_upload", help="Output folder")
+    parser.add_argument(
+        "--max_time", type=float, default=(20 * 60 - 5), help="Maximum time to run, in minutes (default 19H55)"
+    )
     parser.add_argument(
         "--repository", type=str, default="OpenLLM-France/Lucie-Training-Dataset", help="Hugging Face repository"
     )
@@ -338,200 +370,211 @@ if __name__ == "__main__":
     parquet_finished, parquet_filename = True, None
     parquet_files_created = []
     lock_files = []
-    try:
-        for dataset_name, dataset in progress_bar:
-            progress_bar.set_description(f"Processing {dataset_name}")
-            dataset_pseudo = dataset_name.split("-")[0]
-            if previous_pseudo != dataset_pseudo:
-                previous_pseudo = dataset_pseudo
-                random.seed(1234)  # Hack. Try to reproduce same randomness as when tokenizing
+    with TimeOut((args.max_time * 60) if args.max_time else None):
+        try:
+            for dataset_name, dataset in progress_bar:
+                progress_bar.set_description(f"Processing {dataset_name}")
+                dataset_pseudo = dataset_name.split("-")[0]
+                if previous_pseudo != dataset_pseudo:
+                    previous_pseudo = dataset_pseudo
+                    random.seed(1234)  # Hack. Try to reproduce same randomness as when tokenizing
 
-            # To yield dictionaries with metadata instead of just the text
-            language_category, language = to_language(dataset_name)
-            source, source_pseudo, update_dict_func = to_source_and_id_func(dataset_name)
-            assert (
-                source_pseudo and language_category and language and dataset_name
-            ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
-            path_in_repo = f"data/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
+                # To yield dictionaries with metadata instead of just the text
+                language_category, language = to_language(dataset_name)
+                source, source_pseudo, update_dict_func = to_source_and_id_func(dataset_name)
+                assert (
+                    source_pseudo and language_category and language and dataset_name
+                ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
+                path_in_repo = f"data/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
 
-            progress_bar.set_description(f"Generating {path_in_repo}")
+                progress_bar.set_description(f"Generating {path_in_repo}")
 
-            language_configname = language.replace("-", ",")  # fr-en -> fr,en
+                language_configname = language.replace("-", ",")  # fr-en -> fr,en
 
-            if source != "TheStack":  # This one is already under code-*
-                multi_lingual_configs[source] = multi_lingual_configs.get(source, {}) | {
-                    language: {
-                        "config_name": f"{source}-{language_configname}",
-                        "data_files": [
-                            {"split": "train", "path": f"data/{language_category}/{language}/{source_pseudo}/*.parquet"}
-                        ],
+                if source != "TheStack":  # This one is already under code-*
+                    multi_lingual_configs[source] = multi_lingual_configs.get(source, {}) | {
+                        language: {
+                            "config_name": f"{source}-{language_configname}",
+                            "data_files": [
+                                {
+                                    "split": "train",
+                                    "path": f"data/{language_category}/{language}/{source_pseudo}/*.parquet",
+                                }
+                            ],
+                        }
                     }
-                }
 
-            config_names = [c["config_name"] for c in _dataset_header["configs"]]
-            for config in [
-                {
-                    "config_name": source,
-                    "data_files": [{"split": "train", "path": f"data/{language_category}/*/{source_pseudo}/*.parquet"}],
-                },
-                {
-                    "config_name": language_configname
-                    if (language_category == "natural")
-                    else f"{language_category}-{language_configname}",
-                    "data_files": [{"split": "train", "path": f"data/{language_category}/{language}/*/*.parquet"}],
-                },
-            ] + (
-                list(multi_lingual_configs.get(source).values())
-                if len(multi_lingual_configs.get(source, [])) > 1
-                else []
-            ):
-                if config["config_name"] not in config_names:
-                    _dataset_header["configs"].append(config)
-                    _dataset_header["configs"] = sorted(
-                        _dataset_header["configs"], key=lambda x: sort_config_key(x["config_name"])
-                    )
-                    must_update_readme = True
-
-            if must_update_readme:
-                dump_dataset_config()
-
-            parquet_filename = os.path.join(args.folder, path_in_repo)
-            os.makedirs(os.path.dirname(parquet_filename), exist_ok=True)
-
-            lock_file = parquet_filename + ".lock"
-            if do_upload:
-                if os.path.exists(lock_file):
-                    continue
-                with open(lock_file, "w") as f:
-                    f.write("lock")
-                lock_files.append(lock_file)
-
-            dataset.SetYieldMetadata(
-                uniformize_metadata=args.uniformize_metadata,
-                extra_metadata=dict(
-                    source=source,
-                    language=language,
-                ),
-                update_dict_func=update_dict_func,
-            )
-
-            metadatas[source] = metadatas.get(source, {})
-            examples[source] = examples.get(source, {})
-
-            all_data = {}
-            if metadata_fields:
-                for k in metadata_fields:
-                    all_data[k] = []
-
-            has_data = False
-            parquet_finished = do_upload and os.path.isfile(parquet_filename)
-            if parquet_finished:
-                print(f"Warning: Using existing parquet file {parquet_filename}")
-            else:
-                for i, sample in enumerate(dataset):
-                    has_data = True
-                    assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
-                    assert "text" in sample and isinstance(sample["text"], str)
-
-                    # Update metadata
-                    if args.collect_metadata:
-                        # Update types
-                        metadatas[source] = get_union(
-                            [{k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"}, metadatas[source]],
-                            desc=dataset_name,
+                config_names = [c["config_name"] for c in _dataset_header["configs"]]
+                for config in [
+                    {
+                        "config_name": source,
+                        "data_files": [
+                            {"split": "train", "path": f"data/{language_category}/*/{source_pseudo}/*.parquet"}
+                        ],
+                    },
+                    {
+                        "config_name": language_configname
+                        if (language_category == "natural")
+                        else f"{language_category}-{language_configname}",
+                        "data_files": [{"split": "train", "path": f"data/{language_category}/{language}/*/*.parquet"}],
+                    },
+                ] + (
+                    list(multi_lingual_configs.get(source).values())
+                    if len(multi_lingual_configs.get(source, [])) > 1
+                    else []
+                ):
+                    if config["config_name"] not in config_names:
+                        _dataset_header["configs"].append(config)
+                        _dataset_header["configs"] = sorted(
+                            _dataset_header["configs"], key=lambda x: sort_config_key(x["config_name"])
                         )
-                        # Update examples
-                        for k, v in sample.items():
-                            if v is None or k in ["text"]:
-                                continue
-                            if k not in examples[source]:
-                                examples[source][k] = get_example_preview(
-                                    v, enforce_dict=False
-                                )  # True # args.uniformize_metadata)
-                            if k not in examples[_UNION_KEY]:
-                                examples[_UNION_KEY][k] = get_example_preview(v)
-                        dump_metadata(metadatas, examples)
-                        if None not in metadatas[source].values() or i > 100:
-                            break
+                        must_update_readme = True
 
-                    # Add sample data to (parquet) dataset
+                if must_update_readme:
+                    dump_dataset_config()
+
+                parquet_filename = os.path.join(args.folder, path_in_repo)
+                os.makedirs(os.path.dirname(parquet_filename), exist_ok=True)
+
+                lock_file = parquet_filename + ".lock"
+                if do_upload:
+                    if os.path.exists(lock_file):
+                        continue
+                    with open(lock_file, "w") as f:
+                        f.write("lock")
+                    lock_files.append(lock_file)
+
+                dataset.SetYieldMetadata(
+                    uniformize_metadata=args.uniformize_metadata,
+                    extra_metadata=dict(
+                        source=source,
+                        language=language,
+                    ),
+                    update_dict_func=update_dict_func,
+                )
+
+                metadatas[source] = metadatas.get(source, {})
+                examples[source] = examples.get(source, {})
+
+                all_data = {}
+                if metadata_fields:
+                    for k in metadata_fields:
+                        all_data[k] = []
+
+                has_data = False
+                parquet_finished = do_upload and os.path.isfile(parquet_filename)
+                if parquet_finished:
+                    print(f"Warning: Using existing parquet file {parquet_filename}")
+                else:
+                    for i, sample in enumerate(dataset):
+                        has_data = True
+                        assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
+                        assert "text" in sample and isinstance(sample["text"], str)
+
+                        # Update metadata
+                        if args.collect_metadata:
+                            # Update types
+                            metadatas[source] = get_union(
+                                [
+                                    {k: get_type(sample[k]) for k in sorted(sample.keys()) if k != "text"},
+                                    metadatas[source],
+                                ],
+                                desc=dataset_name,
+                            )
+                            # Update examples
+                            for k, v in sample.items():
+                                if v is None or k in ["text"]:
+                                    continue
+                                if k not in examples[source]:
+                                    examples[source][k] = get_example_preview(
+                                        v, enforce_dict=False
+                                    )  # True # args.uniformize_metadata)
+                                if k not in examples[_UNION_KEY]:
+                                    examples[_UNION_KEY][k] = get_example_preview(v)
+                            dump_metadata(metadatas, examples)
+                            if None not in metadatas[source].values() or i > 100:
+                                break
+
+                        # Add sample data to (parquet) dataset
+                        if do_upload:
+                            if not all_data:
+                                all_data = {k: [] for k in sample.keys()}
+                            for k, v in sample.items():
+                                if k not in all_data:
+                                    assert all_data
+                                    num_samples = len(all_data[list(all_data.keys())[0]])
+                                    all_data[k] = [_DEFAULT_VALUE] * num_samples
+                                if v is None:
+                                    v = _DEFAULT_VALUE
+                                all_data[k].append(v)
+                            for k in all_data:
+                                if k not in sample:
+                                    all_data[k].append(_DEFAULT_VALUE)
+
+                    if not has_data:
+                        print(f"Dataset {dataset_name} has no data")
+                        continue
+                        # raise RuntimeError(f"Dataset {dataset_name} has no data")
+
                     if do_upload:
-                        if not all_data:
-                            all_data = {k: [] for k in sample.keys()}
-                        for k, v in sample.items():
-                            if k not in all_data:
-                                assert all_data
-                                num_samples = len(all_data[list(all_data.keys())[0]])
-                                all_data[k] = [_DEFAULT_VALUE] * num_samples
-                            if v is None:
-                                v = _DEFAULT_VALUE
-                            all_data[k].append(v)
-                        for k in all_data:
-                            if k not in sample:
-                                all_data[k].append(_DEFAULT_VALUE)
+                        # Dump parquet file
+                        all_data = pd.DataFrame(all_data)
+                        all_data.to_parquet(parquet_filename)
 
-                if not has_data:
-                    print(f"Dataset {dataset_name} has no data")
-                    continue
-                    # raise RuntimeError(f"Dataset {dataset_name} has no data")
-                parquet_finished = True
+                    parquet_finished = True
+
+                del all_data
 
                 if do_upload:
-                    # Dump parquet file
-                    all_data = pd.DataFrame(all_data)
-                    all_data.to_parquet(parquet_filename)
+                    parquet_files_created.append(parquet_filename)
+                    if len(parquet_files_created) >= args.update_each:
+                        parquet_files_created = list(set(parquet_files_created))
 
-            del all_data
+                        # Dump to Hugging Face
+                        if hf_api is None:
+                            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
 
-            if do_upload:
-                parquet_files_created.append(parquet_filename)
-                if len(parquet_files_created) >= args.update_each:
-                    parquet_files_created = list(set(parquet_files_created))
-
-                    # Dump to Hugging Face
-                    if hf_api is None:
-                        hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
-
-                    common_path = (
-                        os.path.commonpath(parquet_files_created)
-                        if len(parquet_files_created) > 1
-                        else os.path.dirname(parquet_files_created[0])
-                    )
-
-                    if len(parquet_files_created) == 1:
-                        hf_api.upload_file(
-                            path_or_fileobj=parquet_filename,
-                            path_in_repo=path_in_repo,
-                            commit_message=args.message if args.message else f"Upload {source}",
-                            repo_id=args.repository,
-                            repo_type="dataset",
-                            revision=None,
-                        )
-                    else:
-                        hf_api.upload_folder(
-                            folder_path=common_path,
-                            path_in_repo=os.path.relpath(common_path, args.folder),
-                            commit_message=args.message if args.message else "Upload data",
-                            ignore_patterns=["*.lock"],
-                            repo_id=args.repository,
-                            repo_type="dataset",
-                            revision=None,
+                        common_path = (
+                            os.path.commonpath(parquet_files_created)
+                            if len(parquet_files_created) > 1
+                            else os.path.dirname(parquet_files_created[0])
                         )
 
-                    if args.clean:
-                        for f in parquet_files_created:
-                            if os.path.exists(f):
-                                os.remove(f)
+                        if len(parquet_files_created) == 1:
+                            hf_api.upload_file(
+                                path_or_fileobj=parquet_filename,
+                                path_in_repo=path_in_repo,
+                                commit_message=args.message if args.message else f"Upload {source}",
+                                repo_id=args.repository,
+                                repo_type="dataset",
+                                revision=None,
+                            )
+                        else:
+                            hf_api.upload_folder(
+                                folder_path=common_path,
+                                path_in_repo=os.path.relpath(common_path, args.folder),
+                                commit_message=args.message if args.message else "Upload data",
+                                ignore_patterns=["*.lock"],
+                                repo_id=args.repository,
+                                repo_type="dataset",
+                                revision=None,
+                            )
 
-                    parquet_files_created = []
-                    lock_files = []
+                        if args.clean:
+                            for f in parquet_files_created:
+                                if os.path.exists(f):
+                                    os.remove(f)
 
-    except (Exception, KeyboardInterrupt) as err:
-        if not parquet_finished and os.path.exists(parquet_filename):
-            os.remove(parquet_filename)
-        for f in lock_files:
-            os.remove(f)
-        raise err
+                        parquet_files_created = []
+                        lock_files = []
+
+        except (Exception, KeyboardInterrupt) as err:
+            if not parquet_finished and os.path.exists(parquet_filename):
+                os.remove(parquet_filename)
+            for f in lock_files:
+                if os.path.exists(f):
+                    os.remove(f)
+            raise err
 
     if len(parquet_files_created):
         # Dump the last ones
