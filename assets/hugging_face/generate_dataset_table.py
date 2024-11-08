@@ -745,7 +745,10 @@ if __name__ == "__main__":
             for lab, v in zip(pie_labels, pie_values):
                 percentage = v / sum(pie_values) * 100
                 sep = "\n" if percentage > 2.6 else " "
-                label = f"$\\bf{{{lab}}}${sep}({percentage:.1f}%)"
+                use_bold = not lab.isupper()
+                if use_bold:
+                    lab = f"$\\bf{{{lab}}}$"  # bold in matlab label
+                label = f"{lab}{sep}({percentage:.1f}%)"
                 new_labels.append(label)
             pie_labels = new_labels
 
@@ -784,7 +787,7 @@ if __name__ == "__main__":
                 else:
                     reference = i
 
-            plt.figure()
+            plt.clf()
             plt.pie(
                 pie_values,
                 labels=pie_labels,
