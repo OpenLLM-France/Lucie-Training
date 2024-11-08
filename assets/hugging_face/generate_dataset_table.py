@@ -42,6 +42,9 @@ _shown_fields = [
 
 _sorting_field = "B tokens"  # "B chars" # "B words"
 
+# For links that will show up in html (table)
+_html_link_prefix = "https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/"
+
 
 def norm_field(key, val, trace_error=None):
     key = key.strip()
@@ -185,7 +188,7 @@ def format_extra_in_table(extra, use_figures=True):
         descr, figname = figure_name(name, "histogram", suffix=" by year")
     elif len(extra) > 1:
         descr, figname = plot_extra_distribution(extra)
-    md_string = f"[composition details]({figname})"  # f"[{descr}]({figname})"
+    md_string = f"[composition details]({_html_link_prefix}{figname})"  # f"[{descr}]({figname})"
 
     if len(extra) > 1 or hack_am:
         if use_figures and figname:

@@ -115,7 +115,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>583.687</td>
 <td>928.618</td>
 <td>3619.672</td>
-<td><a href="figures/fig_distribution_french_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_french_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -124,7 +124,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>412.202</td>
 <td>611.894</td>
 <td>2553.541</td>
-<td><a href="figures/fig_distribution_english_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_english_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -133,7 +133,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>51.306</td>
 <td>228.954</td>
 <td>630.749</td>
-<td><a href="figures/fig_distribution_code_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_code_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -142,7 +142,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>105.609</td>
 <td>206.610</td>
 <td>764.779</td>
-<td><a href="figures/fig_distribution_german_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_german_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -151,7 +151,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>123.857</td>
 <td>200.825</td>
 <td>759.457</td>
-<td><a href="figures/fig_distribution_spanish_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_spanish_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -160,7 +160,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>62.051</td>
 <td>112.031</td>
 <td>404.454</td>
-<td><a href="figures/fig_distribution_italian_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_italian_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -169,7 +169,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>17.016</td>
 <td>25.494</td>
 <td>107.658</td>
-<td><a href="figures/fig_distribution_fr-en_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_fr-en_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -207,7 +207,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>477.758</td>
 <td>741.023</td>
 <td>2974.596</td>
-<td><a href="figures/fig_distribution_redpajama-french_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-french_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -216,7 +216,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>103.078</td>
 <td>201.371</td>
 <td>747.631</td>
-<td><a href="figures/fig_distribution_redpajama-german_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-german_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -225,7 +225,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>121.751</td>
 <td>197.125</td>
 <td>746.984</td>
-<td><a href="figures/fig_distribution_redpajama-spanish_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-spanish_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -234,7 +234,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>60.194</td>
 <td>108.416</td>
 <td>393.012</td>
-<td><a href="figures/fig_distribution_redpajama-italian_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-italian_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td><a href="#finewebedu"><strong>FineWebEdu</strong></a></td>
@@ -243,7 +243,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>327.453</td>
 <td>467.837</td>
 <td>2018.215</td>
-<td><a href="figures/fig_distribution_finewebedu-english_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td colspan="7"><h4 id="category-newspaper">Category: Newspaper</h4></td></tr>
@@ -263,7 +263,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>8.902</td>
 <td>14.313</td>
 <td>50.844</td>
-<td><a href="figures/fig_distribution_americanstories-english_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_americanstories-english_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td colspan="7"><h4 id="category-technical">Category: Technical</h4></td></tr>
@@ -639,7 +639,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>0.818</td>
 <td>1.161</td>
 <td>4.709</td>
-<td><a href="figures/fig_distribution_claire-english_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-english_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -648,7 +648,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 <td>0.210</td>
 <td>0.311</td>
 <td>1.314</td>
-<td><a href="figures/fig_distribution_claire-french_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-french_pie.png">composition details</a></td>
 </tr>
 <tr>
 <td><a href="#youtube"><strong>YouTube</strong></a></td>
