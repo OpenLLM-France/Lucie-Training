@@ -5,6 +5,7 @@ import re
 import bs4
 import matplotlib.pyplot as plt
 import mistune
+import numpy as np
 import pandas as pd
 import slugify
 
@@ -39,10 +40,7 @@ _shown_fields = [
     "B chars",
 ]
 
-_show_fields_in_details = [
-    "B tokens",  # "B words",
-]
-_sorting_field = _show_fields_in_details[0]  # "B chars"
+_sorting_field = "B tokens"  # "B chars" # "B words"
 
 
 def norm_field(key, val, trace_error=None):
@@ -115,26 +113,115 @@ def compile_stats(row):
     return row
 
 
-def format_extra_info_string(subset, row, sort_by_count=True):
-    assert len(_show_fields_in_details) == 1
-    count = row[_show_fields_in_details[0]]
-    info = f"**{subset}**"
-    # if True:  # round(row[_show_fields_in_details[0]], 3) > 0:
-    #     info += " ("
-    #     info += ", ".join([f"{precision_at_least(row[k], 1)} {k}" for k in _show_fields_in_details])
-    #     info += ")"
+def conform_extra(subset, row, sort_by_count=True, name=None):
+    count = row[_sorting_field]
+    info = subset
     try:
         subset_int = int(subset)
+        info = subset_int
     except ValueError:
         subset_int = None
     sort_criterion = -row[_sorting_field] if sort_by_count else (subset if subset_int is None else -subset_int)
-    return (sort_criterion, count, info)
+    return (name, sort_criterion, count, info)
+
+
+def figure_name(name, graph_type="histogram", suffix=""):
+    return (f"Composition of {name}{suffix}", f"figures/fig_distribution_{slugify.slugify(name)}_{graph_type}.png")
+
+
+def plot_extra_distribution(extra, name=None):
+    assert len(extra)
+    extra_list = sorted(extra.values())
+    sum_count = sum(count for _, _, count, _ in extra_list)
+    ratios = [count * 100.0 / sum_count for _, _, count, _ in extra_list]
+    name = name or extra_list[0][0]
+    is_numeric = isinstance(extra_list[0][-1], int)
+    if is_numeric:
+        graph_type = "histogram"
+        suffix = " by year"
+    else:
+        graph_type = "pie"
+        suffix = ""
+    descr, figname = figure_name(name, graph_type=graph_type, suffix=suffix)
+
+    # Clear figure
+    plt.clf()
+    if graph_type == "histogram":
+        # Histogram of years
+        plt.bar([val for _, _, _, val in extra_list], ratios, width=1)
+        plt.ylabel("Percentage")
+        if suffix:
+            plt.xlabel(suffix.split()[-1])
+        # Avoid non-integer xticks
+        (xvalues, xlabels) = plt.xticks()
+        plt.xticks([v for v in xvalues if int(v) == v])
+    else:
+        # Pie chart
+        labels = [val for _, _, _, val in extra_list]
+        do_not_plot_small = len(labels) > 3
+        if do_not_plot_small:
+            for i, percent in enumerate(ratios):
+                if percent < 1:
+                    labels[i] = ""
+        plt.pie(
+            ratios,
+            labels=labels,
+            autopct=format_percentage if do_not_plot_small else "%1.1f%%",
+            startangle=90 * 2,
+            counterclock=False,
+        )
+    if name:
+        plt.title(descr)
+        plt.savefig(figname, bbox_inches="tight")
+    return descr, figname
+
+
+def format_extra_in_table(extra, use_figures=True):
+    hack_am = extra == "HACK_AmericanStories"
+    descr, figname = None, None
+    if hack_am:
+        name = "AmericanStories (English)"
+        # This one is not generated every time ... (cause we don't have number of tokens for each year)
+        descr, figname = figure_name(name, "histogram", suffix=" by year")
+    elif len(extra) > 1:
+        descr, figname = plot_extra_distribution(extra)
+    md_string = f"[composition details]({figname})"  # f"[{descr}]({figname})"
+
+    if len(extra) > 1 or hack_am:
+        if use_figures and figname:
+            return md_string
+        sum_count = sum(count for _, _, count, _ in extra.values())
+        return ", ".join(
+            [
+                f"**{name}** ({precision_at_least(count*100./sum_count, 1)} %)"
+                for _, _, count, name in sorted(extra.values())
+            ]
+        )
+    if not use_figures and len(extra) == 1 and list(extra.keys())[0].startswith("EuroparlAligned"):
+        name = list(extra.values())[0][2]
+        if name:
+            return f"**{name}**"
+    return ""
 
 
 def merge_stats(row1, row2, orig_name):
     extra = row1.get("extra", {})
     merged = row1.copy()
     sort_by_count = True
+    for k, v in row2.items():
+        assert k in merged
+        if k == "extra":
+            continue
+        if isinstance(v, (float, int)):
+            merged[k] += v
+        elif isinstance(v, str):
+            if v != row1[k]:
+                assert k in ["subset"], f"'{k}' : {v} != {row1[k]} for {merged.get('name', row2['name'])}"
+                merged[k] = ""  # f"{row1[k]} / {v}"
+    name = merged.get("name", row2["name"])
+    language = merged.get("language", row2["language"])
+    if language:
+        name += f" ({format_language(language, include_lang_code=False)})"
     for ds in _web_datasets:
         if orig_name.startswith(ds):
             sort_by_count = False
@@ -144,15 +231,9 @@ def merge_stats(row1, row2, orig_name):
             subset = row.get("subset")
             if not subset:
                 continue
-            extra[subset] = format_extra_info_string(subset, row, sort_by_count)
-    for k, v in row2.items():
-        assert k in merged
-        if isinstance(v, (float, int)):
-            merged[k] += v
-        elif isinstance(v, str):
-            if v != row1[k]:
-                assert k in ["subset"], f"'{k}' : {v} != {row1[k]} for {merged.get('name', row2['name'])}"
-                merged[k] = ""  # f"{row1[k]} / {v}"
+            language = row.get("language")
+            assert language, f"Missing language for {row['name']}"
+            extra[(subset, language)] = conform_extra(subset, row, sort_by_count=sort_by_count, name=name)
     if extra:
         merged["extra"] = extra
     return merged
@@ -166,17 +247,6 @@ def to_generic_language(lang, parallel=False):
     if not lang:
         return "(any)"
     return lang
-
-
-def postprocess_extra(extra):
-    if len(extra) > 1:
-        sum_count = sum(count for _, count, _ in extra.values())
-        return ", ".join(
-            [f"{name} ({precision_at_least(count*100./sum_count, 1)} %)" for _, count, name in sorted(extra.values())]
-        )
-    if len(extra) == 1 and list(extra.keys())[0].startswith("EuroparlAligned"):
-        return list(extra.values())[0][2]
-    return ""
 
 
 def load_stats():
@@ -212,7 +282,7 @@ def load_stats():
     # Add totals
     sum_docs = sum(row["M docs"] for row in data.values())
     sum_words = sum(row["B words"] for row in data.values())
-    sum_tokens = sum(row["B tokens"] for row in data.values())
+    sum_tokens = sum(row["B tokens"] if row.get("B tokens") else 1 for row in data.values())
     sum_chars = sum(row["B chars"] for row in data.values())
 
     languages = {to_generic_language(row["language"]) for row in data.values()}
@@ -225,7 +295,11 @@ def load_stats():
         for lang in languages
     }
     sum_tokens_per_lang = {
-        lang: sum(row["B tokens"] for row in data.values() if to_generic_language(row["language"]) == lang)
+        lang: sum(
+            row["B tokens"] if row.get("B tokens") else 1
+            for row in data.values()
+            if to_generic_language(row["language"]) == lang
+        )
         for lang in languages
     }
     sum_chars_per_lang = {
@@ -242,8 +316,8 @@ def load_stats():
             "B tokens": sum_tokens_per_lang[language],
             "B chars": sum_chars_per_lang[language],
             "extra": {
-                lang if language == "code" else subset: format_extra_info_string(
-                    lang if language == "code" else subset, row
+                lang if language == "code" else subset: conform_extra(
+                    lang if language == "code" else subset, row, name=format_language(language, include_lang_code=False)
                 )
                 for (subset, lang), row in data.items()
                 if to_generic_language(row["language"]) == language
@@ -262,7 +336,8 @@ def load_stats():
 
     df = pd.DataFrame(data.values())
 
-    df["extra"] = df["extra"].apply(postprocess_extra)
+    df.loc[df["name"] == "AmericanStories", "extra"] = "HACK_AmericanStories"
+    df["extra"] = df["extra"].apply(format_extra_in_table)
 
     return df
 
@@ -310,7 +385,9 @@ def format_str(f, x, header=None):
 
 
 def precision_at_least(x, prec=3, length=""):
-    if x == 0:
+    if np.isnan(x):
+        return "0"
+    if x < 10**-7:
         return f"{0:{length}.{prec}f}"
     if round(x, prec) >= 100 * (10**-prec):
         return f"{x:{length}.{prec}f}"
@@ -344,7 +421,7 @@ def format_language(lang_code, include_lang_code=True):
         "de": "German",
         "es": "Spanish",
         "it": "Italian",
-        "code": "Programming Languages",
+        # "code": "Programming Languages",
         "parallel": "Multilingual Parallel",
     }.get(lang_code, lang_code)
     if include_lang_code and lang != lang_code:
@@ -416,6 +493,11 @@ def add_rowspan_to_table(html):
     return str(soup)
 
 
+# format_percentage = "%1.1f%%"
+def format_percentage(pct):
+    return f"{pct:.1f}%" if pct > 1 else ""
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -445,6 +527,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    plt.figure()  # For the pie charts, etc.
     df = load_stats()
     print(df)
 
@@ -528,9 +611,6 @@ if __name__ == "__main__":
     if True:
         # Plot pie
 
-        def format_percentage(pct):
-            return f"{pct:.1f}%" if pct > min_percent_for_label else ""
-
         map_hatch = {
             "fr": "/",
             "en": "*",
@@ -579,7 +659,7 @@ if __name__ == "__main__":
         # rainbow_colors_2 = rainbow_colors[len(rainbow_colors) // 2 :]
         # rainbow_colors = [color for pair in zip(rainbow_colors_1, rainbow_colors_2) for color in pair]
 
-        for STAT_NAME in ("B tokens",):  # "B words", "B chars":
+        for STAT_NAME in (_sorting_field,):  # ("B tokens", "B words", "B chars", ):
             pie_values = []
             pie_labels = []
             pie_colors = []
@@ -656,7 +736,7 @@ if __name__ == "__main__":
             pie_hatches = list(pie_hatches)
 
             sum_values = sum(pie_values)
-            pie_values = [v / sum_values * 100 for v in pie_values]
+            pie_values = [v / sum_values * 100 if sum_values else 0 for v in pie_values]
             for i, v in enumerate(pie_values):
                 if v < min_percent_for_label:
                     pie_labels[i] = ""  # "other"
@@ -698,9 +778,17 @@ if __name__ == "__main__":
             nothing = plt.Rectangle((0, 0), 1, 1, fc="white", edgecolor="white")
             legend_and_labels = (
                 [(nothing, "$\\bf{Categories}$")]
-                + [(legend_categories[label], format_category_for_pie(label)) for label in categories]
+                + [
+                    (legend_categories[label], format_category_for_pie(label))
+                    for label in categories
+                    if label in legend_categories
+                ]
                 + [(nothing, "$\\bf{Languages}$")]
-                + [(legend_languages[label], format_language_for_pie(label)) for label in languages]
+                + [
+                    (legend_languages[label], format_language_for_pie(label))
+                    for label in languages
+                    if label in legend_languages
+                ]
                 + [(nothing, "") for i in range(len(categories) - len(languages))]
             )
             legend, labels = zip(*legend_and_labels)
