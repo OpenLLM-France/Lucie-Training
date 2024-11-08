@@ -1002,7 +1002,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 #### AmericanStories
 * <u>Source</u>: [dell-research-harvard/AmericanStories](https://huggingface.co/datasets/dell-research-harvard/AmericanStories). License: [CC BY 4.0](https://huggingface.co/datasets/dell-research-harvard/AmericanStories).
 * <u>Extracted from</u>: [Chronicling America](https://www.loc.gov/collections/chronicling-america/about-this-collection/). License: [Open](https://www.loc.gov/collections/chronicling-america/about-this-collection/rights-and-access/).
-* <u>Description</u>: "The American Stories dataset is a collection of full article texts extracted from historical U.S. newspaper images. It includes nearly 20 million scans from the public domain Chronicling America collection maintained by the Library of Congress. The dataset is designed to address the challenges posed by complex layouts and low OCR quality in existing newspaper datasets" (from the [dataset card](https://huggingface.co/datasets/dell-research-harvard/AmericanStories)).
+* <u>Description</u>: "The American Stories dataset is a collection of full article texts extracted from historical U.S. newspaper images. It includes nearly 20 million scans from the public domain Chronicling America collection maintained by the Library of Congress. The dataset is designed to address the challenges posed by complex layouts and low OCR quality in existing newspaper datasets" (from the [dataset card](https://huggingface.co/datasets/dell-research-harvard/AmericanStories)). Dataset containing text retrieved through OCR.
 * <u>Citation</u>: Melissa Dell, Jacob Carlson, Tom Bryan, Emily Silcock, Abhishek Arora, Zejiang Shen, Luca D'Amico-Wong, Quan Le, Pablo Querubin and Leander Heldring (2023). "American Stories: A Large-Scale Structured Text Dataset of Historical U.S. Newspapers," [arxiv:2308.12477](https://arxiv.org/abs/2308.12477v1).
 
 
@@ -1010,13 +1010,17 @@ The table provides the number of documents, words, tokens, and characters for ea
 * <u>Sources</u>:
   * French dataset: [OpenLLM-France/Claire-Dialogue-French-0.1](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-French-0.1). License: [CC BY-NC-SA 4.0](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-French-0.1).
   * English dataset: [OpenLLM-France/Claire-Dialogue-English-0.1](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-English-0.1). License: [CC BY-NC-SA 4.0](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-English-0.1).
+* <u>Extracted from</u>: see the datacards for the [French](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-French-0.1) and [English](https://huggingface.co/datasets/OpenLLM-France/Claire-Dialogue-English-0.1) datasets.
 * <u>Description</u>: The Claire datasets are composed of transcripts of spoken conversations -- including parliamentary proceedings, interviews, debates, meetings, and free conversations -- as well as some written conversations from theater plays and written chats. The dataset is designed to help downstream performance of models fine-tuned for tasks requiring the comprehension of spontaneous spoken conversation, such as meeting summarization. Each dialogue is split into speech turns, and each speech turn is labeled with the name of the speaker or a unique identifier.
 * <u>Citation</u>: Julie Hunter, Jérôme Louradour, Virgile Rennard, Ismaïl Harrando, Guokan Shang, Jean-Pierre Lorré (2023). The Claire French Dialogue Dataset. [arXiv:2311.16840](https://arxiv.org/abs/2311.16840).
 
 #### CroissantAligned
-* <u>Source</u>: [croissantllm/croissant_dataset_no_web_data](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data/tree/main/aligned_36b) (aligned_36b). License: not specified.
-* <u>Extracted from</u>: [OPUS](https://opus.nlpl.eu/), theses, [song lyrics](https://www.lacoccinelle.net)
-* <u>Description</u>: A collection of English-French translation pairs selected by a custom filtering pipeline. Designed to "improve the multilingual capabilities of the model" ([Arxiv paper](https://arxiv.org/pdf/2402.00786)).
+* <u>Source</u>: [croissantllm/croissant_dataset_no_web_data](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data/tree/main/aligned_36b) (subset: `aligned_36b`). License: not specified.
+* <u>Extracted from</u>: 
+  * Translation pairs: [OPUS](https://opus.nlpl.eu/) (99.6% of the data in CroissantAligned). Pairs extracted from OPUS are labeled as "UnbabelFrEn". License: .
+  * Thesis abstracts: French thesis abstract pairs. License: [ETALAB-Licence-Ouverte-v2.0](https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf).
+  * Song lyrics: [lacoccinelle](https://www.lacoccinelle.net). License: .
+* <u>Description</u>: Data extracted from OPUS takes the form of sentences pairs, where one sentence is in French and the other is in English. OPUS pairs were passed through a custom pipeline designed to select the highest quality sentences pairs. Selected pairs are labeled "UnbabelFrEn" in the CroissantAligned dataset. The thesis abstract subset contains pairs of French or English thesis abstracts paired with translations written by the thesis author. The song lyrics are translated by contributors to www.lacoccinelle.net. Parallel data are used to boost the multilingual capabilities of models trained on them ([Faysse et al.,2024](https://arxiv.org/pdf/2402.00786)).
 * <u>Citation</u>: Manuel Faysse, Patrick Fernandes, Nuno M. Guerreiro, António Loison, Duarte M. Alves, Caio Corro, Nicolas Boizard, João Alves, Ricardo Rei, Pedro H. Martins, Antoni Bigata Casademunt, François Yvon, André F.T. Martins, Gautier Viaud, Céline Hudelot, Pierre Colombo (2024). "CroissantLLM: A Truly Bilingual French-English Language Model," [arXiv:2402.00786](https://arxiv.org/abs/2402.00786).
 
 #### DiscoursPublics
@@ -1035,7 +1039,7 @@ The table provides the number of documents, words, tokens, and characters for ea
 #### Eurovoc
 * <u>Source</u>:   [EuropeanParliament/Eurovoc](https://huggingface.co/datasets/EuropeanParliament/Eurovoc). License: [EUPL 1.1](https://joinup.ec.europa.eu/licence/european-union-public-licence-version-11-or-later-eupl).
 * <u>Extracted from</u>: [Cellar](https://op.europa.eu/en/web/cellar). License: [Open](https://op.europa.eu/en/web/cellar).
-* <u>Description</u>: A collection of mutlilingual documents from the data repository of the Publications Office of the European Union annotated with Eurovoc labels. 
+* <u>Description</u>: A collection of mutlilingual documents from the data repository of the Publications Office of the European Union annotated with Eurovoc labels. Dataset containing text retrieved through OCR.
 * <u>Citations</u>:
   * Ilias Chalkidis, Emmanouil Fergadiotis, Prodromos Malakasiotis, Nikolaos Aletras, and Ion Androutsopoulos (2019). "Extreme Multi-Label Legal Text Classification: A Case Study in EU Legislation," Proceedings of the Natural Legal Language Processing Workshop 2019, pages 78–87, Minneapolis, Minnesota. Association for Computational Linguistics.
   * Ilias Chalkidis,  Manos Fergadiotis, Prodromos Malakasiotis and Ion Androutsopoulos (2019). "Large-Scale Multi-Label Text Classification on EU Legislation," Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics (ACL 2019), Florence, Italy, (short papers).
@@ -1045,19 +1049,19 @@ The table provides the number of documents, words, tokens, and characters for ea
 #### FineWebEdu
 * <u>Source</u>: [HuggingFaceFW/fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
 * <u>Extracted from</u>: [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
-* <u>Description</u>: A 1.3 trillion token selection from [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), which contains 15 trillion tokens of curated data from 96 Common Crawl dumps. Content in FineWebEdu has been selected by a custom designed classifier for its high-quality, educational content. 
+* <u>Description</u>: A 1.3 trillion token selection from [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), which contains 15 trillion tokens of curated data from 96 Common Crawl dumps. Content in FineWebEdu has been selected by a custom designed classifier for its high-quality, educational content. Knowledge cutoff: 2019-2024.
 * <u>Citation</u>: Guilherme Penedo, Hynek Kydlíček, Loubna Ben allal, Anton Lozhkov, Margaret Mitchell, Colin Raffel, Leandro Von Werra, Thomas Wolf (2024). "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale," [	arXiv:2406.17557](https://arxiv.org/abs/2406.17557).
 
 #### GallicaMonographies
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Books](https://huggingface.co/datasets/PleIAs/French-PD-Books). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
-* <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)).
+* <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Citation</u>: No paper found.
 
 #### GallicaPress
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
-* <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)).
+* <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Citation</u>: No paper found.
 
 #### Gutenberg
@@ -1069,10 +1073,11 @@ The table provides the number of documents, words, tokens, and characters for ea
   * <u>Citation</u>: No paper found.
 
 #### HAL
-* <u>Source</u>:
+* <u>Source</u>: The ROOTS corpus by BigScience (unpublished). License: CC BY-4.0.
 * <u>Extracted from</u>: [HAL](https://hal.science/).
-* <u>Description</u>: A collection of scientific papers and manuscripts distributed through an open science platform.
-* <u>Citation</u>: 
+* <u>Description</u>: A collection of scientific papers and manuscripts distributed through an open science platform. Dataset containing text retrieved through OCR.
+* <u>Citation</u>: Hugo Laurençon, Lucile Saulnier, Thomas Wang, Christopher Akiki, Albert Villanova del Moral, Teven Le Scao, Leandro Von Werra, Chenghao Mou, Eduardo González Ponferrada, Huu Nguyen, Jörg Frohberg, Mario Šaško, Quentin Lhoest, Angelina McMillan-Major, Gerard Dupont, Stella Biderman, Anna Rogers, Loubna Ben allal, Francesco De Toni, Giada Pistilli, Olivier Nguyen, Somaieh Nikpoor, Maraim Masoud, Pierre Colombo, Javier de la Rosa, Paulo Villegas, Tristan Thrush, Shayne Longpre, Sebastian Nagel, Leon Weber, Manuel Muñoz, Jian Zhu, Daniel Van Strien, Zaid Alyafeai, Khalid Almubarak, Minh Chien Vu, Itziar Gonzalez-Dios, Aitor Soroa, Kyle Lo, Manan Dey, Pedro Ortiz Suarez, Aaron Gokaslan, Shamik Bose, David Adelani, Long Phan, Hieu Tran, Ian Yu, Suhas Pai, Jenny Chim, Violette Lepercq, Suzana Ilic, Margaret Mitchell, Sasha Alexandra Luccioni, Yacine Jernite (2022). [The BigScience ROOTS Corpus: A 1.6TB Composite Multilingual Dataset](https://proceedings.neurips.cc/paper_files/paper/2022/hash/ce9e92e3de2372a4b93353eb7f3dc0bd-Abstract-Datasets_and_Benchmarks.html). Advances in Neural Information Processing Systems (NeurIPS), 35, 31809-31826.
+
 
 #### InterventionsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
@@ -1081,13 +1086,13 @@ The table provides the number of documents, words, tokens, and characters for ea
 * <u>Citation</u>: No paper found.
 
 #### MathPile
-* <u>Source</u>: [GAIR/MathPile_Commercial](https://huggingface.co/datasets/GAIR/MathPile_Commercial). License: CC BY-SA 4.0
-* <u>Extracted from</u>: [MathPile](https://huggingface.co/datasets/GAIR/MathPile). License: CC BY-SA-NC 4.0.
+* <u>Source</u>: [GAIR/MathPile_Commercial](https://huggingface.co/datasets/GAIR/MathPile_Commercial). License: [CC BY-SA 4.0](https://huggingface.co/datasets/GAIR/MathPile_Commercial)
+* <u>Extracted from</u>: [MathPile](https://huggingface.co/datasets/GAIR/MathPile). License: [CC BY-SA-NC 4.0](https://huggingface.co/datasets/GAIR/MathPile).
 * <u>Description</u>: A preprocessed collection of documents focused on math, including Textbooks, arXiv, Wikipedia, ProofWiki, StackExchange, and web pages from Common Crawl. The content targets a range of levels, from kindergarten through postgraduate level. MathPile_Commercial was obtained by removing documents from MathPile that do not allow commercial use.
 * <u>Citation</u>: Zengzhi Wang, Rui Xia and Pengfei Liu (2023). "Generative AI for Math: Part I -- MathPile: A Billion-Token-Scale Pretraining Corpus for Math," [	arXiv:2312.17120](https://export.arxiv.org/abs/2312.17120).
 
 #### OpenData
-* <u>Source</u>: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main) (balo, dole, inca, kali, legi and sarde subsets). License: ODC-BY.
+* <u>Source</u>: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main) (balo, dole, inca, kali, legi and sarde subsets). License: [ODC-BY](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
 * <u>Extracted from</u>: [OpenData](https://echanges.dila.gouv.fr/OPENDATA/) (Data collection date: October, 2023).
 * <u>Description</u>: "The French Government Open Data (DILA) Dataset is a collection of text data extracted from various sources provided by the French government, specifically the Direction de l'information légale et administrative (DILA). This dataset contains a wide range of legal, administrative, and legislative documents. The data has been organized into several categories for easy access and analysis" (from the [dataset card](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main)).
 * <u>Citation</u>: No paper found.
@@ -1101,19 +1106,19 @@ The table provides the number of documents, words, tokens, and characters for ea
 #### PeS2o
 * <u>Source</u>: [allenai/peS2o](https://huggingface.co/datasets/allenai/peS2o). License: 	[ODC BY-v1.0](https://opendatacommons.org/licenses/by/1-0/)
 * <u>Extracted from</u>: [S2ORC](https://github.com/allenai/s2orc) (see [aclanthology](https://aclanthology.org/2020.acl-main.447/)). Knowledge cutoff: 2023-01-03.
-* <u>Description</u>: A preprocessed collection of academic papers designed for pre-training of language models. It includes a subset of full papers and another subset of titles and abstracts.
+* <u>Description</u>: A preprocessed collection of academic papers designed for pre-training of language models. PeS2o is composed of two subsets: one containing full papers and one containing only paper titles and abstracts. Dataset containing (some) text retrieved through OCR.
 * <u>Citation</u>: Luca Soldaini and Kyle Lo (2023). "peS2o (Pretraining Efficiently on S2ORC) Dataset}, Allen Institute for AI. [GitHub](https://github.com/allenai/pes2o).
 
 #### Pile (Uncopyrighted)
-* <u>Source</u>: [monology/pile-uncopyrighted](https://huggingface.co/datasets/monology/pile-uncopyrighted).
-* <u>Extracted from</u>: FreeLaw, StackExchange, USPTO Backgrounds, DM Mathematics, Ubuntu IRC, Phil Papers, NIH ExPorter from [The Pile](https://huggingface.co/datasets/EleutherAI/pile). License: MIT.
+* <u>Source</u>: [monology/pile-uncopyrighted](https://huggingface.co/datasets/monology/pile-uncopyrighted). License: [Other](https://huggingface.co/datasets/monology/pile-uncopyrighted).
+* <u>Extracted from</u>: [FreeLaw](https://free.law/), [StackExchange](https://stackexchange.com/), [USPTO Backgrounds](https://bulkdata.uspto.gov/), [DM Mathematics](https://github.com/google-deepmind/mathematics_dataset), [Ubuntu IRC](https://irclogs.ubuntu.com/), [PhilPapers](https://philpapers.org/), NIH ExPorter from [The Pile](https://huggingface.co/datasets/EleutherAI/pile). License: MIT.
 * <u>Description</u> (from the [Datasheet](https://arxiv.org/abs/2201.07311)):
   * FreeLaw: "The Free Law Project is US registered non-profit that provide access to millions of legal opinions and analytical tools for academic studies in the legal realm."
   * StackExchange: "The StackExchange dataset is a dump of anonymized user-contributed content on the Stack Exchange network, a popular collection of websites centered around user-contributed questions and answers."
-  * USPTO Backgrounds: "The USPTO Backgrounds dataset is a set of background sections from patents granted by the United States Patent and Trademark Office, derived from its published [bulk archives](https://bulkdata.uspto.gov/)."
+  * USPTO Backgrounds: "The USPTO Backgrounds dataset is a set of background sections from patents granted by the United States Patent and Trademark Office, derived from its published bulk archives."
   * DM Mathematics: "The DeepMind Mathematics dataset consists of a collection of mathematical problems such as algebra, arithmetic, calculus, number theory, and probability, formatted as natural language prompts [Saxton et al., 2019](https://arxiv.org/abs/1904.01557)."
-  * Ubuntu IRC: "The Ubuntu IRC dataset is derived from the publicly available [chatlogs](https://irclogs.ubuntu.com/) of all Ubunturelated channels on the Freenode IRC chat server."
-  * PhilPapers: [PhilPapers](https://philpapers.org/) is a dataset of open access philosophy publications from an international database maintained by the Center for Digital Philosophy at the University of Western Ontario.
+  * Ubuntu IRC: "The Ubuntu IRC dataset is derived from the publicly available chatlogs of all Ubunturelated channels on the Freenode IRC chat server."
+  * PhilPapers: a dataset of open access philosophy publications from an international database maintained by the Center for Digital Philosophy at the University of Western Ontario.
   * NIH ExPORTER: "The NIH Grant abstracts provides a bulk-data repository for awarded applications through the ExPORTER4 service covering the fiscal years 1985-present."
 * <u>Citation</u>:
   * Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, Shawn Presser, Connor Leahy (2020). "The Pile: An 800GB Dataset of Diverse Text for Language Modeling," [	arXiv:2101.00027](https://arxiv.org/abs/2101.00027).
@@ -1122,28 +1127,31 @@ The table provides the number of documents, words, tokens, and characters for ea
 #### QuestionsEcritesParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([text](https://data.regardscitoyens.org/nosdeputes.fr/)). License: [CC BY-NC-SA](https://data.regardscitoyens.org/nosdeputes.fr/).
-* <u>Description</u>: Collection of long written questions, read during a session at the french national assembly: from a member of french parliament to a minister  (Minister got 2 month to respond). ([text](https://data.regardscitoyens.org/nosdeputes.fr/)).
+* <u>Description</u>: Collection of long written questions, read during a session at the French National Assembly. Questions are asked by a member of the French parliament and addressed to a minister (who is given two months to respond). 
 * <u>Citation</u>: No paper found.
 
 #### RedPajama (v2)
-* <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: Apache 2.0 (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
-* <u>Description</u>: "RedPajama-V2 is an open dataset for training large language models. The dataset includes over 100B text documents coming from 84 CommonCrawl snapshots and processed using the [CCNet](https://github.com/facebookresearch/cc_net) pipeline. Out of these, there are 30B documents in the corpus that additionally come with quality signals, and 20B documents that are deduplicated" (from [GitHub](https://github.com/togethercomputer/RedPajama-Data)).
+* <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
+* <u>Extracted from</u>: [Common Crawl](https://commoncrawl.org/).
+* <u>Description</u>: "RedPajama-V2 is an open dataset for training large language models. The dataset includes over 100B text documents coming from 84 CommonCrawl snapshots and processed using the [CCNet](https://github.com/facebookresearch/cc_net) pipeline. Out of these, there are 30B documents in the corpus that additionally come with quality signals, and 20B documents that are deduplicated" (from [GitHub](https://github.com/togethercomputer/RedPajama-Data)). Knowledge cutoff: 2014-2023.
 * <u>Citation</u>: Together Computer (2023). "RedPajama-Data-v2: an Open Dataset with 30 Trillion Tokens for Training Large Language Models," [GitHub](https://github.com/togethercomputer/RedPajama-Data).
 
 #### STAC
-* <u>Source</u>: [STAC](https://www.irit.fr/STAC/corpus.html). License: CC BY-SA-NC 4.0.
+* <u>Source</u>: [STAC](https://www.irit.fr/STAC/corpus.html). License: [CC BY-SA-NC 4.0](https://www.irit.fr/STAC/corpus.html).
+* <u>Extracted from</u>: [STAC](https://www.irit.fr/STAC/corpus.html). The full STAC corpus contains annotations for discourse structure. We use only the text of the chats.
 * <u>Description</u>: A collection of chats from an online version of the game Settlers of Catan.
 * <u>Citation</u>: Nicholas Asher, Julie Hunter, Mathieu Morey, Farah Benamara and Stergos Afantenos (2016). "Discourse structure and dialogue acts in multiparty dialogue: the STAC corpus," The Tenth International Conference on Language Resources and Evaluation (LREC 2016). European Language Resources Association, pp. 2721-2727.
 
 #### TheStack
-* <u>Source</u>: [bigcode/the-stack-dedup](https://huggingface.co/datasets/bigcode/the-stack-dedup). License: Other (mixture of copyleft licenses).
-* <u>Description</u>: "The Stack contains over 6TB of permissively-licensed source code files covering 358 programming languages. The dataset was created as part of the BigCode Project, an open scientific collaboration working on the responsible development of Large Language Models for Code (Code LLMs). The Stack serves as a pre-training dataset for Code LLMs, i.e., code-generating AI systems which enable the synthesis of programs from natural language descriptions as well as other from code snippets. This is the near-deduplicated version with 3TB data" (from the [dataset card](https://huggingface.co/datasets/bigcode/the-stack-dedup)).
+* <u>Source</u>: [bigcode/the-stack-dedup](https://huggingface.co/datasets/bigcode/the-stack-dedup). License: [Other](https://huggingface.co/datasets/bigcode/the-stack-dedup) (mixture of copyleft licenses).
+* <u>Extracted from</u>: [GHarchive](https://www.gharchive.org/)
+* <u>Description</u>: "The Stack contains over 6TB of permissively-licensed source code files covering 358 programming languages. The dataset was created as part of the [BigCode Project](https://www.bigcode-project.org/), an open scientific collaboration working on the responsible development of Large Language Models for Code (Code LLMs). The Stack serves as a pre-training dataset for Code LLMs, i.e., code-generating AI systems which enable the synthesis of programs from natural language descriptions as well as other from code snippets. This is the near-deduplicated version with 3TB data" (from the [dataset card](https://huggingface.co/datasets/bigcode/the-stack-dedup)).
 * <u>Citation</u>: Denis Kocetkov, Raymond Li, Loubna Ben Allal, Jia Li, Chenghao Mou, Carlos Muñoz Ferrandis, Yacine Jernite, Margaret Mitchell, Sean Hughes, Thomas Wolf, Dzmitry Bahdanau, Leandro von Werra and Harm de Vries (2022). "The Stack: 3 TB of permissively licensed source code," [arxiv:2211.15533](https://arxiv.org/abs/2211.15533).
 
 #### Theses
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL???]().
-* <u>Description</u>: 
+* <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL](https://hal.science/).
+* <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
 * <u>Citation</u>: No paper found.
 
 #### Wikipedia, Wikisource, Wiktionary
@@ -1152,14 +1160,14 @@ The table provides the number of documents, words, tokens, and characters for ea
   * [OpenLLM-France/wikipedia](https://huggingface.co/datasets/OpenLLM-France/wikipedia)
   * [OpenLLM-France/wikisource](https://huggingface.co/datasets/OpenLLM-France/wikisource)
   * [OpenLLM-France/wiktionary](https://huggingface.co/datasets/OpenLLM-France/wiktionary)
-* <u>Extracted from</u>: [Wikimedia dumps](https://dumps.wikimedia.org/other/enterprise_html/runs/). License: [GFDL/CC BY-SA](https://dumps.wikimedia.org/legal.html)
+* <u>Extracted from</u>: [Wikimedia dumps](https://dumps.wikimedia.org/other/enterprise_html/runs/). License: [GFDL/CC BY-SA](https://dumps.wikimedia.org/legal.html).
 * <u>Description</u>:
 * <u>Citation</u>: No paper found.
 
 #### YouTube
 * <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France).
-* <u>Extracted from</u>:
-* <u>Description</u>: 
+* <u>Extracted from</u>: [YouTube](https://www.youtube.com/). License: .
+* <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube.
 * <u>Citation</u>: No paper found.
 
 ## Example use in python
