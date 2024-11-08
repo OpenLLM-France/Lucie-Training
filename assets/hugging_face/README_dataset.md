@@ -82,8 +82,9 @@ The following figure shows the distribution of the dataset by language (colors) 
 The following table provides an overview of the dataset composition,
 broken down by source and language.
 Sources are grouped by category.
-The table provides the number of documents, words, tokens, and characters for each subset.
+The table provides the numbers of documents, words, tokens, and characters for each subset.
 All numbers in this table are available in the CSV file [dataset_composition.csv](metadata/dataset_composition.csv).
+The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://huggingface.co/OpenLLM-France/Lucie-7B).
 
 <!-- The following is automatically generated. Do not update manually. -->
 <!-- TABLE START -->
