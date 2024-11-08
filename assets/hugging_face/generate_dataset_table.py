@@ -12,6 +12,8 @@ _parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpat
 _stats_filename = os.path.join(_parent_folder, "assets", "stats_datasets.csv")
 _stats_filename_detailed = os.path.join(_parent_folder, "assets", "stats_datasets_detailed.csv")
 
+USE_HATCH_FOR_CATEGORIES = True
+
 _web_datasets = ["RedPajama", "FineWebEdu"]
 
 _meta_datasets = [
@@ -467,12 +469,14 @@ if __name__ == "__main__":
 
     def key_category(category, df):
         if "code" in category.lower() or "programming" in category.lower():
+            return 1
+        if "multilingual" in category.lower():
             return 0
         num_tokens = df[df["category"] == category]["B tokens"].sum()
         if category.startswith("Legislative"):
             num_tokens = sum(
                 df[df["category"] == subcat]["B tokens"].sum()
-                for subcat in ["Legislative Texts", "Legislative Transcripts"]
+                for subcat in ["Legislative Texts", "Legislative Transcripts", "Legislative"]
             )
         else:
             num_tokens = df[df["category"] == category]["B tokens"].sum()
@@ -524,17 +528,10 @@ if __name__ == "__main__":
     if True:
         # Plot pie
 
-        def more_dense_hatch(hatch):
-            if hatch in ["o"]:
-                return hatch
-            if hatch in ["-", "+"]:
-                return hatch * 3
-            return hatch * 2
-
         def format_percentage(pct):
             return f"{pct:.1f}%" if pct > min_percent_for_label else ""
 
-        hatch_styles = {
+        map_hatch = {
             "fr": "/",
             "en": "*",
             "de": ".",
@@ -542,14 +539,42 @@ if __name__ == "__main__":
             "it": "|",
             "code": "o",
             "parallel": "+",
+            "Multilingual Parallel Corpora": "",
+            "Programming": "",
+            "Web": "/",
+            "Newspaper": ".",
+            "Technical": "x",
+            "Book": "*",
+            "Legislative": "-",
+            "Legislative Texts": "-",
+            "Legislative Transcripts": "-",
+            "Wiki": "o",
+            "Math": "\\",
+            "Forum": "|",
+            "Dialogue": "+",
         }
 
-        min_percent_for_label = 0.6
+        map_colors = {
+            "fr": "royalblue",  # "mediumblue", # "blue",
+            "en": "crimson",  # "red",
+            "de": "mediumpurple",  # "purple",
+            "es": "gold",  # "orange",
+            "it": "seagreen",  # "olive", # "green",
+            "code": "black",  # "gray",
+            "parallel": "gray",  # "pink",
+        }
+
+        min_percent_for_label = 0.8
 
         categories = [c for c in categories if c]
         categories = sorted(categories, key=lambda x: key_category(x, df))
+        for i, c in enumerate(categories):
+            if c.startswith("Legislative"):
+                categories[i] = "Legislative"
+        categories = list(dict.fromkeys(categories))  # Remove duplicates without resorting
         num_colors = len(categories)
         rainbow_colors = [plt.cm.gist_rainbow(i / num_colors) for i in range(num_colors)]
+        languages = [k for k in map_colors.keys() if len(k) == 2]
         # rainbow_colors_1 = rainbow_colors[: len(rainbow_colors) // 2]
         # rainbow_colors_2 = rainbow_colors[len(rainbow_colors) // 2 :]
         # rainbow_colors = [color for pair in zip(rainbow_colors_1, rainbow_colors_2) for color in pair]
@@ -559,8 +584,17 @@ if __name__ == "__main__":
             pie_labels = []
             pie_colors = []
             pie_hatches = []
+            pie_categories = []
+            pie_languages = []
+
+            legend_categories = {}
+            legend_languages = {}
+            count_per_category = {}
+            count_per_language = {}
             for _, row in df.iterrows():
                 category = row["category"]
+                if category.startswith("Legislative"):
+                    category = "Legislative"
                 language = to_generic_language(row["language"], parallel=True)
                 subset = row["name"]
                 if language == "code":
@@ -570,43 +604,54 @@ if __name__ == "__main__":
                 if subset == "RedPajama":
                     subset += f"-{row['language']}"
                 pie_values.append(row[STAT_NAME])
+                pie_categories.append(category)
+                pie_languages.append(language)
                 pie_labels.append(subset)
-                pie_colors.append(rainbow_colors[categories.index(category)])
-                pie_hatches.append(hatch_styles.get(language, ""))
+                pie_colors.append(
+                    map_colors.get(language, "black")
+                    if USE_HATCH_FOR_CATEGORIES
+                    else rainbow_colors[categories.index(category)]
+                )
+                pie_hatches.append(map_hatch.get(category if USE_HATCH_FOR_CATEGORIES else language, "") * 2)
+                count_per_category[category] = count_per_category.get(category, 0) + row[STAT_NAME]
+                count_per_language[language] = count_per_language.get(language, 0) + row[STAT_NAME]
+                rec_hatch = plt.Rectangle((0, 0), 1, 1, fc="white", hatch=pie_hatches[-1], edgecolor="black")
+                rec_color = plt.Rectangle((0, 0), 1, 1, fc=pie_colors[-1], hatch="", edgecolor="black")
+                rec_hatch_and_color = plt.Rectangle(
+                    (0, 0), 1, 1, fc=pie_colors[-1], hatch=pie_hatches[-1], edgecolor="black"
+                )
+                if len(language) == 2:
+                    legend_categories[category] = rec_hatch
+                    legend_languages[language] = rec_color
+                else:
+                    legend_categories[category] = rec_hatch_and_color
 
             new_labels = []
             for lab, v in zip(pie_labels, pie_values):
                 percentage = v / sum(pie_values) * 100
                 sep = "\n" if percentage > 2.6 else " "
-                label = f"{lab}{sep}({percentage:.1f}%)"
+                label = f"$\\bf{{{lab}}}${sep}({percentage:.1f}%)"
                 new_labels.append(label)
             pie_labels = new_labels
 
-            pie_data = list(
-                zip(
-                    pie_values,
-                    pie_labels,
-                    pie_colors,
-                    pie_hatches,
-                )
-            )
+            pie_data = list(zip(pie_values, pie_labels, pie_colors, pie_hatches, pie_categories, pie_languages))
 
             def get_counts(x):
                 value_subset = x[0]
                 value_dataset = sum(p[0] for p in pie_data if p[1] == x[1])
                 value_category = sum(p[0] for p in pie_data if p[2] == x[2])
                 value_language = sum(p[0] for p in pie_data if p[3] == x[3])
-                # if x[3] == hatch_styles["code"]:
+                # if x[3] == map_hatch["code"]:
                 #     value_category = 0
-                # if x[3] == hatch_styles["parallel"]:
+                # if x[3] == map_hatch["parallel"]:
                 #     value_category = 1
-                value_category = -rainbow_colors.index(x[2])
-                value_language = -list(hatch_styles.values()).index(x[3])
+                value_category = -categories.index(x[4])
+                value_language = -list(map_hatch.keys()).index(x[5])
                 return (value_category, value_language, value_dataset, value_subset)
 
             pie_data = sorted(pie_data, key=get_counts, reverse=True)
 
-            pie_values, pie_labels, pie_colors, pie_hatches = zip(*pie_data)
+            pie_values, pie_labels, pie_colors, pie_hatches, pie_categories, pie_languages = zip(*pie_data)
             pie_labels = list(pie_labels)
             pie_hatches = list(pie_hatches)
 
@@ -615,7 +660,7 @@ if __name__ == "__main__":
             for i, v in enumerate(pie_values):
                 if v < min_percent_for_label:
                     pie_labels[i] = ""  # "other"
-                    pie_hatches[i] = pie_hatches[i] * 2  # more_dense_hatch(pie_hatches[i])
+                    # pie_hatches[i] = pie_hatches[i] * 2
             # Remove duplicates
             reference = None
             for i, v in enumerate(pie_labels):
@@ -635,33 +680,41 @@ if __name__ == "__main__":
                 startangle=90 * 2,
                 counterclock=False,
                 labeldistance=1.05,
-                explode=[0.05 if lab else 0 for lab in pie_labels],
+                explode=[0.1 if lab else 0.05 for lab in pie_labels],
             )
             plt.axis("equal")
 
             # Custom legend
-            labels, hatches, colors = [], [], []
-            labels += categories
-            hatches += ["" for i in categories]
-            colors += rainbow_colors
-            labels += list(hatch_styles.keys())
-            hatches += list(hatch_styles.values())
-            colors += ["white"] * len(hatch_styles)
-            hatches[labels.index("Multilingual Parallel Corpora")] = hatch_styles["parallel"]
-            hatches[labels.index("Programming")] = hatch_styles["code"]
-            for label in "code", "parallel":
-                i = labels.index(label)
-                labels.pop(i)
-                hatches.pop(i)
-                colors.pop(i)
-            hatches = [more_dense_hatch(c) for c in hatches]
-            labels = [format_language(lab) for lab in labels]
+            def format_category_for_pie(category):
+                cat = category.replace(" Parallel Corpora", "")
+                percent = count_per_category[category] / sum(count_per_category.values()) * 100
+                return f"{cat} ({precision_at_least(percent, 0)}%)"
 
-            legend = [
-                plt.Rectangle((0, 0), 1, 1, fc=colors[i], hatch=hatches[i], edgecolor="black")
-                for i in range(len(labels))
-            ]
-            plt.legend(legend, labels, title_fontsize="large")
-            plt.title(STAT_NAME)
+            def format_language_for_pie(language):
+                lang = format_language(language, include_lang_code=False)
+                percent = count_per_language[language] / sum(count_per_language.values()) * 100
+                return f"{lang} ({precision_at_least(percent, 0)}%)"
+
+            nothing = plt.Rectangle((0, 0), 1, 1, fc="white", edgecolor="white")
+            legend_and_labels = (
+                [(nothing, "$\\bf{Categories}$")]
+                + [(legend_categories[label], format_category_for_pie(label)) for label in categories]
+                + [(nothing, "$\\bf{Languages}$")]
+                + [(legend_languages[label], format_language_for_pie(label)) for label in languages]
+                + [(nothing, "") for i in range(len(categories) - len(languages))]
+            )
+            legend, labels = zip(*legend_and_labels)
+            plt.legend(
+                legend,
+                labels,
+                ncols=2,
+                fontsize="large",
+                # markerscale=20,
+                shadow=True,
+                # loc="upper left",
+                loc="best",
+                bbox_to_anchor=(-0.1, 0.0, 0.5, 1),
+            )
+            # plt.title(STAT_NAME)
 
         plt.show()
