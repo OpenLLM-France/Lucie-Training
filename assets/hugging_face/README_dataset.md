@@ -54,11 +54,11 @@ The corpus contains the following information for each text sample:
 * `source`: an identifier for the source(s) of the text sample (`Wikipedia`, `RedPajama`, `Gutenberg`, …).
   The list of all sources is described in this document.
 * `id`: an identifier that is unique among the source.
-* `language`: the language of the text sample, which can be:
-    * the ISO 639-1 code of a natural language: `en`, `fr`, `de`, `es`, or `it`;
-    * the common name prefixed by "`code:`" of a programming language:  `code:python`, `code:c++`, …; or
-    * a list of ISO 639-1 codes separated by commas, if the text sample is multilingual: `fr,en`, `de,fr`, `es,en`, `it,en`
-     (or in the opposite order if the languages appear in the opposite order in the text).
+* `language`: the language of the text sample (relying on the source, that information can be wrong). Possible values are:
+    * an ISO 639-1 code of a natural language: `en`, `fr`, `de`, `es`, or `it`;
+    * a common name prefixed by "`code:`" of a programming language:  `code:python`, `code:c++`, …; or
+    * a list of ISO 639-1 codes separated by commas, if the text sample is multilingual: `fr,en`, `de,fr`, `es,en`, `it,en`,
+     or one of those pairs in the opposite order if the languages appear in the opposite order in the text.
 * `url` (optional): the URL of the original text sample on the web, if available.
 * `title` (optional): the title of the original text sample, if available.
 * `author` (optional): the author of the original text sample, if available.
@@ -83,6 +83,7 @@ The following table provides an overview of the dataset composition,
 broken down by source and language.
 Sources are grouped by category.
 The table provides the number of documents, words, tokens, and characters for each subset.
+All numbers in this table are available in the CSV file [dataset_composition.csv](metadata/dataset_composition.csv).
 
 <!-- The following is automatically generated. Do not update manually. -->
 <!-- TABLE START -->

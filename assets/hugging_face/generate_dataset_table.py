@@ -389,7 +389,7 @@ def format_str(f, x, header=None):
 
 def precision_at_least(x, prec=3, length=""):
     if np.isnan(x):
-        return "0"
+        x = 0
     if x < 10**-7:
         return f"{0:{length}.{prec}f}"
     if round(x, prec) >= 100 * (10**-prec):
@@ -518,6 +518,12 @@ if __name__ == "__main__":
         nargs="?",
     )
     parser.add_argument(
+        "output_csv",
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "metadata", "dataset_composition.csv"),
+        help="Output HTML file",
+        nargs="?",
+    )
+    parser.add_argument(
         "output_main",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "README_dataset.md"),
         help="Output main markdown file (with the HTML table included in it)",
@@ -535,7 +541,7 @@ if __name__ == "__main__":
     print(df)
 
     categories = df["category"].unique()
-    print(categories)
+    print("Categories:", list(categories))
 
     fields = (
         [
@@ -547,6 +553,8 @@ if __name__ == "__main__":
             "extra",
         ]
     )
+
+    csv_fields = fields[:2] + ["category"] + fields[2:-1]  # no extra
 
     def key_row(row, df):
         num_tokens = row["B tokens"]
@@ -568,6 +576,22 @@ if __name__ == "__main__":
             num_tokens = df[df["category"] == category]["B tokens"].sum()
         return -num_tokens
 
+    def conform_for_csv(row):
+        new_row = {}
+        for f in csv_fields:
+            new_row[f] = row[f]
+        num_words = float(row["B words"]) * 1_000_000_000
+        num_chars = float(row["B chars"]) * 1_000_000_000
+        num_tokens = float(row["B tokens"]) * 1_000_000_000
+        num_docs = float(row["M docs"]) * 1_000_000
+        new_row["#words/doc"] = round(num_words / num_docs)
+        new_row["#chars/doc"] = round(num_chars / num_docs)
+        new_row["#tokens/doc"] = round(num_tokens / num_docs)
+        new_row["#char/word"] = round(num_chars / num_words, 1)
+        new_row["#tokens/word"] = round(num_tokens / num_words, 2)
+        return new_row
+
+    new_data = []
     if args.output_md:
         with open(args.output_md, "w") as f:
             f.write(write_md_table_row(fields) + "\n")
@@ -580,7 +604,15 @@ if __name__ == "__main__":
                 df_cat = df[df["category"] == category]
                 rows = [row for irow, row in df_cat.iterrows()]
                 for row in sorted(rows, key=lambda x: key_row(x, df_cat)):
+                    for k in row.keys():
+                        v = row[k]
+                        if isinstance(v, float):
+                            row[k] = precision_at_least(v)
+                    new_data.append(conform_for_csv(row))
                     f.write(write_md_table_row(fields, row) + "\n")
+
+    if args.output_csv:
+        pd.DataFrame(new_data).to_csv(args.output_csv, index=False)
 
     if args.output_html:
         assert args.output_md, "Need to generate the markdown table first"
