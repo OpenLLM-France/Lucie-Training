@@ -8,27 +8,91 @@ The Lucie Training Dataset was used to pretrain [Lucie-7B](https://huggingface.c
 a foundation LLM with strong capabilities in French and English.
 
 Table of Contents:
-* [Dataset Description](#dataset-description)
-  * [Dataset Structure](#dataset-structure)
-  * [Dataset Composition](#dataset-composition)
-    * [Web](#category-web)
-    * [Newspaper](#category-newspaper)
-    * [Technical](#category-technical)
-    * [Book](#category-book)
-    * [Multilingual Parallel Corpora](#category-multilingual-parallel-corpora)
-    * [Legislative Texts](#category-legislative-texts)
-    * [Legislative Transcripts](#category-legislative-transcripts)
-    * [Wiki](#category-wiki)
-    * [Math](#category-math)
-    * [Forum](#category-forum)
-    * [Dialogue](#category-dialogue)
-    * [Programming](#category-programming)
-  * [Details on Data Sources](#details-on-data-sources)
-    <!-- * [RedPajama (v2)](#redpajama-v2) -->
-* [Example use in python](#example-use-in-python)
-* [License](#license)
-* [Citation](#citation)
-* [Contact](#contact)
+<ul>
+  <li><a href="#dataset-description">Dataset Description</a>
+    <ul>
+        <li><a href="#dataset-structure">Dataset Structure</a></li>
+        <li><a href="#dataset-composition">Dataset Composition</a>
+          <table>
+            <tr>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#category-web">Web</a></li>
+                  <li><a href="#category-newspaper">Newspaper</a></li>
+                  <li><a href="#category-technical">Technical</a></li>
+                  <li><a href="#category-book">Book</a></li>
+                </ul>
+              </td>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#category-legislative-texts">Legislative Texts</a></li>
+                  <li><a href="#category-legislative-transcripts">Legislative Transcripts</a></li>
+                  <li><a href="#category-wiki">Wiki</a></li>
+                  <li><a href="#category-math">Math</a></li>
+                </ul>
+              </td>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#category-forum">Forum</a></li>
+                  <li><a href="#category-dialogue">Dialogue</a></li>
+                  <li><a href="#category-multilingual-parallel-corpora">Multilingual Parallel Corpora</a></li>
+                  <li><a href="#category-programming">Programming</a></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </li>
+      <li><a href="#details-on-data-sources">Details on Data Sources</a>
+          <table>
+            <tr>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#amendementsparlement">AmendementsParlement</a></li>
+                  <li><a href="#americanstories">AmericanStories</a></li>
+                  <li><a href="#claire-french-and-english">Claire (French and English)</a></li>
+                  <li><a href="#croissantaligned">CroissantAligned</a></li>
+                  <li><a href="#discourspublics">DiscoursPublics</a></li>
+                  <li><a href="#europarl-monolingual-and-parallel">Europarl (monolingual and parallel)</a></li>
+                  <li><a href="#eurovoc">Eurovoc</a></li>
+                  <li><a href="#finewebedu">FineWebEdu</a></li>
+                  <li><a href="#gallicamonographies">GallicaMonographies</a></li>
+                </ul>
+              </td>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#gallicapress">GallicaPress</a></li>
+                  <li><a href="#gutenberg">Gutenberg</a></li>
+                  <li><a href="#hal">HAL</a></li>
+                  <li><a href="#interventionsparlement">InterventionsParlement</a></li>
+                  <li><a href="#legi">LEGI</a></li>
+                  <li><a href="#mathpile">MathPile</a></li>
+                  <li><a href="#opendata">OpenData</a></li>
+                  <li><a href="#openedition">OpenEdition</a></li>
+                  <li><a href="#pes2o">PeS2o</a></li>
+                </ul>
+              </td>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li><a href="#pile-uncopyrighted">Pile (Uncopyrighted)</a></li>
+                  <li><a href="#questionsecritesparlement">QuestionsEcritesParlement</a></li>
+                  <li><a href="#redpajama-v2">RedPajama (v2)</a></li>
+                  <li><a href="#stac">Stac</a></li>
+                  <li><a href="#thestack">TheStack</a></li>
+                  <li><a href="#theses">Theses</a></li>
+                  <li><a href="#wikipedia-wikisource-wiktionary">Wikipedia, Wikisource, Wiktionary</a></li>
+                  <li><a href="#youtube">YouTube</a></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#example-use-in-python">Example use in python</a></li>
+  <li><a href="#license">License</a></li>
+  <li><a href="#citation">Citation</a></li>
+  <li><a href="#contact">Contact</a></li>
+</ul>
 
 
 ## Dataset Description
