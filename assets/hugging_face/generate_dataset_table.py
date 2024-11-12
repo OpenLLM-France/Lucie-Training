@@ -8,10 +8,12 @@ import mistune
 import numpy as np
 import pandas as pd
 import slugify
+import yaml
 
 _parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-_stats_filename = os.path.join(_parent_folder, "assets", "stats_datasets.csv")
-_stats_filename_detailed = os.path.join(_parent_folder, "assets", "stats_datasets_detailed.csv")
+_asset_folder = os.path.join(_parent_folder, "assets")
+_stats_filename = os.path.join(_asset_folder, "stats_datasets.csv")
+_stats_filename_detailed = os.path.join(_asset_folder, "stats_datasets_detailed.csv")
 
 USE_HATCH_FOR_CATEGORIES = True
 
@@ -64,19 +66,27 @@ def norm_field(key, val, trace_error=None):
     return key, val
 
 
+_category_map = {
+    "legi_written": "Legislative Texts",
+    "legi_spoken": "Legislative Transcripts",
+    "legi_dialogue": "Legislative Transcripts",
+    "aligned": "Multilingual Parallel Corpora",
+}
+
+
+def format_category(category):
+    category = _category_map.get(category.lower(), category)
+    category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
+    return category
+
+
 def compile_stats(row):
     if row["language"] == "code":
         row["language"] = f"{row['subset']}".upper()
 
     category = row["category"]
-    category = {
-        "legi_written": "Legislative Texts",
-        "legi_spoken": "Legislative Transcripts",
-        "legi_dialogue": "Legislative Transcripts",
-        "aligned": "Multilingual Parallel Corpora",
-    }.get(category.lower(), category)
-    category = " ".join([w.capitalize() for w in category.replace("_", " ").split()])
-    row["category"] = category
+    row["category_raw"] = category
+    row["category"] = format_category(category)
 
     subset = row["subset"]
     subset = {
@@ -252,7 +262,7 @@ def to_generic_language(lang, parallel=False):
     return lang
 
 
-def load_stats():
+def load_stats(exclude_persee=True):
     data = {}
     for stat_filename, only_names, excluded_names in [
         (_stats_filename, None, _detail_datasets),
@@ -267,7 +277,7 @@ def load_stats():
                 orig_name = row["name"]
                 row = compile_stats(row)
                 name = row["name"]
-                if name in ["Persee"]:
+                if exclude_persee and name in ["Persee"]:
                     # Exclude from released data
                     continue
                 if only_names and name not in only_names:
@@ -520,13 +530,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "output_csv",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "metadata", "dataset_composition.csv"),
-        help="Output HTML file",
+        help="Output CSV file",
         nargs="?",
     )
     parser.add_argument(
         "output_main",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "README_dataset.md"),
-        help="Output main markdown file (with the HTML table included in it)",
+        help="Output main markdown file (with the HTML table included in it)."
+        " Only the table in it (between special tags) will be replaced.",
         nargs="?",
     )
     parser.add_argument(
@@ -534,10 +545,46 @@ if __name__ == "__main__":
         default="h4",
         help="HTML headers for the table (if None, it will just be centered text)",
     )
+    parser.add_argument(
+        "--pie",
+        default="dataset",
+        choices=["none", "dataset", "training_weights"],
+        help="Which pie chart to plot."
+        "'none' for no pie chart."
+        "'dataset' for dataset distribution."
+        "'training_weights' for dataset distribution taking into account training weights.",
+    )
+    parser.add_argument(
+        "--include_persee",
+        dest="exclude_persee",
+        action="store_false",
+        default=True,
+        help="Weither to add Persee in the dataset statistics",
+    )
     args = parser.parse_args()
 
+    if args.pie == "training_weights":
+        _num_epochs_filename = os.path.join(_asset_folder, "dataset_weights.yaml")
+        assert os.path.isfile(_num_epochs_filename), f"File '{_num_epochs_filename}' does not exist"
+        print(f"Using training weights from '{_num_epochs_filename}'")
+        with open(_num_epochs_filename) as f:
+            _num_epochs = yaml.safe_load(f)
+
+        def get_training_weight(category, language):
+            k = f"{language}--{category}"
+            if k not in _num_epochs:
+                print(f"Warning: No number of epochs for '{k}'")
+                import pdb
+
+                pdb.set_trace()
+            return _num_epochs[k]
+    else:
+
+        def get_training_weight(*kargs, **kwargs):
+            return 1
+
     plt.figure()  # For the pie charts, etc.
-    df = load_stats()
+    df = load_stats(exclude_persee=args.exclude_persee)
     print(df)
 
     categories = df["category"].unique()
@@ -643,7 +690,7 @@ if __name__ == "__main__":
         with open(args.output_main, "w") as f_out:
             f_out.write(new_content)
 
-    if True:
+    if args.pie != "none":
         # Plot pie
 
         map_hatch = {
@@ -708,8 +755,10 @@ if __name__ == "__main__":
             count_per_language = {}
             for _, row in df.iterrows():
                 category = row["category"]
+                category_raw = row["category_raw"]
                 if category.startswith("Legislative"):
                     category = "Legislative"
+                language_raw = to_generic_language(row["language"], parallel=False)
                 language = to_generic_language(row["language"], parallel=True)
                 subset = row["name"]
                 if language == "code":
@@ -718,7 +767,9 @@ if __name__ == "__main__":
                     continue
                 if subset == "RedPajama":
                     subset += f"-{row['language']}"
-                pie_values.append(row[STAT_NAME])
+                amount_value = row[STAT_NAME]
+                amount_value *= get_training_weight(category_raw, language_raw)
+                pie_values.append(amount_value)
                 pie_categories.append(category)
                 pie_languages.append(language)
                 pie_labels.append(subset)
@@ -776,6 +827,9 @@ if __name__ == "__main__":
             sum_values = sum(pie_values)
             pie_values = [v / sum_values * 100 if sum_values else 0 for v in pie_values]
             for i, v in enumerate(pie_values):
+                # if "persee" in pie_labels[i].lower():
+                #     # Force to indicate Persee that is special
+                #     continue
                 if v < min_percent_for_label:
                     pie_labels[i] = ""  # "other"
                     # pie_hatches[i] = pie_hatches[i] * 2
@@ -841,6 +895,8 @@ if __name__ == "__main__":
                 loc="best",
                 bbox_to_anchor=(-0.1, 0.0, 0.5, 1),
             )
-            # plt.title(STAT_NAME)
+            dataset_name = "training dataset" if args.pie == "training_weights" else "dataset"
+            title = f"Composition of {dataset_name}\n({round(sum_values, 3)} {STAT_NAME})"
+            plt.title(title)
 
         plt.show()
