@@ -96,24 +96,37 @@ model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
     ...
 )
 ```
-where `revision` can be one of: "`step0005000`", "`step0010000`", ..., "`step0025000`", "`step0050000`", "`step0075000`", ...
+where `revision` can be one of:
+* ["`step0005000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0005000), ["`step0010000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0010000), ["`step0015000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0015000), ["`step0020000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0020000): each 5000 steps for the first pre-training steps.
+* ["`step0025000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0025000), ["`step0050000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0050000), ["`step0075000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0075000), ["`step0100000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0100000), ..., ["`step0750000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0750000): each 25000 steps from 25k to 750k steps.
+* ["`step0753851`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0753851): last pre-training step before context extension and annealing.
 
 ## Training Details
 
 ### Training Data
 
-The training dataset will be made available soon.
-<!-- at [OpenLLM-France/Lucie-Training-Dataset](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset)
-and described in ["The Lucie Training Dataset" (2024/5)](https://arxiv.org/abs/xxxx.xxxxx). -->
+The training dataset used for the pretraining of Lucie-7B is available
+at [OpenLLM-France/Lucie-Training-Dataset](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset).
+<!-- and described in ["The Lucie Training Dataset" (2024/12)](https://arxiv.org/abs/xxxx.xxxxx). -->
+
+The initial composition of the training data is as follows:
+
+![Initial Data Composition](figures/fig_dataset_composition.png)
+
+Some of the data was upsampled to balance the training data distribution, and the final composition is as follows:
+
+![Training Data Composition](figures/fig_dataset_composition_training.png)
 
 ### Training Procedure 
 
-The training code is available at [https://github.com/OpenLLM-France/Lucie-Training](https://github.com/OpenLLM-France/Lucie-Training),
-and this based on [this fork of Megatron-DeepSpeed](https://github.com/OpenLLM-France/Megatron-DeepSpeed).
-
 Lucie-7B is a causal decoder-only model trained on a causal language modeling task (i.e., predict the next token).
 
-It was trained on 512 H100 80GB GPUs for about <<TODO>> GPU hours on [Jean Zay supercomputer](http://www.idris.fr/eng/jean-zay/jean-zay-presentation-eng.html).
+It was pre-trained on 512 H100 80GB GPUs for about 550\,000 GPU hours on [Jean Zay supercomputer](http://www.idris.fr/eng/jean-zay/jean-zay-presentation-eng.html).
+
+The training code is available at [https://github.com/OpenLLM-France/Lucie-Training](https://github.com/OpenLLM-France/Lucie-Training).
+It is based on [this fork of Megatron-DeepSpeed](https://github.com/OpenLLM-France/Megatron-DeepSpeed).
+
+Optimizer checkpoints are available at [OpenLLM-France/Lucie-7B-optimizer-states](https://huggingface.co/OpenLLM-France/Lucie-7B-optimizer-states).
 
 #### Neural Network Architecture
 
