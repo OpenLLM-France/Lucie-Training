@@ -341,6 +341,14 @@ configs:
   data_files:
   - path: data/natural/*/PeS2o/*.parquet
     split: train
+- config_name: PeS2o-s2ag
+  data_files:
+  - path: data/natural/*/PeS2o/*s2ag.parquet
+    split: train
+- config_name: PeS2o-s2orc
+  data_files:
+  - path: data/natural/*/PeS2o/*s2orc.parquet
+    split: train
 - config_name: Persee
   data_files:
   - path: data/natural/*/Persee/*.parquet
