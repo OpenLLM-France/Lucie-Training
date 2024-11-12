@@ -156,13 +156,13 @@ Training hyperparameters in torch/Megatron-DeepSpeed were the following:
 | Final batch size       | 1024       |
 | Batch size rampup      | by steps of 64 over 10M samples |
 | Context length         | 4096       |
-| Learning rate schedule | warmup + cosine annealing |
+| Learning rate schedule | warmup (2M samples) + cosine annealing |
 | Maximum Learning rate  | 3e-4       |
 | Final Learning rate    | 3e-5       |
 | Weight decay           | 0.1        |
 | Dropout                | _          |
 | Gradient clipping      | 1          |
-| Initializer range      | 0.2        |
+| Initializer range      | 0.009        |
 | Tensor Parallelism (with 512 GPUs)   | 4           |
 | Pipeline Parallelism (with 512 GPUs) | 4           |
 | Data Parallelism (with 512 GPUs)     | 32          |
