@@ -23,7 +23,7 @@ def upload_to_huggingface_hub(
     input: Path,
     message: Optional[str] = None,
     training_steps: Optional[str] = None,
-    type: Literal["final", "checkpoint", "optimizer", "tokenizer", "init"] = "final",
+    type: Literal["final", "checkpoint", "optimizer", "final_optimizer", "tokenizer", "init"] = "final",
     is_optimizer: bool = False,
     format_json: bool = False,
     create_repo: Optional[bool] = None,
@@ -48,7 +48,7 @@ def upload_to_huggingface_hub(
     except (TypeError, ValueError):
         pass
     is_checkpoint = type in ["checkpoint", "optimizer"]
-    is_optimizer = type == "optimizer"
+    is_optimizer = type in ["optimizer", "final_optimizer"]
     is_tokenizer = type == "tokenizer"
     dump_readme = (not is_checkpoint or is_optimizer) and not is_tokenizer
     if is_checkpoint and not is_optimizer:

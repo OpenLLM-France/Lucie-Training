@@ -37,6 +37,7 @@ for UPLOAD_OPTIMIZER in 0 1;do
                 i=$((i+25000))
             done
         fi
+        STEPS="753851 $STEPS"
     else
         echo "Upload optimizer states"
         if [ $UPLOAD_OPTIMIZER -eq 1 ];then
@@ -52,6 +53,7 @@ for UPLOAD_OPTIMIZER in 0 1;do
             STEPS="$i $STEPS"
             i=$((i+25000))
         done
+        STEPS="753851 $STEPS"
     fi
 
     ############################################
@@ -86,6 +88,16 @@ for UPLOAD_OPTIMIZER in 0 1;do
     # 2. Upload checkpoints
 
     for STEP in $STEPS;do
+
+        upload_option=$UPLOAD_OPTION
+        # if [ $STEP -eq 753851 ];then
+        #     if [ $UPLOAD_OPTIMIZER -eq 0 ];then
+        #         upload_option="--type final_optimizer"
+        #     else
+        #         upload_option="--type final"
+        #     fi
+        # fi
+
         FOLDER="$PARENT_FOLDER/global_step$STEP"
 
         # Do not upload again what's already on Hugging Face
@@ -108,7 +120,7 @@ for UPLOAD_OPTIMIZER in 0 1;do
         fi
 
         # Upload model folder to Hugging Face
-        python3 hf_upload_model.py $REPO_NAME $UPLOAD_OPTION \
+        python3 hf_upload_model.py $REPO_NAME $upload_option \
             $FOLDER \
             --training_steps $STEP \
             --message "Upload checkpoint at step $STEP" \
