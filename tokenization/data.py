@@ -326,11 +326,20 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
         for i, parquet_file in enumerate(
             sorted(tqdm.tqdm(files, desc=f"Preparing dataset ({'parquet' if is_parquet else 'jsonl'} files)"))
         ):
-            assert not dataset.max_docs
-            assert not dataset.max_words
-            assert not dataset.max_chars
-            assert dataset.subsample_rate == 1
-            assert not dataset.subsample_invert
+            if isinstance(dataset, DataIterator):
+                assert not dataset.max_docs
+                assert not dataset.max_words
+                assert not dataset.max_chars
+                assert dataset.subsample_rate == 1
+                assert not dataset.subsample_invert
+                kwargs = dict(
+                    key=dataset.key,
+                    preprocess=dataset.preprocess,
+                    postprocess=dataset.postprocess,
+                    filter_fn=dataset.filter_fn,
+                )
+            else:
+                kwargs = {}
             yield DataIterator(
                 datasets.load_dataset(
                     "parquet" if is_parquet else "json",
@@ -339,10 +348,7 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
                     split="train",
                 ),
                 name=f"{dataset.name}:" + (f"{i:03d}" if use_suffix else ""),
-                key=dataset.key,
-                preprocess=dataset.preprocess,
-                postprocess=dataset.postprocess,
-                filter_fn=dataset.filter_fn,
+                **kwargs,
             )
 
     elif isinstance(dataset, (list, types.GeneratorType)):

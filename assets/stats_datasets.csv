@@ -8,7 +8,7 @@ it       ,---                  ,---         ,      ,             ,  99.441,  62.
 fr-en    ,---                  ,---         ,      ,             , 410.032,  17.016, 107.658,         41,        6.3,   25.493,        1.50,        4.22
 es-en    ,---                  ,---         ,      ,             ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
 it-en    ,---                  ,---         ,      ,             ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
-de-fr    ,---                  ,---         ,      ,             ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
+de-fr    ,---                  ,---         ,      ,             ,   1.792,  0.0908,   0.621,         51,        6.8,    0.141,        1.55,        4.41
 code     ,---                  ,---         ,      ,             , 125.768,  51.305, 630.749,        408,       12.3,  228.955,        4.46,        2.75
 fr       ,RedPajama--fr--2019  ,            ,false ,web          , 117.550,  86.934, 540.989,        740,        6.2,  135.128,        1.55,        4.00
 fr       ,RedPajama--fr--2021  ,            ,false ,web          , 112.017,  82.439, 514.093,        736,        6.2,  127.368,        1.55,        4.04
@@ -29,15 +29,15 @@ fr       ,RedPajama--fr--2014  ,            ,false ,web          ,   1.322,   1.
 fr       ,RedPajama--fr--2015  ,            ,false ,web          ,   0.750,   0.776,   4.931,       1035,        6.4,    1.237,        1.59,        3.99
 fr       ,OpenData             ,            ,false ,legi_written ,   1.169,   0.755,   4.638,        646,        6.1,    1.209,        1.60,        3.84
 fr       ,Wikiother.fr         ,            ,false ,wiki         ,   0.836,   0.576,   3.427,        690,        5.9,    0.912,        1.58,        3.76
-fr       ,Gutenberg.fr         ,            ,false ,book         ,   0.003,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
-fr       ,Claire.fr            ,            ,false ,dialogue     ,   0.039,   0.209,   1.314,       5321,        6.3,    0.310,        1.48,        4.23
+fr       ,Gutenberg.fr         ,            ,false ,book         , 0.00345,   0.227,   1.392,      65807,        6.1,    0.383,        1.69,        3.64
+fr       ,Claire.fr            ,            ,false ,dialogue     ,  0.0393,   0.209,   1.314,       5321,        6.3,    0.310,        1.48,        4.23
 fr       ,DiscoursPublics      ,            ,false ,legi_spoken  ,   0.110,   0.163,   1.025,       1481,        6.3,    0.238,        1.47,        4.30
-fr       ,ValidatedYouTube.fr  ,            ,false ,dialogue     ,   0.038,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
+fr       ,ValidatedYouTube.fr  ,            ,false ,dialogue     ,  0.0375,   0.145,   1.003,       3862,        6.9,    0.336,        2.32,        2.98
 fr       ,OtherFr              ,questions_ecrites_parlement,false ,legi_written ,   0.189,   0.108,   0.705,        572,        6.5,    0.156,        1.44,        4.52
 fr       ,OtherFr              ,interventions_parlement,false ,legi_spoken  ,   1.832,   0.104,   0.654,         57,        6.3,    0.157,        1.50,        4.18
-fr       ,OtherFr              ,LEGI        ,false ,legi_written ,   0.621,   0.088,   0.563,        141,        6.4,    0.145,        1.65,        3.88
-fr       ,Europarl.fr          ,            ,false ,legi_dialogue,   0.010,   0.053,   0.339,       5129,        6.4,    0.072,        1.36,        4.73
-fr       ,OtherFr              ,amendements_parlement,false ,legi_written ,   0.673,   0.045,   0.274,         67,        6.1,    0.074,        1.63,        3.71
+fr       ,OtherFr              ,LEGI        ,false ,legi_written ,   0.621,  0.0878,   0.563,        141,        6.4,    0.145,        1.65,        3.88
+fr       ,Europarl.fr          ,            ,false ,legi_dialogue,  0.0103,  0.0528,   0.339,       5129,        6.4,  0.0717,        1.36,        4.73
+fr       ,OtherFr              ,amendements_parlement,false ,legi_written ,   0.673,  0.0452,   0.274,         67,        6.1,  0.0738,        1.63,        3.71
 en       ,FineWebEdu--cc-main-2021,            ,false ,web          ,  94.705,  73.032, 449.530,        771,        6.2,  104.336,        1.43,        4.31
 en       ,FineWebEdu--cc-main-2019,            ,false ,web          ,  85.710,  65.275, 401.924,        762,        6.2,   93.640,        1.43,        4.29
 en       ,FineWebEdu--cc-main-2023,            ,false ,web          ,  76.055,  62.085, 383.741,        816,        6.2,   88.444,        1.42,        4.34
@@ -49,42 +49,42 @@ en       ,AmericanStories      ,            ,true  ,newspaper    ,  59.420,   8.
 en       ,Pile                 ,FreeLaw     ,false ,legi_written ,   3.415,   8.204,  52.580,       2403,        6.4,   14.011,        1.71,        3.75
 en       ,Wikipedia.en         ,            ,false ,wiki         ,   6.893,   4.708,  26.616,        683,        5.7,    7.898,        1.68,        3.37
 en       ,Pile                 ,StackExchange,false ,forum        ,  15.269,   4.534,  33.609,        297,        7.4,   10.275,        2.27,        3.27
-en       ,Gutenberg.en         ,            ,false ,book         ,   0.056,   3.544,  20.579,      62936,        5.8,    5.516,        1.56,        3.73
+en       ,Gutenberg.en         ,            ,false ,book         ,  0.0563,   3.544,  20.579,      62936,        5.8,    5.516,        1.56,        3.73
 en       ,Pile                 ,USPTO_Backgrounds,false ,technical    ,   5.139,   3.492,  22.309,        680,        6.4,    5.105,        1.46,        4.37
 en       ,MathPile             ,            ,false ,math         ,   0.737,   3.408,  27.290,       4626,        8.0,    9.637,        2.83,        2.83
 en       ,Pile                 ,DM_Mathematics,false ,math         ,   0.992,   1.746,   8.127,       1760,        4.7,    4.928,        2.82,        1.65
 en       ,Eurovoc.en           ,            ,true  ,legi_written ,   0.272,   1.523,   9.468,       5594,        6.2,    2.571,        1.69,        3.68
-en       ,Pile                 ,Ubuntu_IRC  ,false ,forum        ,   0.010,   0.867,   5.610,      83577,        6.5,    2.159,        2.49,        2.60
+en       ,Pile                 ,Ubuntu_IRC  ,false ,forum        ,  0.0104,   0.867,   5.610,      83577,        6.5,    2.159,        2.49,        2.60
 en       ,Claire.en            ,            ,false ,dialogue     ,   0.949,   0.818,   4.709,        861,        5.8,    1.161,        1.42,        4.06
-en       ,Pile                 ,PhilPapers  ,false ,technical    ,   0.031,   0.363,   2.304,      11801,        6.3,    0.618,        1.70,        3.73
+en       ,Pile                 ,PhilPapers  ,false ,technical    ,  0.0308,   0.363,   2.304,      11801,        6.3,    0.618,        1.70,        3.73
 en       ,Pile                 ,NIH_ExPorter,false ,technical    ,   0.914,   0.288,   1.979,        315,        6.9,    0.431,        1.50,        4.59
-en       ,Europarl.en          ,            ,false ,legi_dialogue,   0.011,   0.056,   0.339,       5071,        6.0,    0.069,        1.22,        4.92
-en       ,Stac                 ,            ,false ,dialogue     ,   0.000,   0.000,   0.000,       1176,        6.2,    0.000,        2.28,        2.71
+en       ,Europarl.en          ,            ,false ,legi_dialogue,  0.0111,  0.0563,   0.339,       5071,        6.0,  0.0690,        1.22,        4.92
+en       ,Stac                 ,            ,false ,dialogue     ,0.0000450,0.0000529,0.000327,       1176,        6.2,0.000121,        2.28,        2.71
 es       ,RedPajama--es--2022  ,            ,false ,web          , 100.237,  72.062, 442.094,        719,        6.1,  116.673,        1.62,        3.79
 es       ,RedPajama--es--2023  ,            ,false ,web          ,  39.750,  28.868, 177.180,        726,        6.1,   46.710,        1.62,        3.79
 es       ,RedPajama--es--2021  ,            ,false ,web          ,  29.460,  20.821, 127.710,        707,        6.1,   33.742,        1.62,        3.78
 es       ,Wikipedia.es         ,            ,false ,wiki         ,   1.947,   1.245,   7.161,        639,        5.8,    2.124,        1.71,        3.37
 es       ,Eurovoc.es           ,            ,true  ,legi_written ,   0.246,   0.757,   4.684,       3084,        6.2,    1.411,        1.86,        3.32
-es       ,Europarl.es          ,            ,false ,legi_dialogue,   0.010,   0.052,   0.325,       5086,        6.2,    0.073,        1.40,        4.43
-es       ,Gutenberg.es         ,            ,false ,book         ,   0.001,   0.051,   0.303,      69661,        5.9,    0.092,        1.80,        3.30
+es       ,Europarl.es          ,            ,false ,legi_dialogue,  0.0103,  0.0524,   0.325,       5086,        6.2,  0.0733,        1.40,        4.43
+es       ,Gutenberg.es         ,            ,false ,book         ,0.000735,  0.0512,   0.303,      69661,        5.9,  0.0920,        1.80,        3.30
 de       ,RedPajama--de--2022  ,            ,false ,web          ,  95.692,  60.783, 440.845,        635,        7.3,  118.751,        1.95,        3.71
 de       ,RedPajama--de--2023  ,            ,false ,web          ,  39.477,  24.704, 179.027,        626,        7.2,   48.161,        1.95,        3.72
 de       ,RedPajama--de--2021  ,            ,false ,web          ,  27.610,  17.591, 127.759,        637,        7.3,   34.459,        1.96,        3.71
 de       ,Wikipedia.de         ,            ,false ,wiki         ,   2.877,   1.709,  11.252,        594,        6.6,    3.476,        2.03,        3.24
 de       ,Eurovoc.de           ,            ,true  ,legi_written ,   0.247,   0.678,   4.915,       2742,        7.2,    1.497,        2.21,        3.28
-de       ,Gutenberg.de         ,            ,false ,book         ,   0.002,   0.099,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
-de       ,Europarl.de          ,            ,false ,legi_dialogue,   0.010,   0.045,   0.327,       4444,        7.2,    0.073,        1.63,        4.46
+de       ,Gutenberg.de         ,            ,false ,book         , 0.00188,  0.0987,   0.654,      52404,        6.6,    0.193,        1.96,        3.38
+de       ,Europarl.de          ,            ,false ,legi_dialogue,  0.0102,  0.0451,   0.327,       4444,        7.2,  0.0734,        1.63,        4.46
 it       ,RedPajama--it--2022  ,            ,false ,web          ,  57.338,  35.525, 231.918,        620,        6.5,   63.978,        1.80,        3.62
 it       ,RedPajama--it--2023  ,            ,false ,web          ,  23.323,  14.403,  94.066,        618,        6.5,   25.915,        1.80,        3.63
 it       ,RedPajama--it--2021  ,            ,false ,web          ,  16.663,  10.266,  67.028,        616,        6.5,   18.523,        1.80,        3.62
 it       ,Wikipedia.it         ,            ,false ,wiki         ,   1.870,   1.060,   6.161,        567,        5.8,    1.959,        1.85,        3.14
 it       ,Eurovoc.it           ,            ,true  ,legi_written ,   0.245,   0.731,   4.867,       2976,        6.7,    1.527,        2.09,        3.19
-it       ,Gutenberg.it         ,            ,false ,book         ,   0.001,   0.066,   0.414,      68616,        6.3,    0.129,        1.96,        3.21
+it       ,Gutenberg.it         ,            ,false ,book         ,0.000958,  0.0657,   0.414,      68616,        6.3,    0.129,        1.96,        3.21
 fr-en    ,CroissantAligned     ,            ,false ,aligned      , 408.029,  16.911, 107.003,         41,        6.3,   25.351,        1.50,        4.22
 fr-en    ,EuroparlAligned.fr-en,            ,false ,aligned      ,   2.003,   0.105,   0.655,         52,        6.2,    0.143,        1.36,        4.59
 es-en    ,EuroparlAligned.es-en,            ,false ,aligned      ,   1.961,   0.103,   0.631,         52,        6.1,    0.143,        1.39,        4.42
 it-en    ,EuroparlAligned.it-en,            ,false ,aligned      ,   1.901,   0.100,   0.638,         52,        6.4,    0.151,        1.52,        4.22
-de-fr    ,EuroparlAligned.de-fr,            ,false ,aligned      ,   1.792,   0.091,   0.621,         51,        6.8,    0.141,        1.55,        4.41
+de-fr    ,EuroparlAligned.de-fr,            ,false ,aligned      ,   1.792,  0.0908,   0.621,         51,        6.8,    0.141,        1.55,        4.41
 code     ,TheStack             ,javascript  ,false ,programming  ,  21.109,   8.526, 141.647,        404,       16.6,   58.609,        6.87,        2.42
 code     ,TheStack             ,java        ,false ,programming  ,  20.152,   7.421,  89.297,        368,       12.0,   27.680,        3.73,        3.23
 code     ,TheStack             ,c           ,false ,programming  ,   8.626,   5.916,  57.428,        686,        9.7,   24.092,        4.07,        2.38
@@ -108,10 +108,10 @@ code     ,TheStack             ,assembly    ,false ,programming  ,   0.248,   0.
 code     ,TheStack             ,fortran     ,false ,programming  ,   0.165,   0.192,   1.843,       1158,        9.6,    0.780,        4.07,        2.36
 code     ,TheStack             ,julia       ,false ,programming  ,   0.299,   0.152,   1.539,        510,       10.1,    0.660,        4.34,        2.33
 code     ,TheStack             ,ocaml       ,false ,programming  ,   0.160,   0.130,   1.107,        812,        8.5,    0.430,        3.31,        2.58
-code     ,TheStack             ,mathematica ,false ,programming  ,   0.027,   0.120,   1.720,       4454,       14.4,    1.117,        9.32,        1.54
-code     ,TheStack             ,elixir      ,false ,programming  ,   0.282,   0.073,   0.737,        259,       10.1,    0.258,        3.53,        2.85
-code     ,TheStack             ,erlang      ,false ,programming  ,   0.099,   0.066,   0.726,        661,       11.0,    0.260,        3.96,        2.79
-code     ,TheStack             ,clojure     ,false ,programming  ,   0.126,   0.045,   0.492,        355,       11.0,    0.179,        3.98,        2.75
-code     ,TheStack             ,r           ,false ,programming  ,   0.039,   0.028,   0.305,        711,       10.9,    0.158,        5.67,        1.93
-code     ,TheStack             ,matlab      ,false ,programming  ,   0.001,   0.009,   0.037,       8940,        4.3,    0.043,        4.94,        0.87
-code     ,TheStack             ,racket      ,false ,programming  ,   0.004,   0.005,   0.038,       1141,        7.9,    0.015,        3.18,        2.48
+code     ,TheStack             ,mathematica ,false ,programming  ,  0.0269,   0.120,   1.720,       4454,       14.4,    1.117,        9.32,        1.54
+code     ,TheStack             ,elixir      ,false ,programming  ,   0.282,  0.0731,   0.737,        259,       10.1,    0.258,        3.53,        2.85
+code     ,TheStack             ,erlang      ,false ,programming  ,  0.0994,  0.0657,   0.726,        661,       11.0,    0.260,        3.96,        2.79
+code     ,TheStack             ,clojure     ,false ,programming  ,   0.126,  0.0448,   0.492,        355,       11.0,    0.179,        3.98,        2.75
+code     ,TheStack             ,r           ,false ,programming  ,  0.0392,  0.0278,   0.305,        711,       10.9,    0.158,        5.67,        1.93
+code     ,TheStack             ,matlab      ,false ,programming  ,0.000967, 0.00865,  0.0372,       8940,        4.3,  0.0427,        4.94,        0.87
+code     ,TheStack             ,racket      ,false ,programming  , 0.00420, 0.00479,  0.0378,       1141,        7.9,  0.0153,        3.18,        2.48
