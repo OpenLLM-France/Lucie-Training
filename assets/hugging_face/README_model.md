@@ -130,7 +130,7 @@ Optimizer checkpoints are available at [OpenLLM-France/Lucie-7B-optimizer-states
 
 #### Neural Network Architecture
 
-Lucie-7B has the same neural network architecture as Llama3.
+Lucie-7B has the same neural network architecture as [Llama3.1](https://huggingface.co/meta-llama/Llama-3.1-8B).
 It has exactly 6 706 958 336 free parameters,
 with the following hyperparameters:
 | **Hyperparameter**        | **Value** |
