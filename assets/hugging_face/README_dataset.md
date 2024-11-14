@@ -116,22 +116,30 @@ This dataset was made to provide an extensive and diverse dataset for training L
 The corpus contains the following information for each text sample:
 * `text`: the text sample itself.
 * `source`: an identifier for the source(s) of the text sample (`Wikipedia`, `RedPajama`, `Gutenberg`, …).
-  The list of all sources is described in this document.
+  All sources are described in detail [in this document](#details-on-data-sources).
 * `id`: an identifier that is unique among the source.
-* `language`: the language of the text sample (relying on the source, that information can be wrong). Possible values are:
-    * an ISO 639-1 code of a natural language: `en`, `fr`, `de`, `es`, or `it`;
-    * a common name prefixed by "`code:`" of a programming language:  `code:python`, `code:c++`, …; or
-    * a list of ISO 639-1 codes separated by commas, if the text sample is multilingual: `fr,en`, `de,fr`, `es,en`, `it,en`,
-     or one of those pairs in the opposite order if the languages appear in the opposite order in the text.
+* `language`: the language of the text sample (relying on the source, that information can be wrong).
+  <details><summary>Possible values:</summary>
+an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
+a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …) or
+a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
+  or one of those pairs in the opposite order if the languages appear in the opposite order in the text).
+  </details>
 * `url` (optional): the URL of the original text sample on the web, if available.
 * `title` (optional): the title of the original text sample, if available.
 * `author` (optional): the author of the original text sample, if available.
-   Usually the author name in plain text, except for `Gutenberg` where it is the JSON serialized object of the author metadata.
-* `date` (optional): the publication date of the original text sample, if available. The text format of the source depends on the source.
-* `quality_signals` (optional): a list of quality signals about the text sample (that could be used for further filtering or sample weighting).
+  <details><summary>Note:</summary>
+  Usually the author name in plain text, except for `Gutenberg` where it is the JSON serialized object of the author metadata.
+  </details>
+* `date` (optional): the publication date of the original text sample, if available.
+  <details><summary>Note:</summary>
+  The text format of the source depends on the source.
+  </details>
+* `quality_signals` (optional): a list of quality signals about the text sample, in JSON format (that could be used for further filtering or sample weighting).
+  <details><summary>Note:</summary>
   It can include indicators computed by `fasttext` and `CCNet`, statistics about occurrences of characters, words, special characters, etc.
-  This field is always a JSON serialized object.
-* `extra` (optional): JSON serialized extra information about the text sample.
+  </details>
+* `extra` (optional): extra information about the text sample, in JSON format.
   This can include metadata about the source subset, the rights, etc.
 
 Examples of metadata (except from `text`) are shown for each source in [metadata_examples.json](metadata/metadata_examples.json).
