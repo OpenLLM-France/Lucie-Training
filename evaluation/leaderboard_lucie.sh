@@ -1,5 +1,10 @@
 #!/bin/bash
 
+module purge
+module load arch/h100
+module load pytorch-gpu/py3/2.4.0
+conda activate lucie_eval
+
 ## Lucie
 LUCIE_TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped/tokenizer
 CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/transformers_checkpoints
