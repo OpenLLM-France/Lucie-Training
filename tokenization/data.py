@@ -21,6 +21,7 @@ from text import (
     clean_pile_ubuntu,
     clean_theses,
     clean_wikipedia,
+    filter_pile_phil_papers_by_language,
     fix_legi,
     fix_legi_and_remove_title,
     html_unescape,
@@ -563,6 +564,12 @@ class DataIterator(DataIteratorBase):
             "byline": "extra",
             "question": "extra",  # in MathPile (a dict)
             "answers": "extra",  # in MathPile (a list)
+            "field": "extra",  # in MathPile
+            "subfield": "extra",  # in MathPile
+            "model": "extra",  # in MathPile
+            "rag": "extra",  # in MathPile
+            "synthetic_textbooks": "extra",  # in MathPile
+            "topic": "extra",  # in MathPile
         }
         _fields_to_regroup_under_exact = {k: v for k, v in _fields_to_regroup_under.items() if "." not in k}
         _fields_to_regroup_under_fuzzy = {k: v for k, v in _fields_to_regroup_under.items() if "." in k}
@@ -627,6 +634,10 @@ class DataIterator(DataIteratorBase):
                 elif k in ["language"]:
                     # Let the original value
                     pass
+                elif k in ["source"]:
+                    data["extra"] = data.get("extra", {})
+                    data["extra"][k] = data[k]
+                    data[k] = v
                 # elif k in ["source", "subset"]:
                 #     assert isinstance(data[k], str) and isinstance(v, str), f"Cannot merge {k}={data[k]} and {v}"
                 #     data[k] = v + "/" + data[k]
@@ -1703,17 +1714,39 @@ class DataIteratorFineWebEdu(DataIteratorConcat):
                 return False
             return True
 
+        def get_all_parquets(source, streaming=True, split="train", **kwargs):
+            datasets_per_parquet = []
+            idx = 0
+            while True:
+                try:
+                    data_files = f"data/{source}/train-{idx:05d}-of-*.parquet"
+                    print("Loading", data_files)
+                    datasets_per_parquet.append(
+                        DataIterator(
+                            datasets.load_dataset(
+                                repo,
+                                data_files=data_files,
+                                streaming=streaming,
+                                split=split,
+                            ),
+                            name=f"FineWebEdu:{source.lower()}:{idx}",
+                            **kwargs,
+                        )
+                    )
+                    idx += 1
+                except Exception as err:
+                    if not datasets_per_parquet:
+                        raise RuntimeError(f"No parquet files found for {source}") from err
+                    break
+            return DataIteratorConcat(datasets_per_parquet, name=f"FineWebEdu:{source.lower()}")
+
         DataIteratorConcat.__init__(
             self,
             [
-                DataIterator(
-                    datasets.load_dataset(
-                        repo,
-                        data_files=f"data/{source}/*.parquet",
-                        streaming=streaming,
-                        split=split,
-                    ),
-                    name=f"FineWebEdu:{source.lower()}",
+                get_all_parquets(
+                    source,
+                    streaming=streaming,
+                    split=split,
                     filter_fn=filter_fineweb_edu,
                     **kwargs,
                 )
@@ -2184,7 +2217,6 @@ class DataIteratorPes2o(DataIteratorConcat):
             )
         if force_include_all_metadata:
             from_huggingface = True
-            split_by_type = False
 
         if train is not None:
             splits = ["train"] if train else ["validation"]
@@ -2193,6 +2225,12 @@ class DataIteratorPes2o(DataIteratorConcat):
 
         if from_huggingface:
             repo = "allenai/peS2o"
+
+            path_prefix = ""
+            # repo = "json"
+            # path_prefix = os.path.join(os.environ['HOME'],
+            #   ".cache/huggingface/hub/datasets--allenai--peS2o/snapshots/636a503e44a3ca1b58e01fb61eab0825cd574de0"
+            # ) + "/"
 
             if split_by_type:
                 filter_fns = {
@@ -2204,8 +2242,13 @@ class DataIteratorPes2o(DataIteratorConcat):
 
             splits_kwargs = {
                 "train": [
-                    (f"{i:02d}", {"data_files": [f"data/v2/train-000{i:02d}-of-00020.json.gz"]}) for i in range(20)
-                ]
+                    (f"{i:05d}-of-00020", {"data_files": [f"{path_prefix}data/v2/train-{i:05d}-of-00020.json.gz"]})
+                    for i in range(20)
+                ],
+                "validation": [
+                    (f"{i:05d}-of-00002", {"data_files": [f"{path_prefix}data/v2/validation-{i:05d}-of-00002.json.gz"]})
+                    for i in range(2)
+                ],
             }
 
             DataIteratorConcat.__init__(
@@ -2213,17 +2256,18 @@ class DataIteratorPes2o(DataIteratorConcat):
                 [
                     DataIterator(
                         datasets.load_dataset(
-                            repo, streaming=streaming, split=split, trust_remote_code=True, **split_kwargs
+                            repo, streaming=streaming, split="train", trust_remote_code=True, **split_kwargs
                         ),
                         filter_fn=filter_fn,
                         subsample_criteria="id",
-                        name=f"{name}:{subset_name+':' if subset_name else ''}{split}"
-                        + (f":{subsubset_name}" if subsubset_name else ""),
+                        name=name
+                        + (f":{split}-{subset_name}" if subset_name else "")
+                        + (":" + subsubset_name if subsubset_name else ""),
                         **kwargs,
                     )
                     for split in splits
-                    for subset_name, filter_fn in filter_fns.items()
-                    for subsubset_name, split_kwargs in splits_kwargs.get(split, [(None, {})])
+                    for subsubset_name, filter_fn in filter_fns.items()
+                    for subset_name, split_kwargs in splits_kwargs.get(split, [(None, {})])
                 ],
                 name=name,
             )
@@ -2295,6 +2339,9 @@ class DataIteratorPile(DataIteratorConcat):
                             else f":{type}"
                         ),
                         postprocess=clean_pile_ubuntu if (high_quality and "Ubuntu" in json_file) else None,
+                        filter_fn=filter_pile_phil_papers_by_language
+                        if (high_quality and "Phil" in json_file)
+                        else None,
                         **kwargs,
                     )
                 )

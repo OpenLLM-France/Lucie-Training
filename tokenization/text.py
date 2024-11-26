@@ -2,6 +2,7 @@ import hashlib
 import html
 import json
 import math
+import os
 import pickle
 import random
 import urllib
@@ -9,6 +10,12 @@ import urllib.parse
 from collections import Counter
 
 import regex as re
+
+# TODO: Add this to the data, and remove from here ?
+_folder = os.path.dirname(os.path.realpath(__file__))
+_asset_folder = os.path.join(os.path.dirname(_folder), "assets")
+_pile_phil_languages_filename = os.path.join(_asset_folder, "PilePhil_lang_detect.txt")
+assert os.path.isfile(_pile_phil_languages_filename)
 
 
 def clean_pdf_extraction(text, html_escape=False):
@@ -239,6 +246,31 @@ def clean_pile_ubuntu(text):
             return ""
 
     return recover_encoding_errors_cheap(text)
+
+
+_pile_phil_counter = 0
+_pile_phil_languages_detected = None
+
+
+def filter_pile_phil_papers_by_language(_):  # The data is assumed to come in a specific order
+    global _pile_phil_counter, _pile_phil_languages_detected
+    if _pile_phil_languages_detected is None:
+        with open(_pile_phil_languages_filename) as f:
+            has_started = False
+            _pile_phil_languages_detected = []
+            for line in f:
+                if not line.startswith("0") and not has_started:
+                    continue
+                has_started = True
+                idx, lan = line.split()
+                lan = lan.strip()
+                _pile_phil_languages_detected.append(lan)
+                assert idx == str(len(_pile_phil_languages_detected) - 1)
+        _pile_phil_counter = 0
+    assert _pile_phil_counter < len(_pile_phil_languages_detected)
+    is_candidate_language = _pile_phil_languages_detected[_pile_phil_counter] in ["en", "fr", "de", "es", "it"]
+    _pile_phil_counter += 1
+    return is_candidate_language
 
 
 ### Theses
