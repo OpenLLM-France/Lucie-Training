@@ -23,6 +23,7 @@ def upload_to_huggingface_hub(
     input: Path,
     message: Optional[str] = None,
     training_steps: Optional[str] = None,
+    training_phase: Optional[str] = None,
     type: Literal["final", "checkpoint", "optimizer", "final_optimizer", "tokenizer", "init"] = "final",
     is_optimizer: bool = False,
     format_json: bool = False,
@@ -35,8 +36,9 @@ def upload_to_huggingface_hub(
         repo_id: The repository ID. For instance, if the URL of the repository is
             `https://huggingface.co/username/my-model`, the `repo_id` is `username/my-model`.
         input: Directory or file to upload.
-        message (Optional[str], optional): The commit message. Defaults to None.
-        training_steps (Optional[int], optional): The number of the step. Defaults to None.
+        message (str, optional): The commit message. Defaults to None.
+        training_steps (int, optional): The number of the step. Defaults to None.
+        training_phase (str, optional): The prefix of the revision (ex: extension_). Defaults to None.
         is_checkpoint (bool): Whether the upload is a checkpoint. Defaults to False.
         format_json (bool): Whether to ensure json files are not on one line. Defaults to False.
         create_repo (Optional[bool], optional): If None, will automatically create the repo if it doesn't exist.
@@ -69,7 +71,7 @@ def upload_to_huggingface_hub(
         with open(_readme_header_file) as f:
             readme_content += f.read().strip() + "\n"
         if isinstance(training_steps, int) and training_steps >= 0:
-            readme_content += model_yaml_footer(training_steps).strip() + "\n"
+            readme_content += model_yaml_footer(training_steps, training_phase=training_phase).strip() + "\n"
         readme_content += "---\n"
         if dump_readme:
             readme_model_file = _readme_file_optimizer if is_optimizer else _readme_file_main
@@ -94,8 +96,8 @@ def upload_to_huggingface_hub(
                 if isinstance(training_steps, int) and training_steps >= 0 and config_filename == "config.json":
                     with open(config_file) as f:
                         config = json.load(f)
-                    config["training_steps"] = training_steps
-                    config["training_tokens"] = training_step_to_tokens(training_steps)
+                    config["training_steps"] = training_step_total(training_steps, training_phase)
+                    config["training_tokens"] = training_step_to_tokens(training_steps, training_phase)
                     with open(tmp_file, "w") as f:
                         json.dump(config, f, indent=2)
                 else:
@@ -117,6 +119,10 @@ def upload_to_huggingface_hub(
             revision = f"step{training_steps:07d}" if (is_checkpoint and training_steps >= 0) else None
         elif training_steps:
             revision = training_steps
+
+        if training_phase:
+            assert revision, "A revision must be provided to use a revision prefix"
+            revision = f"{training_phase}_{revision}"
 
         is_branch_new = False
         revision_info = ""
@@ -244,7 +250,11 @@ def format_json_files(file_or_folder, verbose=True):
     """
     Format json files that are on one line.
     """
-    if file_or_folder.endswith(".json") and os.path.is_file(file_or_folder):
+    if isinstance(file_or_folder, str):
+        is_json = file_or_folder.endswith(".json") and os.path.isfile(file_or_folder)
+    else:
+        is_json = file_or_folder.suffix == ".json" and file_or_folder.is_file()
+    if is_json:
         json_file = file_or_folder
         num_lines = sum(1 for line in open(json_file))
         if num_lines == 1:
@@ -267,30 +277,63 @@ def format_json_files(file_or_folder, verbose=True):
             print(f"Ignoring {file_or_folder}...")
 
 
-def training_step_to_tokens(training_steps):
-    training_tokens = {  # "pretrained": {
-        0: 0,
-        5000: 5700059136,
-        10000: 13884194816,
-        15000: 26008354816,
-        # 20000: 43747901440,
-        # 25000: 43747901440 + 20971520000, # 64719421440,
-        # 30000: 43747901440 + 2 * 20971520000, # 85690941440,
-        # 35000: 43747901440 + 3 * 20971520000, # 106662461440,
-        # ...
-        22818: 55567450112,
-    }.get(training_steps)
-    if training_tokens is None:
-        assert training_steps >= 20000, f"Cannot infer number of tokens for {training_steps=}"
-        training_tokens = round(43747901440 + ((training_steps - 20000) / 5000) * 20971520000)
+def training_step_total(training_steps, training_phase):
+    if not training_phase:
+        return training_steps
+
+    if training_phase == "extension":
+        return 753851 + training_steps
+
+    raise ValueError(f"Unknown training phase {training_phase}")
+
+
+def training_step_to_tokens(training_steps, training_phase=None):
+    if not training_phase:
+        training_tokens = {  # "pretrained": {
+            0: 0,
+            5000: 5700059136,
+            10000: 13884194816,
+            15000: 26008354816,
+            # 20000: 43747901440,
+            # 25000: 43747901440 + 20971520000, # 64719421440,
+            # 30000: 43747901440 + 2 * 20971520000, # 85690941440,
+            # 35000: 43747901440 + 3 * 20971520000, # 106662461440,
+            # ...
+            22818: 55567450112,
+        }.get(training_steps)
+
+        if training_tokens is None:
+            assert training_steps >= 20000, f"Cannot infer number of tokens for {training_steps=}"
+            training_tokens = round(43747901440 + ((training_steps - 20000) / 5000) * 20971520000)
+
+    elif training_phase == "extension":
+        num_steps_phase_1 = training_step_total(0, training_phase)
+        num_tokens_phase_1 = training_step_to_tokens(num_steps_phase_1)
+        training_tokens = {
+            250: 1024000000,
+            500: 2048000000,
+            750: 3072000000,
+            1000: 4096000000,
+            1220: 4997120000,
+        }.get(training_steps)
+        assert training_tokens, f"Unknown training step {training_steps} for training phase {training_phase}"
+        training_tokens += num_tokens_phase_1
+
+    else:
+        raise ValueError(f"Unknown training phase {training_phase}")
+
     return training_tokens
 
 
-def model_yaml_footer(training_steps, context_length=4096):
+def model_yaml_footer(training_steps, training_phase=None):
+    if not training_phase:
+        context_length = 4096
+    else:
+        context_length = 32_000
     return f"""
 training_progress:
-   num_steps: {training_steps}
-   num_tokens: {training_step_to_tokens(training_steps)}
+   num_steps: {training_step_total(training_steps, training_phase)}
+   num_tokens: {training_step_to_tokens(training_steps, training_phase)}
    context_length: {context_length}
 """
 

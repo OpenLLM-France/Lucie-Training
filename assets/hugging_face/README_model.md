@@ -7,11 +7,17 @@ https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/tem
 * [Model Description](#model-description)
 <!-- * [Uses](#uses) -->
 * [Example code in python](#example-code-in-python)
+  * [Load the model](#load-the-model)
   * [Sentence completion](#sentence-completion)
   * [Load a checkpoint](#load-a-checkpoint)
 * [Training Details](#training-details)
   * [Training Data](#training-data)
   * [Training Procedure](#training-procedure)
+    * [Neural Network Architecture](#neural-network-architecture)
+    * [Training Hyperparameters](#training-hyperparameters)
+      1. [Main pre-training](#1-main-pre-training)
+      2. [Context Extension](#2-context-extension)
+      3. [Annealing](#3-annealing)
 <!-- * [Evaluation](#evaluation) -->
 * [Acknowledgements](#acknowledgements)
 * [Contact](#contact)
@@ -32,7 +38,7 @@ as well as several programming languages (14.7%).
 
 ## Example code in python
 
-### Sentence completion
+### Load the model
 
 Load the model (quantized version on GPU if possible, for efficient inference):
 ```python
@@ -46,6 +52,7 @@ model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
     load_in_4bit=True       # For efficient inference, if quantization is supported by the GPU card
 )
 ```
+### Sentence completion
 
 Wrap the model in a text generation pipeline, and prepare some generation parameters:
 ```
@@ -92,14 +99,15 @@ every 5000 steps during the first 25000 steps, and then every 25000 steps.
 Intermediate checkpoints can be loaded using the `revision` parameter:
 ```python
 model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
-    revision="step0400000",
+    revision="step0753851",
     ...
 )
 ```
 where `revision` can be one of:
-* ["`step0005000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0005000), ["`step0010000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0010000), ["`step0015000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0015000), ["`step0020000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0020000): each 5000 steps for the first pre-training steps.
-* ["`step0025000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0025000), ["`step0050000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0050000), ["`step0075000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0075000), ["`step0100000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0100000), ..., ["`step0750000`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0750000): each 25000 steps from 25k to 750k steps.
-* ["`step0753851`"](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0753851): last pre-training step before context extension and annealing.
+* "[`step0005000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0005000)", "[`step0010000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0010000)", "[`step0015000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0015000)", "[`step0020000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0020000)": each 5000 steps for the first pre-training steps (with a context length of 4096).
+* "[`step0025000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0025000)", "[`step0050000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0050000)", "[`step0075000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0075000)", "[`step0100000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0100000)", ..., "[`step0750000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0750000)": each 25000 steps from 25k to 750k steps.
+* "[`step0753851`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0753851)": last pre-training step before context extension and annealing.
+* "[`extension_step0000250`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000250)", "[`extension_step0000500`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000500)", "[`extension_step0000750`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000750)", "[`extension_step0001000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001000)", "[`extension_step0001220`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001220)": several checkpoints during context extension (with a context length of 32000).
 
 ## Training Details
 
@@ -135,27 +143,39 @@ It has exactly 6 706 958 336 free parameters,
 with the following hyperparameters:
 | **Hyperparameter**        | **Value** |
 |---------------------------|---------|
-| Vocabulary size (\# tokens)| 65 024|
-| ROPE theta                | 500 000|
-| \# transformer blocks     |      32|
-| \# attention heads        |      32|
-| \# key-value heads        |       8|
-| Hidden size               |   4 096|
-| Feed-Forward hidden size  |  12 288|
-| Activation                |  `silu`|
-| RMS norm epsilon          |    1e-5|
+| Vocabulary size (\# tokens)| 65 024 |
+| \# transformer blocks     |      32 |
+| \# attention heads        |      32 |
+| \# key-value heads        |       8 |
+| Hidden size               |   4 096 |
+| Feed-Forward hidden size  |  12 288 |
+| Activation                |  `silu` |
+| RMS norm epsilon          |    1e-5 |
+
+The parameter "theta" of Rotary Positional Embedding (RoPE) varied during the training process
+and is indicated in the tables with training hyperparameters below.
 
 #### Training Hyperparameters
+
+The training consisted of three main phases:
+1. Main pre-training on 3.1T tokens, with a context length of 4096,
+2. Context extension on 5B tokens, with a context length of 32000,
+3. Annealing, with a selected subset of the training data with especially high quality.
+
+The details of each phase are given below.
+
+##### 1. Main pre-training
 
 Training hyperparameters in torch/Megatron-DeepSpeed were the following:
 | **Hyperparameter**     | **Value**  |
 |------------------------|------------|
-| Optimizer              | `AdamW`    |
-| Precision              | `bfloat16` |
-| Initial batch size     | 256        |
-| Final batch size       | 1024       |
+| Total \# samples| 762 144 586 (3.1T tokens) |
+| Total \# steps  | 753 851    |
+| RoPE theta             | 500 000    |
+| Context length         | 4 096      |
+| Initial Batch size     | 256        |
+| Final Batch size       | 1 024      |
 | Batch size rampup      | by steps of 64 over 10M samples |
-| Context length         | 4096       |
 | Learning rate schedule | warmup (2M samples) + cosine annealing |
 | Maximum Learning rate  | 3e-4       |
 | Final Learning rate    | 3e-5       |
@@ -163,10 +183,30 @@ Training hyperparameters in torch/Megatron-DeepSpeed were the following:
 | Dropout                | _          |
 | Gradient clipping      | 1          |
 | Initializer range      | 0.009        |
+| Optimizer              | `AdamW` (β₁=0.9, β₂=0.95, ε=1e-5)    |
+| Precision              | `bfloat16` |
 | Tensor Parallelism (with 512 GPUs)   | 4           |
 | Pipeline Parallelism (with 512 GPUs) | 4           |
 | Data Parallelism (with 512 GPUs)     | 32          |
 
+#### 2. Context Extension
+
+Training hyperparameters are the same as above, with the following changes:
+| **Hyperparameter**     | **Value**  |
+|------------------------|------------|
+| Total \# samples| 156 250 (5B tokens) |
+| Total \# steps  | 1 220      |
+| RoPE theta             | 20 000 000 |
+| Context length         | 32 000     |
+| Batch size             | 128        |
+| Learning rate          | 2e-5       |
+| Tensor Parallelism (with 128 GPUs)   | 4     |
+| Pipeline Parallelism (with 128 GPUs) | 4     |
+| Data Parallelism (with 128 GPUs)     | 8     |
+
+#### 3. Annealing
+
+TODO
 
 ## Acknowledgements
 
