@@ -373,6 +373,7 @@ if __name__ == "__main__":
     with TimeOut((args.max_time * 60) if args.max_time else None):
         try:
             for dataset_name, dataset in progress_bar:
+                dataset_name = dataset_name.strip("-")
                 progress_bar.set_description(f"Processing {dataset_name}")
                 dataset_pseudo = dataset_name.split("-")[0]
                 if previous_pseudo != dataset_pseudo:
@@ -385,7 +386,7 @@ if __name__ == "__main__":
                 assert (
                     source_pseudo and language_category and language and dataset_name
                 ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
-                path_in_repo = f"data/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
+                path_in_repo = f"data/v1.1/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
 
                 progress_bar.set_description(f"Generating {path_in_repo}")
 
@@ -466,7 +467,7 @@ if __name__ == "__main__":
                 if parquet_finished:
                     print(f"Warning: Using existing parquet file {parquet_filename}")
                 else:
-                    for i, sample in enumerate(dataset):
+                    for i, sample in enumerate(tqdm.tqdm(dataset, desc=f"Generating {parquet_filename}")):
                         has_data = True
                         assert isinstance(sample, dict), f"Sample is not a dictionary: {type(sample)}"
                         assert "text" in sample and isinstance(sample["text"], str)
