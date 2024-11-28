@@ -131,8 +131,8 @@ def upload_to_huggingface_hub(
             try:
                 hf_api.create_branch(repo_id, repo_type="model", branch=revision)
                 is_branch_new = True
-            except huggingface_hub.utils._errors.HfHubHTTPError:
-                pass
+            except Exception as err:  # huggingface_hub.utils._errors.HfHubHTTPError ?
+                print(str(err).split("\n")[-1])
             if is_branch_new:
                 print(f"Create branch {revision} in {repo_url}")
             # hf_api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
