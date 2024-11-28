@@ -23,437 +23,437 @@ viewer: true
 configs:
 - config_name: default
   data_files:
-  - path: data/v1.1/*/*/*/*parquet
+  - path: data/v*/*/*/*/*parquet
     split: train
 - config_name: en
   data_files:
-  - path: data/v1.1/natural/en/*/*parquet
+  - path: data/v*/natural/en/*/*parquet
     split: train
 - config_name: fr
   data_files:
-  - path: data/v1.1/natural/fr/*/*parquet
+  - path: data/v*/natural/fr/*/*parquet
     split: train
 - config_name: de
   data_files:
-  - path: data/v1.1/natural/de/*/*parquet
+  - path: data/v*/natural/de/*/*parquet
     split: train
 - config_name: es
   data_files:
-  - path: data/v1.1/natural/es/*/*parquet
+  - path: data/v*/natural/es/*/*parquet
     split: train
 - config_name: it
   data_files:
-  - path: data/v1.1/natural/it/*/*parquet
+  - path: data/v*/natural/it/*/*parquet
     split: train
 - config_name: de,fr
   data_files:
-  - path: data/v1.1/natural/de-fr/*/*.parquet
+  - path: data/v*/natural/de-fr/*/*.parquet
     split: train
 - config_name: es,en
   data_files:
-  - path: data/v1.1/natural/es-en/*/*.parquet
+  - path: data/v*/natural/es-en/*/*.parquet
     split: train
 - config_name: fr,en
   data_files:
-  - path: data/v1.1/natural/fr-en/*/*.parquet
+  - path: data/v*/natural/fr-en/*/*.parquet
     split: train
 - config_name: it,en
   data_files:
-  - path: data/v1.1/natural/it-en/*/*.parquet
+  - path: data/v*/natural/it-en/*/*.parquet
     split: train
 - config_name: natural
   data_files:
-  - path: data/v1.1/natural/*/*/*.parquet
+  - path: data/v*/natural/*/*/*.parquet
     split: train
 - config_name: code
   data_files:
-  - path: data/v1.1/code/*/*/*parquet
+  - path: data/v*/code/*/*/*parquet
     split: train
 - config_name: code-assembly
   data_files:
-  - path: data/v1.1/code/assembly/*/*.parquet
+  - path: data/v*/code/assembly/*/*.parquet
     split: train
 - config_name: code-c
   data_files:
-  - path: data/v1.1/code/c/*/*.parquet
+  - path: data/v*/code/c/*/*.parquet
     split: train
 - config_name: code-c#
   data_files:
-  - path: data/v1.1/code/c#/*/*.parquet
+  - path: data/v*/code/c#/*/*.parquet
     split: train
 - config_name: code-c++
   data_files:
-  - path: data/v1.1/code/c++/*/*.parquet
+  - path: data/v*/code/c++/*/*.parquet
     split: train
 - config_name: code-clojure
   data_files:
-  - path: data/v1.1/code/clojure/*/*.parquet
+  - path: data/v*/code/clojure/*/*.parquet
     split: train
 - config_name: code-dart
   data_files:
-  - path: data/v1.1/code/dart/*/*.parquet
+  - path: data/v*/code/dart/*/*.parquet
     split: train
 - config_name: code-elixir
   data_files:
-  - path: data/v1.1/code/elixir/*/*.parquet
+  - path: data/v*/code/elixir/*/*.parquet
     split: train
 - config_name: code-erlang
   data_files:
-  - path: data/v1.1/code/erlang/*/*.parquet
+  - path: data/v*/code/erlang/*/*.parquet
     split: train
 - config_name: code-fortran
   data_files:
-  - path: data/v1.1/code/fortran/*/*.parquet
+  - path: data/v*/code/fortran/*/*.parquet
     split: train
 - config_name: code-go
   data_files:
-  - path: data/v1.1/code/go/*/*.parquet
+  - path: data/v*/code/go/*/*.parquet
     split: train
 - config_name: code-haskell
   data_files:
-  - path: data/v1.1/code/haskell/*/*.parquet
+  - path: data/v*/code/haskell/*/*.parquet
     split: train
 - config_name: code-java
   data_files:
-  - path: data/v1.1/code/java/*/*.parquet
+  - path: data/v*/code/java/*/*.parquet
     split: train
 - config_name: code-javascript
   data_files:
-  - path: data/v1.1/code/javascript/*/*.parquet
+  - path: data/v*/code/javascript/*/*.parquet
     split: train
 - config_name: code-julia
   data_files:
-  - path: data/v1.1/code/julia/*/*.parquet
+  - path: data/v*/code/julia/*/*.parquet
     split: train
 - config_name: code-kotlin
   data_files:
-  - path: data/v1.1/code/kotlin/*/*.parquet
+  - path: data/v*/code/kotlin/*/*.parquet
     split: train
 - config_name: code-lua
   data_files:
-  - path: data/v1.1/code/lua/*/*.parquet
+  - path: data/v*/code/lua/*/*.parquet
     split: train
 - config_name: code-mathematica
   data_files:
-  - path: data/v1.1/code/mathematica/*/*.parquet
+  - path: data/v*/code/mathematica/*/*.parquet
     split: train
 - config_name: code-matlab
   data_files:
-  - path: data/v1.1/code/matlab/*/*.parquet
+  - path: data/v*/code/matlab/*/*.parquet
     split: train
 - config_name: code-ocaml
   data_files:
-  - path: data/v1.1/code/ocaml/*/*.parquet
+  - path: data/v*/code/ocaml/*/*.parquet
     split: train
 - config_name: code-perl
   data_files:
-  - path: data/v1.1/code/perl/*/*.parquet
+  - path: data/v*/code/perl/*/*.parquet
     split: train
 - config_name: code-php
   data_files:
-  - path: data/v1.1/code/php/*/*.parquet
+  - path: data/v*/code/php/*/*.parquet
     split: train
 - config_name: code-python
   data_files:
-  - path: data/v1.1/code/python/*/*.parquet
+  - path: data/v*/code/python/*/*.parquet
     split: train
 - config_name: code-r
   data_files:
-  - path: data/v1.1/code/r/*/*.parquet
+  - path: data/v*/code/r/*/*.parquet
     split: train
 - config_name: code-racket
   data_files:
-  - path: data/v1.1/code/racket/*/*.parquet
+  - path: data/v*/code/racket/*/*.parquet
     split: train
 - config_name: code-ruby
   data_files:
-  - path: data/v1.1/code/ruby/*/*.parquet
+  - path: data/v*/code/ruby/*/*.parquet
     split: train
 - config_name: code-rust
   data_files:
-  - path: data/v1.1/code/rust/*/*.parquet
+  - path: data/v*/code/rust/*/*.parquet
     split: train
 - config_name: code-scala
   data_files:
-  - path: data/v1.1/code/scala/*/*.parquet
+  - path: data/v*/code/scala/*/*.parquet
     split: train
 - config_name: code-swift
   data_files:
-  - path: data/v1.1/code/swift/*/*.parquet
+  - path: data/v*/code/swift/*/*.parquet
     split: train
 - config_name: code-tex
   data_files:
-  - path: data/v1.1/code/tex/*/*.parquet
+  - path: data/v*/code/tex/*/*.parquet
     split: train
 - config_name: code-typescript
   data_files:
-  - path: data/v1.1/code/typescript/*/*.parquet
+  - path: data/v*/code/typescript/*/*.parquet
     split: train
 - config_name: AmendementsParlement
   data_files:
-  - path: data/v1.1/natural/*/AmendementsParlement/*.parquet
+  - path: data/v*/natural/*/AmendementsParlement/*.parquet
     split: train
 - config_name: AmericanStories
   data_files:
-  - path: data/v1.1/natural/*/AmericanStories/*.parquet
+  - path: data/v*/natural/*/AmericanStories/*.parquet
     split: train
 - config_name: Claire
   data_files:
-  - path: data/v1.1/natural/*/Claire/*.parquet
+  - path: data/v*/natural/*/Claire/*.parquet
     split: train
 - config_name: Claire-en
   data_files:
-  - path: data/v1.1/natural/en/Claire/*.parquet
+  - path: data/v*/natural/en/Claire/*.parquet
     split: train
 - config_name: Claire-fr
   data_files:
-  - path: data/v1.1/natural/fr/Claire/*.parquet
+  - path: data/v*/natural/fr/Claire/*.parquet
     split: train
 - config_name: CroissantAligned
   data_files:
-  - path: data/v1.1/natural/*/CroissantAligned/*.parquet
+  - path: data/v*/natural/*/CroissantAligned/*.parquet
     split: train
 - config_name: DiscoursPublics
   data_files:
-  - path: data/v1.1/natural/*/DiscoursPublics/*.parquet
+  - path: data/v*/natural/*/DiscoursPublics/*.parquet
     split: train
 - config_name: Europarl
   data_files:
-  - path: data/v1.1/natural/*/Europarl/*.parquet
+  - path: data/v*/natural/*/Europarl/*.parquet
     split: train
 - config_name: Europarl-de
   data_files:
-  - path: data/v1.1/natural/de/Europarl/*.parquet
+  - path: data/v*/natural/de/Europarl/*.parquet
     split: train
 - config_name: Europarl-en
   data_files:
-  - path: data/v1.1/natural/en/Europarl/*.parquet
+  - path: data/v*/natural/en/Europarl/*.parquet
     split: train
 - config_name: Europarl-es
   data_files:
-  - path: data/v1.1/natural/es/Europarl/*.parquet
+  - path: data/v*/natural/es/Europarl/*.parquet
     split: train
 - config_name: Europarl-fr
   data_files:
-  - path: data/v1.1/natural/fr/Europarl/*.parquet
+  - path: data/v*/natural/fr/Europarl/*.parquet
     split: train
 - config_name: EuroparlAligned
   data_files:
-  - path: data/v1.1/natural/*/EuroparlAligned/*.parquet
+  - path: data/v*/natural/*/EuroparlAligned/*.parquet
     split: train
 - config_name: EuroparlAligned-de,fr
   data_files:
-  - path: data/v1.1/natural/de-fr/EuroparlAligned/*.parquet
+  - path: data/v*/natural/de-fr/EuroparlAligned/*.parquet
     split: train
 - config_name: EuroparlAligned-es,en
   data_files:
-  - path: data/v1.1/natural/es-en/EuroparlAligned/*.parquet
+  - path: data/v*/natural/es-en/EuroparlAligned/*.parquet
     split: train
 - config_name: EuroparlAligned-fr,en
   data_files:
-  - path: data/v1.1/natural/fr-en/EuroparlAligned/*.parquet
+  - path: data/v*/natural/fr-en/EuroparlAligned/*.parquet
     split: train
 - config_name: EuroparlAligned-it,en
   data_files:
-  - path: data/v1.1/natural/it-en/EuroparlAligned/*.parquet
+  - path: data/v*/natural/it-en/EuroparlAligned/*.parquet
     split: train
 - config_name: Eurovoc
   data_files:
-  - path: data/v1.1/natural/*/Eurovoc/*.parquet
+  - path: data/v*/natural/*/Eurovoc/*.parquet
     split: train
 - config_name: Eurovoc-de
   data_files:
-  - path: data/v1.1/natural/de/Eurovoc/*.parquet
+  - path: data/v*/natural/de/Eurovoc/*.parquet
     split: train
 - config_name: Eurovoc-en
   data_files:
-  - path: data/v1.1/natural/en/Eurovoc/*.parquet
+  - path: data/v*/natural/en/Eurovoc/*.parquet
     split: train
 - config_name: Eurovoc-es
   data_files:
-  - path: data/v1.1/natural/es/Eurovoc/*.parquet
+  - path: data/v*/natural/es/Eurovoc/*.parquet
     split: train
 - config_name: Eurovoc-it
   data_files:
-  - path: data/v1.1/natural/it/Eurovoc/*.parquet
+  - path: data/v*/natural/it/Eurovoc/*.parquet
     split: train
 - config_name: FineWebEdu
   data_files:
-  - path: data/v1.1/natural/*/FineWebEdu/*.parquet
+  - path: data/v*/natural/*/FineWebEdu/*.parquet
     split: train
 - config_name: GallicaMonographies
   data_files:
-  - path: data/v1.1/natural/*/GallicaMonographies/*.parquet
+  - path: data/v*/natural/*/GallicaMonographies/*.parquet
     split: train
 - config_name: GallicaPress
   data_files:
-  - path: data/v1.1/natural/*/GallicaPress/*.parquet
+  - path: data/v*/natural/*/GallicaPress/*.parquet
     split: train
 - config_name: Gutenberg
   data_files:
-  - path: data/v1.1/natural/*/Gutenberg/*.parquet
+  - path: data/v*/natural/*/Gutenberg/*.parquet
     split: train
 - config_name: Gutenberg-de
   data_files:
-  - path: data/v1.1/natural/de/Gutenberg/*.parquet
+  - path: data/v*/natural/de/Gutenberg/*.parquet
     split: train
 - config_name: Gutenberg-en
   data_files:
-  - path: data/v1.1/natural/en/Gutenberg/*.parquet
+  - path: data/v*/natural/en/Gutenberg/*.parquet
     split: train
 - config_name: Gutenberg-es
   data_files:
-  - path: data/v1.1/natural/es/Gutenberg/*.parquet
+  - path: data/v*/natural/es/Gutenberg/*.parquet
     split: train
 - config_name: Gutenberg-fr
   data_files:
-  - path: data/v1.1/natural/fr/Gutenberg/*.parquet
+  - path: data/v*/natural/fr/Gutenberg/*.parquet
     split: train
 - config_name: Gutenberg-it
   data_files:
-  - path: data/v1.1/natural/it/Gutenberg/*.parquet
+  - path: data/v*/natural/it/Gutenberg/*.parquet
     split: train
 - config_name: HAL
   data_files:
-  - path: data/v1.1/natural/*/HAL/*.parquet
+  - path: data/v*/natural/*/HAL/*.parquet
     split: train
 - config_name: InterventionsParlement
   data_files:
-  - path: data/v1.1/natural/*/InterventionsParlement/*.parquet
+  - path: data/v*/natural/*/InterventionsParlement/*.parquet
     split: train
 - config_name: LEGI
   data_files:
-  - path: data/v1.1/natural/*/LEGI/*.parquet
+  - path: data/v*/natural/*/LEGI/*.parquet
     split: train
 - config_name: MathPile
   data_files:
-  - path: data/v1.1/natural/*/MathPile/*.parquet
+  - path: data/v*/natural/*/MathPile/*.parquet
     split: train
 - config_name: OpenData
   data_files:
-  - path: data/v1.1/natural/*/OpenData/*.parquet
+  - path: data/v*/natural/*/OpenData/*.parquet
     split: train
 - config_name: OpenEdition
   data_files:
-  - path: data/v1.1/natural/*/OpenEdition/*.parquet
+  - path: data/v*/natural/*/OpenEdition/*.parquet
     split: train
 - config_name: PeS2o
   data_files:
-  - path: data/v1.1/natural/*/PeS2o/*.parquet
+  - path: data/v*/natural/*/PeS2o/*.parquet
     split: train
 - config_name: PeS2o-s2ag
   data_files:
-  - path: data/v1.1/natural/*/PeS2o/*s2ag.parquet
+  - path: data/v*/natural/*/PeS2o/*s2ag.parquet
     split: train
 - config_name: PeS2o-s2orc
   data_files:
-  - path: data/v1.1/natural/*/PeS2o/*s2orc.parquet
+  - path: data/v*/natural/*/PeS2o/*s2orc.parquet
     split: train
 - config_name: Persee
   data_files:
-  - path: data/v1.1/natural/*/Persee/*.parquet
+  - path: data/v*/natural/*/Persee/*.parquet
     split: train
 - config_name: Pile
   data_files:
-  - path: data/v1.1/natural/*/Pile/*.parquet
+  - path: data/v*/natural/*/Pile/*.parquet
     split: train
 - config_name: Pile-DM_Mathematics
   data_files:
-  - path: data/v1.1/natural/*/Pile/*DM_Mathematics.parquet
+  - path: data/v*/natural/*/Pile/*DM_Mathematics.parquet
     split: train
 - config_name: Pile-FreeLaw
   data_files:
-  - path: data/v1.1/natural/*/Pile/*FreeLaw.parquet
+  - path: data/v*/natural/*/Pile/*FreeLaw.parquet
     split: train
 - config_name: Pile-NIH_ExPorter
   data_files:
-  - path: data/v1.1/natural/*/Pile/*NIH_ExPorter.parquet
+  - path: data/v*/natural/*/Pile/*NIH_ExPorter.parquet
     split: train
 - config_name: Pile-PhilPapers
   data_files:
-  - path: data/v1.1/natural/*/Pile/*PhilPapers.parquet
+  - path: data/v*/natural/*/Pile/*PhilPapers.parquet
     split: train
 - config_name: Pile-StackExchange
   data_files:
-  - path: data/v1.1/natural/*/Pile/*StackExchange.parquet
+  - path: data/v*/natural/*/Pile/*StackExchange.parquet
     split: train
 - config_name: Pile-USPTO_Backgrounds
   data_files:
-  - path: data/v1.1/natural/*/Pile/*USPTO_Backgrounds.parquet
+  - path: data/v*/natural/*/Pile/*USPTO_Backgrounds.parquet
     split: train
 - config_name: Pile-Ubuntu_IRC
   data_files:
-  - path: data/v1.1/natural/*/Pile/*Ubuntu_IRC.parquet
+  - path: data/v*/natural/*/Pile/*Ubuntu_IRC.parquet
     split: train
 - config_name: QuestionsEcritesParlement
   data_files:
-  - path: data/v1.1/natural/*/QuestionsEcritesParlement/*.parquet
+  - path: data/v*/natural/*/QuestionsEcritesParlement/*.parquet
     split: train
 - config_name: RedPajama
   data_files:
-  - path: data/v1.1/natural/*/RedPajama/*.parquet
+  - path: data/v*/natural/*/RedPajama/*.parquet
     split: train
 - config_name: RedPajama-de
   data_files:
-  - path: data/v1.1/natural/de/RedPajama/*.parquet
+  - path: data/v*/natural/de/RedPajama/*.parquet
     split: train
 - config_name: RedPajama-es
   data_files:
-  - path: data/v1.1/natural/es/RedPajama/*.parquet
+  - path: data/v*/natural/es/RedPajama/*.parquet
     split: train
 - config_name: RedPajama-fr
   data_files:
-  - path: data/v1.1/natural/fr/RedPajama/*.parquet
+  - path: data/v*/natural/fr/RedPajama/*.parquet
     split: train
 - config_name: RedPajama-it
   data_files:
-  - path: data/v1.1/natural/it/RedPajama/*.parquet
+  - path: data/v*/natural/it/RedPajama/*.parquet
     split: train
 - config_name: Stac
   data_files:
-  - path: data/v1.1/natural/*/Stac/*.parquet
+  - path: data/v*/natural/*/Stac/*.parquet
     split: train
 - config_name: TheStack
   data_files:
-  - path: data/v1.1/code/*/TheStack/*.parquet
+  - path: data/v*/code/*/TheStack/*.parquet
     split: train
 - config_name: Theses
   data_files:
-  - path: data/v1.1/natural/*/Theses/*.parquet
+  - path: data/v*/natural/*/Theses/*.parquet
     split: train
 - config_name: Wikipedia
   data_files:
-  - path: data/v1.1/natural/*/Wikipedia/*.parquet
+  - path: data/v*/natural/*/Wikipedia/*.parquet
     split: train
 - config_name: Wikipedia-de
   data_files:
-  - path: data/v1.1/natural/de/Wikipedia/*.parquet
+  - path: data/v*/natural/de/Wikipedia/*.parquet
     split: train
 - config_name: Wikipedia-en
   data_files:
-  - path: data/v1.1/natural/en/Wikipedia/*.parquet
+  - path: data/v*/natural/en/Wikipedia/*.parquet
     split: train
 - config_name: Wikipedia-es
   data_files:
-  - path: data/v1.1/natural/es/Wikipedia/*.parquet
+  - path: data/v*/natural/es/Wikipedia/*.parquet
     split: train
 - config_name: Wikipedia-fr
   data_files:
-  - path: data/v1.1/natural/fr/Wikipedia/*.parquet
+  - path: data/v*/natural/fr/Wikipedia/*.parquet
     split: train
 - config_name: Wikipedia-it
   data_files:
-  - path: data/v1.1/natural/it/Wikipedia/*.parquet
+  - path: data/v*/natural/it/Wikipedia/*.parquet
     split: train
 - config_name: Wikisource
   data_files:
-  - path: data/v1.1/natural/*/Wikisource/*.parquet
+  - path: data/v*/natural/*/Wikisource/*.parquet
     split: train
 - config_name: Wiktionary
   data_files:
-  - path: data/v1.1/natural/*/Wiktionary/*.parquet
+  - path: data/v*/natural/*/Wiktionary/*.parquet
     split: train
 - config_name: YouTube
   data_files:
-  - path: data/v1.1/natural/*/YouTube/*.parquet
+  - path: data/v*/natural/*/YouTube/*.parquet
     split: train

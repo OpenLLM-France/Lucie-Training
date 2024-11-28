@@ -299,8 +299,34 @@ if __name__ == "__main__":
     parser.add_argument(
         "--update_each", type=int, default=10, help="Update each N parquet files (to avoid too frequent uploads)"
     )
+    parser.add_argument("--high-quality", default=False, action="store_true", help="Use high quality data only")
+    parser.add_argument("--version", default="v1.1", help="Version of the dataset")
+    parser.add_argument("--revision", default=None, help="Branch name")
     parser.add_argument("--message", type=str, default="Upload data", help="Commit message for the upload")
     args = parser.parse_args()
+
+    revision = args.revision
+    if not revision and args.version != "v1.1":
+        revision = args.version
+
+    repo_id = args.repository
+    repo_url = f"https://huggingface.co/{repo_id}"
+
+    hf_api = None
+
+    is_branch_new = False
+    revision_info = ""
+    if revision:
+        hf_api, _ = connect_to_huggingface(repo_id, repo_type="dataset")
+        revision_info = f" (branch {revision})"
+        try:
+            hf_api.create_branch(repo_id, repo_type="dataset", branch=revision)
+            is_branch_new = True
+        except Exception as err:  # huggingface_hub.utils._errors.HfHubHTTPError ?
+            print(str(err).split("\n")[-1])
+        if is_branch_new:
+            print(f"Create branch {revision} in {repo_url}")
+        # hf_api.create_tag(repo_id, repo_type="model", revision=revision, tag=revision, tag_message=message)
 
     metadata_fields = {
         "source": str,
@@ -318,6 +344,7 @@ if __name__ == "__main__":
         args.datasets,
         max_parquet_files=1 if args.collect_metadata else None,
         force_include_all_metadata=True,
+        high_quality=args.high_quality,
     )
 
     all_datas = dict(
@@ -336,7 +363,7 @@ if __name__ == "__main__":
     args.collect_metadata = (
         (os.path.splitext(args.collect_metadata)[0] + "_types.json") if args.collect_metadata else None
     )
-    do_upload = args.repository and not args.collect_metadata
+    do_upload = repo_id and not args.collect_metadata
     must_update_readme = False
 
     if args.collect_metadata:
@@ -366,7 +393,6 @@ if __name__ == "__main__":
 
     progress_bar = tqdm.tqdm(all_datas.items())
     previous_pseudo = None
-    hf_api = None
     parquet_finished, parquet_filename = True, None
     parquet_files_created = []
     lock_files = []
@@ -386,7 +412,9 @@ if __name__ == "__main__":
                 assert (
                     source_pseudo and language_category and language and dataset_name
                 ), f"{source=} -- {source_pseudo=} -- {language=} -- {language_category=} -- {dataset_name=}"
-                path_in_repo = f"data/v1.1/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
+                path_in_repo = (
+                    f"data/{args.version}/{language_category}/{language}/{source_pseudo}/{dataset_name}.parquet"
+                )
 
                 progress_bar.set_description(f"Generating {path_in_repo}")
 
@@ -533,7 +561,7 @@ if __name__ == "__main__":
 
                         # Dump to Hugging Face
                         if hf_api is None:
-                            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+                            hf_api, _ = connect_to_huggingface(repo_id, repo_type="dataset")
 
                         common_path = (
                             os.path.commonpath(parquet_files_created)
@@ -546,9 +574,9 @@ if __name__ == "__main__":
                                 path_or_fileobj=parquet_filename,
                                 path_in_repo=path_in_repo,
                                 commit_message=args.message if args.message else f"Upload {source}",
-                                repo_id=args.repository,
+                                repo_id=repo_id,
                                 repo_type="dataset",
-                                revision=None,
+                                revision=revision,
                             )
                         else:
                             hf_api.upload_folder(
@@ -556,9 +584,9 @@ if __name__ == "__main__":
                                 path_in_repo=os.path.relpath(common_path, args.folder),
                                 commit_message=args.message if args.message else "Upload data",
                                 ignore_patterns=["*.lock"],
-                                repo_id=args.repository,
+                                repo_id=repo_id,
                                 repo_type="dataset",
-                                revision=None,
+                                revision=revision,
                             )
 
                         if args.clean:
@@ -581,7 +609,7 @@ if __name__ == "__main__":
         # Dump the last ones
 
         if hf_api is None:
-            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+            hf_api, _ = connect_to_huggingface(repo_id, repo_type="dataset")
 
         common_path = (
             os.path.commonpath(parquet_files_created)
@@ -594,9 +622,9 @@ if __name__ == "__main__":
             path_in_repo=os.path.relpath(common_path, args.folder),
             commit_message=args.message if args.message else "Upload data",
             ignore_patterns=["*.lock"],
-            repo_id=args.repository,
+            repo_id=repo_id,
             repo_type="dataset",
-            revision=None,
+            revision=revision,
         )
 
         if args.clean:
@@ -608,7 +636,7 @@ if __name__ == "__main__":
     # if must_update_readme:
     if False:
         if hf_api is None:
-            hf_api, _ = connect_to_huggingface(args.repository, repo_type="dataset")
+            hf_api, _ = connect_to_huggingface(repo_id, repo_type="dataset")
 
         # Create the README.md file
         readme_content = "---\n"
@@ -625,9 +653,9 @@ if __name__ == "__main__":
             path_or_fileobj=tmp_file,
             path_in_repo="README.md",
             commit_message="Update README.md",
-            repo_id=args.repository,
+            repo_id=repo_id,
             repo_type="dataset",
-            revision=None,
+            revision=revision,
         )
 
         os.remove(tmp_file)
