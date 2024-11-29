@@ -1103,6 +1103,8 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
   * <u>Source</u>: Corpus contributed by OpenLLM partners.
   * <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics).
   * <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
+  * <u>Text pre-processing</u>:
+    * <u>Text cleaning</u>: the mention of the source url and the number of views were removed.
   * <u>Citation</u>: No paper found.
 
 #### Europarl (monolingual and parallel)
@@ -1146,6 +1148,9 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
     * [aleph.gutenberg.org](http://aleph.gutenberg.org/) via [Project Gutenberg](https://www.gutenberg.org/). License: [Open](https://www.gutenberg.org/policy/terms_of_use.html).
     * [pgcorpus](https://github.com/pgcorpus/gutenberg). License: [CC BY-4.0](https://zenodo.org/records/2422561).
   * <u>Description</u>: A collection of free eBooks, manually prepared by human annotators. 
+  * <u>Text pre-processing</u>:
+    * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). This filtering was done to ensure that the texts are in the public domain.
+    * <u>Text cleaning</u>: Headers, footers mentioning the Project Gutenberg were removed.
   * <u>Citation</u>: No paper found.
 
 #### HAL
@@ -1228,6 +1233,9 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL](https://hal.science/).
 * <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
+* <u>Text pre-processing</u>:
+  * <u>Filtering</u>: Text with less than 1000 words or 10000 characters were removed.
+  * <u>Text cleaning</u>: Because the results of OCR on tables and graphics can give raise to garbage text, the text was cleaned by removing the most suspicious chunks of text. Chunks of text were removed if the detected language was not among French, English, Spanish, German and Italian, or if the perplexity of a CCNet Language Model was higher than 2000 ([details here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
 * <u>Citation</u>: No paper found.
 
 #### Wikipedia, Wikisource, Wiktionary
