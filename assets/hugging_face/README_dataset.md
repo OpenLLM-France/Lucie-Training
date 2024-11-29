@@ -89,8 +89,10 @@ Table of Contents:
     </ul>
   </li>
   <li><a href="#example-use-in-python">Example use in python</a></li>
+  <li><a href="#versions-variants-of-the-dataset">Versions (variants of the dataset)</a></li>
   <li><a href="#license">License</a></li>
   <li><a href="#citation">Citation</a></li>
+  <li><a href="#acknowledgements">Acknowledgements</a></li>
   <li><a href="#contact">Contact</a></li>
 </ul>
 
@@ -1246,7 +1248,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 
 ## Example use in python
 
-Load the dataset using the `datasets` library:
+Load and iterate over the full dataset using the `datasets` library:
 ```python
 from datasets import load_dataset
 
@@ -1269,6 +1271,7 @@ Load data where French and English are aligned:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "fr,en", **kwargs)
 ```
+
 Load data corresponding to files with programming languages:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "code", **kwargs)
@@ -1277,6 +1280,7 @@ Load data in Python:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "code-python", **kwargs)
 ```
+
 Load data from Wikipedia (in available languages):
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Wikipedia", **kwargs)
@@ -1286,11 +1290,40 @@ Load data from French pages of Wikipedia ([wikipedia.fr](https://www.wikipedia.f
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Wikipedia-fr", **kwargs)
 ```
 
+Load the Pile dataset:
+```python
+dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile", **kwargs)
+```
+Load "`PhilPapers`" subset from the Pile dataset:
+```python
+dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile-PhilPapers", **kwargs)
+```
+
+## Versions (variants of the dataset)
+
+The dataset is available in the following versions
+- `v1.1` / `main` (default): The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which approximates 3.1B tokens.
+- `v1.2`: An improved version of the data, where 
+  - GallicaMonographies and GallicaPress have been updated to filter out documents with bad OCR quality.
+  - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined, by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
+- `v1.2-extension` : The data used for the second pretraining phase that was context-extension of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B). This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
+
+You can load a specific version with the `datasets` Python package using the `revision` parameter of the `load_dataset()` function:
+```python
+name = None # or a configuration (e.g. "fr", "code-python", "Wikipedia-fr", "Pile-PhilPapers")
+dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="v1.2", **kwargs)
+```
+Parquet files corresponding to the datasets are in git branches named after the version (e.g. [`v1.2`](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2)).
+
 ## License
 
 TODO
 
 ## Citation
+
+TODO
+
+## Acknowledgements
 
 TODO
 
