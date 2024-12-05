@@ -46,7 +46,7 @@ if not DATA_PATH:
     for possible_data_path in [
         "/gpfswork/rech/qgz/commun/data/corpus_openllm",  # Jean-Zay
         "/media/storage0/corpus_openllm",  # koios
-        "/data-storage/storage0/corpus_openllm",  # biggerboi
+        "/data-server/data/text/multilang/Lucie/raw",  # biggerboi
     ]:
         if os.path.isdir(possible_data_path):
             DATA_PATH = possible_data_path
@@ -217,6 +217,9 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "subscene",
         "youtube",
     ]
+    corpora_with_years = [
+        "fine_web_edu",
+    ]
 
     name = name.lower()
 
@@ -290,12 +293,20 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
                 yield ds
 
     else:
+        has_year = any(name.startswith(c + "_") for c in corpora_with_years)
+        if has_year:
+            fields = name.split("_")
+            year = fields[-1]
+            name = "_".join(fields[:-1])
+            kwargs["target_years"] = [year]
+
         has_language = any(name.startswith(c + "_") for c in multilang_corpora) and not name.endswith("_aligned")
         if has_language:
             fields = name.split("_")
             language = fields[-1]
             name = "_".join(fields[:-1])
             kwargs["language"] = language
+
         camel_name = "".join([w.capitalize() for w in name.split("_")])
         class_name = f"DataIterator{camel_name}"
         if scope is None:
@@ -2018,9 +2029,78 @@ class DataIteratorPersee(DataIteratorParquet):
             name="Persee",
             key="complete_text",
             subsample_criteria="file_id",
+            # preprocess=collect_persee_metadata,
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
             **kwargs,
         )
+
+
+_persee_collections = {
+    "doc_count": {},
+    "word_count": {},
+    "character_count": {},
+}
+_persee_filtered_data = {
+    "collection": [],
+    "year": [],
+    "file_id": [],
+    "word_count": [],
+    "character_count": [],
+}
+
+
+def collect_persee_metadata(data):
+    global _persee_collections
+    file_id = data["file_id"]
+    category = file_id.split("_")[0]
+    _persee_collections["doc_count"][category] = _persee_collections["doc_count"].get(category, 0) + 1
+    _persee_collections["word_count"][category] = (
+        _persee_collections["word_count"].get(category, 0) + data["word_count"]
+    )
+    _persee_collections["character_count"][category] = (
+        _persee_collections["character_count"].get(category, 0) + data["character_count"]
+    )
+    for k in _persee_filtered_data.keys():
+        if k in data:
+            _persee_filtered_data[k].append(data[k])
+        elif k == "collection":
+            _persee_filtered_data[k].append(category)
+        elif k == "year":
+            _persee_filtered_data[k].append(data["date"])
+        else:
+            raise NotImplementedError(f"Missing key {k} in {data}")
+
+    if len(_persee_filtered_data["file_id"]) % 1000 == 0:
+        print_persee_stats()
+
+    return data
+
+
+def print_persee_stats():
+    if _persee_collections:
+        import pandas as pd
+
+        persee_collection_data = {
+            "collection": [],
+            "doc_count": [],
+            "word_count": [],
+            "character_count": [],
+        }
+        for collection in _persee_collections["doc_count"].keys():
+            for k in persee_collection_data.keys():
+                if k == "collection":
+                    persee_collection_data[k].append(collection)
+                    continue
+                persee_collection_data[k].append(_persee_collections[k][collection])
+        # sort by word count:
+        df = pd.DataFrame(persee_collection_data).sort_values(by="word_count", ascending=False)
+        df.to_csv("persee_metadata_collections.csv", index=False)
+
+    if _persee_filtered_data:
+        import pandas as pd
+
+        df = pd.DataFrame(_persee_filtered_data)  # .sort_values(by="word_count", ascending=False)
+        df.to_csv("persee_metadata_documents.csv", index=False)
 
 
 class DataIteratorOpenEdition(DataIteratorParquet):
@@ -2838,3 +2918,4 @@ if __name__ == "__main__":
                 )
 
     print_gutenberg_stats()
+    print_persee_stats()
