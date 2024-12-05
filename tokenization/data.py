@@ -1793,6 +1793,73 @@ class DataIteratorRedPajama(DataIteratorConcat):
         )
 
 
+class DataIteratorArxiver(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"arxiver:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "neuralwork/arxiver",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            key="markdown",
+            **kwargs,
+        )
+
+
+class DataIteratorOpenWebMath(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"OpenWebMath:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "open-web-math/open-web-math",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            **kwargs,
+        )
+
+
+class DataIteratorStackMathQA(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"StackMathQA:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "math-ai/StackMathQA",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda x: {"text": f"### Question:\n{x['Q']}\n### Answer:\n{x['A']}"},
+            **kwargs,
+        )
+
+
+class DataIteratorFlan(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"Flan:{language}"
+        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
+            excluded_tasks = f.read().splitlines()
+        excluded_tasks = set(excluded_tasks)
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "ai2-adapt-dev/flan_v2_converted",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            filter_fn=lambda x: x["_task_name"] not in excluded_tasks,
+            preprocess=lambda x: {"text": x["inputs"] + " " + x["targets"], "_task_name": x["_task_name"]},
+            **kwargs,
+        )
+
+
 class CheckedDataIterator(DataIterator):
     def __init__(self, *kargs, **kwargs):
         DataIterator.__init__(self, *kargs, **kwargs)
