@@ -70,10 +70,9 @@ done
 # Stage 2
 ANNEALING_CHECKPOINT=${BASE_CHECKPOINT_PATH}/stage2/transformers_checkpoints/global_step1192
 ANNEALING_OUTPUT=empty
-run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH 
+run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $ANNEALING_OUTPUT
 
 # Evaluate instruction model with PEFT
-echo "Processing instruction checkpoint..."
 INSTRUCTION_CHECKPOINT=${BASE_CHECKPOINT_PATH}/pretrained/transformers_checkpoints/global_step753851
 INSTRUCTION_TOKENIZER_PATH=$ALL_CCFRSCRATCH/instruction_lora/Lucie/human/DemoCredi2Small_global_step753851__20241126_202052/checkpoint-final
 INSTRUCTION_OUTPUT=empty
@@ -84,8 +83,8 @@ INSTRUCTION_OUTPUT=empty
 # INSTRUCTION_PEFT_PATH=$ALL_CCFRSCRATCH/instruction_lora/Lucie/human/DemoCredi2_global_step753851__20241126_202052/checkpoint-2700
 # run_evaluation $INSTRUCTION_CHECKPOINT $INSTRUCTION_TOKENIZER_PATH $INSTRUCTION_OUTPUT $INSTRUCTION_PEFT_PATH
 
-INSTRUCTION_PEFT_PATH=$ALL_CCFRSCRATCH/instruction_lora/Lucie/human/DemoCredi2Small_v2_global_step753851/20241128_104748/checkpoint-final
-run_evaluation $INSTRUCTION_CHECKPOINT $INSTRUCTION_TOKENIZER_PATH $INSTRUCTION_OUTPUT $INSTRUCTION_PEFT_PATH '--apply_chat_template --fewshot_as_multiturn --log_samples'
+# INSTRUCTION_PEFT_PATH=$ALL_CCFRSCRATCH/instruction_lora/Lucie/human/DemoCredi2Small_v2_global_step753851/20241128_104748/checkpoint-final
+# run_evaluation $INSTRUCTION_CHECKPOINT $INSTRUCTION_TOKENIZER_PATH $INSTRUCTION_OUTPUT $INSTRUCTION_PEFT_PATH '--apply_chat_template --fewshot_as_multiturn --log_samples'
 
 # Wait for all background tasks to complete
 wait

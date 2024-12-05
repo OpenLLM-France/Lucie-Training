@@ -34,7 +34,7 @@ def process_results(data):
         metric = None
         if ("arc" in benchmark) or ("hellaswag" in benchmark):
             metric = "acc_norm,none"
-        if (
+        elif (
             ("mmlu" == benchmark)
             or ("mmlu_continuation" == benchmark)
             or ("winogrande" == benchmark)
@@ -44,10 +44,20 @@ def process_results(data):
             or ("truthfulqa_mc2" == benchmark)
         ):
             metric = "acc,none"
-        if "gsm8k" == benchmark:
+        elif "gsm8k" == benchmark:
             metric = "exact_match,strict-match"
+        elif (
+            ("french_bench_fquadv2_genq" == benchmark)
+            or ("french_bench_fquadv2_hasAns" == benchmark)
+            or ("french_bench_multifquad" == benchmark)
+            or ("french_bench_orangesum_abstract" in benchmark)
+            or ("french_bench_trivia" == benchmark)
+        ):
+            metric = "rouge1,none"
+        #
         if metric is not None:
             out.append({"benchmark": benchmark, "metric": metric, "score": results[metric]})
+
     return {"results": out}
 
 

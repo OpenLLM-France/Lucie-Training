@@ -69,7 +69,7 @@ done
 # Stage 2
 ANNEALING_CHECKPOINT=${BASE_CHECKPOINT_PATH}/stage2/transformers_checkpoints/global_step1192
 ANNEALING_OUTPUT=empty
-run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH 
+run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $ANNEALING_OUTPUT
 
 # Evaluate instruction model with PEFT
 echo "Processing instruction checkpoint..."
