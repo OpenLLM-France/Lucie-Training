@@ -18,6 +18,7 @@ https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/tem
       1. [Main pre-training](#1-main-pre-training)
       2. [Context Extension](#2-context-extension)
       3. [Annealing](#3-annealing)
+  * [Training logs and learning curves](#training-logs-and-learning-curves)
 <!-- * [Evaluation](#evaluation) -->
 * [Acknowledgements](#acknowledgements)
 * [Contact](#contact)
@@ -207,6 +208,16 @@ Training hyperparameters are the same as above, with the following changes:
 #### 3. Annealing
 
 TODO
+
+### Training logs and learning curves
+
+🚧 work in progress 🚧
+
+Training logs can be found in Tensorboard format in:
+* [`metadata/training_logs/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs)
+<br> ├── [`1_pretraining.zip`](metadata/training_logs/1_pretraining.zip) training logs for the first pre-training phases,
+in a zip file. Each file in the zip corresponds to a job of at most 20H of training (parallelized over 512 GPUs).
+<br> └── [`2_extension/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs/2_extension) folder containing the training log for the context extension phase, which was done in a single job of around 13H of training (parallelized over 128 GPUs).
 
 ## Acknowledgements
 
