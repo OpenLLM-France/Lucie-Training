@@ -45,8 +45,7 @@ DATA_PATH = os.environ.get("DATA_PATH")
 if not DATA_PATH:
     for possible_data_path in [
         "/gpfswork/rech/qgz/commun/data/corpus_openllm",  # Jean-Zay
-        "/media/storage0/corpus_openllm",  # koios
-        "/data-server/data/text/multilang/Lucie/raw",  # biggerboi
+        "/data-server/datasets/text/multilang/Lucie/raw",
     ]:
         if os.path.isdir(possible_data_path):
             DATA_PATH = possible_data_path
