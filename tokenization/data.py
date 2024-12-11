@@ -216,6 +216,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "cultura_x",
         "subscene",
         "youtube",
+        "aya",
     ]
 
     name = name.lower()
@@ -1856,6 +1857,24 @@ class DataIteratorFlan(DataIterator):
             name=name,
             filter_fn=lambda x: x["_task_name"] not in excluded_tasks,
             preprocess=lambda x: {"text": x["inputs"] + " " + x["targets"], "_task_name": x["_task_name"]},
+            **kwargs,
+        )
+
+
+class DataIteratorAya(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"Aya:{language}"
+        language_map = {"en": "english", "fr": "french", "es": "spanish", "it": "italian", "de": "german"}
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "CohereForAI/aya_collection_language_split",
+                language_map[language],
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda x: {"text": x["inputs"] + " " + x["targets"]},
             **kwargs,
         )
 
