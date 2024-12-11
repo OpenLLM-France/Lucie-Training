@@ -1,4 +1,28 @@
+Translate!
+Please translate this.
+Can you translate this?
+I need a translation.
+Could you translate this, please?
+Translate this for me.
+I need this in a my language.
+Would you mind translating this?
+Help me by translating this.
+Provide a translation for this.
+Translate this passage.
+Translate these words.
+Translate this content.
+Translate this piece.
+I need this text translated.
+Would you translate this text?
+Can you help translate this?
+Turn this document into my language.
+Change this to my language, please.
+Translate this for me, please.
+Please help translate this.
+I need this translated, thanks.
+Help me out by translating this.
 Translate to <language_to>.
+I need this rendered in <language_to>.
 Translate from <language_from> to <language_to>.
 Translate this text from <language_from> to <language_to>.
 Please convert this text from <language_from> into <language_to>.

@@ -1,6 +1,45 @@
+Traduisez !
+Veuillez traduire ceci.
+Pouvez-vous traduire ceci ?
+J'ai besoin d'une traduction.
+Pourriez-vous traduire ceci, s'il vous plaît ?
+Traduisez ceci pour moi.
+J'ai besoin de ceci dans ma langue.
+Cela vous dérangerait-il de traduire ceci ? Aidez-moi en traduisant ceci.
+Fournissez une traduction pour ceci.
+Traduisez ce passage.
+Traduisez ces mots.
+Traduisez ce contenu.
+Traduisez ce texte.
+Traduisez ce discours.
+Traduis ce passage.
+Traduis ces mots.
+Traduis ce contenu.
+Traduis ce texte.
+Traduis ce discours.
+Traduire ce passage.
+Traduire ces mots.
+Traduire ce contenu.
+Traduire ce texte.
+Traduire ce discours.
+J'ai besoin que ce texte soit traduit.
+Pourriez-vous traduire ce texte ?
+Pouvez-vous aider à traduire ceci ?
+Transformez ce document dans ma langue.
+Changez cela dans ma langue, s'il vous plaît.
+Traduisez ceci pour moi, s'il vous plaît.
+Veuillez aider à traduire ceci.
+J'ai besoin que ceci soit traduit, merci.
+Aidez-moi en traduisant ceci.
 Traduire en <language_to>.
 Traduire de <language_from> en <language_to>.
 Traduire ce texte de <language_from> en <language_to>.
+Traduisez en <language_to>.
+Traduisez de <language_from> en <language_to>.
+Traduisez ce texte de <language_from> en <language_to>.
+Traduis en <language_to>.
+Traduis de <language_from> en <language_to>.
+Traduis ce texte de <language_from> en <language_to>.
 Veuillez convertir ce texte de <language_from> en <language_to>.
 Pouvez-vous traduire le texte suivant de <language_from> en <language_to> ?
 J'ai besoin que ce texte soit traduit de <language_from> en <language_to>.
@@ -110,9 +149,8 @@ Faites cela en <language_to>, dès que possible.
 J'ai besoin de ce texte en <language_to>, vite.
 Vite, traduisez ceci en <language_to>.
 Faites de cela du <language_to> immédiatement.
-Pouvez-vous convertir ces données de <language_from> en <language_to> ?
 Veuillez traduire ce script en <language_to>.
-Hé, change ce code en <language_to>.
+Change cela en <language_to>.
 Transformez ce fichier en <language_to>.
 Traduisez ce bloc de texte en <language_to>.
 Pourriez-vous créer une traduction de ce texte en <language_to> ?
@@ -138,5 +176,5 @@ Pourriez-vous être un amour et changer ceci en <language_to> ?
 Pouvez-vous faire de ceci du <language_to> ?
 Veuillez transformer ceci en <language_to> pour moi.
 J'ai besoin de ceci en <language_to>, s'il vous plaît.
-Hé, change ça en <language_to>.
+Change-moi ça en <language_to>.
 Pourriez-vous m'aider en changeant ceci en <language_to> ?
