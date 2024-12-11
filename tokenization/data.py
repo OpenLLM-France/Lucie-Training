@@ -179,6 +179,17 @@ def tokenizer_dataset(
     return dataset
 
 
+_class_prefix = "DataIterator"
+_scope_globals = None
+
+
+def set_data_iterator_prefix(prefix, scope=None):
+    global _class_prefix, _scope_globals
+    _class_prefix = prefix
+    if scope:
+        _scope_globals = scope
+
+
 def get_datasets(name, use_nc=True, scope=None, **kwargs):
     """
     Iterator that yields one or sevaral datasets
@@ -194,6 +205,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         use_nc: Use non-commercial datasets
         **kwargs: additional arguments to pass to all dataset iterators
     """
+    global _class_prefix, _scope_globals
 
     if isinstance(name, list):
         for n in name:
@@ -308,12 +320,14 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
             kwargs["language"] = language
 
         camel_name = "".join([w.capitalize() for w in name.split("_")])
-        class_name = f"DataIterator{camel_name}"
+        class_name = f"{_class_prefix}{camel_name}"
         if scope is None:
-            scope = globals()
-        python_class = scope.get(f"DataIterator{camel_name}", None)
+            if _scope_globals is None:
+                _scope_globals = globals()
+            scope = _scope_globals
+        python_class = scope.get(f"{_class_prefix}{camel_name}", None)
         if not python_class:
-            candidates = sorted([k for k in scope.keys() if k.startswith("DataIterator")])
+            candidates = sorted([k for k in scope.keys() if k.startswith(_class_prefix)])
             raise RuntimeError(f"Cannot find python class {class_name} in {candidates}")
         yield python_class(**kwargs)
 
@@ -384,7 +398,13 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
 
 
 class DataIteratorBase:
-    def __init__(self, name):
+    def __init__(
+        self,
+        name,
+        high_quality=False,
+        max_parquet_files=None,
+        force_include_all_metadata=None,
+    ):
         assert name, "Name cannot be empty"
         self.name = name
 
@@ -413,9 +433,7 @@ class DataIterator(DataIteratorBase):
         postprocess=None,
         filter_fn=None,
         name="",
-        high_quality=False,
-        max_parquet_files=None,
-        force_include_all_metadata=None,
+        **kwargs,
     ):
         """
         Args:
@@ -477,7 +495,7 @@ class DataIterator(DataIteratorBase):
         if suffix:
             name += ":" + suffix.strip("-")
 
-        DataIteratorBase.__init__(self, name)
+        DataIteratorBase.__init__(self, name, **kwargs)
 
     def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None, update_dict_func=None):
         if doit:
@@ -824,7 +842,7 @@ class DataIterator(DataIteratorBase):
         if self.key_init not in data and "text" in data:
             self.key_init = "text"
 
-        text_key = self.key if self.key else self.key_init
+        text_key = self.key if isinstance(self.key, str) else self.key_init
         try:
             text = data[text_key]
         except KeyError:
@@ -844,7 +862,7 @@ class DataIterator(DataIteratorBase):
             self.idx -= 1
             return self.__next__()
 
-        if not self.key:
+        if not isinstance(self.key, str):
             # Normalize text key
             data["text"] = text
             if self.key_init != "text" and self.key_init in data:
@@ -855,6 +873,9 @@ class DataIterator(DataIteratorBase):
             else:
                 # Minimal conversion
                 self.conform_metadata(data, flatten=None)  # flatten="metadata")
+
+            if self.key:
+                data = self.key(data)
 
             return data
 
@@ -876,12 +897,12 @@ class DataIterator(DataIteratorBase):
 
 
 class DataIteratorConcat(DataIteratorBase):
-    def __init__(self, datasets, name=None):
+    def __init__(self, datasets, name=None, **kwargs):
         self.datasets = datasets
         self.idx = 0
         if name is None:
             name = "+".join(d.name for d in datasets)
-        DataIteratorBase.__init__(self, name)
+        DataIteratorBase.__init__(self, name, **kwargs)
 
     def __iter__(self):
         return self
@@ -1421,13 +1442,13 @@ def analyze_bilingual_french_english_data(data, add_language_in_data=False):
 
 def create_augmented_text_from_aligned_data(data):
     if "text_1" in data:
-        lan1 = data.pop("lan_1")
-        lan2 = data.pop("lan_2")
-        text1 = data.pop("text_1").strip()
-        text2 = data.pop("text_2").strip()
+        lan1 = data["lan_1"]
+        lan2 = data["lan_2"]
+        text1 = data["text_1"].strip()
+        text2 = data["text_2"].strip()
         data["text"], lan1, lan2 = create_augmented_text(text1, text2, lan1, lan2)
     else:
-        data["text"], lan1, lan2 = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+        data["text"], lan1, lan2 = create_augmented_text(data["text_en"], data["text_fr"], "en", "fr")
     data["languages"] = [lan1, lan2]
     return data
 
@@ -2832,7 +2853,8 @@ def simple_slugify(name):
 ########################################
 # Main
 
-if __name__ == "__main__":
+
+def main():
     import argparse
     import shutil
 
@@ -2986,3 +3008,7 @@ if __name__ == "__main__":
 
     print_gutenberg_stats()
     print_persee_stats()
+
+
+if __name__ == "__main__":
+    main()
