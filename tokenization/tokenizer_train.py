@@ -562,7 +562,7 @@ if __name__ == "__main__":
         "--individual_digits",
         default=True,
         type=str2bool,
-        help="Split digits individually (ex: 1999 -> 1 9 9 9)",
+        help="Split digits individually (ex: 1999 -> 1┃9┃9┃9)",
     )
     parser.add_argument(
         "--consecutive_spaces",

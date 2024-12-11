@@ -1,0 +1,166 @@
+Translate!
+Please translate this.
+Can you translate this?
+I need a translation.
+Could you translate this, please?
+Translate this for me.
+I need this in a my language.
+Would you mind translating this?
+Help me by translating this.
+Provide a translation for this.
+Translate this passage.
+Translate these words.
+Translate this content.
+Translate this piece.
+I need this text translated.
+Would you translate this text?
+Can you help translate this?
+Turn this document into my language.
+Change this to my language, please.
+Translate this for me, please.
+Please help translate this.
+I need this translated, thanks.
+Help me out by translating this.
+Translate to <language_to>.
+I need this rendered in <language_to>.
+Translate from <language_from> to <language_to>.
+Translate this text from <language_from> to <language_to>.
+Please convert this text from <language_from> into <language_to>.
+Can you translate the following text from <language_from> to <language_to>?
+I need this text translated from <language_from> to <language_to>.
+Could you help me by translating this text from <language_from> to <language_to>?
+Turn this <language_from> text into <language_to>, please.
+Translate the following from <language_from> to <language_to>.
+Would you mind translating this from <language_from> to <language_to>?
+Please change this text from <language_from> to <language_to>.
+I'd like this text translated from <language_from> to <language_to>.
+Can you convert this from <language_from> to <language_to> for me?
+Translate the given text from <language_from> into <language_to>.
+From <language_from> to <language_to>, please translate this text.
+Can you help translate this document from <language_from> to <language_to>?
+Please provide a translation of this text from <language_from> to <language_to>.
+I need a translation from <language_from> to <language_to> for this text.
+Would you translate this passage from <language_from> to <language_to>?
+Please turn this text from <language_from> to <language_to>.
+Translate the following sentence from <language_from> to <language_to>.
+I need this converted from <language_from> to <language_to>.
+Could you translate this text from <language_from> to <language_to>?
+This text needs translating from <language_from> to <language_to>.
+Change this text from <language_from> to <language_to>, please.
+Can I get this text translated from <language_from> to <language_to>?
+Would you mind converting this text from <language_from> to <language_to>?
+Please translate the following from <language_from> into <language_to>.
+I need this document translated from <language_from> to <language_to>.
+Can you translate this paragraph from <language_from> to <language_to>?
+Turn this sentence from <language_from> to <language_to> for me.
+Could you translate the provided text from <language_from> to <language_to>?
+Would you kindly translate this text written in <language_from> into <language_to>?
+Could you please convert this document, originally in <language_from>, to <language_to>?
+Please translate this passage, which is in <language_from>, into <language_to>.
+Would you be so kind as to change this text from <language_from> to <language_to>?
+I would appreciate it if you could translate this text from <language_from> to <language_to>.
+May I ask you to translate this text, written in <language_from>, to <language_to>?
+Please help by translating this document from <language_from> into <language_to>.
+It would be great if you could convert this text from <language_from> to <language_to>.
+Kindly translate the following text from <language_from> into <language_to>.
+I need this text, which is in <language_from>, translated into <language_to>.
+Could you please help translate this text, originally in <language_from>, into <language_to>?
+Please provide a translation for this text, written in <language_from>, to <language_to>.
+Would you translate this text, which is in <language_from>, to <language_to> for me?
+Can you kindly turn this <language_from> text into <language_to>?
+Please translate this document from its original language, <language_from>, to <language_to>.
+I would be thankful if you could translate this text from <language_from> to <language_to>.
+Can you convert this passage, which is written in <language_from>, to <language_to>?
+I need a translation of this text from <language_from> into <language_to>, please.
+Would you kindly provide a translation from <language_from> to <language_to> for this text?
+Please change this text, originally in <language_from>, into <language_to>.
+I would appreciate a translation of this <language_from> text into <language_to>.
+Can you help by translating this text from <language_from> into <language_to>?
+Please convert this text, which is written in <language_from>, to <language_to>.
+Would you be able to translate this text from <language_from> into <language_to> for me?
+I need this document, which is in <language_from>, translated into <language_to>, please.
+Kindly change this text from its original language, <language_from>, to <language_to>.
+Please provide a translation of this document from <language_from> to <language_to>.
+Would you mind converting this <language_from> text into <language_to>?
+Can I get a translation for this passage from <language_from> into <language_to>?
+Please translate this text, which is originally in <language_from>, to <language_to>.
+Hey bro, translate this into <language_to>.
+Translate this to <language_to> for me, will ya?
+Yo, can you turn this into <language_to>?
+Get this translated to <language_to>.
+Hey, switch this to <language_to>.
+Translate this to <language_to>, pronto!
+Turn this into <language_to>, ASAP.
+Yo, need this in <language_to>.
+Hey, convert this into <language_to>.
+Make this <language_from> text into <language_to>.
+Hey, get this into <language_to>.
+I need this in <language_to>, right now.
+Change this to <language_to>.
+Hey dude, translate this to <language_to>.
+Yo, translate this from <language_from> to <language_to>.
+Turn this <language_from> text into <language_to>, quick.
+Hey, make this text <language_to>.
+Hey pal, translate this to <language_to>.
+Yo, need a translation to <language_to>.
+Switch this to <language_to>, man.
+Could you please translate this document into <language_to>?
+Please provide a translation for this text into <language_to>.
+I require this text to be translated into <language_to>.
+Kindly translate this passage into <language_to>.
+Would you be able to convert this text into <language_to> for me?
+Could you translate this text from <language_from> to <language_to> for scholarly purposes?
+Please provide an academic translation of this document into <language_to>.
+I need this manuscript translated into <language_to>.
+Kindly convert this academic text from <language_from> to <language_to>.
+Would you assist in translating this research document into <language_to>?
+May I request a translation of this text into <language_to>?
+Please render this document into <language_to>.
+I would appreciate it if you could translate this text into <language_to>.
+Kindly facilitate the translation of this passage into <language_to>.
+Would you be so kind as to translate this text into <language_to>?
+Hey, can you translate this into <language_to> for me?
+Do me a favor and convert this text to <language_to>.
+Could you help me out and translate this into <language_to>?
+Please turn this into <language_to>, thanks!
+Hey there, could you translate this to <language_to>?
+Translate this into <language_to>, please.
+Can you switch this to <language_to>?
+I need this in <language_to>.
+Hey, change this to <language_to>.
+Make this text <language_to>.
+Translate this to <language_to>, now.
+Get this into <language_to>, ASAP.
+I need this text in <language_to>, hurry.
+Quick, translate this to <language_to>.
+Make this <language_to> right away.
+Can you convert this data from <language_from> to <language_to>?
+Please translate this script into <language_to>.
+Hey, switch this code to <language_to>.
+Transform this file into <language_to>.
+Translate this text block into <language_to>.
+Could you craft a translation of this text into <language_to>?
+Please weave this story into <language_to>.
+I need this poem translated into <language_to>.
+Kindly adapt this script into <language_to>.
+Would you transform this narrative into <language_to>?
+Please translate this contract into <language_to>.
+I need this report in <language_to>.
+Kindly convert this business proposal to <language_to>.
+Would you translate this email into <language_to>?
+Translate this presentation into <language_to>, please.
+Can you translate this phrasebook to <language_to>?
+I need these directions in <language_to>.
+Please convert this travel guide to <language_to>.
+Hey, translate this map into <language_to>.
+Could you switch this itinerary to <language_to>?
+Dear, could you translate this into <language_to> for me?
+Please help me by converting this to <language_to>.
+Would you kindly translate this into <language_to>?
+I need this in <language_to>, if you don't mind.
+Could you be a dear and change this to <language_to>?
+Can you make this into <language_to>?
+Please turn this into <language_to> for me.
+I need this in <language_to>, please.
+Hey, switch this to <language_to>.
+Could you help me by changing this to <language_to>?

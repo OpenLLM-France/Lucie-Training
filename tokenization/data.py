@@ -45,8 +45,7 @@ DATA_PATH = os.environ.get("DATA_PATH")
 if not DATA_PATH:
     for possible_data_path in [
         "/gpfswork/rech/qgz/commun/data/corpus_openllm",  # Jean-Zay
-        "/media/storage0/corpus_openllm",  # koios
-        "/data-storage/storage0/corpus_openllm",  # biggerboi
+        "/data-server/datasets/text/multilang/Lucie/raw",
     ]:
         if os.path.isdir(possible_data_path):
             DATA_PATH = possible_data_path
@@ -179,6 +178,17 @@ def tokenizer_dataset(
     return dataset
 
 
+_class_prefix = "DataIterator"
+_scope_globals = None
+
+
+def set_data_iterator_prefix(prefix, scope=None):
+    global _class_prefix, _scope_globals
+    _class_prefix = prefix
+    if scope:
+        _scope_globals = scope
+
+
 def get_datasets(name, use_nc=True, scope=None, **kwargs):
     """
     Iterator that yields one or sevaral datasets
@@ -194,6 +204,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         use_nc: Use non-commercial datasets
         **kwargs: additional arguments to pass to all dataset iterators
     """
+    global _class_prefix, _scope_globals
 
     if isinstance(name, list):
         for n in name:
@@ -217,6 +228,9 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "subscene",
         "youtube",
         "aya",
+    ]
+    corpora_with_years = [
+        "fine_web_edu",
     ]
 
     name = name.lower()
@@ -291,19 +305,29 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
                 yield ds
 
     else:
+        has_year = any(name.startswith(c + "_") for c in corpora_with_years)
+        if has_year:
+            fields = name.split("_")
+            year = fields[-1]
+            name = "_".join(fields[:-1])
+            kwargs["target_years"] = [year]
+
         has_language = any(name.startswith(c + "_") for c in multilang_corpora) and not name.endswith("_aligned")
         if has_language:
             fields = name.split("_")
             language = fields[-1]
             name = "_".join(fields[:-1])
             kwargs["language"] = language
+
         camel_name = "".join([w.capitalize() for w in name.split("_")])
-        class_name = f"DataIterator{camel_name}"
+        class_name = f"{_class_prefix}{camel_name}"
         if scope is None:
-            scope = globals()
-        python_class = scope.get(f"DataIterator{camel_name}", None)
+            if _scope_globals is None:
+                _scope_globals = globals()
+            scope = _scope_globals
+        python_class = scope.get(f"{_class_prefix}{camel_name}", None)
         if not python_class:
-            candidates = sorted([k for k in scope.keys() if k.startswith("DataIterator")])
+            candidates = sorted([k for k in scope.keys() if k.startswith(_class_prefix)])
             raise RuntimeError(f"Cannot find python class {class_name} in {candidates}")
         yield python_class(**kwargs)
 
@@ -374,7 +398,13 @@ def decompose_datasets(dataset, parquet_level=False, return_json_file_if_possibl
 
 
 class DataIteratorBase:
-    def __init__(self, name):
+    def __init__(
+        self,
+        name,
+        high_quality=False,
+        max_parquet_files=None,
+        force_include_all_metadata=None,
+    ):
         assert name, "Name cannot be empty"
         self.name = name
 
@@ -403,9 +433,7 @@ class DataIterator(DataIteratorBase):
         postprocess=None,
         filter_fn=None,
         name="",
-        high_quality=False,
-        max_parquet_files=None,
-        force_include_all_metadata=None,
+        **kwargs,
     ):
         """
         Args:
@@ -467,7 +495,7 @@ class DataIterator(DataIteratorBase):
         if suffix:
             name += ":" + suffix.strip("-")
 
-        DataIteratorBase.__init__(self, name)
+        DataIteratorBase.__init__(self, name, **kwargs)
 
     def SetYieldMetadata(self, doit=True, uniformize_metadata=False, extra_metadata=None, update_dict_func=None):
         if doit:
@@ -814,7 +842,7 @@ class DataIterator(DataIteratorBase):
         if self.key_init not in data and "text" in data:
             self.key_init = "text"
 
-        text_key = self.key if self.key else self.key_init
+        text_key = self.key if isinstance(self.key, str) else self.key_init
         try:
             text = data[text_key]
         except KeyError:
@@ -834,7 +862,7 @@ class DataIterator(DataIteratorBase):
             self.idx -= 1
             return self.__next__()
 
-        if not self.key:
+        if not isinstance(self.key, str):
             # Normalize text key
             data["text"] = text
             if self.key_init != "text" and self.key_init in data:
@@ -845,6 +873,9 @@ class DataIterator(DataIteratorBase):
             else:
                 # Minimal conversion
                 self.conform_metadata(data, flatten=None)  # flatten="metadata")
+
+            if self.key:
+                data = self.key(data)
 
             return data
 
@@ -866,12 +897,12 @@ class DataIterator(DataIteratorBase):
 
 
 class DataIteratorConcat(DataIteratorBase):
-    def __init__(self, datasets, name=None):
+    def __init__(self, datasets, name=None, **kwargs):
         self.datasets = datasets
         self.idx = 0
         if name is None:
             name = "+".join(d.name for d in datasets)
-        DataIteratorBase.__init__(self, name)
+        DataIteratorBase.__init__(self, name, **kwargs)
 
     def __iter__(self):
         return self
@@ -1411,13 +1442,13 @@ def analyze_bilingual_french_english_data(data, add_language_in_data=False):
 
 def create_augmented_text_from_aligned_data(data):
     if "text_1" in data:
-        lan1 = data.pop("lan_1")
-        lan2 = data.pop("lan_2")
-        text1 = data.pop("text_1").strip()
-        text2 = data.pop("text_2").strip()
+        lan1 = data["lan_1"]
+        lan2 = data["lan_2"]
+        text1 = data["text_1"].strip()
+        text2 = data["text_2"].strip()
         data["text"], lan1, lan2 = create_augmented_text(text1, text2, lan1, lan2)
     else:
-        data["text"], lan1, lan2 = create_augmented_text(data.pop("text_en"), data.pop("text_fr"), "en", "fr")
+        data["text"], lan1, lan2 = create_augmented_text(data["text_en"], data["text_fr"], "en", "fr")
     data["languages"] = [lan1, lan2]
     return data
 
@@ -2104,9 +2135,78 @@ class DataIteratorPersee(DataIteratorParquet):
             name="Persee",
             key="complete_text",
             subsample_criteria="file_id",
+            # preprocess=collect_persee_metadata,
             # postprocess=lambda text: clean_pdf_extraction(text, html_escape=True),
             **kwargs,
         )
+
+
+_persee_collections = {
+    "doc_count": {},
+    "word_count": {},
+    "character_count": {},
+}
+_persee_filtered_data = {
+    "collection": [],
+    "year": [],
+    "file_id": [],
+    "word_count": [],
+    "character_count": [],
+}
+
+
+def collect_persee_metadata(data):
+    global _persee_collections
+    file_id = data["file_id"]
+    category = file_id.split("_")[0]
+    _persee_collections["doc_count"][category] = _persee_collections["doc_count"].get(category, 0) + 1
+    _persee_collections["word_count"][category] = (
+        _persee_collections["word_count"].get(category, 0) + data["word_count"]
+    )
+    _persee_collections["character_count"][category] = (
+        _persee_collections["character_count"].get(category, 0) + data["character_count"]
+    )
+    for k in _persee_filtered_data.keys():
+        if k in data:
+            _persee_filtered_data[k].append(data[k])
+        elif k == "collection":
+            _persee_filtered_data[k].append(category)
+        elif k == "year":
+            _persee_filtered_data[k].append(data["date"])
+        else:
+            raise NotImplementedError(f"Missing key {k} in {data}")
+
+    if len(_persee_filtered_data["file_id"]) % 1000 == 0:
+        print_persee_stats()
+
+    return data
+
+
+def print_persee_stats():
+    if _persee_collections:
+        import pandas as pd
+
+        persee_collection_data = {
+            "collection": [],
+            "doc_count": [],
+            "word_count": [],
+            "character_count": [],
+        }
+        for collection in _persee_collections["doc_count"].keys():
+            for k in persee_collection_data.keys():
+                if k == "collection":
+                    persee_collection_data[k].append(collection)
+                    continue
+                persee_collection_data[k].append(_persee_collections[k][collection])
+        # sort by word count:
+        df = pd.DataFrame(persee_collection_data).sort_values(by="word_count", ascending=False)
+        df.to_csv("persee_metadata_collections.csv", index=False)
+
+    if _persee_filtered_data:
+        import pandas as pd
+
+        df = pd.DataFrame(_persee_filtered_data)  # .sort_values(by="word_count", ascending=False)
+        df.to_csv("persee_metadata_documents.csv", index=False)
 
 
 class DataIteratorOpenEdition(DataIteratorParquet):
@@ -2771,7 +2871,8 @@ def simple_slugify(name):
 ########################################
 # Main
 
-if __name__ == "__main__":
+
+def main():
     import argparse
     import shutil
 
@@ -2924,3 +3025,8 @@ if __name__ == "__main__":
                 )
 
     print_gutenberg_stats()
+    print_persee_stats()
+
+
+if __name__ == "__main__":
+    main()
