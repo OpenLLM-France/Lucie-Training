@@ -52,7 +52,7 @@ Table of Contents:
                   <li><a href="#claire-french-and-english">Claire (French and English)</a></li>
                   <li><a href="#croissantaligned">CroissantAligned</a></li>
                   <li><a href="#discourspublics">DiscoursPublics</a></li>
-                  <li><a href="#europarl-monolingual-and-parallel">Europarl (monolingual and parallel)</a></li>
+                  <li><a href="#europarl-and-europarlaligned-monolingual-and-parallel">Europarl and EuroparlAligned (monolingual and parallel)</a></li>
                   <li><a href="#eurovoc">Eurovoc</a></li>
                   <li><a href="#finewebedu">FineWebEdu</a></li>
                   <li><a href="#gallicamonographies">GallicaMonographies</a></li>
@@ -1079,8 +1079,12 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: [dell-research-harvard/AmericanStories](https://huggingface.co/datasets/dell-research-harvard/AmericanStories). License: [CC BY 4.0](https://huggingface.co/datasets/dell-research-harvard/AmericanStories).
 * <u>Extracted from</u>: [Chronicling America](https://www.loc.gov/collections/chronicling-america/about-this-collection/). License: [Open](https://www.loc.gov/collections/chronicling-america/about-this-collection/rights-and-access/).
 * <u>Description</u>: "The American Stories dataset is a collection of full article texts extracted from historical U.S. newspaper images. It includes nearly 20 million scans from the public domain Chronicling America collection maintained by the Library of Congress. The dataset is designed to address the challenges posed by complex layouts and low OCR quality in existing newspaper datasets" (from the [dataset card](https://huggingface.co/datasets/dell-research-harvard/AmericanStories)). Dataset containing text retrieved through OCR.
+* <u>Text Pre-processing</u>:
+  * <u>Filtering</u>:
+  To filter out documents with excessive OCR errors, the dataset was refined by discarding texts with a perplexity higher than 1500,
+  measured using a CCNET model in English.
+  The code to compute perplexity, parallelized on Parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
 * <u>Citation</u>: Melissa Dell, Jacob Carlson, Tom Bryan, Emily Silcock, Abhishek Arora, Zejiang Shen, Luca D'Amico-Wong, Quan Le, Pablo Querubin and Leander Heldring (2023). "American Stories: A Large-Scale Structured Text Dataset of Historical U.S. Newspapers," [arxiv:2308.12477](https://arxiv.org/abs/2308.12477v1).
-
 
 #### Claire (French and English)
 * <u>Sources</u>:
@@ -1097,21 +1101,31 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
   * Thesis abstracts: French thesis abstract pairs. License: [ETALAB-Licence-Ouverte-v2.0](https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf).
   * Song lyrics: [lacoccinelle](https://www.lacoccinelle.net). License: .
 * <u>Description</u>: Data extracted from OPUS takes the form of sentences pairs, where one sentence is in French and the other is in English. OPUS pairs were passed through a custom pipeline designed to select the highest quality sentences pairs. Selected pairs are labeled "UnbabelFrEn" in the CroissantAligned dataset. The thesis abstract subset contains pairs of French or English thesis abstracts paired with translations written by the thesis author. The song lyrics are translated by contributors to www.lacoccinelle.net. Parallel data are used to boost the multilingual capabilities of models trained on them ([Faysse et al.,2024](https://arxiv.org/pdf/2402.00786)).
+* <u>Text Pre-processing</u>:
+  * <u>Language Separation and Tagging</u>: The original text field of [the Croissant dataset](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data) includes both French and English passages in a non-deterministic order (sometimes English first, sometimes not), separated by different delimiters depending on the subset.
+  Each text was split into monolingual sentences and tagged with the appropriate language code, identified automatically using the [langid library](https://pypi.org/project/langid/).
+  These texts are provided separately in the Lucie-Training-Dataset under the extra field as text_fr for French and text_en for English.
+  * <u>Random combination of texts prefixed by language</u>: The monolingual texts were recombined using random separators and various methods of prefixing the text with the language (name or code).
+  This was done as a precaution to prevent models trained on this data from language switching when generating text.
+  It can be seen as a very basic instruction to translate the first text into the other language.
 * <u>Citation</u>: Manuel Faysse, Patrick Fernandes, Nuno M. Guerreiro, António Loison, Duarte M. Alves, Caio Corro, Nicolas Boizard, João Alves, Ricardo Rei, Pedro H. Martins, Antoni Bigata Casademunt, François Yvon, André F.T. Martins, Gautier Viaud, Céline Hudelot, Pierre Colombo (2024). "CroissantLLM: A Truly Bilingual French-English Language Model," [arXiv:2402.00786](https://arxiv.org/abs/2402.00786).
 
 #### DiscoursPublics
-  * <u>Source</u>: Corpus contributed by OpenLLM partners.
-  * <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics).
-  * <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
-  * <u>Text pre-processing</u>:
-    * <u>Text cleaning</u>: the mention of the source url and the number of views were removed.
-  * <u>Citation</u>: No paper found.
+* <u>Source</u>: Corpus contributed by OpenLLM partners.
+* <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics).
+* <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
+* <u>Text Pre-processing</u>:
+  * <u>Text cleaning</u>: the mention of the source url and the number of views were removed.
+* <u>Citation</u>: No paper found.
 
-#### Europarl (monolingual and parallel)
+#### Europarl and EuroparlAligned (monolingual and parallel)
 * <u>Sources</u>: 
   * `fr-en`, `es-en`, `it-en` parallel data: [Europarl v7](https://www.statmt.org/europarl/v7/). License: [Open](https://www.statmt.org/europarl/).
   * `fr`, `en`, `de`, `es` monolingual data and `de-fr` parallel data: [Europarl v10](https://www.statmt.org/europarl/v10/training-monolingual/). License: [Open](https://www.statmt.org/europarl/).
 * <u>Description</u>: "The Europarl parallel corpus is extracted from the proceedings of the European Parliament. It includes versions in 21 European languages: Romanic (French, Italian, Spanish, Portuguese, Romanian), Germanic (English, Dutch, German, Danish, Swedish), Slavik (Bulgarian, Czech, Polish, Slovak, Slovene), Finni-Ugric (Finnish, Hungarian, Estonian), Baltic (Latvian, Lithuanian), and Greek. The goal of the extraction and processing was to generate sentence aligned text for statistical machine translation systems" ([www.statmt.org](https://www.statmt.org/europarl/)).
+* <u>Text Pre-processing</u>:
+  * <u>Random Combination of Aligned Texts Prefixed by Language</u>: The same process as used for the [CroissantAligned](#croissantaligned) dataset was applied to the Europarl dataset.
+  In the Lucie-Training-Dataset, this dataset provides texts in the two languages under the extra sub-fields `text_1` and `text_2`, and the corresponding language codes under `lang_1` and `lang_2`.
 * <u>Citation</u>: Philipp Koehn (2005). "Europarl: A Parallel Corpus for Statistical Machine Translation," MT Summit. 
 
 #### Eurovoc
@@ -1143,15 +1157,15 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Citation</u>: No paper found.
 
 #### Gutenberg
-  * <u>Source</u>: Corpus compiled by OpenLLM partners.
-  * <u>Extracted from</u>: 
-    * [aleph.gutenberg.org](http://aleph.gutenberg.org/) via [Project Gutenberg](https://www.gutenberg.org/). License: [Open](https://www.gutenberg.org/policy/terms_of_use.html).
-    * [pgcorpus](https://github.com/pgcorpus/gutenberg). License: [CC BY-4.0](https://zenodo.org/records/2422561).
-  * <u>Description</u>: A collection of free eBooks, manually prepared by human annotators. 
-  * <u>Text pre-processing</u>:
-    * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). This filtering was done to ensure that the texts are in the public domain.
-    * <u>Text cleaning</u>: Headers, footers mentioning the Project Gutenberg were removed.
-  * <u>Citation</u>: No paper found.
+* <u>Source</u>: Corpus compiled by OpenLLM partners.
+* <u>Extracted from</u>: 
+  * [aleph.gutenberg.org](http://aleph.gutenberg.org/) via [Project Gutenberg](https://www.gutenberg.org/). License: [Open](https://www.gutenberg.org/policy/terms_of_use.html).
+  * [pgcorpus](https://github.com/pgcorpus/gutenberg). License: [CC BY-4.0](https://zenodo.org/records/2422561).
+* <u>Description</u>: A collection of free eBooks, manually prepared by human annotators. 
+* <u>Text Pre-processing</u>:
+  * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). This filtering was done to ensure that the texts are in the public domain.
+  * <u>Text cleaning</u>: Headers, footers mentioning the Project Gutenberg were removed.
+* <u>Citation</u>: No paper found.
 
 #### HAL
 * <u>Source</u>: The ROOTS corpus by BigScience (unpublished). License: CC BY-4.0.
@@ -1233,7 +1247,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL](https://hal.science/).
 * <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Text Pre-processing</u>:
   * <u>Filtering</u>: Text with less than 1000 words or 10000 characters were removed.
   * <u>Text cleaning</u>: Because the results of OCR on tables and graphics can give raise to garbage text, the text was cleaned by removing the most suspicious chunks of text. Chunks of text were removed if the detected language was not among French, English, Spanish, German and Italian, or if the perplexity of a CCNet Language Model was higher than 2000 ([details here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
 * <u>Citation</u>: No paper found.
