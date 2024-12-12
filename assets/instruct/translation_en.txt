@@ -18,7 +18,8 @@ Change this to <language_to>.
 Change this to my language, please.
 Could you be a dear and change this to <language_to>?
 Could you craft a translation of this text into <language_to>?
-Could you help me by changing this to <language_to>?Could you help me by translating this text from <language_from> to <language_to>?
+Could you help me by changing this to <language_to>?
+Could you help me by translating this text from <language_from> to <language_to>?
 Could you help me out and translate this into <language_to>?
 Could you please convert this document, originally in <language_from>, to <language_to>?
 Could you please help translate this text, originally in <language_from>, into <language_to>?
@@ -44,7 +45,6 @@ Hey, change this to <language_to>.
 Hey, convert this into <language_to>.
 Hey, get this into <language_to>.
 Hey, make this text <language_to>.
-Hey, switch this code to <language_to>.
 Hey, switch this to <language_to>.
 Hey, translate this map into <language_to>.
 I need a translation from <language_from> to <language_to> for this text.
@@ -75,7 +75,6 @@ I would appreciate it if you could translate this text into <language_to>.
 I would be thankful if you could translate this text from <language_from> to <language_to>.
 I'd like this text translated from <language_from> to <language_to>.
 It would be great if you could convert this text from <language_from> to <language_to>.
-Kindly adapt this script into <language_to>.
 Kindly change this text from its original language, <language_from>, to <language_to>.
 Kindly convert this academic text from <language_from> to <language_to>.
 Kindly convert this business proposal to <language_to>.
@@ -105,7 +104,6 @@ Please translate the following from <language_from> into <language_to>.
 Please translate this contract into <language_to>.
 Please translate this document from its original language, <language_from>, to <language_to>.
 Please translate this passage, which is in <language_from>, into <language_to>.
-Please translate this script into <language_to>.
 Please translate this text, which is originally in <language_from>, to <language_to>.
 Please translate this.
 Please turn this into <language_to> for me.
@@ -133,7 +131,6 @@ Translate this text block into <language_to>.
 Translate this text from <language_from> to <language_to>.
 Translate this to <language_to> for me, will ya?
 Translate this to <language_to>, now.
-Translate this to <language_to>, pronto!
 Translate to <language_to>.
 Translate!
 Turn this <language_from> text into <language_to>, please.
