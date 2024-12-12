@@ -1892,6 +1892,39 @@ class DataIteratorFlan(DataIterator):
         )
 
 
+class DataIteratorFlanv2(DataIteratorConcat):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        sampling_sizes = {
+            "cot_fsopt_data": 20000 * 50,
+            "cot_zsopt_data": 20000 * 50,
+            "niv2_fsopt_data": 20000 * 50,
+            "niv2_zsopt_data": 20000 * 50,
+            "flan_fsopt_data": 2000 * 50,
+            "flan_zsopt_data": 2000 * 50,
+            "t0_fsopt_data": 6000 * 50,
+        }
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "Open-Orca/FLAN",
+                        data_files=f"{subset}/*",
+                        streaming=streaming,
+                        split="train",
+                    ).shuffle(seed=42),
+                    name=f"Flanv2:{language}:{subset}",
+                    preprocess=lambda x: {"text": x["inputs"] + "\n" + x["targets"]},
+                    max_docs=sampling_size,
+                    **kwargs,
+                )
+                for subset, sampling_size in sampling_sizes.items()
+            ],
+            name=f"Flanv2:{language}",
+        )
+
+
 class DataIteratorAya(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
         name = f"Aya:{language}"
