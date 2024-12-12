@@ -29,6 +29,7 @@ from text import (
     is_url_duplicated,
     string_to_random01,
 )
+from transformers import AutoTokenizer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -228,6 +229,9 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "subscene",
         "youtube",
         "aya",
+        "alpaca",
+        "dolly",
+        "aya_dataset",
     ]
     corpora_with_years = [
         "fine_web_edu",
@@ -297,6 +301,8 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
             # "gutenberg": ["fr", "en", "de", "es", "it"],
             # "cultura_x": ["fr", "en", "de", "es", "it"],
             "red_pajama": ["fr", "de", "es", "it"],
+            "alpaca": ["en", "fr"],
+            "dolly": ["en", "fr", "de", "es"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         if "use_nc" in kwargs:
             use_nc = kwargs.pop("use_nc")
@@ -1946,6 +1952,85 @@ class DataIteratorAya(DataIterator):
             ),
             name=name,
             preprocess=lambda x: {"text": x["inputs"] + " " + x["targets"]},
+            **kwargs,
+        )
+
+
+tokenizer = AutoTokenizer.from_pretrained(
+    "/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
+)
+
+
+def convert_to_chat(
+    data, tokenizer, instruction_col_name="instruction", input_col_name="input", output_col_name="output"
+):
+    if (input_col_name is not None) and (data[input_col_name] != ""):
+        chat = [
+            {"role": "user", "content": f"{data[instruction_col_name]}\n{data[input_col_name]}"},
+            {"role": "assistant", "content": f"{data[output_col_name]}"},
+        ]
+    else:
+        chat = [
+            {"role": "user", "content": f"{data[instruction_col_name]}"},
+            {"role": "assistant", "content": f"{data[output_col_name]}"},
+        ]
+    text = tokenizer.apply_chat_template(chat, tokenize=False)
+    data["text"] = text
+    return data
+
+
+class DataIteratorAlpaca(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        if language == "en":
+            data_path = "yahma/alpaca-cleaned"
+        elif language == "fr":
+            data_path = "cmh/alpaca_data_cleaned_fr_52k"
+        else:
+            raise NotImplementedError
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                data_path,
+                streaming=streaming,
+                split="train",
+            ),
+            name=f"Alpaca:{language}",
+            preprocess=lambda x: convert_to_chat(x, tokenizer),
+            **kwargs,
+        )
+
+
+class DataIteratorDolly(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "argilla/databricks-dolly-15k-curated-multilingual",
+                streaming=streaming,
+                split=language,
+            ),
+            name=f"Dolly:{language}",
+            preprocess=lambda x: convert_to_chat(x, tokenizer, input_col_name="context", output_col_name="response"),
+            **kwargs,
+        )
+
+
+class DataIteratorAyaDataset(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"AyaDataset:{language}"
+        language_map = {"en": "English", "fr": "French", "es": "Spanish", "it": "Italian", "de": "German"}
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "CohereForAI/aya_dataset",
+                streaming=streaming,
+                split="train",
+            ),
+            filter_fn=lambda x: x["language"] == language_map[language],
+            name=name,
+            preprocess=lambda x: convert_to_chat(
+                x, tokenizer, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
+            ),
             **kwargs,
         )
 
