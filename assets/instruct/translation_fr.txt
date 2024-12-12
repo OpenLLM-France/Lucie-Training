@@ -51,7 +51,6 @@ J'ai besoin que ceci soit converti de <language_from> en <language_to>.
 J'ai besoin que ceci soit traduit, merci.
 J'aimerais que ce texte soit traduit de <language_from> en <language_to>.
 J'apprécierais une traduction de ce texte <language_from> en <language_to>.
-Je nécessite que ce texte soit traduit en <language_to>.
 Je vous serais reconnaissant si vous pouviez traduire ce texte de <language_from> en <language_to>.
 Je vous serais reconnaissant si vous pouviez traduire ce texte en <language_to>.
 Mon cher, pourriez-vous traduire cela en <language_to> pour moi ?
@@ -60,7 +59,8 @@ Pourriez-vous changer cet itinéraire en <language_to> ?
 Pourriez-vous créer une traduction de ce texte en <language_to> ?
 Pourriez-vous gentiment traduire ce texte écrit en <language_from> en <language_to> ?
 Pourriez-vous gentiment traduire ceci en <language_to> ?
-Pourriez-vous m'aider en changeant ceci en <language_to> ?Pourriez-vous m'aider en traduisant ce texte de <language_from> en <language_to> ?
+Pourriez-vous m'aider en changeant ceci en <language_to> ?
+Pourriez-vous m'aider en traduisant ce texte de <language_from> en <language_to> ?
 Pourriez-vous m'aider et traduire ceci en <language_to> ?
 Pourriez-vous s'il vous plaît aider à traduire ce texte, à l'origine en <language_from>, en <language_to> ?
 Pourriez-vous s'il vous plaît convertir ce document, à l'origine en <language_from>, en <language_to> ?
@@ -100,7 +100,6 @@ Traduire ce texte.
 Traduire ces mots.
 Traduire de <language_from> en <language_to>.
 Traduire en <language_to>.
-Traduiriez-vous cet e-mail en <language_to> ?
 Traduis ce contenu.
 Traduis ce discours.
 Traduis ce passage.
@@ -118,7 +117,6 @@ Traduisez ce qui suit de <language_from> en <language_to>.
 Traduisez ce texte de <language_from> en <language_to>.
 Traduisez ce texte.
 Traduisez ceci en <language_to> pour moi, s'il vous plaît.
-Traduisez ceci en <language_to>, pronto !
 Traduisez ceci en <language_to>, s'il vous plaît.
 Traduisez ceci pour moi, s'il vous plaît.
 Traduisez ceci pour moi.
@@ -129,14 +127,12 @@ Traduisez en <language_to>.
 Traduisez la phrase suivante de <language_from> en <language_to>.
 Traduisez le texte donné de <language_from> en <language_to>.
 Transforme ce texte <language_from> en <language_to>, vite.
-Transformeriez-vous cette narration en <language_to> ?
 Transformez ce document dans ma langue.
 Transformez ce fichier en <language_to>.
 Transformez ce texte <language_from> en <language_to>.
 Transformez ce texte de <language_from> en <language_to>, s'il vous plaît.
 Transformez ceci en <language_to>, dès que possible.
 Transformez cette phrase de <language_from> en <language_to> pour moi.
-Veuillez adapter ce script en <language_to>.
 Veuillez aider en traduisant ce document de <language_from> en <language_to>.
 Veuillez aider à traduire ceci.
 Veuillez changer ce texte de <language_from> en <language_to>.
@@ -147,7 +143,6 @@ Veuillez convertir ce texte académique de <language_from> en <language_to>.
 Veuillez convertir ce texte de <language_from> en <language_to>.
 Veuillez convertir ce texte, qui est écrit en <language_from>, en <language_to>.
 Veuillez convertir cette proposition commerciale en <language_to>.
-Veuillez faciliter la traduction de ce passage en <language_to>.
 Veuillez fournir une traduction académique de ce document en <language_to>.
 Veuillez fournir une traduction de ce document de <language_from> en <language_to>.
 Veuillez fournir une traduction de ce texte de <language_from> en <language_to>.
@@ -155,13 +150,11 @@ Veuillez fournir une traduction de ce texte en <language_to>.
 Veuillez fournir une traduction de ce texte, écrit en <language_from>, en <language_to>.
 Veuillez m'aider en convertissant cela en <language_to>.
 Veuillez rendre ce document en <language_to>.
-Veuillez tisser cette histoire en <language_to>.
 Veuillez traduire ce constat en <language_to>.
 Veuillez traduire ce document de sa langue d'origine, <language_from>, en <language_to>.
 Veuillez traduire ce passage en <language_to>.
 Veuillez traduire ce passage, qui est en <language_from>, en <language_to>.
 Veuillez traduire ce qui suit de <language_from> en <language_to>.
-Veuillez traduire ce script en <language_to>.
 Veuillez traduire ce texte, qui est à l'origine en <language_from>, en <language_to>.
 Veuillez traduire ceci.
 Veuillez traduire cette présentation en <language_to>.
