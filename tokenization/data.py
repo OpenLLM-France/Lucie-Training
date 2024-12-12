@@ -599,6 +599,13 @@ class DataIterator(DataIteratorBase):
             "rag": "extra",  # in MathPile
             "synthetic_textbooks": "extra",  # in MathPile
             "topic": "extra",  # in MathPile
+            # Aligned datasets
+            "text_fr": "extra",
+            "text_en": "extra",
+            "text_1": "extra",
+            "text_2": "extra",
+            "lan_1": "extra",
+            "lan_2": "extra",
         }
         _fields_to_regroup_under_exact = {k: v for k, v in _fields_to_regroup_under.items() if "." not in k}
         _fields_to_regroup_under_fuzzy = {k: v for k, v in _fields_to_regroup_under.items() if "." in k}
@@ -708,6 +715,11 @@ class DataIterator(DataIteratorBase):
                 del data[key]
 
         # - Special stuff for languages
+        if "languages" in data:
+            assert (
+                not is_programming_language
+            ), "Not Implemented : mixing programming language with natural language information"
+            data["language"] = ",".join(data.pop("languages"))  # json.dumps(data.pop("languages"), ensure_ascii=False)
         if "language" in data:
             if is_programming_language:
                 # Programming languages (not natural)
@@ -718,14 +730,9 @@ class DataIterator(DataIteratorBase):
                 if len(lang) == 3:
                     # Used in Eurovoc
                     assert lang in ["ita", "fra", "eng", "deu", "spa"], f"Unknown language {lang}"
-                    lang = {"spa": "es"}[lang]
+                    lang = {"spa": "es"}.get(lang, lang)
                     lang = lang[:2]
                     data["language"] = lang
-        if "languages" in data:
-            assert (
-                not is_programming_language
-            ), "Not Implemented : mixing programming language with natural language information"
-            data["language"] = ",".join(data.pop("languages"))  # json.dumps(data.pop("languages"), ensure_ascii=False)
 
         # At last, enforce types of final data, avoiding to have embedded dictionaries
         self.enforce_types(data, no_dict=True)

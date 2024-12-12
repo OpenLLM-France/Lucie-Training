@@ -191,12 +191,10 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
                         raise ValueError(f"Template {template} has <language_from> but not <language_to>")
                     else:
                         self.instruct_templates[lan]["no_lang"].append(template)
-
-        # Remove duplicates
-        for k in self.instruct_templates:
-            self.instruct_templates[k] = {
-                lan: sorted(set(templates)) for lan, templates in self.instruct_templates[k].items()
-            }
+            # Check it is not empty and remove duplicates
+            for k in self.instruct_templates[lan]:
+                assert self.instruct_templates[lan][k], f"No instruction template found for {k}"
+                self.instruct_templates[lan][k] = sorted(set(self.instruct_templates[lan][k]))
 
         # Set probabilities inversely proportional to the square of the number of characters
         def compute_weights(instructions):
@@ -242,57 +240,70 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
         text_en = data["text_en"]
 
         french_first = random.random() < self.proba_french_to_english
-        language_from = "fr" if french_first else "en"
-        language_to = "en" if french_first else "fr"
-        text_from = text_fr if french_first else text_en
-        text_to = text_en if french_first else text_fr
+        language_input = "fr" if french_first else "en"
+        language_output = "en" if french_first else "fr"
+        text_input = text_fr if french_first else text_en
+        text_translated = text_en if french_first else text_fr
 
-        instruction_in_the_same_language = random.random() < self.proba_same_language
-        language_instruction = language_from if instruction_in_the_same_language else language_to
+        instruction_has_input_language = random.random() < self.proba_same_language
+        language_instruction = language_input if instruction_has_input_language else language_output
 
-        type = random.choice(["no_lang", "to", "from_and_to"])
-
+        # Choose whether to mention input/output languages in the instruction or not
         proba_by_languages_mentioned = (
             self.proba_by_languages_mentioned_if_same_as_instruct
-            if instruction_in_the_same_language
+            if instruction_has_input_language
             else self.proba_by_languages_mentioned_if_different_from_instruct
         )
         type = random.choices(
             list(proba_by_languages_mentioned.keys()), weights=list(proba_by_languages_mentioned.values())
         )[0]
-        instructions = self.instruct_templates[language_instruction][type]
-        weights = self.intruct_template_probas[language_instruction][type]
-        instruction = random.choices(instructions, weights=weights)[0]
+
+        # Choose the instruction template among available ones
+        instruction = random.choices(
+            self.instruct_templates[language_instruction][type],
+            weights=self.intruct_template_probas[language_instruction][type],
+        )[0]
 
         # Get the language names, and noise them a bit
-        language_from_str = self.language_strings[language_instruction][language_from]
-        language_to_str = self.language_strings[language_instruction][language_to]
-        # 1. Sometimes there are several options (["français",  "francais"] -> random choice)
-        if not isinstance(language_from_str, str):
-            language_from_str = random.choice(language_from_str)
-        if not isinstance(language_to_str, str):
-            language_to_str = random.choice(language_to_str)
-        # 2. Capitalize (or not) the language
+        language_input_str = self.language_strings[language_instruction][language_input]
+        language_output_str = self.language_strings[language_instruction][language_output]
+        # - Sometimes there are several options (["français",  "francais"] -> random choice)
+        if not isinstance(language_input_str, str):
+            language_input_str = random.choice(language_input_str)
+        if not isinstance(language_output_str, str):
+            language_output_str = random.choice(language_output_str)
+        # - Capitalize (or not) the language
         should_capitalize = language_instruction == "en"
         if random.random() < self.proba_wrong_case_for_language:
             do_capitalize = not should_capitalize
-            language_from_str = language_from_str.capitalize() if do_capitalize else language_from_str.lower()
-            language_to_str = language_to_str.capitalize() if do_capitalize else language_to_str.lower()
-        # 3. Language-specific fixes
-        if language_from == "fr":
+            language_input_str = language_input_str.capitalize() if do_capitalize else language_input_str.lower()
+            language_output_str = language_output_str.capitalize() if do_capitalize else language_output_str.lower()
+
+        # Make the substitutions
+        # - First language-specific fixes
+        if language_instruction == "fr":
             # Contractions needed (de -> d', du -> de l')
-            if language_from_str[0] in "aeiouyAEIOUY":  # only when the word starts with a vowel
-                instruction = re.sub(r"\b([Dd])e <language_from>", r"\1'" + language_from_str, instruction)
-                instruction = re.sub(r"\b([Dd])u <language_from>", r"\1e l'" + language_from_str, instruction)
+            if language_input_str[0] in "aeiouyAEIOUY":  # only when the word starts with a vowel
+                instruction = re.sub(r"\b([Dd])e <language_from>", r"\1'" + language_input_str, instruction)
+                instruction = re.sub(r"\b([Dd])u <language_from>", r"\1e l'" + language_input_str, instruction)
             # Sometimes remove space before question mark in French
             if instruction.endswith("?") and random.random() < self.proba_wrong_question_mark_fr:
                 instruction = instruction[:-1].rstrip() + "?"
+            # Contractions needed (au -> à l', du -> de l')
+            if language_output_str[0] in "aeiouyAEIOUY":  # only when the word starts with a vowel
+                instruction = re.sub(r"\bau <language_to>", r"à l'" + language_output_str, instruction)
+                instruction = re.sub(r"\bdu <language_to>", r"de l'" + language_output_str, instruction)
+        # - Then the general substitutions
+        instruction = re.sub("<language_from>", language_input_str, instruction)
+        instruction = re.sub("<language_to>", language_output_str, instruction)
 
-        instruction = re.sub("<language_from>", language_from_str, instruction)
-        instruction = re.sub("<language_to>", language_to_str, instruction)
+        # Additional data augmentation
+        # - Choose random sentence ending
         if instruction.endswith("."):
-            instruction = instruction[:-1] + random.choice([".", ":", ""])
-
+            instruction = instruction[:-1] + random.choices([".", ":", ""], weights=[0.25, 0.35, 0.4])[0]
+        elif instruction.endswith("?"):
+            instruction = instruction[:-1] + random.choices(["?", ""], weights=[0.7, 0.3])[0]
+        # - Choose random separation between the instruction and the text to translate
         separators = random.choice(
             [
                 ("\n", ""),
@@ -305,19 +316,21 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
                 ("\n\n«", "»"),
             ]
         )
-        instruction += separators[0] + text_from + separators[1]
+
+        # Make the final instruction and response
+        instruction += separators[0] + text_input + separators[1]
 
         output_prefix = separators[0].strip()
         output_suffix = separators[1].strip()
-        response = output_prefix + text_to + output_suffix
+        response = output_prefix + text_translated + output_suffix
 
         if self.verbose:
-            short_text_from = f"{text_from[:10]:10}[[... ({language_from})]]"
-            short_text_to = f"{text_to[:10]:10}[[... ({language_to})]]"
+            short_text_input = f"{text_input[:10]:10}[[... ({language_input})]]"
+            short_text_translated = f"{text_translated[:10]:10}[[... ({language_output})]]"
             debug_print = (
                 (instruction + "[[]]" + response)
-                .replace(text_from, short_text_from)
-                .replace(text_to, short_text_to)
+                .replace(text_input, short_text_input)
+                .replace(text_translated, short_text_translated)
                 .replace("\n", "\\n")
                 .replace("\t", "\\t")
                 .replace("[[]]", "\n -> ")

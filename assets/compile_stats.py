@@ -191,6 +191,7 @@ def to_language_name_subset(name, subset=None):
     _languages = ["fr", "en", "de", "es", "it"]
     if subset is None:
         name, subset = to_name_subset(name)
+    subset = subset.replace(":0-1parquet", "")
     for lan in _languages:
         subset2 = subset.rstrip(":.0123456789")
         if subset.startswith(lan) and (len(subset) == len(lan) or subset[len(lan)] in ".:-"):
@@ -202,6 +203,8 @@ def to_language_name_subset(name, subset=None):
             subset = subset.strip(":_")
             if "gutenberg" in name.lower():
                 subset = ""
+            if "europarl" in name.lower():
+                subset = lan
             return lan, name + "." + lan, subset
     if "En" in name:
         language = "en"

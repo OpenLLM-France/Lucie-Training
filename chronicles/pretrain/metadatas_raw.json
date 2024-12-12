@@ -154,7 +154,13 @@
     "max_forks_repo_forks_event_max_datetime": "2021-03-28T13:58:47.000Z",
     "max_issues_count": 1,
     "max_issues_repo_issues_event_min_datetime": "2022-02-04T15:43:52.000Z",
-    "max_issues_repo_issues_event_max_datetime": "2022-02-04T16:07:45.000Z"
+    "max_issues_repo_issues_event_max_datetime": "2022-02-04T16:07:45.000Z",
+    "text_en": "The Panel has decided to request that the federal Minister of the Environment and the BC Minister of Environment amend the Panel's Terms of Reference to extend the date for completion of the Panel review process and for delivery of the Panel's report as follows:",
+    "text_fr": "La Commission a décidé de demander à la ministre fédérale de l'Environnement et au ministre de l'Environnement de la Colombie-Britannique de modifier son mandat afin que la date de la fin de son processus d'examen soit reportée et que les modalités de dépôt de son rapport prévoient :",
+    "text_1": "4. Ratifizierung und Umsetzung der aktualisierten IAO-Übereinkommen (Abstimmung)",
+    "text_2": "4. Ratification et mise en œuvre des conventions de l'OIT mises à jour (vote)",
+    "lan_1": "de",
+    "lan_2": "fr"
   },
   "AmendementsParlement": {
     "texteloi_id": "109",
@@ -196,7 +202,9 @@
     "languages": [
       "en",
       "fr"
-    ]
+    ],
+    "text_en": "The Panel has decided to request that the federal Minister of the Environment and the BC Minister of Environment amend the Panel's Terms of Reference to extend the date for completion of the Panel review process and for delivery of the Panel's report as follows:",
+    "text_fr": "La Commission a décidé de demander à la ministre fédérale de l'Environnement et au ministre de l'Environnement de la Colombie-Britannique de modifier son mandat afin que la date de la fin de son processus d'examen soit reportée et que les modalités de dépôt de son rapport prévoient :"
   },
   "DiscoursPublics": {
     "id": "http://www.vie-publique.fr/discours/254758-declaration-de-m-michel-aurillac-ministre-de-la-cooperation-sur-la-re",
@@ -209,7 +217,11 @@
     "languages": [
       "it",
       "en"
-    ]
+    ],
+    "text_1": "4. Ratifizierung und Umsetzung der aktualisierten IAO-Übereinkommen (Abstimmung)",
+    "text_2": "4. Ratification et mise en œuvre des conventions de l'OIT mises à jour (vote)",
+    "lan_1": "de",
+    "lan_2": "fr"
   },
   "Eurovoc": {
     "title": "Decision of the EEA Joint Committee No 18/96 of 26 March 1996 amending Annex II (Technical regulations, standards, testing and certification) to the EEA Agreement",
@@ -374,9 +386,9 @@
     "character_count": 8277
   },
   "Pile": {
-      "meta": {
-        "pile_set_name": "DM Mathematics"
-      }
+    "meta": {
+      "pile_set_name": "DM Mathematics"
+    }
   },
   "RedPajama": {
     "id": "/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/assets/RedPajama-Data-V2/00001/4",
