@@ -229,9 +229,11 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "subscene",
         "youtube",
         "aya",
+        "aya_chat",
         "alpaca",
         "dolly",
         "aya_dataset",
+        "oasst1",
     ]
     corpora_with_years = [
         "fine_web_edu",
@@ -1838,6 +1840,7 @@ class DataIteratorRedPajama(DataIteratorConcat):
         )
 
 
+##### Anneacling datasets
 class DataIteratorArxiver(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
         name = f"arxiver:{language}"
@@ -1885,59 +1888,6 @@ class DataIteratorStackMathQA(DataIterator):
         )
 
 
-class DataIteratorFlan(DataIterator):
-    def __init__(self, language="en", streaming=True, **kwargs):
-        name = f"Flan:{language}"
-        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
-            excluded_tasks = f.read().splitlines()
-        excluded_tasks = set(excluded_tasks)
-        DataIterator.__init__(
-            self,
-            datasets.load_dataset(
-                "ai2-adapt-dev/flan_v2_converted",
-                streaming=streaming,
-                split="train",
-            ),
-            name=name,
-            filter_fn=lambda x: x["_task_name"] not in excluded_tasks,
-            preprocess=lambda x: {"text": x["inputs"] + " " + x["targets"], "_task_name": x["_task_name"]},
-            **kwargs,
-        )
-
-
-class DataIteratorFlanv2(DataIteratorConcat):
-    def __init__(self, language="en", streaming=True, **kwargs):
-        sampling_sizes = {
-            "cot_fsopt_data": 20000 * 50,
-            "cot_zsopt_data": 20000 * 50,
-            "niv2_fsopt_data": 20000 * 50,
-            "niv2_zsopt_data": 20000 * 50,
-            "flan_fsopt_data": 2000 * 50,
-            "flan_zsopt_data": 2000 * 50,
-            "t0_fsopt_data": 6000 * 50,
-        }
-
-        DataIteratorConcat.__init__(
-            self,
-            [
-                DataIterator(
-                    datasets.load_dataset(
-                        "Open-Orca/FLAN",
-                        data_files=f"{subset}/*",
-                        streaming=streaming,
-                        split="train",
-                    ).shuffle(seed=42),
-                    name=f"Flanv2:{language}:{subset}",
-                    preprocess=lambda x: {"text": x["inputs"] + "\n" + x["targets"]},
-                    max_docs=sampling_size,
-                    **kwargs,
-                )
-                for subset, sampling_size in sampling_sizes.items()
-            ],
-            name=f"Flanv2:{language}",
-        )
-
-
 class DataIteratorAya(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
         name = f"Aya:{language}"
@@ -1955,6 +1905,45 @@ class DataIteratorAya(DataIterator):
             **kwargs,
         )
 
+
+class DataIteratorFlanv2(DataIteratorConcat):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        sampling_sizes = {
+            "cot_fsopt_data": 20000 * 50,
+            "cot_zsopt_data": 20000 * 50,
+            "niv2_fsopt_data": 20000 * 50,
+            "niv2_zsopt_data": 20000 * 50,
+            "flan_fsopt_data": 2000 * 50,
+            "flan_zsopt_data": 2000 * 50,
+            "t0_fsopt_data": 6000 * 50,
+        }
+
+        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
+            excluded_tasks = f.read().splitlines()
+        excluded_tasks = set(excluded_tasks)
+
+        DataIteratorConcat.__init__(
+            self,
+            [
+                DataIterator(
+                    datasets.load_dataset(
+                        "Open-Orca/FLAN",
+                        data_files=f"{subset}/*",
+                        streaming=streaming,
+                        split="train",
+                    ).shuffle(seed=42),
+                    name=f"Flanv2:{language}:{subset}",
+                    preprocess=lambda x: {"text": x["inputs"] + x["targets"], "_task_name": x["_task_name"]},
+                    max_docs=sampling_size,
+                    **kwargs,
+                )
+                for subset, sampling_size in sampling_sizes.items()
+            ],
+            name=f"Flanv2:{language}",
+        )
+
+
+# Instruction datasets
 
 tokenizer = AutoTokenizer.from_pretrained(
     "/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
@@ -1975,6 +1964,12 @@ def convert_to_chat(
             {"role": "assistant", "content": f"{data[output_col_name]}"},
         ]
     text = tokenizer.apply_chat_template(chat, tokenize=False)
+    data["text"] = text
+    return data
+
+
+def apply_chat_template_to_data(data, key):
+    text = tokenizer.apply_chat_template(data[key], tokenize=False)
     data["text"] = text
     return data
 
@@ -2000,6 +1995,42 @@ class DataIteratorAlpaca(DataIterator):
         )
 
 
+class DataIteratorLongAlpaca(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "Yukang/LongAlpaca-12k",
+                streaming=streaming,
+                split="train",
+            ),
+            name=f"LongAlpaca:{language}",
+            preprocess=lambda x: convert_to_chat(x, tokenizer),
+            **kwargs,
+        )
+
+
+class DataIteratorAyaChat(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"AyaChat:{language}"
+        print(name)
+        language_map = {"en": "english", "fr": "french", "es": "spanish", "it": "italian", "de": "german"}
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "CohereForAI/aya_collection_language_split",
+                language_map[language],
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda x: convert_to_chat(
+                x, tokenizer, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
+            ),
+            **kwargs,
+        )
+
+
 class DataIteratorDolly(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
         DataIterator.__init__(
@@ -2015,22 +2046,159 @@ class DataIteratorDolly(DataIterator):
         )
 
 
-class DataIteratorAyaDataset(DataIterator):
+class DataIteratorFlanv2Converted(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
-        name = f"AyaDataset:{language}"
-        language_map = {"en": "English", "fr": "French", "es": "Spanish", "it": "Italian", "de": "German"}
+        name = f"Flanv2Converted:{language}"
+        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
+            excluded_tasks = f.read().splitlines()
+        excluded_tasks = set(excluded_tasks)
         DataIterator.__init__(
             self,
             datasets.load_dataset(
-                "CohereForAI/aya_dataset",
+                "ai2-adapt-dev/flan_v2_converted",
                 streaming=streaming,
                 split="train",
             ),
-            filter_fn=lambda x: x["language"] == language_map[language],
             name=name,
-            preprocess=lambda x: convert_to_chat(
-                x, tokenizer, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
+            filter_fn=lambda x: x["_task_name"] not in excluded_tasks,
+            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorEns(DataIterator):
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "Gael540/dataSet_ens_sup_fr-v1",
+                streaming=streaming,
+                split="train",
             ),
+            name=f"Ens:{language}",
+            preprocess=lambda x: convert_to_chat(
+                x, tokenizer, instruction_col_name="question", input_col_name=None, output_col_name="answer"
+            ),
+            **kwargs,
+        )
+
+
+class DataIteratorOasst1(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"Oasst1:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.Dataset.from_json(
+                "/linkhome/rech/gendjf01/uxk42lw/DATA/oasst1/oasst1_format-2.jsonl",
+            ),
+            name=name,
+            filter_fn=lambda x: x["language"] == language,
+            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorPiaf(DataIterator):
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        name = f"Piaf:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.Dataset.from_json(
+                "/linkhome/rech/gendjf01/uxk42lw/DATA/piaf/piaf-v1.2_instruct.jsonl",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            **kwargs,
+        )
+
+
+filter_strings = [
+    "OpenAI",
+    "Open AI",
+    "ChatGPT",
+    "Chat GPT",
+    "GPT-3",
+    "GPT3",
+    "GPT 3",
+    "GPT-4",
+    "GPT4",
+    "GPT 4",
+    "GPT-3.5",
+    "GPT3.5",
+    "GPT 3.5",
+    "BingChat",
+    "Bing Chat",
+    "LAION",
+    "Open Assistant",
+    "OpenAssistant",
+    "BARD",
+    "PaLM",
+    "Gemini",
+    "Gemma",
+    "Google AI",
+    "Anthropic",
+    "Claude",
+    "LLaMA",
+    "Meta AI",
+    "Mixtral",
+    "Mistral",
+]
+
+
+def filter_by_keyword(example, key):
+    # we filter out conversations that contain some specific strings
+    for message in example[key]:
+        if message["role"] != "assistant":
+            continue
+        if re.search(r"\b(" + "|".join([s.lower() for s in filter_strings]) + r")\b", message["content"].lower()):
+            return False
+    return True
+
+
+class DataIteratorWildChat(DataIterator):
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        name = f"WildChat:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "allenai/WildChat-1M",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template_to_data(data, "conversation"),
+            filter_fn=lambda x: (x["language"] == "French") & (filter_by_keyword(x, "conversation")),
+            **kwargs,
+        )
+
+
+def preproc_magpie(data):
+    messages = []
+    for conv in data["conversations"]:
+        messages.append(
+            {
+                "role": "user" if conv["from"] == "human" else "assistant",
+                "content": conv["value"],
+            }
+        )
+    data["messages"] = messages
+    data = apply_chat_template_to_data(data, "messages")
+    return data
+
+
+class DataIteratorMagpieGemma(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"MagpieGemma:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "Magpie-Align/Magpie-Gemma2-Pro-200K-Filtered",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=preproc_magpie,
+            filter_fn=lambda x: (x["language"] == "EN") & (filter_by_keyword(x, "messages")),
             **kwargs,
         )
 
