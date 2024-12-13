@@ -1944,15 +1944,14 @@ class DataIteratorFlanv2(DataIteratorConcat):
 
 
 # Instruction datasets
-
-tokenizer = AutoTokenizer.from_pretrained(
-    "/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
-)
-
-
 def convert_to_chat(
-    data, tokenizer, instruction_col_name="instruction", input_col_name="input", output_col_name="output"
+    data,
+    tokenizer_path="/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special",
+    instruction_col_name="instruction",
+    input_col_name="input",
+    output_col_name="output",
 ):
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
     if (input_col_name is not None) and (data[input_col_name] != ""):
         chat = [
             {"role": "user", "content": f"{data[instruction_col_name]}\n{data[input_col_name]}"},
@@ -1968,7 +1967,10 @@ def convert_to_chat(
     return data
 
 
-def apply_chat_template_to_data(data, key):
+def apply_chat_template(
+    data, key, tokenizer_path="/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
+):
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
     text = tokenizer.apply_chat_template(data[key], tokenize=False)
     data["text"] = text
     return data
@@ -1990,7 +1992,7 @@ class DataIteratorAlpaca(DataIterator):
                 split="train",
             ),
             name=f"Alpaca:{language}",
-            preprocess=lambda x: convert_to_chat(x, tokenizer),
+            preprocess=convert_to_chat,
             **kwargs,
         )
 
@@ -2005,7 +2007,7 @@ class DataIteratorLongAlpaca(DataIterator):
                 split="train",
             ),
             name=f"LongAlpaca:{language}",
-            preprocess=lambda x: convert_to_chat(x, tokenizer),
+            preprocess=convert_to_chat,
             **kwargs,
         )
 
@@ -2025,7 +2027,7 @@ class DataIteratorAyaChat(DataIterator):
             ),
             name=name,
             preprocess=lambda x: convert_to_chat(
-                x, tokenizer, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
+                x, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
             ),
             **kwargs,
         )
@@ -2041,7 +2043,7 @@ class DataIteratorDolly(DataIterator):
                 split=language,
             ),
             name=f"Dolly:{language}",
-            preprocess=lambda x: convert_to_chat(x, tokenizer, input_col_name="context", output_col_name="response"),
+            preprocess=lambda x: convert_to_chat(x, input_col_name="context", output_col_name="response"),
             **kwargs,
         )
 
@@ -2061,7 +2063,7 @@ class DataIteratorFlanv2Converted(DataIterator):
             ),
             name=name,
             filter_fn=lambda x: x["_task_name"] not in excluded_tasks,
-            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            preprocess=lambda data: apply_chat_template(data, "messages"),
             **kwargs,
         )
 
@@ -2077,7 +2079,7 @@ class DataIteratorEns(DataIterator):
             ),
             name=f"Ens:{language}",
             preprocess=lambda x: convert_to_chat(
-                x, tokenizer, instruction_col_name="question", input_col_name=None, output_col_name="answer"
+                x, instruction_col_name="question", input_col_name=None, output_col_name="answer"
             ),
             **kwargs,
         )
@@ -2093,7 +2095,7 @@ class DataIteratorOasst1(DataIterator):
             ),
             name=name,
             filter_fn=lambda x: x["language"] == language,
-            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            preprocess=lambda data: apply_chat_template(data, "messages"),
             **kwargs,
         )
 
@@ -2107,7 +2109,21 @@ class DataIteratorPiaf(DataIterator):
                 "/linkhome/rech/gendjf01/uxk42lw/DATA/piaf/piaf-v1.2_instruct.jsonl",
             ),
             name=name,
-            preprocess=lambda data: apply_chat_template_to_data(data, "messages"),
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorOracle(DataIterator):
+    def __init__(self, language="fr", streaming=True, **kwargs):
+        name = f"Oracle:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.Dataset.from_json(
+                "/linkhome/rech/gendjf01/uxk42lw/DATA/oracle/oracle_instruct.jsonl",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
             **kwargs,
         )
 
@@ -2166,8 +2182,24 @@ class DataIteratorWildChat(DataIterator):
                 split="train",
             ),
             name=name,
-            preprocess=lambda data: apply_chat_template_to_data(data, "conversation"),
+            preprocess=lambda data: apply_chat_template(data, "conversation"),
             filter_fn=lambda x: (x["language"] == "French") & (filter_by_keyword(x, "conversation")),
+            **kwargs,
+        )
+
+
+class DataIteratorTulu3(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"Tulu3:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "allenai/tulu-3-sft-mixture",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
             **kwargs,
         )
 
@@ -2182,7 +2214,7 @@ def preproc_magpie(data):
             }
         )
     data["messages"] = messages
-    data = apply_chat_template_to_data(data, "messages")
+    data = apply_chat_template(data, "messages")
     return data
 
 
