@@ -117,13 +117,13 @@ This dataset was made to provide an extensive and diverse dataset for training L
 
 The corpus contains the following information for each text sample:
 * `text`: the text sample itself.
-* `source`: an identifier for the source(s) of the text sample (`Wikipedia`, `RedPajama`, `Gutenberg`, …).
+* [`source`](metadata/metadata_examples.json#): an identifier for the source(s) of the text sample (Wikipedia, RedPajama, Gutenberg, …).
   All sources are described in detail [in this document](#details-on-data-sources).
 * `id`: an identifier that is unique among the source.
 * `language`: the language of the text sample (relying on the source, that information can be wrong). <details><summary>Possible values:</summary>
-  an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
-  a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …) or
-  a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
+  - an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
+  - a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …), or
+  - a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
   or one of those pairs in the opposite order if the languages appear in the opposite order in the text).
   </details>
 * `url` (optional): the URL of the original text sample on the web, if available.
@@ -1276,7 +1276,7 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", **kwargs)
 
 for sample in dataset:
    text = sample["text"]
-   # ... do something with the text
+   # … do something with the text
 ```
 
 Several configurations are available to select a language, a source, or both, illustrated in the following examples.
@@ -1299,7 +1299,7 @@ Load data in Python:
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "code-python", **kwargs)
 ```
 
-Load data from Wikipedia (in available languages):
+Load data from Wikipedia (in all available languages):
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Wikipedia", **kwargs)
 ```
@@ -1312,7 +1312,7 @@ Load the Pile dataset:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile", **kwargs)
 ```
-Load "`PhilPapers`" subset from the Pile dataset:
+Load the subset "`PhilPapers`" from the Pile dataset:
 ```python
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile-PhilPapers", **kwargs)
 ```
@@ -1320,11 +1320,12 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile-PhilPapers
 ## Versions (variants of the dataset)
 
 The dataset is available in the following versions
-- `v1.1` / `main` (default): The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which approximates 3.1B tokens.
+- `v1.1` / `main` (default): The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which approximates 2.3T tokens.
 - `v1.2`: An improved version of the data, where 
   - GallicaMonographies and GallicaPress have been updated to filter out documents with bad OCR quality.
   - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined, by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
-- `v1.2-extension` : The data used for the second pretraining phase that was context-extension of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B). This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
+- `v1.2-recent_web` : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
+  This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
 
 You can load a specific version with the `datasets` Python package using the `revision` parameter of the `load_dataset()` function:
 ```python

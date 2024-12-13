@@ -18,7 +18,7 @@ from data import (
 
 
 class InstructDataIterator(DataIterator):
-    def __init__(self, dataset, data_to_question_and_answer=None, *kargs, **kwargs):
+    def __init__(self, dataset, data_to_chat_instructions=None, *kargs, **kwargs):
         if isinstance(dataset, DataIterator):
             # inherit from the dataset
             self.__dict__ = dataset.__dict__
@@ -31,32 +31,13 @@ class InstructDataIterator(DataIterator):
         self.key = self.data_to_chat_instructions
 
         # That can be passed externally
-        self.data_to_question_and_answer = None
-        if data_to_question_and_answer:
-            self.data_to_question_and_answer = data_to_question_and_answer
+        self.data_to_chat_instructions = None
+        if data_to_chat_instructions:
+            self.data_to_chat_instructions = data_to_chat_instructions
 
     def data_to_chat_instructions(self, data):
-        try:
-            question, answer = self.data_to_question_and_answer(data)
-            assert isinstance(question, str)
-            question_answers = [(question, answer)]
-        except (TypeError, AssertionError):
-            question_answers = self.data_to_question_and_answer(data)
-
-        turns = []
-        assert isinstance(question_answers, list)
-        for question, answer in question_answers:
-            assert isinstance(question, str)
-            assert isinstance(answer, str)
-            turns += [
-                {"role": "user", "content": question},
-                {"role": "assistant", "content": answer},
-            ]
-        return turns
-
-    def data_to_question_and_answer(self, data):
-        if self.data_to_question_and_answer:
-            return self.data_to_question_and_answer(data)
+        if self.data_to_chat_instructions:
+            return self.data_to_chat_instructions(data)
         raise NotImplementedError
 
 
@@ -64,20 +45,21 @@ class InstructDataIteratorConcat(DataIteratorConcat):
     def __init__(self, datasets, *kargs, **kwargs):
         DataIteratorConcat.__init__(self, datasets, *kargs, **kwargs)
         self.datasets = [
-            InstructDataIterator(
-                dataset, *kargs, data_to_question_and_answer=self.data_to_question_and_answer, **kwargs
-            )
+            InstructDataIterator(dataset, *kargs, data_to_chat_instructions=self.data_to_chat_instructions, **kwargs)
             for dataset in datasets
         ]
 
-    def data_to_question_and_answer(self, data):
+    def data_to_chat_instructions(self, data):
         raise NotImplementedError
 
 
 ### Implementation of specific datasets
 
-_asset_croissant_aligned_by_languages = {
+_asset_instruct_translation = {
     lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}.txt") for lan in ["fr", "en"]
+}
+_asset_instruct_translation_cont = {
+    lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}_cont.txt") for lan in ["fr", "en"]
 }
 
 
@@ -87,30 +69,6 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
 
         # Make that an instruction dataset (composite dataset)
         InstructDataIteratorConcat.__init__(self, self.datasets, *kargs, name=self.name + "_instruct", **kwargs)
-
-        # Some parameters
-        # ----------------
-        # - proba that the language of the text to translate is the same as the instruction language
-        self.proba_same_language = 0.5
-        # - proba that the text to translate is in French (otherwise in English)
-        self.proba_french_to_english = 0.5
-        # - Probabilities of common mistakes
-        self.proba_wrong_case_for_language = (
-            0.3  # confusion "english" <-> "English" (right) | "anglais" (right) <-> "Anglais"
-        )
-        self.proba_wrong_question_mark_fr = 0.5  # don't use space before question mark in French
-        # - Probabilities of whether from/to languages are mentioned in the instruction,
-        #   depending on whether the instruction is in the **same language as the input text to translate**
-        self.proba_by_languages_mentioned_if_different_from_instruct = {
-            "no_lang": 4.0 / 7,
-            "to": 2.0 / 7,
-            "from_and_to": 1.0 / 7,
-        }
-        # In this second case, we have to specify the target language when it's not the same as the original language
-        self.proba_by_languages_mentioned_if_same_as_instruct = {
-            "to": 2.0 / 3,
-            "from_and_to": 1.0 / 3,
-        }
 
         # Languages strings
         self.language_strings = {
@@ -163,10 +121,11 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
 
         # Load instruction templates, and sort them by whether they have <language_from> and/or <language_to>
         self.instruct_templates = {
-            lan: {k: [] for k in ["no_lang", "to", "from_and_to"]} for lan in self.language_strings
+            lan: {k: [] for k in ["no_lang", "no_lang_with_context", "to", "to_with_context", "from_and_to"]}
+            for lan in self.language_strings
         }
 
-        for lan, filename in _asset_croissant_aligned_by_languages.items():
+        for lan, filename in _asset_instruct_translation.items():
             assert os.path.exists(filename), f"File {filename} does not exist"
             with open(filename) as f:
                 for template in f.readlines():
@@ -191,7 +150,20 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
                         raise ValueError(f"Template {template} has <language_from> but not <language_to>")
                     else:
                         self.instruct_templates[lan]["no_lang"].append(template)
-            # Check it is not empty and remove duplicates
+
+        for lan, filename in _asset_instruct_translation_cont.items():
+            assert os.path.exists(filename), f"File {filename} does not exist"
+            with open(filename) as f:
+                lines = f.readlines()
+                lines = [line.strip() for line in lines]
+                lines = [line for line in lines if line]
+                self.instruct_templates[lan]["to_with_context"] = lines
+                templates_no_lang = [remove_tag(line, self.regex_to_remove_to_tag[lan]) for line in lines]
+                templates_no_lang = [line for line in templates_no_lang if line]
+                self.instruct_templates[lan]["no_lang_with_context"] = templates_no_lang
+
+        # Check that each set of instruction is not empty and remove duplicates
+        for lan in self.instruct_templates:
             for k in self.instruct_templates[lan]:
                 assert self.instruct_templates[lan][k], f"No instruction template found for {k}"
                 self.instruct_templates[lan][k] = sorted(set(self.instruct_templates[lan][k]))
@@ -228,41 +200,114 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
                 for k in self.instruct_templates[lan]:
                     k_str = {
                         "no_lang": "without language",
+                        "no_lang_with_context": "without language (and a chat history)",
                         "to": "with language to",
+                        "to_with_context": "with language to (and a chat history)",
                         "from_and_to": "with language from and to",
                     }[k]
                     print(f"Loaded {len(self.instruct_templates[lan][k])} templates {k_str} for {lan}")
 
-    def data_to_question_and_answer(self, data):
+        # Some parameters
+        # ----------------
+        # - proba that the language of the text to translate is the same as the instruction language
+        self.proba_same_language = 0.5
+        # - proba that the text to translate is in French (otherwise in English)
+        self.proba_french_to_english = 0.5
+        # - proba of the instruction coming after the text to translate
+        self.proba_instruction_after_text = 0.6
+        self.proba_text_to_translate_from_previous_instruct = 0.5
+        # - Probabilities of common mistakes
+        self.proba_wrong_case_for_language = (
+            0.3  # confusion "english" <-> "English" (right) | "anglais" (right) <-> "Anglais"
+        )
+        self.proba_wrong_question_mark_fr = 0.5  # don't use space before question mark in French
+        # - Probabilities of whether from/to languages are mentioned in the instruction,
+        #   depending on whether the instruction is in the **same language as the input text to translate**
+        self.proba_by_languages_mentioned_if_different_from_instruct = {
+            "no_lang": 4.0 / 7,
+            "to": 2.0 / 7,
+            "from_and_to": 1.0 / 7,
+        }
+        # In this second case, we have to specify the target language when it's not the same as the original language
+        self.proba_by_languages_mentioned_if_same_as_instruct = {
+            "to": 2.0 / 3,
+            "from_and_to": 1.0 / 3,
+        }
+
+    def data_to_chat_instructions(self, data):
+        #########################################
+        ### Randomly choose some parameters
+
+        # - choose the input/output languages
+        bool_french_first = random.random() < self.proba_french_to_english
+        # - whether the instruction (to translate) comes after the text to translate
+        bool_put_instruction_after_text = random.random() < self.proba_instruction_after_text
+        # - whether the text to translate comes from the chat history
+        bool_translate_from_chat_history = (
+            bool_put_instruction_after_text and random.random() < self.proba_text_to_translate_from_previous_instruct
+        )
+        # - whether the user speaks the same language as the text to translate
+        bool_same_input_and_chat_language = random.random() < self.proba_same_language
+        # - whether to mistake about French/french and français/Français
+        bool_wrong_case_for_language = random.random() < self.proba_wrong_case_for_language
+        # - opening and ending quotes
+        opening_quote, ending_quote = random.choice(
+            [
+                ("", ""),
+                ("«", "»"),
+                ('"', '"'),
+                ("'", "'"),
+                ("``", "''"),
+                ("“", "”"),
+                ("‘", "’"),
+            ]
+        )
+        # - how to separate the instruction from the text to translate
+        separator = random.choice(["\n", "\t", "\n\n", ":"] + ([" "] if opening_quote else []))
+        if not separator.strip():
+            separator *= random.choices([1, 2, 3], weights=[0.85, 0.1, 0.05])[0]
+        # - instruction ending punctuation mark
+        ending_point = random.choices(
+            [".", ":" if not bool_put_instruction_after_text else "", ""], weights=[0.3, 0.2, 0.5]
+        )[0]
+        ending_question_mark = random.choices(["?", ""], weights=[0.7, 0.3])[0]
+        # - choose whether to mention input/output languages in the instruction or not
+        proba_by_languages_mentioned = (
+            self.proba_by_languages_mentioned_if_same_as_instruct
+            if bool_same_input_and_chat_language
+            else self.proba_by_languages_mentioned_if_different_from_instruct
+        ).copy()
+        # - sometimes use a specific instruction type when there is context before
+        if bool_translate_from_chat_history and random.random() < 0.5:
+            proba_by_languages_mentioned["to_with_context"] = proba_by_languages_mentioned.pop("to")
+            if "no_lang" in proba_by_languages_mentioned:
+                proba_by_languages_mentioned["no_lang_with_context"] = proba_by_languages_mentioned.pop("no_lang")
+        type = random.choices(
+            list(proba_by_languages_mentioned.keys()), weights=list(proba_by_languages_mentioned.values())
+        )[0]
+        # - sometimes use lower / upper case only
+        case_instruct = random.choices(["lower", "upper", "normal"], weights=[0.18, 0.02, 0.8])[0]
+        case_text = random.choices([case_instruct, "normal"], weights=[0.2, 0.8])[0]
+        # - choose the instruction template among available ones
+        language_input = "fr" if bool_french_first else "en"
+        language_output = "en" if bool_french_first else "fr"
+        language_instruction = language_input if bool_same_input_and_chat_language else language_output
+        instruction = random.choices(
+            self.instruct_templates[language_instruction][type],
+            weights=self.intruct_template_probas[language_instruction][type],
+        )[0]
+
+        #########################################
+        ### Go !
+
+        # - load the fields
         assert "text_fr" in data
         assert "text_en" in data
         text_fr = data["text_fr"]
         text_en = data["text_en"]
 
-        french_first = random.random() < self.proba_french_to_english
-        language_input = "fr" if french_first else "en"
-        language_output = "en" if french_first else "fr"
-        text_input = text_fr if french_first else text_en
-        text_translated = text_en if french_first else text_fr
-
-        instruction_has_input_language = random.random() < self.proba_same_language
-        language_instruction = language_input if instruction_has_input_language else language_output
-
-        # Choose whether to mention input/output languages in the instruction or not
-        proba_by_languages_mentioned = (
-            self.proba_by_languages_mentioned_if_same_as_instruct
-            if instruction_has_input_language
-            else self.proba_by_languages_mentioned_if_different_from_instruct
-        )
-        type = random.choices(
-            list(proba_by_languages_mentioned.keys()), weights=list(proba_by_languages_mentioned.values())
-        )[0]
-
-        # Choose the instruction template among available ones
-        instruction = random.choices(
-            self.instruct_templates[language_instruction][type],
-            weights=self.intruct_template_probas[language_instruction][type],
-        )[0]
+        text_input = text_fr if bool_french_first else text_en
+        text_translated = text_en if bool_french_first else text_fr
 
         # Get the language names, and noise them a bit
         language_input_str = self.language_strings[language_instruction][language_input]
@@ -274,7 +319,7 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
             language_output_str = random.choice(language_output_str)
         # - Capitalize (or not) the language
         should_capitalize = language_instruction == "en"
-        if random.random() < self.proba_wrong_case_for_language:
+        if bool_wrong_case_for_language:
             do_capitalize = not should_capitalize
             language_input_str = language_input_str.capitalize() if do_capitalize else language_input_str.lower()
             language_output_str = language_output_str.capitalize() if do_capitalize else language_output_str.lower()
@@ -293,53 +338,88 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
             if language_output_str[0] in "aeiouyAEIOUY":  # only when the word starts with a vowel
                 instruction = re.sub(r"\bau <language_to>", r"à l'" + language_output_str, instruction)
                 instruction = re.sub(r"\bdu <language_to>", r"de l'" + language_output_str, instruction)
+            # Feminine words ("version française / anglaise")
+            instruction = re.sub(r"\b(version) <language_to>", r"\1 " + language_output_str + "e", instruction)
+            instruction = re.sub(r"\b(version) <language_from>", r"\1 " + language_input_str + "e", instruction)
         # - Then the general substitutions
         instruction = re.sub("<language_from>", language_input_str, instruction)
         instruction = re.sub("<language_to>", language_output_str, instruction)
 
-        # Additional data augmentation
-        # - Choose random sentence ending
-        if instruction.endswith("."):
-            instruction = instruction[:-1] + random.choices([".", ":", ""], weights=[0.25, 0.35, 0.4])[0]
-        elif instruction.endswith("?"):
-            instruction = instruction[:-1] + random.choices(["?", ""], weights=[0.7, 0.3])[0]
-        # - Choose random separation between the instruction and the text to translate
-        separators = random.choice(
-            [
-                ("\n", ""),
-                ("\n\n", ""),
-                (' "', '"'),
-                (" «", "»"),
-                (" '", "'"),
-                ('\n"', '"'),
-                ('\n\n"', '"'),
-                ("\n\n«", "»"),
-            ]
-        )
+        # Instruction ending
+        if instruction.endswith("?"):
+            instruction = instruction[:-1] + ending_question_mark
+        elif instruction.endswith("."):
+            instruction = instruction[:-1] + ending_point
+        else:
+            instruction += ending_point
+
+        # Sometimes in lower / upper case...
+        if case_instruct == "lower":
+            instruction = instruction.lower()
+        elif case_instruct == "upper":
+            instruction = instruction.upper()
+        if case_text == "lower":
+            text_input = text_input.lower()
+            text_translated = text_translated.lower()
+        elif case_text == "upper":
+            text_input = text_input.upper()
+            text_translated = text_translated.upper()
+
+        # Keep same quotes for the response (if any)
+        text_input = opening_quote + text_input + ending_quote
+        text_translated = opening_quote + text_translated + ending_quote
 
         # Make the final instruction and response
-        instruction += separators[0] + text_input + separators[1]
+        if bool_put_instruction_after_text:
+            # First text to translate, then instruction
 
-        output_prefix = separators[0].strip()
-        output_suffix = separators[1].strip()
-        response = output_prefix + text_translated + output_suffix
+            if bool_translate_from_chat_history:
+                # Sometimes, the text to translate is in the instruction
+                last_chatbot_turn = text_input
+                return self.release(
+                    [
+                        {"role": "assistant", "content": last_chatbot_turn},
+                        {"role": "user", "content": instruction},
+                        {"role": "assistant", "content": text_translated},
+                    ],
+                    text_input,
+                    text_translated,
+                    language_input,
+                    language_output,
+                )
 
+            separator = separator.replace(":", "\n--\n")
+            instruction = text_input + separator + instruction
+        else:
+            instruction = instruction + separator + text_input
+
+        return self.release(
+            [
+                {"role": "user", "content": instruction},
+                {"role": "assistant", "content": text_translated},
+            ],
+            text_input,
+            text_translated,
+            language_input,
+            language_output,
+        )
+
+    def release(self, turns, text_input, text_translated, language_input, language_output):
         if self.verbose:
-            short_text_input = f"{text_input[:10]:10}[[... ({language_input})]]"
-            short_text_translated = f"{text_translated[:10]:10}[[... ({language_output})]]"
-            debug_print = (
-                (instruction + "[[]]" + response)
-                .replace(text_input, short_text_input)
-                .replace(text_translated, short_text_translated)
-                .replace("\n", "\\n")
-                .replace("\t", "\\t")
-                .replace("[[]]", "\n -> ")
-            )
-            print(debug_print)
-            # if "\n" in debug_print:
-            #     import pdb; pdb.set_trace()
-
-        return instruction, response
+            short_text_input = f"{text_input[:20]:20}[[... ({language_input}) ...]]{text_input[-5:]:5}"
+            short_text_translated = f"{text_translated[:20]:20}[[... ({language_output}) ...]]{text_translated[-5:]:5}"
+            for turn in turns:
+                role = turn["role"]
+                content = (
+                    turn["content"]
+                    .replace(text_input, short_text_input)
+                    .replace(text_translated, short_text_translated)
+                    .replace("\n", "\\n")
+                    .replace("\t", "\\t")
+                )
+                print(f"– {role}: {content}")
+            print("---")
+        return turns
 
 
 def main_dump_parquet():
@@ -349,6 +429,7 @@ def main_dump_parquet():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("datasets", type=str, default="translation")
+    parser.add_argument("--output", type=str, default=".", help="Output directory")
     parser.add_argument("--high_quality", action="store_true")
     parser.add_argument("--max_per_parquet", default=None, type=int, help="Maximum number of examples per parquet file")
     parser.add_argument("--debug", action="store_true")
@@ -365,7 +446,7 @@ def main_dump_parquet():
 
     random.seed(1969)
     for k, data_iterator in all_datas.items():
-        output_filename = k + ".parquet"
+        output_filename = os.path.join(args.output, k + ".parquet")
         print(f"Generating {output_filename}")
         datas = []
         for i, messages in enumerate(data_iterator):

@@ -1,0 +1,51 @@
+Bien, en <language_to>?
+En <language_to> s'il te plaît.
+En <language_to> ça donne quoi stp?
+En <language_to> ça donne quoi?
+En <language_to>?
+Est-ce que tu peux convertir ce message en <language_to> ?
+Est-ce que tu peux traduire ce que tu viens de dire en <language_to> ?
+Est-ce que tu pourrais s'il te plaît traduire cette phrase en <language_to> ?
+Est-ce que tu pourrais transformer ta réponse en <language_to> ?
+Et maintenant en <language_to>.
+Maintenant en <language_to> SVP.
+Maintenant en <language_to> steup.Maintenant en <language_to> svp.
+OK et en <language_to>?
+OK, en <language_to>?
+Oh bien. Peux-tu me traduire ça en <language_to>?
+Peux-tu donner la traduction de ce message en <language_to> ?
+Peux-tu donner la version <language_to> de ce que tu viens de dire ?
+Peux-tu donner la version <language_to> de ce texte ?
+Peux-tu exprimer cela en <language_to> ?
+Peux-tu exprimer ta réponse en <language_to> ?
+Peux-tu fournir la traduction de cette phrase en <language_to> ?Peux-tu fournir la traduction de ta réponse en <language_to> ?
+Peux-tu me la refaire en <language_to>?
+Peux-tu me traduire ça en <language_to> stp?
+Peux-tu reformuler cette phrase en <language_to> ?
+Peux-tu reformuler ton message en <language_to> ?
+Peux-tu reformuler ton message précédent en <language_to> ?
+Peux-tu s'il te plaît traduire ce message en <language_to> ?
+Peux-tu s'il te plaît écrire ta réponse en <language_to> ?
+Peux-tu stp me la refaire en <language_to>?
+Peux-tu traduire cette phrase en <language_to> ?
+Peux-tu traduire ta réponse précédente en <language_to> ?
+Peux-tu traduire ton dernier message en <language_to> ?
+Peux-tu transformer ce que tu viens de dire en <language_to> ?
+Peux-tu écrire ta dernière réponse en <language_to> ?
+Pourrais-tu convertir ce que tu viens de dire en <language_to> ?
+Pourrais-tu convertir cette phrase en <language_to> ?
+Pourrais-tu donner la version <language_to> de ta réponse ?
+Pourrais-tu donner une traduction de ce message en <language_to> ?
+Pourrais-tu exprimer cette réponse en <language_to> ?
+Pourrais-tu formuler cela en <language_to> ?
+Pourrais-tu formuler cette réponse en <language_to> ?
+Pourrais-tu fournir une traduction de cela en <language_to> ?
+Pourrais-tu reformuler ta réponse en <language_to> ?
+Pourrais-tu s'il te plaît reformuler ce texte en <language_to> ?
+Pourrais-tu s'il te plaît traduire cela en <language_to> ?
+Pourrais-tu s'il te plaît écrire cela en <language_to> ?
+Pourrais-tu traduire cette phrase en <language_to> ?
+Pourrais-tu traduire cette réponse en <language_to> ?
+Serait-il possible de reformuler ce message en <language_to> ?
+Traduis ta dernière phrase en <language_to>, s'il te plaît.
+Traduisez votre dernière réponse en <language_to>, s'il vous plaît.
