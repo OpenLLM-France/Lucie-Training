@@ -17,26 +17,26 @@ Table of Contents:
             <tr>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#category-web">Web</a></li>
-                  <li><a href="#category-newspaper">Newspaper</a></li>
-                  <li><a href="#category-technical">Technical</a></li>
-                  <li><a href="#category-book">Book</a></li>
+                  <li><a href="#category-web">                      Web</a></li>
+                  <li><a href="#category-newspaper">                Newspaper</a></li>
+                  <li><a href="#category-technical">                Technical</a></li>
+                  <li><a href="#category-book">                     Book</a></li>
                 </ul>
               </td>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#category-legislative-texts">Legislative Texts</a></li>
-                  <li><a href="#category-legislative-transcripts">Legislative Transcripts</a></li>
-                  <li><a href="#category-wiki">Wiki</a></li>
-                  <li><a href="#category-math">Math</a></li>
+                  <li><a href="#category-legislative-texts">        Legislative Texts</a></li>
+                  <li><a href="#category-legislative-transcripts">  Legislative Transcripts</a></li>
+                  <li><a href="#category-wiki">                     Wiki</a></li>
+                  <li><a href="#category-math">                     Math</a></li>
                 </ul>
               </td>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#category-forum">Forum</a></li>
-                  <li><a href="#category-dialogue">Dialogue</a></li>
+                  <li><a href="#category-forum">                    Forum</a></li>
+                  <li><a href="#category-dialogue">                 Dialogue</a></li>
                   <li><a href="#category-multilingual-parallel-corpora">Multilingual Parallel Corpora</a></li>
-                  <li><a href="#category-programming">Programming</a></li>
+                  <li><a href="#category-programming">              Programming</a></li>
                 </ul>
               </td>
             </tr>
@@ -47,40 +47,40 @@ Table of Contents:
             <tr>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#amendementsparlement">AmendementsParlement</a></li>
-                  <li><a href="#americanstories">AmericanStories</a></li>
-                  <li><a href="#claire-french-and-english">Claire (French and English)</a></li>
-                  <li><a href="#croissantaligned">CroissantAligned</a></li>
-                  <li><a href="#discourspublics">DiscoursPublics</a></li>
-                  <li><a href="#europarl-and-europarlaligned-monolingual-and-parallel">Europarl and EuroparlAligned (monolingual and parallel)</a></li>
-                  <li><a href="#eurovoc">Eurovoc</a></li>
-                  <li><a href="#finewebedu">FineWebEdu</a></li>
-                  <li><a href="#gallicamonographies">GallicaMonographies</a></li>
+                  <li><a href="#amendementsparlement">              AmendementsParlement</a></li>
+                  <li><a href="#americanstories">                   AmericanStories</a></li>
+                  <li><a href="#claire-french-and-english">         Claire (French and English)</a></li>
+                  <li><a href="#croissantaligned">                  CroissantAligned</a></li>
+                  <li><a href="#discourspublics">                   DiscoursPublics</a></li>
+                  <li><a href="#europarl-and-europarlaligned">      Europarl and EuroparlAligned</a></li>
+                  <li><a href="#eurovoc">                           Eurovoc</a></li>
+                  <li><a href="#finewebedu">                        FineWebEdu</a></li>
+                  <li><a href="#gallicamonographies">               GallicaMonographies</a></li>
                 </ul>
               </td>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#gallicapress">GallicaPress</a></li>
-                  <li><a href="#gutenberg">Gutenberg</a></li>
-                  <li><a href="#hal">HAL</a></li>
-                  <li><a href="#interventionsparlement">InterventionsParlement</a></li>
-                  <li><a href="#legi">LEGI</a></li>
-                  <li><a href="#mathpile">MathPile</a></li>
-                  <li><a href="#opendata">OpenData</a></li>
-                  <li><a href="#openedition">OpenEdition</a></li>
-                  <li><a href="#pes2o">PeS2o</a></li>
+                  <li><a href="#gallicapress">                      GallicaPress</a></li>
+                  <li><a href="#gutenberg">                         Gutenberg</a></li>
+                  <li><a href="#hal">                               HAL</a></li>
+                  <li><a href="#interventionsparlement">            InterventionsParlement</a></li>
+                  <li><a href="#legi">                              LEGI</a></li>
+                  <li><a href="#mathpile">                          MathPile</a></li>
+                  <li><a href="#opendata">                          OpenData</a></li>
+                  <li><a href="#openedition">                       OpenEdition</a></li>
+                  <li><a href="#pes2o">                             PeS2o</a></li>
                 </ul>
               </td>
               <td style="vertical-align: top;">
                 <ul>
-                  <li><a href="#pile-uncopyrighted">Pile (Uncopyrighted)</a></li>
-                  <li><a href="#questionsecritesparlement">QuestionsEcritesParlement</a></li>
-                  <li><a href="#redpajama-v2">RedPajama (v2)</a></li>
-                  <li><a href="#stac">Stac</a></li>
-                  <li><a href="#thestack">TheStack</a></li>
-                  <li><a href="#theses">Theses</a></li>
-                  <li><a href="#wikipedia-wikisource-wiktionary">Wikipedia, Wikisource, Wiktionary</a></li>
-                  <li><a href="#youtube">YouTube</a></li>
+                  <li><a href="#pile-uncopyrighted">                Pile (Uncopyrighted)</a></li>
+                  <li><a href="#questionsecritesparlement">         QuestionsEcritesParlement</a></li>
+                  <li><a href="#redpajama-v2">                      RedPajama (v2)</a></li>
+                  <li><a href="#stac">                              Stac</a></li>
+                  <li><a href="#thestack">                          TheStack</a></li>
+                  <li><a href="#theses">                            Theses</a></li>
+                  <li><a href="#wikipedia-wikisource-wiktionary">   Wikipedia, Wikisource, Wiktionary</a></li>
+                  <li><a href="#youtube">                           YouTube</a></li>
                 </ul>
               </td>
             </tr>
@@ -120,25 +120,21 @@ The corpus contains the following information for each text sample:
 * `source`: an identifier for the source(s) of the text sample (`Wikipedia`, `RedPajama`, `Gutenberg`, …).
   All sources are described in detail [in this document](#details-on-data-sources).
 * `id`: an identifier that is unique among the source.
-* `language`: the language of the text sample (relying on the source, that information can be wrong).
-  <details><summary>Possible values:</summary>
-an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
-a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …) or
-a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
+* `language`: the language of the text sample (relying on the source, that information can be wrong). <details><summary>Possible values:</summary>
+  an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
+  a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …) or
+  a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
   or one of those pairs in the opposite order if the languages appear in the opposite order in the text).
   </details>
 * `url` (optional): the URL of the original text sample on the web, if available.
 * `title` (optional): the title of the original text sample, if available.
-* `author` (optional): the author of the original text sample, if available.
-  <details><summary>Note:</summary>
-  Usually the author name in plain text, except for `Gutenberg` where it is the JSON serialized object of the author metadata.
+* `author` (optional): the author of the original text sample, if available. <details><summary>Note:</summary>
+  Usually the author name in plain text, except for [Gutenberg books](metadata/metadata_examples.json#L91) , where it is the JSON serialized object of the author metadata.
   </details>
-* `date` (optional): the publication date of the original text sample, if available.
-  <details><summary>Note:</summary>
+* `date` (optional): the publication date of the original text sample, if available. <details><summary>Note:</summary>
   The text format of the source depends on the source.
   </details>
-* `quality_signals` (optional): a list of quality signals about the text sample, in JSON format (that could be used for further filtering or sample weighting).
-  <details><summary>Note:</summary>
+* `quality_signals` (optional): a list of quality signals about the text sample, in JSON format (that could be used for further filtering or sample weighting). <details><summary>Note:</summary>
   It can include indicators computed by `fasttext` and `CCNet`, statistics about occurrences of characters, words, special characters, etc.
   </details>
 * `extra` (optional): extra information about the text sample, in JSON format.
@@ -548,7 +544,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 <tr>
 <td colspan="7"><h4 id="category-legislative-transcripts">Category: Legislative Transcripts</h4></td></tr>
 <tr>
-<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-and-europarlaligned"><strong>Europarl</strong></a></td>
 <td><strong>German (de)</strong></td>
 <td>0.0102</td>
 <td>0.0451</td>
@@ -756,7 +752,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 <td></td>
 </tr>
 <tr>
-<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-and-europarlaligned"><strong>EuroparlAligned</strong></a></td>
 <td><strong>it-en</strong></td>
 <td>1.901</td>
 <td>0.100</td>
@@ -1118,7 +1114,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
   * <u>Text cleaning</u>: the mention of the source url and the number of views were removed.
 * <u>Citation</u>: No paper found.
 
-#### Europarl and EuroparlAligned (monolingual and parallel)
+#### Europarl and EuroparlAligned
 * <u>Sources</u>: 
   * `fr-en`, `es-en`, `it-en` parallel data: [Europarl v7](https://www.statmt.org/europarl/v7/). License: [Open](https://www.statmt.org/europarl/).
   * `fr`, `en`, `de`, `es` monolingual data and `de-fr` parallel data: [Europarl v10](https://www.statmt.org/europarl/v10/training-monolingual/). License: [Open](https://www.statmt.org/europarl/).

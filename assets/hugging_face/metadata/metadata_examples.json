@@ -25,7 +25,8 @@
     "CroissantAligned": {
         "language": "en,fr",
         "source": "CroissantAligned",
-        "id": "{\"id\": \"-8403949827142368011\", \"dataset_id\": \"UnbabelFrEn\"}"
+        "id": "{\"id\": \"-8403949827142368011\", \"dataset_id\": \"UnbabelFrEn\"}",
+        "extra": "{\"text_en\": \"The Panel has decided to request that the federal Minister of the Environment and the BC Minister of Environment amend the Panel's Terms of Reference to extend the date for completion of the Panel review process and for delivery of the Panel's report as follows:\", \"text_fr\": \"La Commission a décidé de demander à la ministre fédérale de l'Environnement et au ministre de l'Environnement de la Colombie-Britannique de modifier son mandat afin que la date de la fin de son processus d'examen soit reportée et que les modalités de dépôt de son rapport prévoient :\"}"
     },
     "DiscoursPublics": {
         "language": "fr",
@@ -45,7 +46,7 @@
         "language": "it,en",
         "source": "EuroparlAligned",
         "id": "{\"idx_row\": 0}",
-        "extra": "{\"subset\": \"-en:0-1parquet\"}"
+        "extra": "{\"text_1\": \"4. Ratifizierung und Umsetzung der aktualisierten IAO-Übereinkommen (Abstimmung)\", \"text_2\": \"4. Ratification et mise en œuvre des conventions de l'OIT mises à jour (vote)\", \"lan_1\": \"de\", \"lan_2\": \"fr\", \"subset\": \"de-fr\"}"
     },
     "Eurovoc": {
         "language": "en",
