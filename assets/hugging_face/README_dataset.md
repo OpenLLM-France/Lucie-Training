@@ -1,4 +1,4 @@
-# Dataset Card
+# Lucie Training Dataset Card
 
 The Lucie Training Dataset is a curated collection of text data
 in English, French, German, Spanish and Italian culled from a variety of sources including: web data, video subtitles, academic papers,
@@ -42,7 +42,8 @@ Table of Contents:
             </tr>
           </table>
         </li>
-      <li><a href="#details-on-data-sources">Details on Data Sources</a>
+        <li><a href="#subsets-and-versions">Subsets and Versions</a></li>
+        <li><a href="#details-on-data-sources">Details on Data Sources</a>
           <table>
             <tr>
               <td style="vertical-align: top;">
@@ -88,9 +89,13 @@ Table of Contents:
       </li>
     </ul>
   </li>
-  <li><a href="#example-use-in-python">Example use in python</a></li>
-  <li><a href="#versions-variants-of-the-dataset">Versions (variants of the dataset)</a></li>
-  <li><a href="#license">License</a></li>
+  <li><a href="#example-use-in-python">Example use in python</a>
+   <ul>
+      <li><a href="#load-the-dataset">Load the dataset</a></li>
+      <li><a href="#iterate-over-a-subset">Iterate over a subset</a></li>
+      <li><a href="#load-a-specific-version">Load a specific version</a></li>
+    </ul>
+  </li>
   <li><a href="#citation">Citation</a></li>
   <li><a href="#acknowledgements">Acknowledgements</a></li>
   <li><a href="#contact">Contact</a></li>
@@ -117,27 +122,30 @@ This dataset was made to provide an extensive and diverse dataset for training L
 
 The corpus contains the following information for each text sample:
 * `text`: the text sample itself.
-* [`source`](metadata/metadata_examples.json#): an identifier for the source(s) of the text sample (Wikipedia, RedPajama, Gutenberg, …).
-  All sources are described in detail [in this document](#details-on-data-sources).
-* `id`: an identifier that is unique among the source.
-* `language`: the language of the text sample (relying on the source, that information can be wrong). <details><summary>Possible values:</summary>
+* [`language`](metadata/metadata_examples.json#L3): the language of the text sample (relying on the source, that information can be wrong).
+  <br>Possible values:
   - an ISO 639-1 code of a natural language ("en", "fr", "de", "es", or "it"),
   - a common name prefixed by "code:" of a programming language ("code:python", "code:c++", …), or
   - a list of ISO 639-1 codes separated by commas when the text sample is multilingual and aligned ("fr,en", "de,fr", "es,en", "it,en",
   or one of those pairs in the opposite order if the languages appear in the opposite order in the text).
-  </details>
-* `url` (optional): the URL of the original text sample on the web, if available.
-* `title` (optional): the title of the original text sample, if available.
-* `author` (optional): the author of the original text sample, if available. <details><summary>Note:</summary>
+* [`source`](metadata/metadata_examples.json#L4): an identifier for the source(s) of the text sample (Wikipedia, RedPajama, Gutenberg, …).
+  All sources are described in detail [in this document](#details-on-data-sources).
+* [`id`](metadata/metadata_examples.json#L13): an identifier that is unique among the source.
+* [`url`](metadata/metadata_examples.json#L35) (optional): the URL of the original text sample on the web, if available.
+* [`title`](metadata/metadata_examples.json#L36) (optional): the title of the original text sample, if available.
+* [`author`](metadata/metadata_examples.json#L81) (optional): the author of the original text sample, if available.
+  <details><summary>Note:</summary>
   Usually the author name in plain text, except for [Gutenberg books](metadata/metadata_examples.json#L91) , where it is the JSON serialized object of the author metadata.
   </details>
-* `date` (optional): the publication date of the original text sample, if available. <details><summary>Note:</summary>
+* [`date`](metadata/metadata_examples.json#L6) (optional): the publication date of the original text sample, if available.
+  <details><summary>Note:</summary>
   The text format of the source depends on the source.
   </details>
-* `quality_signals` (optional): a list of quality signals about the text sample, in JSON format (that could be used for further filtering or sample weighting). <details><summary>Note:</summary>
+* [`quality_signals`](metadata/metadata_examples.json#L17) (optional): a list of quality signals about the text sample, in JSON format (that could be used for further filtering or sample weighting).
+  <details><summary>Note:</summary>
   It can include indicators computed by `fasttext` and `CCNet`, statistics about occurrences of characters, words, special characters, etc.
   </details>
-* `extra` (optional): extra information about the text sample, in JSON format.
+* [`extra`](metadata/metadata_examples.json#L16) (optional): extra information about the text sample, in JSON format.
   This can include metadata about the source subset, the rights, etc.
 
 Examples of metadata (except from `text`) are shown for each source in [metadata_examples.json](metadata/metadata_examples.json).
@@ -1063,13 +1071,35 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 </table>
 <!-- TABLE END -->
 
+
+### Subsets and Versions
+
+As the dataset is the result of merging multiple sources, it is divided into subsets based on the source and the language of the texts.
+<br> Different configurations of the dataset are available, depending on the sources and languages included.
+The list of all configurations is available [in the YAML header of this README file](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/v1.2/README.md?code=true#L24).
+Each configuration corresponds to a pathname pattern in the [data subdirectory](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data).
+
+The dataset is available in the following versions:
+- **v1.1** / [**main**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/main/data) (default): 
+  The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which approximates 2.3T tokens.
+- [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data): An improved version of the data, where 
+  - GallicaMonographies and GallicaPress have been updated to filter out documents with bad OCR quality.
+  - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined, by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
+- [**v1.2-recent_web**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2-recent_web/data) : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
+  This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
+  All data that was not filtered out remained unchanged.
+
+Except from **v1.1**, which is a git tag, all versions are git branches in the dataset repository
+(e.g. [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data)).
+
+
 ### Details on Data Sources
 
 #### AmendementsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([nodeputes.fr](http://www.nosdeputes.fr/), [nossenateurs.fr](http://www.nossenateurs.fr/)). [API](https://github.com/regardscitoyens). License: [CC BY-SA](https://www.regardscitoyens.org/#&panel1-2).
 * <u>Description</u>: A collection of proposed amendments by the French parliament: the legal text and description of the requested modification. 
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### AmericanStories
 * <u>Source</u>: [dell-research-harvard/AmericanStories](https://huggingface.co/datasets/dell-research-harvard/AmericanStories). License: [CC BY 4.0](https://huggingface.co/datasets/dell-research-harvard/AmericanStories).
@@ -1112,7 +1142,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
 * <u>Text Pre-processing</u>:
   * <u>Text cleaning</u>: the mention of the source url and the number of views were removed.
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### Europarl and EuroparlAligned
 * <u>Sources</u>: 
@@ -1144,13 +1174,13 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Books](https://huggingface.co/datasets/PleIAs/French-PD-Books). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### GallicaPress
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### Gutenberg
 * <u>Source</u>: Corpus compiled by OpenLLM partners.
@@ -1161,7 +1191,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Text Pre-processing</u>:
   * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). This filtering was done to ensure that the texts are in the public domain.
   * <u>Text cleaning</u>: Headers, footers mentioning the Project Gutenberg were removed.
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### HAL
 * <u>Source</u>: The ROOTS corpus by BigScience (unpublished). License: CC BY-4.0.
@@ -1174,7 +1204,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([nodeputes.fr](http://www.nosdeputes.fr/), [nossenateurs.fr](http://www.nossenateurs.fr/)). [API](https://github.com/regardscitoyens). License: [CC BY-SA](https://www.regardscitoyens.org/#&panel1-2).
 * <u>Description</u>: Transcripts of speeches made during French parlementary debates.  
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### MathPile
 * <u>Source</u>: [GAIR/MathPile_Commercial](https://huggingface.co/datasets/GAIR/MathPile_Commercial). License: [CC BY-SA 4.0](https://huggingface.co/datasets/GAIR/MathPile_Commercial)
@@ -1186,13 +1216,13 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main) (balo, dole, inca, kali, legi and sarde subsets). License: [ODC-BY](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
 * <u>Extracted from</u>: [OpenData](https://echanges.dila.gouv.fr/OPENDATA/) (Data collection date: October, 2023).
 * <u>Description</u>: "The French Government Open Data (DILA) Dataset is a collection of text data extracted from various sources provided by the French government, specifically the Direction de l'information légale et administrative (DILA). This dataset contains a wide range of legal, administrative, and legislative documents. The data has been organized into several categories for easy access and analysis" (from the [dataset card](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main)).
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### OpenEdition
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>: [Open Edition](https://www.openedition.org/).
-* <u>Description</u>: 
-* <u>Citation</u>: No paper found.
+<!-- * <u>Description</u>: TODO -->
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### PeS2o
 * <u>Source</u>: [allenai/peS2o](https://huggingface.co/datasets/allenai/peS2o). License: 	[ODC BY-v1.0](https://opendatacommons.org/licenses/by/1-0/)
@@ -1211,7 +1241,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
   * Ubuntu IRC: "The Ubuntu IRC dataset is derived from the publicly available chatlogs of all Ubunturelated channels on the Freenode IRC chat server."
   * PhilPapers: a dataset of open access philosophy publications from an international database maintained by the Center for Digital Philosophy at the University of Western Ontario.
   * NIH ExPORTER: "The NIH Grant abstracts provides a bulk-data repository for awarded applications through the ExPORTER4 service covering the fiscal years 1985-present."
-* <u>Citation</u>:
+* <u>Citations</u>:
   * Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, Shawn Presser, Connor Leahy (2020). "The Pile: An 800GB Dataset of Diverse Text for Language Modeling," [	arXiv:2101.00027](https://arxiv.org/abs/2101.00027).
   * Stella Biderman, Kieran Bicheno, Leo Gao (2022). "Datasheet for the Pile," [	arXiv:2201.07311](https://arxiv.org/abs/2201.07311).
 
@@ -1219,7 +1249,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([text](https://data.regardscitoyens.org/nosdeputes.fr/)). License: [CC BY-NC-SA](https://data.regardscitoyens.org/nosdeputes.fr/).
 * <u>Description</u>: Collection of long written questions, read during a session at the French National Assembly. Questions are asked by a member of the French parliament and addressed to a minister (who is given two months to respond). 
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### RedPajama (v2)
 * <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
@@ -1246,7 +1276,7 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
 * <u>Text Pre-processing</u>:
   * <u>Filtering</u>: Text with less than 1000 words or 10000 characters were removed.
   * <u>Text cleaning</u>: Because the results of OCR on tables and graphics can give raise to garbage text, the text was cleaned by removing the most suspicious chunks of text. Chunks of text were removed if the detected language was not among French, English, Spanish, German and Italian, or if the perplexity of a CCNet Language Model was higher than 2000 ([details here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
-* <u>Citation</u>: No paper found.
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### Wikipedia, Wikisource, Wiktionary
 * <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France).
@@ -1255,34 +1285,42 @@ The Number of tokens was computed using the tokenizer of [Lucie-7B LLM](https://
   * [OpenLLM-France/wikisource](https://huggingface.co/datasets/OpenLLM-France/wikisource)
   * [OpenLLM-France/wiktionary](https://huggingface.co/datasets/OpenLLM-France/wiktionary)
 * <u>Extracted from</u>: [Wikimedia dumps](https://dumps.wikimedia.org/other/enterprise_html/runs/). License: [GFDL/CC BY-SA](https://dumps.wikimedia.org/legal.html).
-* <u>Description</u>:
-* <u>Citation</u>: No paper found.
+<!-- * <u>Description</u>: TODO -->
+<!-- * <u>Citation</u>: No paper found. -->
 
 #### YouTube
 * <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France).
-* <u>Extracted from</u>: [YouTube](https://www.youtube.com/). License: .
-* <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube.
-* <u>Citation</u>: No paper found.
+* <u>Extracted from</u>: [YouTube](https://www.youtube.com/). <!-- License: TODO? -->
+* <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube. <!-- TODO -->
+<!-- * <u>Citation</u>: No paper found. -->
 
 ## Example use in python
+
+### Load the dataset
 
 Load and iterate over the full dataset using the `datasets` library:
 ```python
 from datasets import load_dataset
 
-kwargs = {"split": "train", "streaming": True}
-
-dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", **kwargs)
+dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", split="train", streaming=True)
 
 for sample in dataset:
+   
    text = sample["text"]
+
    # … do something with the text
 ```
+
+### Iterate over a subset
 
 Several configurations are available to select a language, a source, or both, illustrated in the following examples.
 
 Load data in French:
 ```python
+from datasets import load_dataset
+
+kwargs = dict(split="train", streaming=True)
+
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "fr", **kwargs)
 ```
 Load data where French and English are aligned:
@@ -1317,26 +1355,20 @@ Load the subset "`PhilPapers`" from the Pile dataset:
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile-PhilPapers", **kwargs)
 ```
 
-## Versions (variants of the dataset)
+### Load a specific version
 
-The dataset is available in the following versions
-- `v1.1` / `main` (default): The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which approximates 2.3T tokens.
-- `v1.2`: An improved version of the data, where 
-  - GallicaMonographies and GallicaPress have been updated to filter out documents with bad OCR quality.
-  - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined, by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
-- `v1.2-recent_web` : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
-  This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
 
-You can load a specific version with the `datasets` Python package using the `revision` parameter of the `load_dataset()` function:
+You can load a specific version with the `datasets` Python package using the `revision` parameter of `load_dataset(…)`:
 ```python
+from datasets import load_dataset
+
+kwargs = dict(split="train", streaming=True)
+
 name = None # or a configuration (e.g. "fr", "code-python", "Wikipedia-fr", "Pile-PhilPapers")
+
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="v1.2", **kwargs)
 ```
-Parquet files corresponding to the datasets are in git branches named after the version (e.g. [`v1.2`](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2)).
 
-## License
-
-TODO
 
 ## Citation
 
