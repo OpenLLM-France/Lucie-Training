@@ -1315,6 +1315,20 @@ for sample in dataset:
 
 Several configurations are available to select a language, a source, or both, illustrated in the following examples.
 
+The list of possible configurations can be obtained programmatically:
+```python
+from datasets import load_dataset_builder
+
+config_names = list(load_dataset_builder("OpenLLM-France/Lucie-Training-Dataset").builder_configs)
+
+print(config_names)
+```
+```plaintext
+['default', 'en', 'fr', 'de', 'es', 'it', 'de,fr', 'es,en', 'fr,en', 'it,en', 'natural', 'code', 'code-assembly', 'code-c', 'code-c#', 'code-c++', 'code-clojure', 'code-dart', 'code-elixir', 'code-erlang', 'code-fortran', 'code-go', 'code-haskell', 'code-java', 'code-javascript', 'code-julia', 'code-kotlin', 'code-lua', 'code-mathematica', 'code-matlab', 'code-ocaml', 'code-perl', 'code-php', 'code-python', 'code-r', 'code-racket', 'code-ruby', 'code-rust', 'code-scala', 'code-swift', 'code-tex', 'code-typescript', 'AmendementsParlement', 'AmericanStories', 'Claire', 'Claire-en', 'Claire-fr', 'CroissantAligned', 'DiscoursPublics', 'Europarl', 'Europarl-de', 'Europarl-en', 'Europarl-es', 'Europarl-fr', 'EuroparlAligned', 'EuroparlAligned-de,fr', 'EuroparlAligned-es,en', 'EuroparlAligned-fr,en', 'EuroparlAligned-it,en', 'Eurovoc', 'Eurovoc-de', 'Eurovoc-en', 'Eurovoc-es', 'Eurovoc-it', 'FineWebEdu', 'GallicaMonographies', 'GallicaPress', 'Gutenberg', 'Gutenberg-de', 'Gutenberg-en', 'Gutenberg-es', 'Gutenberg-fr', 'Gutenberg-it', 'HAL', 'InterventionsParlement', 'LEGI', 'MathPile', 'OpenData', 'OpenEdition', 'PeS2o', 'PeS2o-s2ag', 'PeS2o-s2orc', 'Pile', 'Pile-DM_Mathematics', 'Pile-FreeLaw', 'Pile-NIH_ExPorter', 'Pile-PhilPapers', 'Pile-StackExchange', 'Pile-USPTO_Backgrounds', 'Pile-Ubuntu_IRC', 'QuestionsEcritesParlement', 'RedPajama', 'RedPajama-de', 'RedPajama-es', 'RedPajama-fr', 'RedPajama-it', 'Stac', 'TheStack', 'Theses', 'Wikipedia', 'Wikipedia-de', 'Wikipedia-en', 'Wikipedia-es', 'Wikipedia-fr', 'Wikipedia-it', 'Wikisource', 'Wiktionary', 'YouTube']
+```
+
+Below are some examples of how to load data from different sources and in different languages.
+
 Load data in French:
 ```python
 from datasets import load_dataset
