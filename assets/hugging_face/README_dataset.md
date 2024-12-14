@@ -1085,7 +1085,7 @@ The dataset is available in the following versions:
 - [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data): An improved version of the data, where 
   - GallicaMonographies and GallicaPress have been updated to filter out documents with bad OCR quality.
   - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined, by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
-- [**v1.2-recent_web**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2-recent_web/data) : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
+- [**v1.2-recent-web**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2-recent-web/data) : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
   This consists in the same as `v1.2` without old snapshots for web data (only year 2023 for RedPajama, and only year 2024 for FineWebEdu).
   All data that was not filtered out remained unchanged.
 
