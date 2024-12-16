@@ -1098,7 +1098,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### AmendementsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([nodeputes.fr](http://www.nosdeputes.fr/), [nossenateurs.fr](http://www.nossenateurs.fr/)). [API](https://github.com/regardscitoyens). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/).
+* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/).
 * <u>Description</u>: A collection of proposed amendments by the French parliament. Documents contain the text of the proposed amendment, the name of the associated law as well as information on who voted on the amendment and what was decided.
 
 #### AmericanStories
@@ -1123,9 +1123,9 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 #### CroissantAligned
 * <u>Source</u>: [croissantllm/croissant_dataset_no_web_data](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data/tree/main/aligned_36b) (subset: `aligned_36b`). License: not specified.
 * <u>Extracted from</u>: 
-  * Translation pairs: [OPUS](https://opus.nlpl.eu/) (99.6% of the data in CroissantAligned). Pairs extracted from OPUS are labeled as "UnbabelFrEn". License: .
+  * Translation pairs: [OPUS](https://opus.nlpl.eu/) (99.6% of the data in CroissantAligned). Pairs extracted from OPUS are labeled as "UnbabelFrEn". 
   * Thesis abstracts: French thesis abstract pairs. License: [ETALAB-Licence-Ouverte-v2.0](https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf).
-  * Song lyrics: [lacoccinelle](https://www.lacoccinelle.net). License: .
+  * Song lyrics: [lacoccinelle](https://www.lacoccinelle.net). 
 * <u>Description</u>: CroissantAligned contains samples of parallel French/English (or English/French) data. Data extracted from OPUS takes the form of sentences pairs, where one sentence is in French and the other is in English. OPUS pairs were passed through a custom pipeline designed to select the highest quality translation examples. Selected pairs are labeled "UnbabelFrEn" in the CroissantAligned dataset. The thesis abstract subset contains thesis abstracts paired with translations written by the thesis authors. The song lyrics are translated by contributors to www.lacoccinelle.net. Parallel data are used to boost the multilingual capabilities of models trained on them ([Faysse et al.,2024](https://arxiv.org/pdf/2402.00786)).
 * <u>Pre-processing</u>:
   * <u>Language separation and tagging</u>: The original text field of [the Croissant dataset](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data) contains a sentence or passage in French or English immediately followed by its translation without any indication of which passage is in which language. The first step was thus to split each text into separate, monolingual passages and tag each passage with the appropriate language code, identified automatically using the [langid library](https://pypi.org/project/langid/) (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/data.py#L1407)). In the Lucie Training Dataset, the `extra` metadata field for CroissantAligned contains separate keys, `text_fr` for French and `text_en` for English, that stores the texts separately.
@@ -1135,7 +1135,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### DiscoursPublics
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics).
+* <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics). License: [ETALAB-Licence-Ouverte-v2.0](https://www.vie-publique.fr/mentions-legales).
 * <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
 * <u>Pre-processing</u>:
   * <u>Text cleaning</u>: the mention of the source url and the number of views were removed from the text.
@@ -1152,7 +1152,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### Eurovoc
 * <u>Source</u>:   [EuropeanParliament/Eurovoc](https://huggingface.co/datasets/EuropeanParliament/Eurovoc). License: [EUPL 1.1](https://huggingface.co/datasets/EuropeanParliament/Eurovoc).
-* <u>Extracted from</u>: [Cellar](https://op.europa.eu/en/web/cellar). License: [Open](https://op.europa.eu/en/web/cellar).
+* <u>Extracted from</u>: [Cellar](https://op.europa.eu/en/web/cellar). License: [CC BY-4.0](https://op.europa.eu/en/web/about-us/legal-notices/publications-office-of-the-european-union-copyright).
 * <u>Description</u>: A collection of mutlilingual documents from the data repository of the Publications Office of the European Union annotated with Eurovoc labels. The corpus contains legal, policy-related, historical and organizational information about the EU. Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Filtering</u>:
@@ -1176,7 +1176,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Citation</u>: Guilherme Penedo, Hynek Kydlíček, Loubna Ben allal, Anton Lozhkov, Margaret Mitchell, Colin Raffel, Leandro Von Werra, Thomas Wolf (2024). "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale," [	arXiv:2406.17557](https://arxiv.org/abs/2406.17557).
 
 #### GallicaMonographies
-* <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Books](https://huggingface.co/datasets/PleIAs/French-PD-Books). License: None (public domain).
+* <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Books](https://huggingface.co/datasets/PleIAs/French-PD-Books). License: Public domain.
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
@@ -1186,7 +1186,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1896)).
 
 #### GallicaPress
-* <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: None (public domain).
+* <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: Public domain.
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
@@ -1206,8 +1206,8 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * <u>Text cleaning</u>: Headers and footers containing information about Project Gutenberg were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L93)).
 
 #### HAL
-* <u>Source</u>: [bigscience-data/roots_fr_hal_archives_ouvertes](https://huggingface.co/datasets/bigscience-data/roots_fr_hal_archives_ouvertes). License: Other.
-* <u>Extracted from</u>: [HAL](https://hal.science/).
+* <u>Source</u>: [bigscience-data/roots_fr_hal_archives_ouvertes](https://huggingface.co/datasets/bigscience-data/roots_fr_hal_archives_ouvertes). License: Roots dataset.
+* <u>Extracted from</u>: [HAL](https://hal.science/) ([Open access](https://about.hal.science/)).
 * <u>Description</u>: A collection of scientific papers and manuscripts distributed through the open science platform HAL. Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Filtering</u>:
@@ -1219,7 +1219,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### InterventionsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([nodeputes.fr](http://www.nosdeputes.fr/), [nossenateurs.fr](http://www.nossenateurs.fr/)). [API](https://github.com/regardscitoyens). License: [CC BY-SA](https://www.regardscitoyens.org/#&panel1-2).
+* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/). 
 * <u>Description</u>: Transcripts of speeches made during French parlementary debates.  
 <!-- * <u>Citation</u>: No paper found. -->
 
@@ -1242,7 +1242,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### OpenEdition
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>: [Open Edition](https://www.openedition.org/).
+* <u>Extracted from</u>: [Open Edition](https://www.openedition.org/). License: [Open Edition Books](https://www.openedition.org/12554).
 * <u>Description</u>: A collection of scientific books, journal articles, blog entries and event descriptions. 
 <!-- * <u>Citation</u>: No paper found. -->
 
@@ -1272,7 +1272,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### QuestionsEcritesParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4) ([text](https://data.regardscitoyens.org/nosdeputes.fr/)). License: [CC BY-NC-SA](https://data.regardscitoyens.org/nosdeputes.fr/).
+* <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/).
 * <u>Description</u>: Collection of long written questions, read during a session at the French National Assembly. Questions are asked by a member of the French parliament and addressed to a minister (who is given two months to respond). 
 <!-- * <u>Citation</u>: No paper found. -->
 
@@ -1304,7 +1304,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 
 #### Theses
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
-* <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL](https://hal.science/).
+* <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) (License: [Licence Ouverte / Open Licence version 2.0](https://www.data.gouv.fr/fr/datasets/theses-soutenues-en-france-depuis-1985/)) and  [HAL](https://hal.science/) ([Open access](https://about.hal.science/)).
 * <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Text cleaning</u>:
