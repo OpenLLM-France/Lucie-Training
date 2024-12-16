@@ -66,10 +66,10 @@ Table of Contents:
                   <li><a href="#hal">                               HAL</a></li>
                   <li><a href="#interventionsparlement">            InterventionsParlement</a></li>
                   <li><a href="#legi">                              LEGI</a></li>
-                  <li><a href="#mathpile">                          MathPile</a></li>
+                  <li><a href="#mathpile-commercial">               MathPile (Commercial)</a></li>
                   <li><a href="#opendata">                          OpenData</a></li>
                   <li><a href="#openedition">                       OpenEdition</a></li>
-                  <li><a href="#pes2o">                             PeS2o</a></li>
+                  <li><a href="#pes2o-v2">                          PeS2o (v2)</a></li>
                 </ul>
               </td>
               <td style="vertical-align: top;">
@@ -78,7 +78,7 @@ Table of Contents:
                   <li><a href="#questionsecritesparlement">         QuestionsEcritesParlement</a></li>
                   <li><a href="#redpajama-v2">                      RedPajama (v2)</a></li>
                   <li><a href="#stac">                              Stac</a></li>
-                  <li><a href="#thestack">                          TheStack</a></li>
+                  <li><a href="#thestack-v12">                      TheStack (v1.2)</a></li>
                   <li><a href="#theses">                            Theses</a></li>
                   <li><a href="#wikipedia-wikisource-wiktionary">   Wikipedia, Wikisource, Wiktionary</a></li>
                   <li><a href="#youtube">                           YouTube</a></li>
@@ -89,15 +89,11 @@ Table of Contents:
       </li>
     </ul>
   </li>
-  <li><a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Subsets, and Versions</a>
-   <ul>
-      <li><a href="#in-python">In Python</a></li>
-        <ul>
-          <li><a href="#load-the-dataset">Load the dataset</a></li>
-          <li><a href="#iterate-over-a-subset">Iterate over a subset</a></li>
-          <li><a href="#load-a-specific-version">Load a specific version</a></li>
-        </ul>
-      <li><a href="#by-folder">By Folder</a></li>
+  <li><a href="#example-use-in-python">Example use in Python</a></li>
+    <ul>
+      <li><a href="#load-the-dataset">Load the dataset</a></li>
+      <li><a href="#iterate-over-a-subset">Iterate over a subset</a></li>
+      <li><a href="#load-a-specific-version">Load a specific version</a></li>
     </ul>
   </li>
   <li><a href="#citation">Citation</a></li>
@@ -352,7 +348,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-technical">Category: Technical</h4></td></tr>
 <tr>
-<td><a href="#pes2o"><strong>PeS2o</strong></a></td>
+<td><a href="#pes2o-v2"><strong>PeS2o</strong></a></td>
 <td><strong>English (en)</strong></td>
 <td>38.972</td>
 <td>42.296</td>
@@ -677,7 +673,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-math">Category: Math</h4></td></tr>
 <tr>
-<td><a href="#mathpile"><strong>MathPile</strong></a></td>
+<td><a href="#mathpile-commercial"><strong>MathPile</strong></a></td>
 <td><strong>English (en)</strong></td>
 <td>0.737</td>
 <td>3.408</td>
@@ -802,7 +798,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-programming">Category: Programming</h4></td></tr>
 <tr>
-<td rowspan="30" style="vertical-align: top;"><a href="#thestack"><strong>TheStack</strong></a></td>
+<td rowspan="30" style="vertical-align: top;"><a href="#thestack-v12"><strong>TheStack</strong></a></td>
 <td><strong>JAVASCRIPT</strong></td>
 <td>21.109</td>
 <td>8.526</td>
@@ -1095,7 +1091,7 @@ The dataset is also  available in the following versions:
 Except from **v1.1**, which is a git tag, all versions are git branches in the dataset repository
 (e.g. [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data)).
 
-The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Subsets, and Versions</a> section contains example Python code for loading and iterating over the dataset with different configurations, including source, language and version.
+The <a href="#example-use-in-python">Example use in Python</a> section contains example Python code for loading and iterating over the dataset with different configurations, including source, language and version.
 
 
 ### Details on Data Sources
@@ -1109,11 +1105,11 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: [dell-research-harvard/AmericanStories](https://huggingface.co/datasets/dell-research-harvard/AmericanStories). License: [CC BY 4.0](https://huggingface.co/datasets/dell-research-harvard/AmericanStories).
 * <u>Extracted from</u>: [Chronicling America](https://www.loc.gov/collections/chronicling-america/about-this-collection/). License: [Open](https://www.loc.gov/collections/chronicling-america/about-this-collection/rights-and-access/).
 * <u>Description</u>: "The American Stories dataset is a collection of full article texts extracted from historical U.S. newspaper images. It includes nearly 20 million scans from the public domain Chronicling America collection maintained by the Library of Congress. The dataset is designed to address the challenges posed by complex layouts and low OCR quality in existing newspaper datasets" (from the [dataset card](https://huggingface.co/datasets/dell-research-harvard/AmericanStories)). See the dataset <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_americanstories-english_histogram.png">composition details</a> for statistics on documents by year. Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Filtering</u>:
   To filter out documents with excessive OCR errors, the dataset was refined by discarding texts with a perplexity higher than 2310,
   measured using a CCNET model in English (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2106)).
-  The code to compute perplexity, parallelized on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
+  The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
 * <u>Citation</u>: Melissa Dell, Jacob Carlson, Tom Bryan, Emily Silcock, Abhishek Arora, Zejiang Shen, Luca D'Amico-Wong, Quan Le, Pablo Querubin and Leander Heldring (2023). "American Stories: A Large-Scale Structured Text Dataset of Historical U.S. Newspapers," [arxiv:2308.12477](https://arxiv.org/abs/2308.12477v1).
 
 #### Claire (French and English)
@@ -1131,7 +1127,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
   * Thesis abstracts: French thesis abstract pairs. License: [ETALAB-Licence-Ouverte-v2.0](https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf).
   * Song lyrics: [lacoccinelle](https://www.lacoccinelle.net). License: .
 * <u>Description</u>: CroissantAligned contains samples of parallel French/English (or English/French) data. Data extracted from OPUS takes the form of sentences pairs, where one sentence is in French and the other is in English. OPUS pairs were passed through a custom pipeline designed to select the highest quality translation examples. Selected pairs are labeled "UnbabelFrEn" in the CroissantAligned dataset. The thesis abstract subset contains thesis abstracts paired with translations written by the thesis authors. The song lyrics are translated by contributors to www.lacoccinelle.net. Parallel data are used to boost the multilingual capabilities of models trained on them ([Faysse et al.,2024](https://arxiv.org/pdf/2402.00786)).
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Language separation and tagging</u>: The original text field of [the Croissant dataset](https://huggingface.co/datasets/croissantllm/croissant_dataset_no_web_data) contains a sentence or passage in French or English immediately followed by its translation without any indication of which passage is in which language. The first step was thus to split each text into separate, monolingual passages and tag each passage with the appropriate language code, identified automatically using the [langid library](https://pypi.org/project/langid/) (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/data.py#L1407)). In the Lucie Training Dataset, the `extra` metadata field for CroissantAligned contains separate keys, `text_fr` for French and `text_en` for English, that stores the texts separately.
   * <u>Random combination of texts prefixed by language</u>: To create the text values, each monolingual text was repaired with its translation, but random separators and various methods of prefixing the text with the language (name or code) were added.
   This was done as a precaution to prevent models trained on this data from switching languages when generating text and can be seen as a very basic instruction to translate the source (first) text into the target (second) text (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/data.py#L1458)).
@@ -1141,7 +1137,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>: [Vie Publique](https://www.vie-publique.fr/collection-discours-publics).
 * <u>Description</u>: A collection of public speeches from the principal public actors in France including speeches from the French President starting from 1974 and from the Prime Minister and members of the government starting from 1980.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Text cleaning</u>: the mention of the source url and the number of views were removed from the text.
 
 #### Europarl and EuroparlAligned
@@ -1149,7 +1145,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
   * `fr-en`, `es-en`, `it-en` parallel data: [Europarl v7](https://www.statmt.org/europarl/v7/). License: [Open](https://www.statmt.org/europarl/).
   * `fr`, `en`, `de`, `es` monolingual data and `de-fr` parallel data: [Europarl v10](https://www.statmt.org/europarl/v10/training-monolingual/). License: [Open](https://www.statmt.org/europarl/).
 * <u>Description</u>: "The Europarl parallel corpus is extracted from the proceedings of the European Parliament. It includes versions in 21 European languages: Romanic (French, Italian, Spanish, Portuguese, Romanian), Germanic (English, Dutch, German, Danish, Swedish), Slavik (Bulgarian, Czech, Polish, Slovak, Slovene), Finni-Ugric (Finnish, Hungarian, Estonian), Baltic (Latvian, Lithuanian), and Greek. The goal of the extraction and processing was to generate sentence aligned text for statistical machine translation systems" ([www.statmt.org](https://www.statmt.org/europarl/)).
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Random combination of aligned texts prefixed by language</u>: The same process as used for the [CroissantAligned](#croissantaligned) dataset was applied to the EuroparlAligned dataset (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/data.py#L1350)).
   In the Lucie Training Dataset, the `extra` field in the metadata for EuroparlAligned provides texts in the two languages under the sub-fields `text_1` and `text_2`, and the corresponding language codes under `lang_1` and `lang_2`.
 * <u>Citation</u>: Philipp Koehn (2005). "Europarl: A Parallel Corpus for Statistical Machine Translation," MT Summit. 
@@ -1158,11 +1154,13 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>:   [EuropeanParliament/Eurovoc](https://huggingface.co/datasets/EuropeanParliament/Eurovoc). License: [EUPL 1.1](https://huggingface.co/datasets/EuropeanParliament/Eurovoc).
 * <u>Extracted from</u>: [Cellar](https://op.europa.eu/en/web/cellar). License: [Open](https://op.europa.eu/en/web/cellar).
 * <u>Description</u>: A collection of mutlilingual documents from the data repository of the Publications Office of the European Union annotated with Eurovoc labels. The corpus contains legal, policy-related, historical and organizational information about the EU. Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Filtering</u>:
   To filter out documents with excessive OCR errors, the dataset was refined by discarding texts with a perplexity higher than 1500,
   measured using a CCNET model in English (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1590)).
-  The code to compute perplexity, parallelized on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
+  The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
+  * <u>Text cleaning</u>:
+  Mentions of Credit Institutions Directives (CID) that appears in the raw texts such as `(cid:146)` were removed.
 * <u>Citations</u>:
   * Ilias Chalkidis, Emmanouil Fergadiotis, Prodromos Malakasiotis, Nikolaos Aletras, and Ion Androutsopoulos (2019). "[Extreme Multi-Label Legal Text Classification: A Case Study in EU Legislation](https://arxiv.org/pdf/1905.10892)," Proceedings of the Natural Legal Language Processing Workshop 2019, pages 78–87, Minneapolis, Minnesota. Association for Computational Linguistics.
   * Ilias Chalkidis,  Manos Fergadiotis, Prodromos Malakasiotis and Ion Androutsopoulos (2019). "[Large-Scale Multi-Label Text Classification on EU Legislation](https://arxiv.org/pdf/1906.02192)," Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics (ACL 2019), Florence, Italy, (short papers).
@@ -1173,7 +1171,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: [HuggingFaceFW/fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
 * <u>Extracted from</u>: [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
 * <u>Description</u>: A 1.3 trillion token selection from [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), which contains 15 trillion tokens of curated data from 96 Common Crawl dumps. Content in FineWebEdu has been selected by a custom designed classifier for its high-quality, educational content. Most recent crawl: 2024-10 (see <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png">composition details</a> for information about the crawls included in this dataset.)
-* <u>Text pre-processing</u>: 
+* <u>Pre-processing</u>: 
   * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "philpapers.org") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1708)).
 * <u>Citation</u>: Guilherme Penedo, Hynek Kydlíček, Loubna Ben allal, Anton Lozhkov, Margaret Mitchell, Colin Raffel, Leandro Von Werra, Thomas Wolf (2024). "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale," [	arXiv:2406.17557](https://arxiv.org/abs/2406.17557).
 
@@ -1181,21 +1179,21 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Books](https://huggingface.co/datasets/PleIAs/French-PD-Books). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Text cleaning for v1.1</u>:
   To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was classified as French using [FastText](https://github.com/facebookresearch/fastText) and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1840)).
+  The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
   * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1896)).
-
-
 
 #### GallicaPress
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: None (public domain).
 * <u>Extracted from</u>: [Gallicagram](https://shiny.ens-paris-saclay.fr/app/gallicagram).
 * <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Text cleaning for v1.1</u>:
   To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was classified as French using [FastText](https://github.com/facebookresearch/fastText) and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1840)).
-  * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1917)).
+  The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
+* <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1917)).
 
 #### Gutenberg
 * <u>Source</u>: Corpus compiled by OpenLLM partners.
@@ -1203,7 +1201,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
   * [aleph.gutenberg.org](http://aleph.gutenberg.org/) via [Project Gutenberg](https://www.gutenberg.org/). License: [Open](https://www.gutenberg.org/policy/terms_of_use.html).
   * [pgcorpus](https://github.com/pgcorpus/gutenberg). License: [CC BY-4.0](https://zenodo.org/records/2422561).
 * <u>Description</u>: A collection of free eBooks, manually prepared by human annotators. 
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1136).) This filtering was done to ensure that the texts are in the public domain.
   * <u>Text cleaning</u>: Headers and footers containing information about Project Gutenberg were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L93)).
 
@@ -1211,11 +1209,11 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: [bigscience-data/roots_fr_hal_archives_ouvertes](https://huggingface.co/datasets/bigscience-data/roots_fr_hal_archives_ouvertes). License: Other.
 * <u>Extracted from</u>: [HAL](https://hal.science/).
 * <u>Description</u>: A collection of scientific papers and manuscripts distributed through the open science platform HAL. Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
+* <u>Pre-processing</u>:
   * <u>Filtering</u>:
   To filter out documents with excessive OCR errors, the dataset was refined by discarding texts with a perplexity higher than 930,
   measured using a CCNET model in French (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1929)).
-  The code to compute perplexity, parallelized on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
+  The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
 * <u>Citation</u>: Hugo Laurençon, Lucile Saulnier, Thomas Wang, Christopher Akiki, Albert Villanova del Moral, Teven Le Scao, Leandro Von Werra, Chenghao Mou, Eduardo González Ponferrada, Huu Nguyen, Jörg Frohberg, Mario Šaško, Quentin Lhoest, Angelina McMillan-Major, Gerard Dupont, Stella Biderman, Anna Rogers, Loubna Ben allal, Francesco De Toni, Giada Pistilli, Olivier Nguyen, Somaieh Nikpoor, Maraim Masoud, Pierre Colombo, Javier de la Rosa, Paulo Villegas, Tristan Thrush, Shayne Longpre, Sebastian Nagel, Leon Weber, Manuel Muñoz, Jian Zhu, Daniel Van Strien, Zaid Alyafeai, Khalid Almubarak, Minh Chien Vu, Itziar Gonzalez-Dios, Aitor Soroa, Kyle Lo, Manan Dey, Pedro Ortiz Suarez, Aaron Gokaslan, Shamik Bose, David Adelani, Long Phan, Hieu Tran, Ian Yu, Suhas Pai, Jenny Chim, Violette Lepercq, Suzana Ilic, Margaret Mitchell, Sasha Alexandra Luccioni, Yacine Jernite (2022). "[The BigScience ROOTS Corpus: A 1.6TB Composite Multilingual Dataset](https://proceedings.neurips.cc/paper_files/paper/2022/hash/ce9e92e3de2372a4b93353eb7f3dc0bd-Abstract-Datasets_and_Benchmarks.html)," Advances in Neural Information Processing Systems (NeurIPS), 35, 31809-31826.
 
 
@@ -1229,8 +1227,11 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: [GAIR/MathPile_Commercial](https://huggingface.co/datasets/GAIR/MathPile_Commercial). License: [CC BY-SA 4.0](https://huggingface.co/datasets/GAIR/MathPile_Commercial).
 * <u>Extracted from</u>: [MathPile](https://huggingface.co/datasets/GAIR/MathPile). License: [CC BY-SA-NC 4.0](https://huggingface.co/datasets/GAIR/MathPile).
 * <u>Description</u>: A preprocessed collection of documents focused on math, including Textbooks, arXiv, Wikipedia, ProofWiki, StackExchange, and web pages from Common Crawl. The content targets a range of levels, from kindergarten through postgraduate level. MathPile_Commercial was obtained by removing documents from MathPile that do not allow commercial use.
-* <u>Text pre-processing</u>:
-  * <u>Formatting</u>: Converted the content of StackExchange questions and answers to match the {"text": value} format (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2395)).
+* <u>Pre-processing</u>:
+  * <u>Formatting</u>: Converted the content of StackExchange questions and answers to match the {"text": value} format (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2395)), using the following formula:
+  ```python
+  text = sample["question"]["Body"] + "\n\n".join([answer["Body"] for answer in sample["answers"]])
+  ```
 * <u>Citation</u>: Zengzhi Wang, Rui Xia and Pengfei Liu (2023). "Generative AI for Math: Part I -- MathPile: A Billion-Token-Scale Pretraining Corpus for Math," [	arXiv:2312.17120](https://export.arxiv.org/abs/2312.17120).
 
 #### OpenData
@@ -1262,7 +1263,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
   * Ubuntu IRC: "The Ubuntu IRC dataset is derived from the publicly available chatlogs of all Ubunturelated channels on the Freenode IRC chat server."
   * PhilPapers: a dataset of open access philosophy publications from an international database maintained by the Center for Digital Philosophy at the University of Western Ontario.
   * NIH ExPORTER: "The NIH Grant abstracts provides a bulk-data repository for awarded applications through the ExPORTER4 service covering the fiscal years 1985-present."
-* <u>Text pre-processing (v1.2 only)</u>:
+* <u>Pre-processing (v1.2 only)</u>:
   * <u>Filtering of PhilPapers</u>: Papers were removed if their language, detected using [Stanza](https://github.com/stanfordnlp/stanza), was not classified as English, French, German, Spanish or Italian (see [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L255) and [here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2341)).
   * <u>Filtering and text cleaning of Ubuntu IRC</u>: Texts from some channels were excluded to avoid data from languages other than English, French, German, Spanish or Italian and certain encoding errors were fixed (see [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L190) and [here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2341)).
 * <u>Citations</u>:
@@ -1279,7 +1280,7 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
 * <u>Extracted from</u>: [Common Crawl](https://commoncrawl.org/).
 * <u>Description</u>: "RedPajama-V2 is an open dataset for training large language models. The dataset includes over 100B text documents coming from 84 CommonCrawl snapshots and processed using the [CCNet](https://github.com/facebookresearch/cc_net) pipeline. Out of these, there are 30B documents in the corpus that additionally come with quality signals, and 20B documents that are deduplicated" (from [GitHub](https://github.com/togethercomputer/RedPajama-Data)). Most recent crawl for French data in the Lucie Training Dataset v1.1: 2023-14. (For more details on the time periods covered by crawls in this dataset see the composition details for <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-french_histogram.png">French</a>, <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-german_histogram.png">German</a>, <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-italian_histogram.png">Italian</a> and <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-spanish_histogram.png">Spanish</a>.)
-* <u>Text pre-processing</u>: 
+* <u>Pre-processing</u>: 
   * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "theses.fr") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L154)).
   * <u>Filtering certain toxic content</u>: urls from a list of blacklisted content were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L177)).
   * <u>Filtering</u>: Gopher...
@@ -1305,8 +1306,12 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>: [theses.fr](https://theses.fr/?domaine=theses) and  [HAL](https://hal.science/).
 * <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
-* <u>Text pre-processing</u>:
-  * <u>Text cleaning</u>: References to HAL, symbols for page breaks and duplicate lines were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L277)). Also, because the results of OCR on tables and graphics can give rise to garbage text, the text was cleaned by removing the most suspicious chunks. In particular, a chunk was removed if it was not detected as being written in French, English, Spanish, German or Italian, or if the perplexity of a CCNet Language Model on the chunk was higher than 2000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
+* <u>Pre-processing</u>:
+  * <u>Text cleaning</u>:
+    * References to HAL, symbols for page breaks and duplicate lines were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L277)).
+    * Because the results of OCR on tables and graphics can give rise to garbage text, the text was cleaned by removing the most suspicious pages.
+    In particular, a page was removed if it was not detected as being written in French, English, Spanish, German or Italian, or if the perplexity of a CCNet Language Model on the chunk was higher than 2000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
+    The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
   * <u>Filtering</u>: Texts with fewer than 1000 words or 10000 characters were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1975)).
 
 <!-- * <u>Citation</u>: No paper found. -->
@@ -1327,10 +1332,9 @@ The <a href="#loading-the-dataset-subsets-and-versions">Loading the Dataset, Sub
 * <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube. <!-- TODO -->
 <!-- * <u>Citation</u>: No paper found. -->
 
-## Loading the Dataset, Subsets, and Versions 
+## Example use in Python
 
-### In Python
-#### Load the dataset
+### Load the dataset
 
 Load and iterate over the full dataset using the `datasets` library:
 ```python
@@ -1345,7 +1349,7 @@ for sample in dataset:
    # … do something with the text
 ```
 
-#### Iterate over a subset
+### Iterate over a subset
 
 Several configurations are available to select a language, a source, or both, illustrated in the following examples.
 
@@ -1403,7 +1407,7 @@ Load the subset "`PhilPapers`" from the Pile dataset:
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", "Pile-PhilPapers", **kwargs)
 ```
 
-#### Load a specific version
+### Load a specific version
 
 
 You can load a specific version with the `datasets` Python package using the `revision` parameter of `load_dataset(…)`:
@@ -1416,10 +1420,6 @@ name = None # or a configuration (e.g. "fr", "code-python", "Wikipedia-fr", "Pil
 
 dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="v1.2", **kwargs)
 ```
-
-### By Folder
-
-TODO
 
 ## Citation
 
