@@ -6,6 +6,15 @@
     * [With python virtual environment (conda)](#with-python-virtual-environment-conda)
     * [With Docker](#with-docker)
   * [Install Megatron-Deepspeed](#install-megatron-deepspeed)
+* [Train a model](#train-a-model)
+  * [1. Pretraining (first main phase)](#1-pretraining-first-main-phase)
+  * [2. Context Extension](#2-context-extension)
+  * [3. Annealing](#3-annealing)
+  * [4. Instruct-Tuning and Finetuning](#4-instruct-tuning-and-finetuning)
+* [Model conversion](#model-conversion)
+  * [From LORA to full weights (PEFT)](#from-lora-to-full-weights-peft)
+  * [Quantize models](#quantize-models)
+
 
 ## Setup
 
