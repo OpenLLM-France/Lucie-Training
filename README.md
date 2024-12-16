@@ -12,6 +12,7 @@
   * [3. Annealing](#3-annealing)
   * [4. Instruct-Tuning and Finetuning](#4-instruct-tuning-and-finetuning)
 * [Model conversion](#model-conversion)
+  * [From Megratron-Deepspeed to transformers](#from-megratron-deepspeed-to-transformers)
   * [From LORA to full weights (PEFT)](#from-lora-to-full-weights-peft)
   * [Quantize models](#quantize-models)
 
@@ -181,7 +182,7 @@ if [ ! -d $UNIVERSAL_CHECKPOINT ]; then
 fi
 
 if [ ! -d $TRANSFORMERS_CHECKPOINT ]; then
-    python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT --output_folder $TRANSFORMERS_CHECKPOINT --max_shard_size 5GB
+    python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT --output_folder $TRANSFORMERS_CHECKPOINT --max_shouiard_size 5GB
 fi
 ```
 
