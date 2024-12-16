@@ -1,6 +1,6 @@
 # Lucie Training
 
-* [1. Setup](#1-setup)
+* [Setup](#setup)
   * [Clone the repository](#clone-the-repository)
   * [Environment setup](#environment-setup)
     * [With python virtual environment (conda)](#with-python-virtual-environment-conda)
@@ -12,6 +12,7 @@
   * [3. Annealing](#3-annealing)
   * [4. Instruct-Tuning and Finetuning](#4-instruct-tuning-and-finetuning)
 * [Model conversion](#model-conversion)
+  * [From Megratron-Deepspeed to transformers](#from-megratron-deepspeed-to-transformers)
   * [From LORA to full weights (PEFT)](#from-lora-to-full-weights-peft)
   * [Quantize models](#quantize-models)
 
@@ -165,6 +166,25 @@ TODO
 TODO
 
 ## Model conversion
+
+### From Megratron-Deepspeed to transformers
+
+Converting a Megatron-Deepspeed model/checkpoint in transformers format
+can be done by running the following in the folder with the clone of [OpenLLM-France's fork of Megatron-DeepSpeed](https://github.com/OpenLLM-France/Megatron-DeepSpeed)
+```bash
+MEGATRON_CHECKPOINT=... # input path
+UNIVERSAL_CHECKPOINT=... # output path (1st step)
+TRANSFORMERS_CHECKPOINT=... # output path (final)
+
+if [ ! -d $UNIVERSAL_CHECKPOINT ]; then
+    # DS to Universal
+    python tools/convert_checkpoint/ds_to_universal.py --input_folder $MEGATRON_CHECKPOINT --output_folder $UNIVERSAL_CHECKPOINT
+fi
+
+if [ ! -d $TRANSFORMERS_CHECKPOINT ]; then
+    python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT --output_folder $TRANSFORMERS_CHECKPOINT --max_shouiard_size 5GB
+fi
+```
 
 ### From LORA to full weights (PEFT)
 
