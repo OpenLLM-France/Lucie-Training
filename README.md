@@ -7,7 +7,7 @@
     * [With Docker](#with-docker)
   * [Install Megatron-Deepspeed](#install-megatron-deepspeed)
 
-## 1. Setup
+## Setup
 
 ### Clone the repository
 
@@ -136,3 +136,87 @@ srun --ntasks=1 --gres=gpu:1 -C a100 -A qgz@a100 --qos=qos_gpu-dev --time=00:03:
 sh scripts/training/pretrain_llama.sh <MEGATRON_REPO> <CACHE_FOLDER> <CHECKPOINTS_FOLDER>
 ```
  -->
+
+## Train a model
+
+### 1. Pretraining (first main phase)
+
+TODO
+
+### 2. Context Extension
+
+TODO
+
+### 3. Annealing
+
+TODO
+
+### 4. Instruct-Tuning and Finetuning
+
+TODO
+
+## Model conversion
+
+### From LORA to full weights (PEFT)
+
+If you have LORA weights from Parameter Efficient FineTuning (PEFT),
+you can combine those weights with the base model to have the "full" model.
+
+This can typically be done with this kind of script on CPU:
+```python
+import os
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("lora", type=str, default=None)
+parser.add_argument("base", type=str, default=None)
+parser.add_argument("output", type=str, default=None)
+parser.add_argument("device", type=str, default="cpu")
+args = parser.parse_args()
+
+path_base = args.base
+path_instruct = args.lora
+path_output = args.output
+device = torch.device(args.device)
+
+tokenizer = AutoTokenizer.from_pretrained(path_base)
+
+model = AutoModelForCausalLM.from_pretrained(
+    path_base,
+    torch_dtype=torch.bfloat16
+)
+
+model = PeftModel.from_pretrained(model, path_instruct)
+model.to(device).eval()
+
+model = model.merge_and_unload()
+model.eval()
+
+model.save_pretrained(path_output)
+```
+
+### Quantize models
+
+Quantification can be done from models in `transformers` format.
+
+Install [llama.cpp](https://github.com/ggerganov/llama.cpp):
+```bash
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+make
+python3 -m pip install -r requirements.txt
+```
+
+Run the conversion of the model packaged for Hugging Face,
+choosing the desired quantization method:
+```bash
+# Convert to GGUF FP16 format
+python3 convert_hf_to_gguf.py /path/to/model/transformers/ --outfile custom-name-f16.gguf --outtype f16
+
+# Quantize model weights
+./llama-quantize custom-name-f16.gguf custom-name-q4_k_m.gguf  $OUT q4_k_m
+```
+
