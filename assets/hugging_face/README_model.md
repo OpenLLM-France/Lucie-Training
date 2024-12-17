@@ -211,13 +211,21 @@ TODO
 
 ### Training logs and learning curves
 
-🚧 work in progress 🚧
-
 Training logs can be found in Tensorboard format in:
 * [`metadata/training_logs/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs)
 <br> ├── [`1_pretraining.zip`](metadata/training_logs/1_pretraining.zip) training logs for the first pre-training phases,
 in a zip file. Each file in the zip corresponds to a job of at most 20H of training (parallelized over 512 GPUs).
 <br> └── [`2_extension/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs/2_extension) folder containing the training log for the context extension phase, which was done in a single job of around 13H of training (parallelized over 128 GPUs).
+
+🚧 TODO: Plot convergence curve (and link CSV ?) 🚧
+
+Evaluation results on benchmark datasets of checkpoints of Lucie-7B throughout the training process are available at
+[metadata/evaluation_learning_curve_lucie.csv](metadata/evaluation_learning_curve_lucie.csv).
+Evaluation results of baseline models on the same benchmark datasets are available at
+[metadata/evaluation_baselines.csv](metadata/evaluation_baselines.csv).
+
+🚧 TODO: Plot learning curves 🚧
+
 
 ## Acknowledgements
 
