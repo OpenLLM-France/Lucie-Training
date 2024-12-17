@@ -20,6 +20,7 @@ https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/tem
       3. [Annealing](#3-annealing)
   * [Training Logs and Learning Curves](#training-logs-and-learning-curves)
 <!-- * [Evaluation](#evaluation) -->
+* [Disclaimer](#disclaimer)
 * [Citation](#citation)
 * [Acknowledgements](#acknowledgements)
 * [Contact](#contact)
