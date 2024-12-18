@@ -169,7 +169,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <table>
 <thead>
 <tr>
-<th><a href="#subset"><strong>Subset</strong></a></th>
+<th><strong>Subset</strong></th>
 <th><strong>Language</strong></th>
 <th><strong>M docs</strong></th>
 <th><strong>B words</strong></th>
@@ -1171,8 +1171,9 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Source</u>: [HuggingFaceFW/fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
 * <u>Extracted from</u>: [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
 * <u>Description</u>: A 1.3 trillion token selection from [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), which contains 15 trillion tokens of curated data from 96 Common Crawl dumps. Content in FineWebEdu has been selected by a custom designed classifier for its high-quality, educational content. Most recent crawl: 2024-10 (see <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png">composition details</a> for information about the crawls included in this dataset.)
-* <u>Pre-processing</u>: 
-  * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "philpapers.org") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1708)).
+* <u>Pre-processing (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1708))</u>: 
+  * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "philpapers.org") in order to increase diversity of content.
+  * <u>Filtering by robots.txt files</u>: we collect robots.txt, and remove all documents for which CCBot is disallowed or for which we failed to collect information as of July 2024.
 * <u>Citation</u>: Guilherme Penedo, Hynek Kydlíček, Loubna Ben allal, Anton Lozhkov, Margaret Mitchell, Colin Raffel, Leandro Von Werra, Thomas Wolf (2024). "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale," [	arXiv:2406.17557](https://arxiv.org/abs/2406.17557).
 
 #### GallicaMonographies
@@ -1280,10 +1281,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
 * <u>Extracted from</u>: [Common Crawl](https://commoncrawl.org/).
 * <u>Description</u>: "RedPajama-V2 is an open dataset for training large language models. The dataset includes over 100B text documents coming from 84 CommonCrawl snapshots and processed using the [CCNet](https://github.com/facebookresearch/cc_net) pipeline. Out of these, there are 30B documents in the corpus that additionally come with quality signals, and 20B documents that are deduplicated" (from [GitHub](https://github.com/togethercomputer/RedPajama-Data)). Most recent crawl for French data in the Lucie Training Dataset v1.1: 2023-14. (For more details on the time periods covered by crawls in this dataset see the composition details for <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-french_histogram.png">French</a>, <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-german_histogram.png">German</a>, <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-italian_histogram.png">Italian</a> and <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-spanish_histogram.png">Spanish</a>.)
-
-The [Datatrove](https://github.com/huggingface/datatrove) library was used to perform both filtering and deduplication stages.
-
-* <u>Pre-processing</u>: 
+* <u>Pre-processing and deduplication</u>: 
   * <u> Url filtering: </u>
     * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "theses.fr") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L154)).
     * <u>Filtering certain toxic content</u>: urls from a list of blacklisted content were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L177)).
@@ -1295,8 +1293,9 @@ The [Datatrove](https://github.com/huggingface/datatrove) library was used to pe
     * Gopher repetition removal
     * Redpajama document deduplication
   * <u>PII removal</u>: email addresses and ip addresses were replaced with random addresses (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L301)).
-* <u>MinHash deduplication</u> was performed on each snapshot and language independantly as proposed in FineWeb. For minhash configuration [see code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/minhash.py#L63). 
+  * <u>MinHash deduplication</u> was performed on each snapshot and language independantly as proposed in FineWeb. For minhash configuration [see code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/minhash.py#L63). 
 
+  The [Datatrove](https://github.com/huggingface/datatrove) library was used to perform both filtering and deduplication stages.
 
 * <u>Citation</u>: Together Computer (2023). "RedPajama-Data-v2: an Open Dataset with 30 Trillion Tokens for Training Large Language Models," [GitHub](https://github.com/togethercomputer/RedPajama-Data).
 
@@ -1317,9 +1316,9 @@ The [Datatrove](https://github.com/huggingface/datatrove) library was used to pe
 * <u>Description</u>: A collection of doctoral theses published in France. Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Text cleaning</u>:
-    * References to HAL, symbols for page breaks and duplicate lines were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L277)).
-    * Because the results of OCR on tables and graphics can give rise to garbage text, the text was cleaned by removing the most suspicious pages.
-    In particular, a page was removed if it was not detected as being written in French, English, Spanish, German or Italian, or if the perplexity of a CCNet Language Model on the chunk was higher than 2000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
+    * Title pages about HAL, pages containing a significant fraction of control characters, and duplicate lines were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L277)).
+    * Because the results of OCR on tables and graphics can give rise to garbage text, the text was cleaned by removing the most suspicious chunks.
+    In particular, a chunk was removed if it was not detected as being written in French, English, Spanish, German or Italian, or if the perplexity of a CCNet Language Model on the chunk was higher than 2000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1946)).
     The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
   * <u>Filtering</u>: Texts with fewer than 1000 words or 10000 characters were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1975)).
 
@@ -1438,7 +1437,7 @@ TODO
 
 The Lucie Training Dataset was created by members of LINAGORA and OpenLLM-France community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
 
-We thank Rachel Bawden, Clément Bénesse, Christophe Cérisara, Olivier Ferret, Joöl Gombin, Ismaïl Harrando, Jordan Ricker, Guokan Shang, and Yaya Sy for their helpful input.
+We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
 
 Data storage and significant parts of the data processing were made possible through the HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
 
