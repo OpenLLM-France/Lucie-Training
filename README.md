@@ -247,6 +247,6 @@ choosing the desired quantization method:
 python3 convert_hf_to_gguf.py /path/to/model/transformers/ --outfile custom-name-f16.gguf --outtype f16
 
 # Quantize model weights
-./llama-quantize custom-name-f16.gguf custom-name-q4_k_m.gguf  $OUT q4_k_m
+./llama-quantize custom-name-f16.gguf custom-name-q4_k_m.gguf q4_k_m
 ```
 
