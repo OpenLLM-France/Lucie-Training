@@ -54,6 +54,17 @@ if not DATA_PATH:
     if not DATA_PATH:
         raise RuntimeError("No data path found. You can set it using DATA_PATH environment variable.")
 
+INSTRUCT_DATA_PATH = os.environ.get("INSTRUCT_DATA_PATH")
+if not INSTRUCT_DATA_PATH:
+    for path in [
+        "/lustre/fsn1/projects/rech/qgz/commun/instruct",  # JZ
+        "/data-server/datasets/text/raw/multilang/Lucie/instruct",  # BB
+    ]:
+        if os.path.isdir(path):
+            INSTRUCT_DATA_PATH = path
+            break
+    if not INSTRUCT_DATA_PATH:
+        raise RuntimeError("No instruct data path found. You can set it using INSTRUCT_DATA_PATH environment variable.")
 
 ########################################
 # Custom Iterators
@@ -234,6 +245,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "dolly",
         "aya_dataset_chat",
         "oasst1",
+        "hard_coded",
     ]
     corpora_with_years = [
         "fine_web_edu",
@@ -305,6 +317,8 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
             "red_pajama": ["fr", "de", "es", "it"],
             "alpaca": ["en", "fr"],
             "dolly": ["en", "fr", "de", "es"],
+            "hard_coded": ["en", "fr"],
+            "aya_chat": ["fr", "de", "es", "it"],
         }.get(name, ["fr", "en", "de", "es", "it"])
         if "use_nc" in kwargs:
             use_nc = kwargs.pop("use_nc")
@@ -1918,7 +1932,11 @@ class DataIteratorFlanv2(DataIteratorConcat):
             "t0_fsopt_data": 6000 * 50,
         }
 
-        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
+        with open(
+            os.path.join(
+                INSTRUCT_DATA_PATH, "flan/task_name_to_exclude_for_languages_ai2-adapt-dev.flan_v2_converted.txt"
+            )
+        ) as f:
             excluded_tasks = f.read().splitlines()
         excluded_tasks = set(excluded_tasks)
 
@@ -2127,7 +2145,11 @@ class DataIteratorDolly(DataIterator):
 class DataIteratorFlanv2Converted(DataIterator):
     def __init__(self, language="en", streaming=True, **kwargs):
         name = f"Flanv2Converted:{language}"
-        with open(os.path.join(_asset_folder, "flan_excluded_tasks.txt")) as f:
+        with open(
+            os.path.join(
+                INSTRUCT_DATA_PATH, "flan/task_name_to_exclude_for_languages_ai2-adapt-dev.flan_v2_converted.txt"
+            )
+        ) as f:
             excluded_tasks = f.read().splitlines()
         excluded_tasks = set(excluded_tasks)
         DataIterator.__init__(
@@ -2167,7 +2189,7 @@ class DataIteratorOasst1(DataIterator):
         DataIterator.__init__(
             self,
             datasets.Dataset.from_json(
-                "/linkhome/rech/gendjf01/uxk42lw/DATA/oasst1/oasst1_format-2.jsonl",
+                os.path.join(INSTRUCT_DATA_PATH, "oasst1/oasst1_format-2.jsonl"),
             ),
             name=name,
             filter_fn=lambda x: x["language"] == language,
@@ -2182,7 +2204,7 @@ class DataIteratorPiaf(DataIterator):
         DataIterator.__init__(
             self,
             datasets.Dataset.from_json(
-                "/linkhome/rech/gendjf01/uxk42lw/DATA/piaf/piaf-v1.2_instruct.jsonl",
+                os.path.join(INSTRUCT_DATA_PATH, "piaf/piaf-v1.2_instruct.jsonl"),
             ),
             name=name,
             preprocess=lambda data: apply_chat_template(data, "messages"),
@@ -2196,7 +2218,25 @@ class DataIteratorOracle(DataIterator):
         DataIterator.__init__(
             self,
             datasets.Dataset.from_json(
-                "/linkhome/rech/gendjf01/uxk42lw/DATA/oracle/oracle_instruct.jsonl",
+                os.path.join(INSTRUCT_DATA_PATH, "oracle/oracle_instruct.jsonl"),
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorHardCoded(DataIterator):
+    def __init__(self, language="fr", **kwargs):
+        name = f"HardCoded:{language}"
+        language_map = {"fr": "french", "en": "english"}
+        dataset_name = f"hard_coded/tulu2_openllm_{language_map[language]}.jsonl"
+        print(INSTRUCT_DATA_PATH)
+        print(dataset_name)
+        DataIterator.__init__(
+            self,
+            datasets.Dataset.from_json(
+                os.path.join(INSTRUCT_DATA_PATH, dataset_name),
             ),
             name=name,
             preprocess=lambda data: apply_chat_template(data, "messages"),
@@ -2210,7 +2250,8 @@ class DataIteratorCroissantAlignedInstruct(DataIterator):
         DataIterator.__init__(
             self,
             datasets.load_dataset(
-                "parquet", data_dir="/lustre/fshomisc/home/rech/gendjf01/uxk42lw/DATA/translated_croissant_aligned"
+                "parquet",
+                data_dir=os.path.join(INSTRUCT_DATA_PATH, "traduction/CroissantAligned/v1.2"),
             )["train"],
             name=name,
             preprocess=lambda data: apply_chat_template(data, "messages"),
@@ -2247,6 +2288,8 @@ class DataIteratorTulu3(DataIterator):
             ),
             name=name,
             preprocess=lambda data: apply_chat_template(data, "messages"),
+            filter_fn=lambda x: x["source"]
+            not in ["ai2-adapt-dev/tulu_v3.9_aya_100k", "ai2-adapt-dev/oasst1_converted", ""],
             **kwargs,
         )
 
