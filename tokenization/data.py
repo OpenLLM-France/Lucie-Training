@@ -232,7 +232,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "aya_chat",
         "alpaca",
         "dolly",
-        "aya_dataset",
+        "aya_dataset_chat",
         "oasst1",
     ]
     corpora_with_years = [
@@ -1943,15 +1943,23 @@ class DataIteratorFlanv2(DataIteratorConcat):
         )
 
 
-# Instruction datasets
+tokenizer = None
+
+
+def tokenizer_from_cache():
+    global tokenizer
+    if tokenizer is None:
+        tokenizer_path = "/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    return tokenizer
+
+
 def convert_to_chat(
     data,
-    tokenizer_path="/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special",
     instruction_col_name="instruction",
     input_col_name="input",
     output_col_name="output",
 ):
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
     if (input_col_name is not None) and (data[input_col_name] != ""):
         chat = [
             {"role": "user", "content": f"{data[instruction_col_name]}\n{data[input_col_name]}"},
@@ -1962,18 +1970,65 @@ def convert_to_chat(
             {"role": "user", "content": f"{data[instruction_col_name]}"},
             {"role": "assistant", "content": f"{data[output_col_name]}"},
         ]
-    text = tokenizer.apply_chat_template(chat, tokenize=False)
+
+    text = tokenizer_from_cache().apply_chat_template(chat, tokenize=False)
     data["text"] = text
     return data
 
 
-def apply_chat_template(
-    data, key, tokenizer_path="/linkhome/rech/gendjf01/uzq54wg/lucie_instruct/lucie_tokenizer_llama_special"
-):
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-    text = tokenizer.apply_chat_template(data[key], tokenize=False)
+def apply_chat_template(data, key):
+    text = tokenizer_from_cache().apply_chat_template(data[key], tokenize=False)
     data["text"] = text
     return data
+
+
+filter_strings = [
+    "OpenAI",
+    "Open AI",
+    "ChatGPT",
+    "Chat GPT",
+    "GPT-3",
+    "GPT3",
+    "GPT 3",
+    "GPT-4",
+    "GPT4",
+    "GPT 4",
+    "GPT-3.5",
+    "GPT3.5",
+    "GPT 3.5",
+    "BingChat",
+    "Bing Chat",
+    "LAION",
+    "Open Assistant",
+    "OpenAssistant",
+    "BARD",
+    "PaLM",
+    "Gemini",
+    "Gemma",
+    "Google AI",
+    "Anthropic",
+    "Claude",
+    "LLaMA",
+    "Meta AI",
+    "Mixtral",
+    "Mistral",
+]
+
+
+def filter_output_by_keyword(example, key):
+    if re.search(r"\b(" + "|".join([s.lower() for s in filter_strings]) + r")\b", example[key].lower()):
+        return False
+    return True
+
+
+def filter_conversations_by_keyword(example, key):
+    # we filter out conversations that contain some specific strings
+    for message in example[key]:
+        if message["role"] != "assistant":
+            continue
+        if re.search(r"\b(" + "|".join([s.lower() for s in filter_strings]) + r")\b", message["content"].lower()):
+            return False
+    return True
 
 
 class DataIteratorAlpaca(DataIterator):
@@ -1993,6 +2048,7 @@ class DataIteratorAlpaca(DataIterator):
             ),
             name=f"Alpaca:{language}",
             preprocess=convert_to_chat,
+            filter_fn=lambda x: filter_output_by_keyword(x, "output"),
             **kwargs,
         )
 
@@ -2008,6 +2064,26 @@ class DataIteratorLongAlpaca(DataIterator):
             ),
             name=f"LongAlpaca:{language}",
             preprocess=convert_to_chat,
+            **kwargs,
+        )
+
+
+class DataIteratorAyaDatasetChat(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"AyaDatasetChat:{language}"
+        language_map = {"en": "English", "fr": "French", "es": "Spanish", "it": "Italian", "de": "German"}
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "CohereForAI/aya_dataset",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            filter_fn=lambda x: x["language"] == language_map[language],
+            preprocess=lambda x: convert_to_chat(
+                x, instruction_col_name="inputs", input_col_name=None, output_col_name="targets"
+            ),
             **kwargs,
         )
 
@@ -2128,47 +2204,18 @@ class DataIteratorOracle(DataIterator):
         )
 
 
-filter_strings = [
-    "OpenAI",
-    "Open AI",
-    "ChatGPT",
-    "Chat GPT",
-    "GPT-3",
-    "GPT3",
-    "GPT 3",
-    "GPT-4",
-    "GPT4",
-    "GPT 4",
-    "GPT-3.5",
-    "GPT3.5",
-    "GPT 3.5",
-    "BingChat",
-    "Bing Chat",
-    "LAION",
-    "Open Assistant",
-    "OpenAssistant",
-    "BARD",
-    "PaLM",
-    "Gemini",
-    "Gemma",
-    "Google AI",
-    "Anthropic",
-    "Claude",
-    "LLaMA",
-    "Meta AI",
-    "Mixtral",
-    "Mistral",
-]
-
-
-def filter_by_keyword(example, key):
-    # we filter out conversations that contain some specific strings
-    for message in example[key]:
-        if message["role"] != "assistant":
-            continue
-        if re.search(r"\b(" + "|".join([s.lower() for s in filter_strings]) + r")\b", message["content"].lower()):
-            return False
-    return True
+class DataIteratorCroissantAlignedInstruct(DataIterator):
+    def __init__(self, **kwargs):
+        name = "CroissantAlignedInstruct"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "parquet", data_dir="/lustre/fshomisc/home/rech/gendjf01/uxk42lw/DATA/translated_croissant_aligned"
+            )["train"],
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            **kwargs,
+        )
 
 
 class DataIteratorWildChat(DataIterator):
@@ -2183,7 +2230,7 @@ class DataIteratorWildChat(DataIterator):
             ),
             name=name,
             preprocess=lambda data: apply_chat_template(data, "conversation"),
-            filter_fn=lambda x: (x["language"] == "French") & (filter_by_keyword(x, "conversation")),
+            filter_fn=lambda x: (x["language"] == "French") & (filter_conversations_by_keyword(x, "conversation")),
             **kwargs,
         )
 
@@ -2230,7 +2277,7 @@ class DataIteratorMagpieGemma(DataIterator):
             ),
             name=name,
             preprocess=preproc_magpie,
-            filter_fn=lambda x: (x["language"] == "EN") & (filter_by_keyword(x, "messages")),
+            filter_fn=lambda x: (x["language"] == "EN") & (filter_conversations_by_keyword(x, "messages")),
             **kwargs,
         )
 
