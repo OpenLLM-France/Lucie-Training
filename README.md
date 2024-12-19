@@ -13,7 +13,7 @@
   * [4. Instruct-Tuning and Finetuning](#4-instruct-tuning-and-finetuning)
 * [Model conversion](#model-conversion)
   * [From Megratron-Deepspeed to transformers](#from-megratron-deepspeed-to-transformers)
-  * [From LORA to full weights (PEFT)](#from-lora-to-full-weights-peft)
+  * [From LORA (PEFT) to full weights](#from-lora-peft-to-full-weights)
   * [Quantize models](#quantize-models)
 
 
@@ -177,16 +177,17 @@ UNIVERSAL_CHECKPOINT=... # output path (1st step)
 TRANSFORMERS_CHECKPOINT=... # output path (final)
 
 if [ ! -d $UNIVERSAL_CHECKPOINT ]; then
-    # DS to Universal
+    # DS to Universal Megatron (merge chunks of models that were spread overs GPUs)
     python tools/convert_checkpoint/ds_to_universal.py --input_folder $MEGATRON_CHECKPOINT --output_folder $UNIVERSAL_CHECKPOINT
 fi
 
 if [ ! -d $TRANSFORMERS_CHECKPOINT ]; then
+    # Universal Megatron to transformers
     python tools/convert_checkpoint/universal_to_hf_llama.py --input_folder $UNIVERSAL_CHECKPOINT --output_folder $TRANSFORMERS_CHECKPOINT --max_shouiard_size 5GB
 fi
 ```
 
-### From LORA to full weights (PEFT)
+### From LORA (PEFT) to full weights
 
 If you have LORA weights from Parameter Efficient FineTuning (PEFT),
 you can combine those weights with the base model to have the "full" model.
