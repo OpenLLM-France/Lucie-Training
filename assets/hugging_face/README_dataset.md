@@ -1080,7 +1080,7 @@ Each configuration corresponds to a pathname pattern in the [data subdirectory](
 
 The dataset is also  available in the following versions:
 - **v1.1** / [**main**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/main/data) (default): 
-  The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which contains approximately 2.3T tokens.
+  The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which contains approximately 2.3T tokens. The statistics above apply to this version.
 - [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data): An improved version of the main dataset, where 
   - GallicaMonographies and GallicaPress have been fltered aggressively to remove documents with low OCR quality.
   - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
@@ -1171,9 +1171,9 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Source</u>: [HuggingFaceFW/fineweb-edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
 * <u>Extracted from</u>: [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb). License: [ODC-BY](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
 * <u>Description</u>: A 1.3 trillion token selection from [FineWeb](https://huggingface.co/datasets/HuggingFaceFW/fineweb), which contains 15 trillion tokens of curated data from 96 Common Crawl dumps. Content in FineWebEdu has been selected by a custom designed classifier for its high-quality, educational content. Most recent crawl: 2024-10 (see <a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png">composition details</a> for information about the crawls included in this dataset.)
-* <u>Pre-processing (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1708))</u>: 
-  * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "philpapers.org") in order to increase diversity of content.
-  * <u>Filtering by robots.txt files</u>: we collect robots.txt, and remove all documents for which CCBot is disallowed or for which we failed to collect information as of July 2024.
+* <u>Pre-processing</u>: 
+  * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "philpapers.org") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/text.py#L843))
+  * <u>Filtering by robots.txt files</u>: we collect robots.txt and remove all documents for which CCBot is disallowed or for which we failed to collect information as of July 2024 in an effort to select data free from opt-out evidence according to the 4th article of the copyright European directive (2019).
 * <u>Citation</u>: Guilherme Penedo, Hynek Kydlíček, Loubna Ben allal, Anton Lozhkov, Margaret Mitchell, Colin Raffel, Leandro Von Werra, Thomas Wolf (2024). "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale," [	arXiv:2406.17557](https://arxiv.org/abs/2406.17557).
 
 #### GallicaMonographies
@@ -1182,9 +1182,9 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Description</u>: A large collection of French monographies in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Text cleaning for v1.1</u>:
-  To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was classified as French using [FastText](https://github.com/facebookresearch/fastText) and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1840)).
+  To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was detected as French by [FastText](https://github.com/facebookresearch/fastText) with a confidence score of 0.65 or above, and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000.
   The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
-  * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1896)).
+  * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of less than 90 out of 100 were filtered out.
 
 #### GallicaPress
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [PleIAs/French-PD-Newspapers](https://huggingface.co/datasets/PleIAs/French-PD-Newspapers). License: Public domain.
@@ -1192,9 +1192,9 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Description</u>: A large collection of French newspapers and periodicals in the public domain made available through the French National Library ([Gallica](https://gallica.bnf.fr/accueil/fr/content/accueil-fr?mode=desktop)). Dataset containing text retrieved through OCR.
 * <u>Pre-processing</u>:
   * <u>Text cleaning for v1.1</u>:
-  To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was classified as French using [FastText](https://github.com/facebookresearch/fastText) and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1840)).
+  To filter out documents with excessive OCR errors, the dataset was split into chunks and chunks were kept if the source language was detected as French by [FastText](https://github.com/facebookresearch/fastText) with a confidence score of 0.65 or above, and the perplexity score, as measured using a CCNET model in French, was between 10 and 1000 (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1840)).
   The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
-* <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of 90 or more out of 100 were filtered out (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1917)).
+  * <u>Filtering for v1.2</u>: Using OCR scores provided in the metadata of the source corpus, documents with an OCR score of less than 90 out of 100 were filtered out.
 
 #### Gutenberg
 * <u>Source</u>: Corpus compiled by OpenLLM partners.
@@ -1203,7 +1203,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * [pgcorpus](https://github.com/pgcorpus/gutenberg). License: [CC BY-4.0](https://zenodo.org/records/2422561).
 * <u>Description</u>: A collection of free eBooks, manually prepared by human annotators. 
 * <u>Pre-processing</u>:
-  * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1136).) This filtering was done to ensure that the texts are in the public domain.
+  * <u>Filtering</u>: The dataset was filtered based on the author date of death, so that only texts from authors who died more than 70 years ago are included (80 years for French authors). See [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1136). This filtering was done to ensure that the texts are in the public domain.
   * <u>Text cleaning</u>: Headers and footers containing information about Project Gutenberg were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L93)).
 
 #### HAL
@@ -1224,19 +1224,24 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Description</u>: Transcripts of speeches made during French parlementary debates.  
 <!-- * <u>Citation</u>: No paper found. -->
 
+#### LEGI
+* <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
+* <u>Extracted from</u>: [OpenData](https://echanges.dila.gouv.fr/OPENDATA/) (Data collection date: October, 2023).
+* <u>Description</u>: "The French Government Open Data (DILA) Dataset is a collection of text data extracted from various sources provided by the French government, specifically the Direction de l'information légale et administrative (DILA). This dataset contains a wide range of legal, administrative, and legislative documents. The data has been organized into several categories for easy access and analysis" (from the [dataset card](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main)).
+
 #### MathPile (Commercial)
 * <u>Source</u>: [GAIR/MathPile_Commercial](https://huggingface.co/datasets/GAIR/MathPile_Commercial). License: [CC BY-SA 4.0](https://huggingface.co/datasets/GAIR/MathPile_Commercial).
 * <u>Extracted from</u>: [MathPile](https://huggingface.co/datasets/GAIR/MathPile). License: [CC BY-SA-NC 4.0](https://huggingface.co/datasets/GAIR/MathPile).
 * <u>Description</u>: A preprocessed collection of documents focused on math, including Textbooks, arXiv, Wikipedia, ProofWiki, StackExchange, and web pages from Common Crawl. The content targets a range of levels, from kindergarten through postgraduate level. MathPile_Commercial was obtained by removing documents from MathPile that do not allow commercial use.
 * <u>Pre-processing</u>:
-  * <u>Formatting</u>: Converted the content of StackExchange questions and answers to match the {"text": value} format (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2395)), using the following formula:
+  * <u>Formatting</u>: Converted the content of StackExchange questions and answers to match the {"text": value} format, using the following formula:
   ```python
   text = sample["question"]["Body"] + "\n\n".join([answer["Body"] for answer in sample["answers"]])
   ```
 * <u>Citation</u>: Zengzhi Wang, Rui Xia and Pengfei Liu (2023). "Generative AI for Math: Part I -- MathPile: A Billion-Token-Scale Pretraining Corpus for Math," [	arXiv:2312.17120](https://export.arxiv.org/abs/2312.17120).
 
 #### OpenData
-* <u>Source</u>: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main) (balo, dole, inca, kali, legi and sarde subsets). License: [ODC-BY](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
+* <u>Source</u>: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main) (balo, dole, inca, kali, and sarde subsets). License: [ODC-BY](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
 * <u>Extracted from</u>: [OpenData](https://echanges.dila.gouv.fr/OPENDATA/) (Data collection date: October, 2023).
 * <u>Description</u>: "The French Government Open Data (DILA) Dataset is a collection of text data extracted from various sources provided by the French government, specifically the Direction de l'information légale et administrative (DILA). This dataset contains a wide range of legal, administrative, and legislative documents. The data has been organized into several categories for easy access and analysis" (from the [dataset card](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main)).
 <!-- * <u>Citation</u>: No paper found. -->
@@ -1265,8 +1270,8 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * PhilPapers: a dataset of open access philosophy publications from an international database maintained by the Center for Digital Philosophy at the University of Western Ontario.
   * NIH ExPORTER: "The NIH Grant abstracts provides a bulk-data repository for awarded applications through the ExPORTER4 service covering the fiscal years 1985-present."
 * <u>Pre-processing (v1.2 only)</u>:
-  * <u>Filtering of PhilPapers</u>: Papers were removed if their language, detected using [Stanza](https://github.com/stanfordnlp/stanza), was not classified as English, French, German, Spanish or Italian (see [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L255) and [here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2341)).
-  * <u>Filtering and text cleaning of Ubuntu IRC</u>: Texts from some channels were excluded to avoid data from languages other than English, French, German, Spanish or Italian and certain encoding errors were fixed (see [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L190) and [here](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L2341)).
+  * <u>Filtering of PhilPapers</u>: Papers were removed if their language, detected using [Stanza](https://github.com/stanfordnlp/stanza), was not classified as English, French, German, Spanish or Italian.
+  * <u>Filtering and text cleaning of Ubuntu IRC</u>: Texts from some channels were excluded to avoid data from languages other than English, French, German, Spanish or Italian and certain encoding errors were fixed (see [code details here](https://github.com/OpenLLM-France/Lucie-Training/blob/cdec8fd6369385455829ab39c2f04bcb1a8a475a/tokenization/text.py#L190)).
 * <u>Citations</u>:
   * Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, Shawn Presser, Connor Leahy (2020). "The Pile: An 800GB Dataset of Diverse Text for Language Modeling," [	arXiv:2101.00027](https://arxiv.org/abs/2101.00027).
   * Stella Biderman, Kieran Bicheno, Leo Gao (2022). "Datasheet for the Pile," [arXiv:2201.07311](https://arxiv.org/abs/2201.07311).
@@ -1285,14 +1290,13 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * <u> Url filtering: </u>
     * <u>Removing duplicate urls</u>: urls were removed if their base domain overlapped with a dataset already in the Lucie Training Dataset (e.g., "theses.fr") in order to increase diversity of content (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L154)).
     * <u>Filtering certain toxic content</u>: urls from a list of blacklisted content were removed (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L177)).
-    * <u>Filtering by robots.txt files</u>: we collect robots.txt, and remove all documents for which CCBot is disallowed or for which we failed to collect information as of July 2024.
-  * <u>Filtering</u>: Document filtering of documents based on pre-calculated [quality signals](https://github.com/togethercomputer/RedPajama-Data?tab=readme-ov-file#quality-annotations) (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/d9cccb7bfac37b8c8285f9c04aa67d907ce475f0/webdata_processing/base.py#L36))
-    * CCnet perplexity and language score
+    * <u>Filtering by robots.txt files</u>: we collect robots.txt and remove all documents for which CCBot is disallowed or for which we failed to collect information as of July 2024 in an effort to select data free from opt-out evidence according to the 4th article of the copyright European directive (2019).
+  * <u>Filtering</u>: A series of filters were applied using [quality signals](https://github.com/togethercomputer/RedPajama-Data?tab=readme-ov-file#quality-annotations)  already available in the dataset. This includes (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/d9cccb7bfac37b8c8285f9c04aa67d907ce475f0/webdata_processing/base.py#L36)):
+    * CCnet perplexity below 10 or above 1000 
     * C4 filtering (including removal of documents that contain toxic words)
-    * Gopher filtering
-    * Gopher repetition removal
+    * Gopher filtering and repetition removal
     * Redpajama document deduplication
-  * <u>PII removal</u>: email addresses and ip addresses were replaced with random addresses (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L301)).
+  * <u>Removal of personally identifying information (PII)</u>: email addresses and ip addresses were replaced with random addresses (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/base.py#L301)).
   * <u>MinHash deduplication</u> was performed on each snapshot and language independantly as proposed in FineWeb. For minhash configuration [see code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/webdata_processing/minhash.py#L63). 
 
   The [Datatrove](https://github.com/huggingface/datatrove) library was used to perform both filtering and deduplication stages.
@@ -1332,13 +1336,15 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
   * [OpenLLM-France/wiktionary](https://huggingface.co/datasets/OpenLLM-France/wiktionary)
 * <u>Extracted from</u>: [Wikimedia dumps](https://dumps.wikimedia.org/other/enterprise_html/runs/). License: [GFDL/CC BY-SA](https://dumps.wikimedia.org/legal.html).
 <!-- * <u>Description</u>: TODO -->
+<!-- * <u>Pre-processing</u>: TODO -->
 <!-- * <u>Citation</u>: No paper found. -->
 
 #### YouTube
-* <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France).
+* <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France) and [LeVoiceLab](https://www.levoicelab.org/).
 * <u>Extracted from</u>: [YouTube](https://www.youtube.com/). <!-- License: TODO? -->
 * <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube. <!-- TODO -->
-<!-- * <u>Citation</u>: No paper found. -->
+
+
 
 ## Example use in Python
 
