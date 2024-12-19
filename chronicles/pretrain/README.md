@@ -9,7 +9,11 @@ as well as the model's performance convergence.
 
 ## Training loss
 
-TODO (convergence curves, with tensorboard logs)
+Training logs collected with Tensorboard during the pretraining of Lucie-7B are available
+in [`*/training_logs.csv`](1_pretraining/training_logs.csv) CSV files.
+
+The training losses are shown in the following figure, for the 3 stages of the pretraining:
+![figs/convergence-curve-pretraining.png](figs/convergence-curve-pretraining.png)
 
 ## Evaluation Benchmarks
 
