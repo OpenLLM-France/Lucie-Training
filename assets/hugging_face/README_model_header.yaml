@@ -18,9 +18,7 @@ widget:
       Quelle est la capitale de la France ?
     example_title: Capital cities in French
     group: 1-shot Question Answering
-# inference:
-#     parameters:
-#         temperature: 1.0
-#         top_p: 1.0
-#         top_k: null
-#         max_new_tokens: null
+training_progress:
+  num_steps: 756291
+  num_tokens: 3131736326144
+  context_length: 32000
