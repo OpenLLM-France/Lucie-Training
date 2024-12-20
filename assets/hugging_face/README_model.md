@@ -122,11 +122,11 @@ at [OpenLLM-France/Lucie-Training-Dataset](https://huggingface.co/datasets/OpenL
 
 The initial composition of the training data is as follows:
 
-![Initial Data Composition](figures/fig_dataset_composition.png)
+![Initial Data Composition](figures/pie_dataset_composition.png)
 
 Some of the data was upsampled to balance the training data distribution yielding the following  composition for training:
 
-![Training Data Composition](figures/fig_dataset_composition_training.png)
+![Training Data Composition](figures/pie_dataset_composition_training.png)
 
 ### Training Procedure 
 

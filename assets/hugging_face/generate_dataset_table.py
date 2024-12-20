@@ -139,7 +139,7 @@ def conform_extra(subset, row, sort_by_count=True, name=None):
 
 
 def figure_name(name, graph_type="histogram", suffix=""):
-    return (f"Composition of {name}{suffix}", f"figures/fig_distribution_{slugify.slugify(name)}_{graph_type}.png")
+    return (f"Composition of {name}{suffix}", f"figures/pie_distribution_{slugify.slugify(name)}_{graph_type}.png")
 
 
 def plot_extra_distribution(extra, name=None):
