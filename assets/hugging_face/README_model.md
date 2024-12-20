@@ -203,13 +203,19 @@ Training hyperparameters are the same as above, with the following changes:
 | Context length         | 32 000     |
 | Batch size             | 128        |
 | Learning rate          | 2e-5       |
+| Learning rate schedule | constant   |
 | Tensor Parallelism (with 128 GPUs)   | 4     |
 | Pipeline Parallelism (with 128 GPUs) | 4     |
 | Data Parallelism (with 128 GPUs)     | 8     |
 
 #### 3. Annealing
 
-TODO
+Training hyperparameters are the same as for context extension, with the following changes:
+| **Hyperparameter**     | **Value**  |
+|------------------------|------------|
+| Learning rate schedule | linear annealing |
+| Maximum Learning rate  | 3e-5       |
+| Final Learning rate    | 0          |
 
 ### Training Logs and Learning Curves
 
