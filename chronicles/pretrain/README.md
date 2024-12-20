@@ -39,10 +39,10 @@ The sub-folder [`figs/`](figs) contains corresponding learning curves shown belo
 ### Needle in a Haystack
 
 #### Pretraining
-![Figure 1](figs/needle-in-a-haystack/Lucie-7B-main.png) 
+![figs/needle-in-a-haystack/Lucie-7B-main.png](figs/needle-in-a-haystack/Lucie-7B-main.png) 
 
 #### Context Extension
-![Figure 2](figs/needle-in-a-haystack/Lucie-7B-extension.png) 
+![figs/needle-in-a-haystack/Lucie-7B-extension.png](figs/needle-in-a-haystack/Lucie-7B-extension.png) 
 
 #### Annealing
-![Figure 3](figs/needle-in-a-haystack/Lucie-7B-annealing.png) 
+![figs/needle-in-a-haystack/Lucie-7B-annealing.png](figs/needle-in-a-haystack/Lucie-7B-annealing.png) 

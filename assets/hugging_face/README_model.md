@@ -213,20 +213,56 @@ TODO
 
 ### Training Logs and Learning Curves
 
+#### Training loss
+
 Training logs can be found in Tensorboard format in:
 * [`metadata/training_logs/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs)
 <br> ├── [`1_pretraining.zip`](metadata/training_logs/1_pretraining.zip) training logs for the first pre-training phases,
 in a zip file. Each file in the zip corresponds to a job of at most 20H of training (parallelized over 512 GPUs).
-<br> └── [`2_extension/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs/2_extension) folder containing the training log for the context extension phase, which was done in a single job of around 13H of training (parallelized over 128 GPUs).
+<br> ├── [`2_extension/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs/2_extension) folder containing the training log <br> └── [`3_annealing/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs/3_annealing) folder containing the training log for the annealing phase, which also took around 13H of training (parallelized over 128 GPUs).
 
-🚧 TODO: Plot convergence curve (and link CSV ?) 🚧
+The convergence curves of the three pre-training phases are the following:
+
+![figures/convergence-curve-pretraining.png](figures/convergence-curve-pretraining.png)
+
+Data corresponding to these plots were extracted from tensorboard logs and are available in the following CSV files:
+* [`metadata/training_logs/`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/main/metadata/training_logs)
+<br> ├── [`1_pretraining.csv`](metadata/training_logs/1_pretraining.csv)
+<br> ├── [`2_extension.csv`](metadata/training_logs/2_extension.csv)
+<br> └── [`3_annealing.csv`](metadata/training_logs/3_annealing.csv)
+
+#### Evaluations
+
+Multiple evaluations were conducted during Lucie-7B's training to assess its performance on standard benchmarks,
+primarily in French and English, as well as in Spanish, German, and Italian.
 
 Evaluation results on benchmark datasets of checkpoints of Lucie-7B throughout the training process are available at
 [metadata/evaluation_learning_curve_lucie.csv](metadata/evaluation_learning_curve_lucie.csv).
 Evaluation results of baseline models on the same benchmark datasets are available at
 [metadata/evaluation_baselines.csv](metadata/evaluation_baselines.csv).
 
-🚧 TODO: Plot learning curves 🚧
+Main results are summarized in the following figures:
+
+### French
+![figures/learning-curve-evaluation-french-bench.png](figures/learning-curve-evaluation-french-bench.png)
+
+### English
+![figures/learning-curve-evaluation-benchmarks-in-english.png](figures/learning-curve-evaluation-benchmarks-in-english.png)
+
+### other
+![figures/learning-curve-evaluation-multilingual-arc-benchmark.png](figures/learning-curve-evaluation-multilingual-arc-benchmark.png)
+
+### Needle in a Haystack
+
+#### Pretraining
+![figures/needle-in-a-haystack/Lucie-7B-main.png](figures/needle-in-a-haystack/Lucie-7B-main.png) 
+
+#### Context Extension
+![figures/needle-in-a-haystack/Lucie-7B-extension.png](figures/needle-in-a-haystack/Lucie-7B-extension.png) 
+
+#### Annealing
+![figures/needle-in-a-haystack/Lucie-7B-annealing.png](figures/needle-in-a-haystack/Lucie-7B-annealing.png) 
+
 
 ## Disclaimer
 
