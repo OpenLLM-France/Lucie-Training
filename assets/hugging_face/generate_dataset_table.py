@@ -70,7 +70,7 @@ _category_map = {
     "legi_written": "Legislative Texts",
     "legi_spoken": "Legislative Transcripts",
     "legi_dialogue": "Legislative Transcripts",
-    "aligned": "Multilingual Parallel Corpora",
+    "aligned": "Multilingual Parallel",
 }
 
 
@@ -563,6 +563,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    args.code_as_language = True  # La flemme
+
     if args.pie == "training_weights":
         _num_epochs_filename = os.path.join(_asset_folder, "dataset_weights.yaml")
         assert os.path.isfile(_num_epochs_filename), f"File '{_num_epochs_filename}' does not exist"
@@ -701,7 +703,7 @@ if __name__ == "__main__":
             "it": "|",
             "code": "o",
             "parallel": "+",
-            "Multilingual Parallel Corpora": "",
+            "Multilingual Parallel": "",
             "Programming": "",
             "Web": "/",
             "Newspaper": ".",
@@ -736,7 +738,16 @@ if __name__ == "__main__":
         categories = list(dict.fromkeys(categories))  # Remove duplicates without resorting
         num_colors = len(categories)
         rainbow_colors = [plt.cm.gist_rainbow(i / num_colors) for i in range(num_colors)]
-        languages = [k for k in map_colors.keys() if len(k) == 2]
+
+        if args.code_as_language:
+            languages = list(map_colors.keys())
+            # categories = categories[:-2]
+        else:
+            languages = [k for k in map_colors.keys() if len(k) == 2]
+
+        print(f"NOCOMMIT {languages=}")
+        print(f"NOCOMMIT {categories=}")
+
         # rainbow_colors_1 = rainbow_colors[: len(rainbow_colors) // 2]
         # rainbow_colors_2 = rainbow_colors[len(rainbow_colors) // 2 :]
         # rainbow_colors = [color for pair in zip(rainbow_colors_1, rainbow_colors_2) for color in pair]
@@ -767,8 +778,8 @@ if __name__ == "__main__":
                     continue
                 if subset == "RedPajama":
                     subset += f"-{row['language']}"
-                amount_value = row[STAT_NAME]
-                amount_value *= get_training_weight(category_raw, language_raw)
+                weight = get_training_weight(category_raw, language_raw)
+                amount_value = weight * row[STAT_NAME]
                 pie_values.append(amount_value)
                 pie_categories.append(category)
                 pie_languages.append(language)
@@ -779,8 +790,8 @@ if __name__ == "__main__":
                     else rainbow_colors[categories.index(category)]
                 )
                 pie_hatches.append(map_hatch.get(category if USE_HATCH_FOR_CATEGORIES else language, "") * 2)
-                count_per_category[category] = count_per_category.get(category, 0) + row[STAT_NAME]
-                count_per_language[language] = count_per_language.get(language, 0) + row[STAT_NAME]
+                count_per_category[category] = count_per_category.get(category, 0) + weight * row[STAT_NAME]
+                count_per_language[language] = count_per_language.get(language, 0) + weight * row[STAT_NAME]
                 rec_hatch = plt.Rectangle((0, 0), 1, 1, fc="white", hatch=pie_hatches[-1], edgecolor="black")
                 rec_color = plt.Rectangle((0, 0), 1, 1, fc=pie_colors[-1], hatch="", edgecolor="black")
                 rec_hatch_and_color = plt.Rectangle(
@@ -791,6 +802,7 @@ if __name__ == "__main__":
                     legend_languages[language] = rec_color
                 else:
                     legend_categories[category] = rec_hatch_and_color
+                    legend_languages[category] = rec_hatch_and_color
 
             new_labels = []
             for lab, v in zip(pie_labels, pie_values):
@@ -864,6 +876,12 @@ if __name__ == "__main__":
 
             def format_language_for_pie(language):
                 lang = format_language(language, include_lang_code=False)
+                if language not in count_per_language:
+                    language = {  # WTF
+                        "Multilingual Parallel": "parallel",
+                        "Programming": "code",
+                    }.get(language, language)
+                assert language in count_per_language, f"Key {language} not found in {count_per_language.keys()}"
                 percent = count_per_language[language] / sum(count_per_language.values()) * 100
                 return f"{lang} ({precision_at_least(percent, 0)}%)"
 
@@ -872,16 +890,19 @@ if __name__ == "__main__":
                 [(nothing, "$\\bf{Categories}$")]
                 + [
                     (legend_categories[label], format_category_for_pie(label))
-                    for label in categories
+                    for label in (categories[:-2] if args.code_as_language else categories)
                     if label in legend_categories
                 ]
-                + [(nothing, "$\\bf{Languages}$")]
+                + [
+                    # (nothing, ""),
+                    (nothing, "$\\bf{Languages}$"),
+                ]
                 + [
                     (legend_languages[label], format_language_for_pie(label))
-                    for label in languages
+                    for label in (languages + (categories[-2:] if args.code_as_language else []))
                     if label in legend_languages
                 ]
-                + [(nothing, "") for i in range(len(categories) - len(languages))]
+                + [(nothing, "") for i in range(len(categories) - len(languages) - (2 if args.code_as_language else 0))]
             )
             legend, labels = zip(*legend_and_labels)
             plt.legend(

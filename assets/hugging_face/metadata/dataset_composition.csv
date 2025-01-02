@@ -1,6 +1,6 @@
 name,language,category,M docs,B words,B tokens,B chars,#words/doc,#chars/doc,#tokens/doc,#char/word,#tokens/word
-TOTAL,,,2186.562,1356.021,2314.862,8842.200,620,4044,1059,6.5,1.71
-TOTAL,fr,,653.812,583.687,928.618,3619.672,893,5536,1420,6.2,1.59
+TOTAL,,,2187.656,1359.271,2320.616,8862.514,621,4051,1061,6.5,1.71
+TOTAL,fr,,654.906,586.937,934.372,3639.986,896,5558,1427,6.2,1.59
 TOTAL,en,,554.289,412.202,611.894,2553.541,744,4607,1104,6.2,1.48
 TOTAL,code,,125.769,51.306,228.954,630.749,408,5015,1820,12.3,4.46
 TOTAL,de,,165.915,105.609,206.610,764.779,637,4609,1245,7.2,1.96
@@ -20,6 +20,7 @@ AmericanStories,en,Newspaper,59.420,8.902,14.313,50.844,150,856,241,5.7,1.61
 PeS2o,en,Technical,38.972,42.296,65.365,268.963,1085,6901,1677,6.4,1.55
 HAL,fr,Technical,0.349,9.356,16.224,58.308,26808,167072,46487,6.2,1.73
 Theses,fr,Technical,0.102,7.547,14.060,47.758,73990,468216,137843,6.3,1.86
+Persee,fr,Technical,1.094,3.250,5.754,20.314,2971,18569,5260,6.3,1.77
 Pile (USPTO_Backgrounds),en,Technical,5.139,3.492,5.105,22.309,680,4341,993,6.4,1.46
 OpenEdition,fr,Technical,0.939,2.225,3.604,14.459,2370,15398,3838,6.5,1.62
 Pile (PhilPapers),en,Technical,0.0308,0.363,0.618,2.304,11786,74805,20065,6.3,1.7
@@ -60,11 +61,11 @@ Claire,en,Dialogue,0.949,0.818,1.161,4.709,862,4962,1223,5.8,1.42
 Claire,fr,Dialogue,0.0393,0.210,0.311,1.314,5344,33435,7913,6.3,1.48
 YouTube,fr,Dialogue,0.0375,0.145,0.336,1.003,3867,26747,8960,6.9,2.32
 Stac,en,Dialogue,0.0000450,0.0000529,0.000121,0.000327,1176,7267,2689,6.2,2.29
-CroissantAligned,fr-en,Multilingual Parallel Corpora,408.029,16.911,25.351,107.003,41,262,62,6.3,1.5
-EuroparlAligned,it-en,Multilingual Parallel Corpora,1.901,0.100,0.151,0.638,53,336,79,6.4,1.51
-EuroparlAligned,fr-en,Multilingual Parallel Corpora,2.003,0.105,0.143,0.655,52,327,71,6.2,1.36
-EuroparlAligned,es-en,Multilingual Parallel Corpora,1.961,0.103,0.143,0.631,53,322,73,6.1,1.39
-EuroparlAligned,de-fr,Multilingual Parallel Corpora,1.792,0.0908,0.141,0.621,51,347,79,6.8,1.55
+CroissantAligned,fr-en,Multilingual Parallel,408.029,16.911,25.351,107.003,41,262,62,6.3,1.5
+EuroparlAligned,it-en,Multilingual Parallel,1.901,0.100,0.151,0.638,53,336,79,6.4,1.51
+EuroparlAligned,fr-en,Multilingual Parallel,2.003,0.105,0.143,0.655,52,327,71,6.2,1.36
+EuroparlAligned,es-en,Multilingual Parallel,1.961,0.103,0.143,0.631,53,322,73,6.1,1.39
+EuroparlAligned,de-fr,Multilingual Parallel,1.792,0.0908,0.141,0.621,51,347,79,6.8,1.55
 TheStack,JAVASCRIPT,Programming,21.109,8.526,58.609,141.647,404,6710,2776,16.6,6.87
 TheStack,JAVA,Programming,20.152,7.421,27.680,89.297,368,4431,1374,12.0,3.73
 TheStack,C,Programming,8.626,5.916,24.092,57.428,686,6658,2793,9.7,4.07
