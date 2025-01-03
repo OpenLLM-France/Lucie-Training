@@ -101,15 +101,27 @@ def to_source_and_id_func(name, **kwargs):
     update_dict_func = None
 
     # Add default id-ing to some datasets that miss "id" field
-    if main in ["Claire", "ValidatedYouTube", "YouTube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
+    _other_fr = ["OtherFr", "LEGI", "AmendementsParlement", "InterventionsParlement", "QuestionsEcritesParlement"]
+    if main in _other_fr + [
+        "Claire",
+        "ValidatedYouTube",
+        "YouTube",
+        "Europarl",
+        "EuroparlAligned",
+        "Stac",
+    ]:
 
         def update_dict_func(x, idx, _):
             out = {}
-            if subset:
+            if subset and main not in _other_fr:
                 out = {
                     "subset": subset,
                 }
-            out["idx_row"] = idx
+            if subset not in ["LEGI", "QuestionsEcritesParlement"] and main not in [
+                "LEGI",
+                "QuestionsEcritesParlement",
+            ]:
+                out["idx_row"] = idx
             return out
 
     if source is None:
@@ -118,13 +130,6 @@ def to_source_and_id_func(name, **kwargs):
             ("Claire", "en"): "Claire",  # "OpenLLM-France/Claire-Dialogue-English-0.1",
             ("ValidatedYouTube", "fr"): "YouTube",  # "LeVoiceLab/YouTube.fr",
         }.get((main, lan))
-    if source is None:
-        source = {
-            ("OtherFr", "questions_ecrites_parlement"): "QuestionsEcritesParlement",
-            ("OtherFr", "interventions_parlement"): "InterventionsParlement",
-            ("OtherFr", "LEGI"): "LEGI",
-            ("OtherFr", "amendements_parlement"): "AmendementsParlement",
-        }.get((main, subset))
     if main == "Wikiother":
         source = subset.split(":")[0]
         source = source[0].upper() + source[1:]
