@@ -283,12 +283,15 @@ TODO
 
 This work was performed using HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
 
-Lucie-7B was created by members of [LINAGORA](https://labs.linagora.com/) and OpenLLM-France community, including in alphabetical order:
+Lucie-7B was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order:
+Agustin Martin Picard (IRT),
+Thibaut Boissin (IRT),
 Christophe Cerisara (LORIA),
 Evan Dufraisse (CEA),
 Julie Hunter (LINAGORA),
 Jean-Pierre Lorré (LINAGORA),
 Jérôme Louradour (LINAGORA),
+Lucas Hervier (IRT),
 Michel-Marie Maudet (LINAGORA),
 Olivier Gouvert (LINAGORA), and
 Yaya Sy (LORIA).
