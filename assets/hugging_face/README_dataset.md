@@ -1230,8 +1230,8 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 #### InterventionsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/). 
-* <u>Description</u>: Transcripts of speeches made during French parlementary debates.  
-<!-- * <u>Citation</u>: No paper found. -->
+* <u>Description</u>: Transcripts of remarks made during French parlementary debates. Each text contains a continuous remark by a single speaker. 
+
 
 #### LEGI
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
@@ -1289,7 +1289,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/).
 * <u>Description</u>: Collection of long written questions, read during a session at the French National Assembly. Questions are asked by a member of the French parliament and addressed to a minister (who is given two months to respond). 
-<!-- * <u>Citation</u>: No paper found. -->
+
 
 #### RedPajama (v2)
 * <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
@@ -1450,7 +1450,7 @@ TODO
 
 ## Acknowledgements
 
-The Lucie Training Dataset was created by members of LINAGORA and OpenLLM-France community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
+The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
 
 We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
 
