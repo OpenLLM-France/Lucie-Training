@@ -245,6 +245,7 @@ def get_datasets(name, use_nc=True, scope=None, **kwargs):
         "dolly",
         "aya_dataset_chat",
         "oasst1",
+        "filtered_oasst",
         "hard_coded",
     ]
     corpora_with_years = [
@@ -2193,6 +2194,30 @@ class DataIteratorOasst1(DataIterator):
             ),
             name=name,
             filter_fn=lambda x: x["language"] == language,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorFilteredOasst(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"FilteredOasst:{language}"
+        print("load dataset")
+        dataset = datasets.Dataset.from_json(
+            os.path.join(INSTRUCT_DATA_PATH, "oasst1/oasst1_format-2.jsonl"),
+        )
+        print("convert to pandas")
+        df = dataset.to_pandas()
+        print("deduplicated")
+        df = df[df.duplicated("messages")]
+        print("convert to dataset")
+        dataset = datasets.Dataset.from_pandas(df)
+        print(dataset)
+        DataIterator.__init__(
+            self,
+            dataset,
+            name=name,
+            filter_fn=lambda x: (x["language"] == language) & (filter_conversations_by_keyword(x, "messages")),
             preprocess=lambda data: apply_chat_template(data, "messages"),
             **kwargs,
         )
