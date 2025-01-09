@@ -16,7 +16,7 @@ https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/tem
     * [Neural Network Architecture](#neural-network-architecture)
     * [Training Hyperparameters](#training-hyperparameters)
       1. [Main Pre-training](#1-main-pre-training)
-      2. [Context Extension](#2-context-extension)
+      2. [Context Length Extension](#2-context-extension)
       3. [Annealing](#3-annealing)
   * [Training Logs and Learning Curves](#training-logs-and-learning-curves)
 <!-- * [Evaluation](#evaluation) -->
@@ -109,8 +109,8 @@ model = transformers.AutoModelForCausalLM.from_pretrained(model_name,
 where `revision` can be one of:
 * "[`step0005000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0005000)", "[`step0010000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0010000)", "[`step0015000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0015000)", "[`step0020000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0020000)": every 5000 steps for the first pre-training steps (with a context length of 4096).
 * "[`step0025000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0025000)", "[`step0050000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0050000)", "[`step0075000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0075000)", "[`step0100000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0100000)", ..., "[`step0750000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0750000)": every 25000 steps from 25k to 750k steps.
-* "[`step0753851`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0753851)": last pre-training step before context extension and annealing.
-* "[`extension_step0000250`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000250)", "[`extension_step0000500`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000500)", "[`extension_step0000750`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000750)", "[`extension_step0001000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001000)", "[`extension_step0001220`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001220)": several checkpoints during context extension (with a context length of 32000).
+* "[`step0753851`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/step0753851)": last pre-training step before context length extension and annealing.
+* "[`extension_step0000250`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000250)", "[`extension_step0000500`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000500)", "[`extension_step0000750`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0000750)", "[`extension_step0001000`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001000)", "[`extension_step0001220`](https://huggingface.co/OpenLLM-France/Lucie-7B/tree/extension_step0001220)": several checkpoints during context length extension (with a context length of 32000).
 
 ## Training Details
 
@@ -192,7 +192,7 @@ Training hyperparameters in torch/Megatron-DeepSpeed were as follows:
 | Pipeline Parallelism (with 512 GPUs) | 4           |
 | Data Parallelism (with 512 GPUs)     | 32          |
 
-#### 2. Context Extension
+#### 2. Context Length Extension
 
 Training hyperparameters are the same as above, with the following changes:
 | **Hyperparameter**     | **Value**  |
@@ -210,9 +210,11 @@ Training hyperparameters are the same as above, with the following changes:
 
 #### 3. Annealing
 
-Training hyperparameters are the same as for context extension, with the following changes:
+Training hyperparameters are the same as for context length extension, with the following changes:
 | **Hyperparameter**     | **Value**  |
 |------------------------|------------|
+| Total \# samples| 156 250 (5B tokens) |
+| Total \# steps  | 1 220      |
 | Learning rate schedule | linear annealing |
 | Maximum Learning rate  | 3e-5       |
 | Final Learning rate    | 0          |
@@ -263,7 +265,7 @@ Main results are summarized in the following figures:
 #### Pretraining
 ![figures/needle-in-a-haystack/Lucie-7B-main.png](figures/needle-in-a-haystack/Lucie-7B-main.png) 
 
-#### Context Extension
+#### Context Length Extension
 ![figures/needle-in-a-haystack/Lucie-7B-extension.png](figures/needle-in-a-haystack/Lucie-7B-extension.png) 
 
 #### Annealing
@@ -283,12 +285,15 @@ TODO
 
 This work was performed using HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
 
-Lucie-7B was created by members of [LINAGORA](https://labs.linagora.com/) and OpenLLM-France community, including in alphabetical order:
+Lucie-7B was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order:
+Agustin Martin Picard (IRT),
+Thibaut Boissin (IRT),
 Christophe Cerisara (LORIA),
 Evan Dufraisse (CEA),
 Julie Hunter (LINAGORA),
 Jean-Pierre Lorré (LINAGORA),
 Jérôme Louradour (LINAGORA),
+Lucas Hervier (IRT),
 Michel-Marie Maudet (LINAGORA),
 Olivier Gouvert (LINAGORA), and
 Yaya Sy (LORIA).

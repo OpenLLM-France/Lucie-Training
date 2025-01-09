@@ -46,7 +46,7 @@ DATA_PATH = os.environ.get("DATA_PATH")
 if not DATA_PATH:
     for possible_data_path in [
         "/gpfswork/rech/qgz/commun/data/corpus_openllm",  # Jean-Zay
-        "/data-server/datasets/text/multilang/Lucie/raw",
+        "/data-server/datasets/text/raw/multilang/Lucie/raw",
     ]:
         if os.path.isdir(possible_data_path):
             DATA_PATH = possible_data_path
@@ -549,6 +549,7 @@ class DataIterator(DataIteratorBase):
             "hexsha": "id",
             "idx": "id",
             "idx_row": "id",
+            "ID": "id",  # LEGI
             # vvv "title"
             "page_title": "title",
             "headline": "title",
@@ -557,6 +558,7 @@ class DataIterator(DataIteratorBase):
             "created": "date",
             "added": "date",
             "date_download": "date",
+            "Date": "date",  # LEGI
             # vvv "language"
             "lang": "language",
             # vvv "path"
@@ -569,6 +571,7 @@ class DataIterator(DataIteratorBase):
             "hexsha": "id",
             r".*id": "id",
             r"idx.*": "id",  # idx, idx_row
+            "index": "id",  # QuestionsEcritesParlement
             # "__index_level_0__":  "id", # Pandas index
             "author": "author",
             "authoryearofbirth": "author",
@@ -602,6 +605,7 @@ class DataIterator(DataIteratorBase):
             "loi": "extra",  # in adandements.fr
             "texteloi_id": "extra",  # in adandements.fr
             "intervenants": "extra",  # in adandements.fr
+            "intervenant": "extra",  # in InterventionsParlement
             "signataires": "extra",  # in adandements.fr
             "type": "extra",  # in MathPile
             "mimetype": "extra",  # in MathPile
@@ -614,6 +618,10 @@ class DataIterator(DataIteratorBase):
             "dataset": "extra",
             "digest": "extra",
             "byline": "extra",
+            "theme": "extra",  # in QuestionsEcritesParlement
+            "depute": "extra",  # in QuestionsEcritesParlement
+            "ministre": "extra",  # in QuestionsEcritesParlement
+            "reponse": "extra",  # in QuestionsEcritesParlement
             "question": "extra",  # in MathPile (a dict)
             "answers": "extra",  # in MathPile (a list)
             "field": "extra",  # in MathPile
@@ -2660,16 +2668,39 @@ class DataIteratorOpenEdition(DataIteratorParquet):
         )
 
 
-class DataIteratorOtherFr(DataIteratorParquetSplitted):
+class DataIteratorOtherFr(DataIteratorConcat):  # Previouslt DataIteratorParquetSplitted
     def __init__(self, regex_parquet=None, **kwargs):
-        DataIteratorParquetSplitted.__init__(
+        def camelize(name):
+            words = name.split("_")
+            if len(words) == 1:
+                return name
+            return "".join([word.capitalize() for word in words])
+
+        if regex_parquet:
+            raise NotImplementedError
+
+        DataIteratorConcat.__init__(
             self,
-            DATA_PATH + "/other_fr_parquet",
-            name="OtherFr" if not regex_parquet else regex_parquet,
-            postprocess=kwargs.pop("postprocess", fix_legi),
-            regex_parquet=regex_parquet,
-            **kwargs,
+            [
+                DataIteratorParquet(
+                    filename,
+                    name=camelize(os.path.splitext(os.path.basename(filename))[0]),
+                    postprocess=kwargs.pop("postprocess", fix_legi),
+                    **kwargs,
+                )
+                for filename in glob.glob(DATA_PATH + "/other_fr_parquet/*parquet")
+            ],
+            name="OtherFr",
         )
+
+        # DataIteratorParquetSplitted.__init__(
+        #     self,
+        #     DATA_PATH + "/other_fr_parquet",
+        #     name="OtherFr" if not regex_parquet else regex_parquet,
+        #     postprocess=kwargs.pop("postprocess", fix_legi),
+        #     regex_parquet=regex_parquet,
+        #     **kwargs,
+        # )
 
 
 class DataIteratorOpenDataFr(DataIteratorParquetSplitted):

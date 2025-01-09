@@ -169,8 +169,8 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <table>
 <thead>
 <tr>
-<th><a href="#subset"><strong>subset</strong></a></th>
-<th><strong>language</strong></th>
+<th><strong>Subset</strong></th>
+<th><strong>Language</strong></th>
 <th><strong>M docs</strong></th>
 <th><strong>B words</strong></th>
 <th><strong>B tokens</strong></th>
@@ -182,20 +182,20 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td rowspan="11" style="vertical-align: top;"><strong>TOTAL</strong></td>
 <td></td>
-<td>2187.656</td>
-<td>1359.271</td>
-<td>2320.616</td>
-<td>8862.514</td>
+<td>2186.562</td>
+<td>1356.021</td>
+<td>2314.862</td>
+<td>8842.200</td>
 <td></td>
 </tr>
 <tr>
 
 <td><strong>French (fr)</strong></td>
-<td>654.906</td>
-<td>586.937</td>
-<td>934.372</td>
-<td>3639.986</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_french_pie.png">composition details</a></td>
+<td>653.812</td>
+<td>583.687</td>
+<td>928.618</td>
+<td>3619.672</td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_french_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -204,7 +204,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>412.202</td>
 <td>611.894</td>
 <td>2553.541</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_english_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_english_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -213,7 +213,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>51.306</td>
 <td>228.954</td>
 <td>630.749</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_code_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_code_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -222,7 +222,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>105.609</td>
 <td>206.610</td>
 <td>764.779</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_german_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_german_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -231,7 +231,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>123.857</td>
 <td>200.825</td>
 <td>759.457</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_spanish_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_spanish_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -240,7 +240,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>62.051</td>
 <td>112.031</td>
 <td>404.454</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_italian_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_italian_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -249,7 +249,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>17.016</td>
 <td>25.494</td>
 <td>107.658</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_fr-en_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_fr-en_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -287,7 +287,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>477.758</td>
 <td>741.023</td>
 <td>2974.596</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-french_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-french_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -296,7 +296,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>103.078</td>
 <td>201.371</td>
 <td>747.631</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-german_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-german_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -305,7 +305,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>121.751</td>
 <td>197.125</td>
 <td>746.984</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-spanish_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-spanish_histogram.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -314,7 +314,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>60.194</td>
 <td>108.416</td>
 <td>393.012</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-italian_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-italian_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td><a href="#finewebedu"><strong>FineWebEdu</strong></a></td>
@@ -323,7 +323,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>327.453</td>
 <td>467.837</td>
 <td>2018.215</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_finewebedu-english_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td colspan="7"><h4 id="category-newspaper">Category: Newspaper</h4></td></tr>
@@ -343,12 +343,12 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>8.902</td>
 <td>14.313</td>
 <td>50.844</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_americanstories-english_histogram.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_americanstories-english_histogram.png">composition details</a></td>
 </tr>
 <tr>
 <td colspan="7"><h4 id="category-technical">Category: Technical</h4></td></tr>
 <tr>
-<td><a href="#pes2o"><strong>PeS2o</strong></a></td>
+<td><a href="#pes2o-v2"><strong>PeS2o</strong></a></td>
 <td><strong>English (en)</strong></td>
 <td>38.972</td>
 <td>42.296</td>
@@ -372,15 +372,6 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>7.547</td>
 <td>14.060</td>
 <td>47.758</td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#persee"><strong>Persee</strong></a></td>
-<td><strong>French (fr)</strong></td>
-<td>1.094</td>
-<td>3.250</td>
-<td>5.754</td>
-<td>20.314</td>
 <td></td>
 </tr>
 <tr>
@@ -561,7 +552,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-legislative-transcripts">Category: Legislative Transcripts</h4></td></tr>
 <tr>
-<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>Europarl</strong></a></td>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-and-europarlaligned"><strong>Europarl</strong></a></td>
 <td><strong>German (de)</strong></td>
 <td>0.0102</td>
 <td>0.0451</td>
@@ -682,7 +673,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-math">Category: Math</h4></td></tr>
 <tr>
-<td><a href="#mathpile"><strong>MathPile</strong></a></td>
+<td><a href="#mathpile-commercial"><strong>MathPile</strong></a></td>
 <td><strong>English (en)</strong></td>
 <td>0.737</td>
 <td>3.408</td>
@@ -728,7 +719,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>0.818</td>
 <td>1.161</td>
 <td>4.709</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_claire-english_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-english_pie.png">composition details</a></td>
 </tr>
 <tr>
 
@@ -737,7 +728,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td>0.210</td>
 <td>0.311</td>
 <td>1.314</td>
-<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_claire-french_pie.png">composition details</a></td>
+<td><a href="https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-french_pie.png">composition details</a></td>
 </tr>
 <tr>
 <td><a href="#youtube"><strong>YouTube</strong></a></td>
@@ -749,7 +740,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td></td>
 </tr>
 <tr>
-<td><a href="#stac"><strong>Stac</strong></a></td>
+<td><a href="#stac"><strong>STAC</strong></a></td>
 <td><strong>English (en)</strong></td>
 <td>0.0000450</td>
 <td>0.0000529</td>
@@ -758,7 +749,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td></td>
 </tr>
 <tr>
-<td colspan="7"><h4 id="category-multilingual-parallel">Category: Multilingual Parallel</h4></td></tr>
+<td colspan="7"><h4 id="category-multilingual-parallel-corpora">Category: Multilingual Parallel Corpora</h4></td></tr>
 <tr>
 <td><a href="#croissantaligned"><strong>CroissantAligned</strong></a></td>
 <td><strong>fr-en</strong></td>
@@ -769,7 +760,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <td></td>
 </tr>
 <tr>
-<td rowspan="4" style="vertical-align: top;"><a href="#europarl-monolingual-and-parallel"><strong>EuroparlAligned</strong></a></td>
+<td rowspan="4" style="vertical-align: top;"><a href="#europarl-and-europarlaligned"><strong>EuroparlAligned</strong></a></td>
 <td><strong>it-en</strong></td>
 <td>1.901</td>
 <td>0.100</td>
@@ -807,7 +798,7 @@ Token counts are computed using the tokenizer for [Lucie-7B](https://huggingface
 <tr>
 <td colspan="7"><h4 id="category-programming">Category: Programming</h4></td></tr>
 <tr>
-<td rowspan="30" style="vertical-align: top;"><a href="#thestack"><strong>TheStack</strong></a></td>
+<td rowspan="30" style="vertical-align: top;"><a href="#thestack-v12"><strong>TheStack</strong></a></td>
 <td><strong>JAVASCRIPT</strong></td>
 <td>21.109</td>
 <td>8.526</td>
@@ -1230,8 +1221,8 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 #### InterventionsParlement
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/). 
-* <u>Description</u>: Transcripts of speeches made during French parlementary debates.  
-<!-- * <u>Citation</u>: No paper found. -->
+* <u>Description</u>: Transcripts of remarks made during French parlementary debates. Each text contains a continuous remark by a single speaker. 
+
 
 #### LEGI
 * <u>Source</u>: Corpus contributed by OpenLLM partners. A version is also published here: [Nicolas-BZRD/DILA_OPENDATA_FR_2023](https://huggingface.co/datasets/Nicolas-BZRD/DILA_OPENDATA_FR_2023/tree/main).
@@ -1289,7 +1280,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Source</u>: Corpus contributed by OpenLLM partners.
 * <u>Extracted from</u>:  [Regards citoyens](https://www.regardscitoyens.org/#&panel1-4). License: [CC BY-SA](https://www.regardscitoyens.org/mentions-legales/).
 * <u>Description</u>: Collection of long written questions, read during a session at the French National Assembly. Questions are asked by a member of the French parliament and addressed to a minister (who is given two months to respond). 
-<!-- * <u>Citation</u>: No paper found. -->
+
 
 #### RedPajama (v2)
 * <u>Source</u>: [togethercomputer/RedPajama-Data-V2](https://huggingface.co/datasets/togethercomputer/RedPajama-Data-V2). License: [Apache 2.0](https://github.com/togethercomputer/RedPajama-Data) (data preparation code), Not specified (data) but see [Common Crawl terms of use](https://commoncrawl.org/terms-of-use).
@@ -1450,7 +1441,7 @@ TODO
 
 ## Acknowledgements
 
-The Lucie Training Dataset was created by members of LINAGORA and OpenLLM-France community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
+The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
 
 We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
 
