@@ -5,7 +5,7 @@ in English, French, German, Spanish and Italian culled from a variety of sources
 digital books, newspapers, and magazines, some of which were processed by Optical Character Recognition (OCR). It also contains samples of diverse programming languages.
 
 The Lucie Training Dataset was used to pretrain [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B),
-a foundation LLM with strong capabilities in French and English. Code for data preparation can be found in the [training respository](https://github.com/OpenLLM-France/Lucie-Training/tree/7f1f7efa1288f709662a9067bf2c3db856b850f8) for Lucie-7B. 
+a foundation LLM with strong capabilities in French and English. Code for data preparation can be found in the [training respository](https://github.com/OpenLLM-France/Lucie-Training/tree/7f1f7efa1288f709662a9067bf2c3db856b850f8) for Lucie-7B. Due to the licenses of a few subcorpora, the Lucie Training Dataset is released under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). A subset available for commercial use will be released soon.
 
 Table of Contents:
 <ul>
@@ -116,7 +116,7 @@ This dataset is intended to provide extensive and diverse multilingual data  for
 * Ethics:
     * Special care has been taken to respect copyright laws and individual privacy.
       All newspapers, monographies, magazines and legislative documents, as well as most books, are in the public domain
-  (which depends on the author's date of death and the country of publication). Other data are published with permissive licenses (e.g., CC BY or CC BY-SA).
+  (which depends on the author's date of death and the country of publication). Other data are published with permissive licenses (e.g., CC BY or CC BY-SA) or, in very rare cases, CC BY-NC-SA.
     * All web data in the dataset come from sites with robots.txt files that do not forbid crawling.
 
 ### Sample Metadata

@@ -27,8 +27,7 @@ https://github.com/huggingface/huggingface_hub/blob/main/src/huggingface_hub/tem
 
 ## Model Description
 
-Lucie-7B is a pretrained 7B parameter causal language model built by [LINAGORA](https://labs.linagora.com/) and [OpenLLM-France](https://github.com/OpenLLM-France),
-available under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
+Lucie-7B is a pretrained 7B parameter causal language model built by [LINAGORA](https://labs.linagora.com/) and [OpenLLM-France](https://github.com/OpenLLM-France). While Lucie-7B is released under an [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0), we are awaiting authorization from the copyright holder of one subcorpus of the Lucie-Training-Dataset and so ask that usage of the model be limited to non-commercial purposes until this authorization is obtained.
 
 Lucie-7B was trained on 3 trillion tokens of multilingual data, including
 English (33.2%),
