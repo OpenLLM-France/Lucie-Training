@@ -3,29 +3,27 @@
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH -A fwx@h100                  # comptabilite a utiliser, avec xyz le trigramme de votre projet
 #SBATCH --constraint=h100                      # pour cibler les noeuds H100
 #SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
-#SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=lucie_slurm_logs/%x-%j.out           # output file name
+#SBATCH --time 2:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --output=%x-%j.out           # output file name
 #SBATCH --job-name=lucie-pretraining
-#SBATCH --mail-type=ARRAY_TASKS,BEGIN,END,FAIL,REQUEUE
-#SBATCH --mail-user=ogouvert@linagora.com,jlouradour@linagora.com
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=name1@email.com
+#SBATCH --job-name=lucie-test
 
 set -x -e
 
 echo "START TIME: $(date)"
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
-export SRC_DIR=~/Lucie-Training
-
 # Load env and variables
-source $SRC_DIR/training/set_env.sh
+source ~/Lucie-Training/training/set_env.sh
 
 # Variables
-CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/checkpoints
-TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/tensorboard/pretraining
-LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/logs
+VARIANT=test
+CHECKPOINT_PATH=$ALL_CCFRSCRATCH/checkpoints/$VARIANT
+TENSORBOARD_PATH=$ALL_CCFRSCRATCH/tensorboard/$VARIANT
+LOGS_PATH=$ALL_CCFRSCRATCH/lucie-logs/lucie-logs/$VARIANT
 mkdir -p $LOGS_PATH
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
@@ -35,17 +33,19 @@ export CUDA_LAUNCH_BLOCKING=1
 # hide duplicated errors using this hack - will be properly fixed in pt-1.12
 export TORCHELASTIC_ERROR_FILE=/tmp/torch-elastic-error.json
 # force crashing on nccl issues like hanging broadcast
-export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+export NCCL_ASYNC_ERROR_HANDLING=1
 
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
-cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+cd $MEGATRON_DEEPSPEED_REPO
 
 # Tokenizer and data
+TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k/tokenizer
 TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-TOKENIZER_PATH=$TOKENS_DIR/tokenizer 
-DATASET="$(python $SRC_DIR/training/collect_data_and_weights_light.py $TOKENS_DIR)"
+DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
+DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -67,8 +67,6 @@ SEQ_LENGTH=4096
 NUM_KV_HEADS=8 
 
 GLOBAL_BATCH_SIZE=1024
-GLOBAL_BATCH_SIZE_MIN=256
-GLOBAL_BATCH_SIZE_STEP=64
 MICRO_BATCH_SIZE=2
 TP=4
 PP=4
@@ -80,14 +78,14 @@ MIN_LR=3e-5
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
-TRAIN_SAMPLES=762_144_586 # 3T tokens
-LR_DECAY_SAMPLES=762_144_586 # 3T tokens - not used right now
+TRAIN_SAMPLES=750_000_000 # 3T tokens
+LR_DECAY_SAMPLES=750_000_000 # 3T tokens - not used right now
 LR_WARMUP_SAMPLES=2_000_000
 RAMPUP_SAMPLES=10_000_000
 
-SAVE_INTERVAL=5000
+SAVE_INTERVAL=1000
 
-config_json="$LOGS_PATH/ds_config.json"
+config_json="./ds_config.json"
 
 cat <<EOT > $config_json
 {
@@ -110,7 +108,7 @@ DEEPSPEED_ARGS=" \
     --deepspeed_config ${config_json} \
     --zero-stage ${ZERO_STAGE} \
     --deepspeed-activation-checkpointing \
-    "
+    "  
 
 GPT_ARGS=" \
        --num-layers $NUM_LAYERS \
@@ -155,8 +153,9 @@ LOG_ARGS=" \
        --no-log-loss-scale-to-tensorboard \
        "
 
+# for 20h 1190
 EXIT_OPTS=" \
-    --exit-duration-in-mins 1190 \
+       --exit-interval 3 \
     "
 
 DISTRIBUTED_ARGS=" \
@@ -169,8 +168,6 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH
-
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
        --data-cache-path $DATA_CACHE_PATH \
@@ -179,7 +176,7 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
        --train-samples $TRAIN_SAMPLES \
-       --rampup-batch-size $GLOBAL_BATCH_SIZE_MIN $GLOBAL_BATCH_SIZE_STEP $RAMPUP_SAMPLES \
+       --rampup-batch-size 256 128 $RAMPUP_SAMPLES \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \

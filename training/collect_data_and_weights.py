@@ -2,7 +2,6 @@ import csv
 import json
 import os
 import re
-import warnings
 
 import pandas as pd
 import yaml
@@ -12,65 +11,6 @@ asset_folder = os.path.join(parent_dir, "assets")
 
 _stats_datasets = os.path.join(asset_folder, "stats_datasets.csv")
 assert os.path.exists(_stats_datasets), f"File {_stats_datasets} does not exist"
-
-_stats_programming_languages = {
-    stat_name: os.path.join(asset_folder, "programming-languages", "githut", f"gh-{stat_name}.json")
-    for stat_name in ["pull-request", "issue-event", "star-event", "push-event"]
-}
-_minimum_count = None
-
-
-def get_programming_language_stat(
-    language, stat_name="pull-request", min_year=2023, max_year=2024, no_minimum_count=False
-):
-    global _stats_programming_languages, _minimum_count
-    assert stat_name in _stats_programming_languages, f"Unknown statistic name {stat_name}"
-    language = format_programming_language(language)
-
-    data = _stats_programming_languages[stat_name]
-    if isinstance(data, str):
-        assert os.path.exists(data), f"File {data} does not exist"
-        # First time loading
-        with open(data) as f:
-            data = _stats_programming_languages[stat_name] = json.load(f)
-    if isinstance(data, list):
-        # Conversion
-        data = pd.DataFrame(data)
-        data["name"] = data["name"].apply(format_programming_language)
-        data["year"] = data["year"].apply(int)
-        data["quarter"] = data["quarter"].apply(int)
-        data["count"] = data["count"].apply(int)
-        _stats_programming_languages[stat_name] = data
-
-    data = data[(data["year"] >= min_year) & (data["year"] <= max_year)]
-    val = data[(data["name"] == language)]
-    if not len(val):
-        if no_minimum_count:
-            return 0
-        if _minimum_count is None:
-            _minimum_count = min(
-                [
-                    get_programming_language_stat(
-                        lan, stat_name=stat_name, min_year=min_year, max_year=max_year, no_minimum_count=True
-                    )
-                    for lan in data["name"].unique()
-                ]
-            )
-        warnings.warn(
-            f"Programming language {language} not found in statistics (using {_minimum_count=})", stacklevel=2
-        )
-        return _minimum_count
-    return val["count"].sum()
-
-
-def compute_programming_languages_target_proportions(programming_languages):
-    programming_languages_weights = {}
-    for language in programming_languages:
-        count = get_programming_language_stat(language)
-        programming_languages_weights[language] = count
-    total = sum(programming_languages_weights.values())
-    programming_languages_weights = {k: v / total for k, v in programming_languages_weights.items()}
-    return programming_languages_weights
 
 
 def read_stats_datasets(stats_datasets_filename=_stats_datasets):
@@ -185,21 +125,27 @@ if __name__ == "__main__":
         help="What to count",
     )
     parser.add_argument(
-        "--fr_proportion",
+        "--fr_weight",
         type=float,
-        default=0.3,
+        default=1.0,
         help="How much French data in total",
     )
     parser.add_argument(
-        "--en_proportion",
+        "--en_weight",
         type=float,
-        default=0.3,
+        default=1.0,
         help="How much English data in total",
     )
     parser.add_argument(
-        "--code_proportion",
+        "--code_weight",
         type=float,
-        default=0.3,
+        default=1.0,
+        help="How much Code data in total",
+    )
+    parser.add_argument(
+        "--other_weight",
+        type=float,
+        default=1.0,
         help="How much Code data in total",
     )
     parser.add_argument(
@@ -208,16 +154,26 @@ if __name__ == "__main__":
         default=False,
         help="To print debug output",
     )
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        help="Output path of the df info (useful for extension)",
+        nargs="?",
+    )
+    parser.add_argument(
+        "--start_path",
+        type=str,
+        help="Start path for relative path",
+        nargs="?",
+    )
     args = parser.parse_args()
 
-    language_target_proportions = {
-        "fr": args.fr_proportion,
-        "en": args.en_proportion,
-        "code": args.code_proportion,
-        # The rest (10% will be splitted among it/es/de)
-    }
-
     stats_datasets = read_stats_datasets()
+    add_language_weights = {
+        "en": args.en_weight,
+        "fr": args.fr_weight,
+        "code": args.code_weight,
+    }
 
     with open(os.path.join(asset_folder, "dataset_weights.yaml")) as stream:
         domain_upsampling = yaml.safe_load(stream)
@@ -231,9 +187,6 @@ if __name__ == "__main__":
         prefixes.append(os.path.splitext(filename)[0])
 
     data = {}
-    num_tokens_per_language = {}
-    num_tokens_per_language_weighted = {}
-    num_tokens_per_programming_language = {}
 
     for prefix in prefixes:
         prefix = os.path.join(args.folder, prefix)
@@ -241,7 +194,6 @@ if __name__ == "__main__":
         name = prefix_to_canonical_name(prefix, stats_datasets)
         if name not in stats_datasets:
             raise RuntimeError(f"Dataset {name} cannot be matched ({prefix=}, {sorted(stats_datasets.keys())=})")
-            continue
         if name in not_tokenized_datasets:
             not_tokenized_datasets.remove(name)
 
@@ -254,142 +206,85 @@ if __name__ == "__main__":
             return d
 
         d = load_data_from_prefix(prefix)
-
         d.update(stats_datasets[name])
-        data[prefix] = d
 
-        additional_weight = domain_upsampling[d["language"] + "--" + d["category"]]
-
-        languages = d["language"].split("-")
+        num_epochs = domain_upsampling[d["language"] + "--" + d["category"]] * add_language_weights.get(
+            d["language"], args.other_weight
+        )
         count = d[args.count]
-        count_weighted = additional_weight * count
-        for language in languages:
-            num_tokens_per_language_weighted[language] = num_tokens_per_language_weighted.get(language, 0) + (
-                count_weighted // len(languages)
-            )
-            num_tokens_per_language[language] = num_tokens_per_language.get(language, 0) + (count // len(languages))
+        reweighted_count = num_epochs * count
 
-        if language == "code":
-            prog_lang = format_programming_language(name)
-            num_tokens_per_programming_language[prog_lang] = (
-                num_tokens_per_programming_language.get(prog_lang, 0) + count
-            )
+        d["num_epochs"] = num_epochs
+        d["count"] = count
+        d["reweighted_count"] = reweighted_count
+
+        data[prefix] = d
 
     if not_tokenized_datasets and args.debug:
         print(f"WARNING! Those datasets are missing (not tokenized): {', '.join(not_tokenized_datasets)}")
 
-    # Sort data by count
-    data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1][args.count], reverse=True)}  # noqa
+    # Convert to pandas
+    df = pd.DataFrame.from_dict(data, orient="index").reset_index(names="prefix")
+    total_count = df["count"].sum()
+    total_reweighted_count = df["reweighted_count"].sum()
 
-    total_count = sum(num_tokens_per_language.values())
-    total_count_weighted = sum(num_tokens_per_language_weighted.values())
-    total_count_weighted_rest = total_count_weighted - sum(
-        [num_tokens_per_language_weighted.get(lan, 0) for lan in language_target_proportions]
-    )
+    # Weight per dataset
+    df["ratio"] = df["count"] / total_count
+    df["new_ratio"] = df["reweighted_count"] / total_reweighted_count
+    df = df.sort_values("reweighted_count", ascending=False)
 
-    language_target_proportion_rest = 1 - sum(language_target_proportions.values())
-    assert (
-        language_target_proportion_rest >= 0 and language_target_proportion_rest < 1
-    ), f"{language_target_proportion_rest=}"
-
-    # Set the weights for languages (fr, en, code, ...)
-    language_weights = {}
-    for language, count_weighted in num_tokens_per_language_weighted.items():
-        if language in language_target_proportions:
-            target_proportion = language_target_proportions[language]
-        else:
-            target_proportion = language_target_proportion_rest * count_weighted / total_count_weighted_rest
-            language_target_proportions[language] = target_proportion
-        weight = target_proportion / (count_weighted / total_count_weighted)
-        language_weights[language] = weight
-
-    # Set the weights for programming languages
-    programming_language_target_proportions = compute_programming_languages_target_proportions(
-        num_tokens_per_programming_language.keys()
-    )
-    programming_language_weights = {}
-    for language, count_weighted in num_tokens_per_programming_language.items():
-        assert language in programming_language_target_proportions, f"{language=} not found"
-        target_proportion = programming_language_target_proportions[language] * language_target_proportions["code"]
-        weight = target_proportion / (count_weighted / total_count_weighted)
-        programming_language_weights[language] = weight
+    if args.output_path is not None:
+        df["prefix"] = df["prefix"].apply(lambda x: os.path.relpath(x, args.start_path))
+        df.to_csv(args.output_path)
 
     if args.debug:
-        for what, lf, num_tokens, target_proportions, weights in [
-            ("language", "4s", num_tokens_per_language_weighted, language_target_proportions, language_weights),
-            (
-                "programming language",
-                "12s",
-                num_tokens_per_programming_language,
-                programming_language_target_proportions,
-                programming_language_weights,
-            ),
-        ]:
-            print(f"# Weights per {what}\n```")
-            num_tokens = {  # noqa
-                k: v for k, v in sorted(num_tokens.items(), key=lambda item: item[1], reverse=True)
-            }
-            total_tokens_weighted = sum(num_tokens[language] * weights[language] for language in num_tokens)
-            total_tokens = sum(num_tokens.values())
-            for language, count in num_tokens.items():
-                target_proportion = target_proportions[language]
-                weight = weights[language]
-                language = language.format("")
-                print(
-                    f"{language=:{lf}} {target_proportion=:4.3f} {weight=:9.6f} \
-before={count * 100/ total_tokens:6.3f}% after={count * weight * 100/ total_tokens_weighted:6.3f}%"
-                )
-            print("```\n")
-
         print("# Weights per sub-corpus\n```")
+        for _, row in df.iterrows():
+            name = row["prefix"].split("/")[-1][: -len("_text_document")]
+            ratio = row["ratio"]
+            new_ratio = row["new_ratio"]
+            num_epochs = row["num_epochs"]
+            reweighted_count = row["reweighted_count"]
+            print(
+                f"{name:40s}: \
+before={ratio*100:6.3f}% after={new_ratio*100:6.3f}% reweighted_count={reweighted_count*1e-9:.3f} B tokens \
+-> num_epochs={num_epochs:3.1f}"
+            )
+        print("```\n")
 
-    for second_pass in [False, True]:
-        if not second_pass:
-            all_weights = {}
-        else:
-            data = {k: v for k, v in sorted(data.items(), key=lambda x: all_weights[x[0]], reverse=True)}  # noqa
-            total_weights = sum(all_weights.values())
-            # Normalization factor for weights
-            norm_weight = total_weights / 100
+        print("# Weights per language\n```")
+        df["language"] = df["language"].apply(lambda x: x if x in ["en", "fr", "de", "es", "it", "code"] else "aligned")
+        df_lan = df.groupby("language")[["count", "reweighted_count"]].sum().reset_index()
+        df_lan["ratio"] = df_lan["count"] / total_count
+        df_lan["new_ratio"] = df_lan["reweighted_count"] / total_reweighted_count
+        df_lan = df_lan.sort_values("reweighted_count", ascending=False)
 
-        for prefix, d in data.items():
-            languages = d["language"].split("-")
-            count = d[args.count]
-            ratio = count / total_count
+        for _, row in df_lan.iterrows():
+            language = row["language"]
+            reweighted_count = row["reweighted_count"]
+            ratio = row["ratio"]
+            new_ratio = row["new_ratio"]
 
-            language_weight = max(language_weights[language] for language in languages)
-            if d["language"] == "code":
-                prog_language = format_programming_language(prefix)
-                language_weight = programming_language_weights[prog_language]
+            print(
+                f"{language:40s}: \
+before={ratio*100:6.3f}% after={new_ratio*100:6.3f}% reweighted_count={reweighted_count*1e-9:.3f} B tokens"
+            )
+        print("```\n")
 
-            additional_weight = domain_upsampling[d["language"] + "--" + d["category"]]
-
-            weight = all_weights[prefix] = ratio * language_weight * additional_weight
-
-            if second_pass:
-                new_ratio = weight / total_weights
-                weight = weight / norm_weight
-
-                if args.debug:
-                    name = os.path.basename(prefix).replace("_text_document", "")
-                    num_epochs = new_ratio * 3 * 1e12 / d[args.count]
-                    print(
-                        f"{name:40s}: {weight=:12.9f} \
-before={ratio * 100:6.3f}% after={new_ratio * 100:6.3f}% ({language_weight=:8.6f} {additional_weight=:3.1f}) \
--> num_epochs={num_epochs:.2f}"
-                    )
-
-                else:
-                    # Print the weight (expected output)
-                    sweight = f"{weight:11.9f}"
-                    print(f"{sweight} {prefix} ", end="")
-
-                    # Check that nothing was rounded to weight=0
-                    if not re.search(r"[^\.0]", sweight):
-                        print()
-                        raise RuntimeError(f"Weight is zero for {prefix}")
-
-    if args.debug:
+        print("# Total Tokens\n```")
+        print(f"before={total_count*1e-9:.3f} B tokens, after={total_reweighted_count*1e-9:.3f} B tokens")
+        print(f"Number of samples={total_reweighted_count/4096:.2f} with sequence length=4096")
         print("```")
+
     else:
-        print()
+        for _, row in df.iterrows():
+            prefix = row["prefix"]
+            new_ratio = row["new_ratio"]
+            # Print the weight (expected output)
+            sweight = f"{new_ratio:11.9f}"
+            print(f"{sweight} {prefix} ", end="")
+
+            # Check that nothing was rounded to weight=0
+            if not re.search(r"[^\.0]", sweight):
+                print()
+                raise RuntimeError(f"Weight is zero for {prefix}")

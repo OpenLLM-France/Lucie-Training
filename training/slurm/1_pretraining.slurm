@@ -1,42 +1,32 @@
 #!/bin/bash
-#SBATCH --nodes=32
+#SBATCH --nodes=128
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH -A fwx@h100                  # comptabilite a utiliser, avec xyz le trigramme de votre projet
-#SBATCH --constraint=h100                      # pour cibler les noeuds H100
-#SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
+#SBATCH --account=fwx@h100           # project
+#SBATCH --constraint=h100            # H100 nodes
+#SBATCH --gres=gpu:4                 # number of GPUs per node (max 4 for Jean-Zay H100)
 #SBATCH --time=20:00:00              # maximum execution time (HH:MM:SS)
-#SBATCH --output=lucie_slurm_logs/%x-%j.out           # output file name
-#SBATCH --job-name=context_extension
-#SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=ogouvert@linagora.com,jlouradour@linagora.com
+#SBATCH --output=%x-%j.out           # output file name
+#SBATCH --job-name=pretraining       # job name
+#SBATCH --mail-type=BEGIN,END,FAIL   # email notification
+#SBATCH --mail-user=name1@email.com,name2@email.com
 
 set -x -e
 
 echo "START TIME: $(date)"
 
-ZERO_STAGE=1
-SEQ_LENGTH=32_000 
-GLOBAL_BATCH_SIZE=128
-MICRO_BATCH_SIZE=4
-TP=4
-PP=4
-
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed-sandbox
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
 export SRC_DIR=~/Lucie-Training
 
 # Load env and variables
 source $SRC_DIR/training/set_env.sh
 
 # Variables
-UNIVERSAL_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/universal_checkpoints
-SAVE_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/checkpoints
-TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/tensorboard/pretraining
-LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/logs
+CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/checkpoints
+TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/tensorboard/pretraining
+LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/logs
 mkdir -p $LOGS_PATH
-
-echo global_step753851 > /lustre/fsn1/projects/rech/qgz/commun/trained_models/Lucie/pretrained/universal_checkpoints/latest_universal
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
 export OMP_NUM_THREADS=1
@@ -53,9 +43,9 @@ export TRANSFORMERS_OFFLINE=1
 cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
-TOKENS_DIR=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped
-DATASET="$(python $SRC_DIR/training/collect_data_and_weights_extension.py)"
-TOKENIZER_PATH=$TOKENS_DIR/tokenizer
+TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENIZER_PATH=$TOKENS_DIR/tokenizer 
+DATASET="$(python $SRC_DIR/training/collect_data_and_weights.py $TOKENS_DIR)"
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -73,17 +63,29 @@ HIDDEN_SIZE=4096
 FFN_HIDDEN_SIZE=12288 
 NUM_LAYERS=32 
 NUM_HEADS=32
+SEQ_LENGTH=4096 
 NUM_KV_HEADS=8 
-ROPE_THETA=20_000_000
+
+GLOBAL_BATCH_SIZE=1024
+GLOBAL_BATCH_SIZE_MIN=256
+GLOBAL_BATCH_SIZE_STEP=64
+MICRO_BATCH_SIZE=2
+TP=4
+PP=4
+ZERO_STAGE=0
 
 # ------ Optimizer
-LR=2e-5
+LR=3e-4
+MIN_LR=3e-5
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
 
-TRAIN_SAMPLES=156250 # 5B tokens
+TRAIN_SAMPLES=762_144_586 # 3T tokens
+LR_DECAY_SAMPLES=762_144_586 # 3T tokens - not used right now
+LR_WARMUP_SAMPLES=2_000_000
+RAMPUP_SAMPLES=10_000_000
 
-SAVE_INTERVAL=250
+SAVE_INTERVAL=5000
 
 config_json="$LOGS_PATH/ds_config.json"
 
@@ -97,9 +99,6 @@ cat <<EOT > $config_json
   "bf16": {
     "enabled": true
   },
-  "data_types": {
-    "grad_accum_dtype": "fp32" 
-  },
   "gradient_clipping": 1.0,
   "steps_per_print": 2000,
   "wall_clock_breakdown": false
@@ -110,8 +109,7 @@ DEEPSPEED_ARGS=" \
     --deepspeed \
     --deepspeed_config ${config_json} \
     --zero-stage ${ZERO_STAGE} \
-    --recompute-granularity full \
-    --recompute-method uniform \
+    --deepspeed-activation-checkpointing \
     "
 
 GPT_ARGS=" \
@@ -124,7 +122,6 @@ GPT_ARGS=" \
        --attention-dropout 0 \
        --hidden-dropout 0 \
        --use-rotary-position-embeddings \
-       --rotary-position-embeddings-theta $ROPE_THETA \
        --untie-embeddings-and-output-weights \
        --swiglu \
        --normalization rmsnorm \
@@ -135,7 +132,9 @@ GPT_ARGS=" \
 
 OPTIMIZER_ARGS=" \
        --lr $LR \
-       --lr-decay-style constant \
+       --lr-decay-style cosine \
+       --min-lr $MIN_LR \
+       --lr-warmup-samples $LR_WARMUP_SAMPLES \
        --clip-grad $GRAD_CLIP \
        --optimizer adam \
        --adam-beta1 0.9 \
@@ -170,7 +169,7 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-DATA_CACHE_PATH=${TOKENS_DIR}/extension/data_indices_ts-${TRAIN_SAMPLES}_sl-${SEQ_LENGTH}
+DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH
 
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
@@ -180,27 +179,28 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --micro-batch-size $MICRO_BATCH_SIZE \
        --global-batch-size $GLOBAL_BATCH_SIZE \
        --train-samples $TRAIN_SAMPLES \
+       --rampup-batch-size $GLOBAL_BATCH_SIZE_MIN $GLOBAL_BATCH_SIZE_STEP $RAMPUP_SAMPLES \
        --data-path $DATASET \
        --data-impl mmap \
-       --tokenizer-type PretrainedFromHF \
+       --tokenizer-type PretrainedFromHF  \
        --tokenizer-name-or-path $TOKENIZER_PATH \
        --distributed-backend nccl \
        --save-interval $SAVE_INTERVAL \
        --eval-interval 1000 \
        --eval-iters 0 \
        --split 1,0,0 \
-       --no-query-key-layer-scaling \
        --use-flash-attn-v2 \
+       --no-query-key-layer-scaling \
        --seed 42 \
-       --load $UNIVERSAL_CHECKPOINT_PATH \
-       --save $SAVE_CHECKPOINT_PATH \
+       --init-method-std 0.009 \
+       --checkpoint-activations \
+       --save $CHECKPOINT_PATH \
+       --load $CHECKPOINT_PATH \
        $GPT_ARGS \
        $OPTIMIZER_ARGS \
-       $LOG_ARGS \
        $DEEPSPEED_ARGS \
+       $LOG_ARGS \
        $EXIT_OPTS \
-       --universal-checkpoint \
-       --finetune \
        "
 
 SRUN_ARGS=" \
