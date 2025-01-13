@@ -7,7 +7,7 @@
 #SBATCH --constraint=a100
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=./out/%x-%j.out # STDOUT
-#SBATCH --account=qgz@a100
+#SBATCH --account=xxx@a100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --job-name=lucie-test
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -30,9 +30,9 @@ mkdir -p $LOGS_PATH
 cd $MEGATRON_DEEPSPEED_REPO
 
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
-TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENS_DIR="/gpfsssd/scratch/rech/xxx/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR --wikipedia_weight 1)"
-DATA_CACHE_PATH=/gpfswork/rech/qgz/uzq54wg/.cache
+DATA_CACHE_PATH=/gpfswork/rech/xxx/xxx00xx/.cache
 
 # so processes know who to talk to
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)

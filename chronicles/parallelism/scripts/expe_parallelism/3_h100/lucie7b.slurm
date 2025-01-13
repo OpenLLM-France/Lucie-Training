@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
 #SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=%x-%j.out           # output file name
-#SBATCH --account=fwx@h100
+#SBATCH --account=xxx@h100
 #SBATCH --qos=qos_gpu-t3
 #SBATCH --job-name=lucie-test
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -25,15 +25,15 @@ echo "MICRO_BATCH_SIZE: $MICRO_BATCH_SIZE"
 source ~/Lucie-Training/training/h100_tests/set_env.sh
 cd $MEGATRON_DEEPSPEED_REPO
 
-VARIANT=h100_tests/z0
-CHECKPOINT_PATH=$CHECKPOINT_PATH/$VARIANT/$SLURM_JOB_NAME
-TENSORBOARD_PATH=$TENSORBOARD_PATH/$VARIANT/$SLURM_JOB_NAME
+
+OUTPUT_PATH=$SCRATCH/expe_z0
+CHECKPOINT_PATH=$OUTPUT_PATH/checkpoints
+TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard
 
 # Tokenizer and data
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-65k
-TOKENS_DIR="/gpfsssd/scratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENS_DIR="/gpfsssd/scratch/rech/xxx/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights.py $TOKENS_DIR)"
-DATA_CACHE_PATH="$TOKENS_DIR/data_indices_"$TRAIN_SAMPLES"x"$SEQ_LENGTH
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -173,6 +173,8 @@ DISTRIBUTED_ARGS=" \
        --max_restarts 0 \
        --tee 3 \
        "
+
+DATA_CACHE_PATH=$LOGS_PATH/data_indices
 
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \

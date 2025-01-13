@@ -6,7 +6,7 @@
 #SBATCH --constraint=a100
 #SBATCH --time 00:15:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=./out/%x-%j.out # STDOUT
-#SBATCH --account=qgz@a100
+#SBATCH --account=xxx@a100
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=ogouvert@linagora.com
 
@@ -35,15 +35,15 @@ module load cuda/12.1.0 # Use this cuda version already installed in Jean-Zay. I
 module load gcc/12.2.0
 conda activate lucie
 
-OUTPUT_PATH=/gpfswork/rech/qgz/uzq54wg
-TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard/$SLURM_JOB_NAME
-LOGS_PATH=$OUTPUT_PATH/lucie-logs/$SLURM_JOB_NAME
+OUTPUT_PATH=$SCRATCH/expe_lucie7b-seq4k
+TENSORBOARD_PATH=$OUTPUT_PATH/tensorboard
+LOGS_PATH=$OUTPUT_PATH/logs
 mkdir -p $LOGS_PATH
 
-MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+MEGATRON_DEEPSPEED_REPO=/linkhome/rech/xxxxx00/xxx00xx/Lucie-Training/Megatron-DeepSpeed
 cd $MEGATRON_DEEPSPEED_REPO
 
-DATASET=/gpfsscratch/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
+DATASET=/gpfsscratch/rech/xxx/commun/preprocessed_data/Lucie/lucie_tokens_2.4-space_prefix_all/Wikipedia--fr--026_text_document
 TOKENIZER_PATH=OpenLLM-France/Lucie-tokenizer-v2.4-space_prefix_all
 
 # so processes know who to talk to
@@ -88,21 +88,6 @@ cat <<EOT > $config_json
 }
 EOT
 
-#   "gradient_clipping": 1.0,
-# ,
-#   "tensorboard": {
-#     "enabled": true,
-#     "output_path": "$OUTPUT_PATH/tensorboard/",
-#     "job_name": "$SLURM_JOB_NAME"
-#   },
-#   "flops_profiler": {
-#     "enabled": true,
-#     "profile_step": 1,
-#     "module_depth": -1,
-#     "top_modules": 1,
-#     "detailed": true,
-#     "output_file": null,
-#     }
 
 DEEPSPEED_ARGS=" \
     --deepspeed \
@@ -168,11 +153,11 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-       # --save $CHECKPOINT_PATH \
-       # --load $CHECKPOINT_PATH \
+DATA_CACHE_PATH=$LOGS_PATH/data_indices
+
 export RUN="torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
-       --data-cache-path /gpfswork/rech/qgz/uzq54wg/.cache \
+       --data-cache-path $DATA_CACHE_PATH \
        --tensor-model-parallel-size $TP \
        --pipeline-model-parallel-size $PP \
        $EXTRA_ARGS \

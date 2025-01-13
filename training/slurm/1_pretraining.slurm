@@ -16,16 +16,14 @@ set -x -e
 
 echo "START TIME: $(date)"
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
-export SRC_DIR=~/Lucie-Training
-
 # Load env and variables
-source $SRC_DIR/training/set_env.sh
+source ../set_env.sh
 
-# Variables
-CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/checkpoints
-TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/tensorboard/pretraining
-LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/logs
+# Output folders
+OUTPUT_DIR_PRETRAINING=$OUTPUT_DIR/1_pretrained
+CHECKPOINT_PATH=$OUTPUT_DIR_PRETRAINING/checkpoints
+TENSORBOARD_PATH=$OUTPUT_DIR_PRETRAINING/tensorboard
+LOGS_PATH=$OUTPUT_DIR_PRETRAINING/logs
 mkdir -p $LOGS_PATH
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
@@ -43,9 +41,8 @@ export TRANSFORMERS_OFFLINE=1
 cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
-TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
-TOKENIZER_PATH=$TOKENS_DIR/tokenizer 
-DATASET="$(python $SRC_DIR/training/collect_data_and_weights.py $TOKENS_DIR)"
+TOKENIZER=$TOKENS_DATA_DIR/tokenizer 
+DATASET="$(python $SRC_DIR/training/collect_data_and_weights.py $TOKENS_DATA_DIR)"
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -169,7 +166,7 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-DATA_CACHE_PATH=$TOKENS_DIR"/data_indices_ts-"$TRAIN_SAMPLES"_sl-"$SEQ_LENGTH
+DATA_CACHE_PATH=$LOGS_PATH/data_indices_ts-${TRAIN_SAMPLES}_sl-${SEQ_LENGTH}
 
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
@@ -183,7 +180,7 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF  \
-       --tokenizer-name-or-path $TOKENIZER_PATH \
+       --tokenizer-name-or-path $TOKENIZER \
        --distributed-backend nccl \
        --save-interval $SAVE_INTERVAL \
        --eval-interval 1000 \

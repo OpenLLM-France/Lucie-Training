@@ -23,20 +23,19 @@ MICRO_BATCH_SIZE=4
 TP=4
 PP=4
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed-sandbox
-export SRC_DIR=~/Lucie-Training
-
 # Load env and variables
-source $SRC_DIR/training/set_env.sh
+source ../set_env.sh
 
-# Variables
-UNIVERSAL_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/pretrained/universal_checkpoints
-SAVE_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/checkpoints
-TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/tensorboard/pretraining
-LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/logs
+# Input folder (foundation model)
+BASE_DIR=$OUTPUT_DIR/pretrained/universal_checkpoints
+
+# Output folders
+OUTPUT_DIR_EXTENSION=$OUTPUT_DIR/2_extension
+SAVE_CHECKPOINT_PATH=$OUTPUT_DIR_EXTENSION/checkpoints
+TENSORBOARD_PATH=$OUTPUT_DIR_EXTENSION/tensorboard
+LOGS_PATH=$OUTPUT_DIR_EXTENSION/logs
+
 mkdir -p $LOGS_PATH
-
-echo global_step753851 > /lustre/fsn1/projects/rech/qgz/commun/trained_models/Lucie/pretrained/universal_checkpoints/latest_universal
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
 export OMP_NUM_THREADS=1
@@ -53,9 +52,8 @@ export TRANSFORMERS_OFFLINE=1
 cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
-TOKENS_DIR=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped
 DATASET="$(python $SRC_DIR/training/collect_data_and_weights_extension.py)"
-TOKENIZER_PATH=$TOKENS_DIR/tokenizer
+TOKENIZER=$TOKENS_DATA_DIR/tokenizer
 
 if [ -z "$DATASET" ]; then
   echo "No data found"
@@ -170,7 +168,7 @@ DISTRIBUTED_ARGS=" \
        --tee 3 \
        "
 
-DATA_CACHE_PATH=${TOKENS_DIR}/extension/data_indices_ts-${TRAIN_SAMPLES}_sl-${SEQ_LENGTH}
+DATA_CACHE_PATH=$LOGS_PATH/data_indices_ts-${TRAIN_SAMPLES}_sl-${SEQ_LENGTH}
 
 export RUN=" torchrun $DISTRIBUTED_ARGS \
        `pwd`/pretrain_gpt.py \
@@ -183,7 +181,7 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --data-path $DATASET \
        --data-impl mmap \
        --tokenizer-type PretrainedFromHF \
-       --tokenizer-name-or-path $TOKENIZER_PATH \
+       --tokenizer-name-or-path $TOKENIZER \
        --distributed-backend nccl \
        --save-interval $SAVE_INTERVAL \
        --eval-interval 1000 \
@@ -192,7 +190,7 @@ export RUN=" torchrun $DISTRIBUTED_ARGS \
        --no-query-key-layer-scaling \
        --use-flash-attn-v2 \
        --seed 42 \
-       --load $UNIVERSAL_CHECKPOINT_PATH \
+       --load $BASE_DIR \
        --save $SAVE_CHECKPOINT_PATH \
        $GPT_ARGS \
        $OPTIMIZER_ARGS \

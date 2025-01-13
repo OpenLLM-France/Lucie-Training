@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=96           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH -A fwx@h100                  # comptabilite a utiliser, avec xyz le trigramme de votre projet
+#SBATCH -A xxx@h100                  # comptabilite a utiliser, avec xyz le trigramme de votre projet
 #SBATCH --constraint=h100                      # pour cibler les noeuds H100
 #SBATCH --gres=gpu:4                 # nombre de GPU par noeud (max 4 pour les noeuds H100)
 #SBATCH --time=20:00:00              # maximum execution time (HH:MM:SS)
@@ -23,7 +23,7 @@ MICRO_BATCH_SIZE=4
 TP=4
 PP=4
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed-sandbox
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/xxxxx00/xxx00xx/Lucie-Training/Megatron-DeepSpeed-sandbox
 export SRC_DIR=~/Lucie-Training
 
 # Load env and variables
@@ -36,7 +36,7 @@ TENSORBOARD_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/tensorb
 LOGS_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie/extension_rope20M/logs
 mkdir -p $LOGS_PATH
 
-echo global_step753851 > /lustre/fsn1/projects/rech/qgz/commun/trained_models/Lucie/pretrained/universal_checkpoints/latest_universal
+echo global_step753851 > /lustre/fsn1/projects/rech/xxx/commun/trained_models/Lucie/pretrained/universal_checkpoints/latest_universal
 
 export TORCH_CUDA_ARCH_LIST="9.0+PTX" 
 export OMP_NUM_THREADS=1
@@ -53,7 +53,7 @@ export TRANSFORMERS_OFFLINE=1
 cd $MEGATRON_DEEPSPEED_REPO # "megatron" will be in PYTHONPATH (current folder)
 
 # Tokenizer and data
-TOKENS_DIR=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped
+TOKENS_DIR=/lustre/fsn1/projects/rech/xxx/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped
 DATASET="$(python $SRC_DIR/training/collect_data_and_weights_extension.py)"
 TOKENIZER_PATH=$TOKENS_DIR/tokenizer
 

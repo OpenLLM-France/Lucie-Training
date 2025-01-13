@@ -37,11 +37,11 @@ export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
-export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/gendjf01/uzq54wg/Lucie-Training/Megatron-DeepSpeed
+export MEGATRON_DEEPSPEED_REPO=/linkhome/rech/xxxxx00/xxx00xx/Lucie-Training/Megatron-DeepSpeed
 cd $MEGATRON_DEEPSPEED_REPO
 
 # Tokenizer and data
-TOKENS_DIR="/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
+TOKENS_DIR="/lustre/fsn1/projects/rech/xxx/commun/preprocessed_data/Lucie/lucie_tokens_65k_grouped"
 TOKENIZER_PATH=$TOKENS_DIR/tokenizer # OpenLLM-France/Lucie-tokenizer-65k
 DATASET="$(python ~/Lucie-Training/training/collect_data_and_weights_light.py $TOKENS_DIR)"
 
