@@ -1437,7 +1437,21 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="
 
 ## Citation
 
-TODO
+When using the Lucie Training Dataset, please cite the following paper:
+
+✍ Julie Hunter, Jérôme Louradour, Olivier Gouvert,
+Evan Dufraisse, Yaya Sy, Pierre-Carl Langlais, Anastasia Stasenko,
+Laura Rivière, Christophe Cerisara, Jean-Pierre Lorré (2025)
+Lucie-7B LLM and its training dataset
+```bibtex
+@misc{openllm2023claire,
+      title={Lucie-7B LLM and its training dataset}, 
+      author={Julie Hunter and Jérôme Louradour and Olivier Gouvert and Evan Dufraisse and Yaya Sy and Pierre-Carl Langlais and Anastasia Stasenko and Laura Rivière and Christophe Cerisara and Jean-Pierre Lorré},
+      year={2025},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
 
 ## Acknowledgements
 
