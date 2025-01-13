@@ -444,7 +444,7 @@ def format_language(lang_code, include_lang_code=True):
 
 def convert_markdown_table_to_html(
     markdown,
-    html_doc,
+    fid,
     headers=None,
     # center_title= True,
 ):
@@ -471,7 +471,118 @@ def convert_markdown_table_to_html(
     # Add multi-rows when cell name is the same
     generated_html = add_rowspan_to_table(generated_html)
 
-    html_doc.write(generated_html)
+    fid.write(generated_html)
+
+
+def convert_markdown_table_to_tex(data, fid, use_column_as_header=None, label=None, caption=None):
+    # Drop the columns that contain a "/" in the name
+    data = data.drop(columns=[col for col in data.columns if "/" in col])
+
+    # Drop the columns that have a unique value
+    data = data.drop(columns=[col for col in data.columns if len(data[col].unique()) == 1])
+
+    # Get the index of the column to use as header
+    irow_header = data.columns.get_loc(use_column_as_header) if use_column_as_header else None
+    num_columns = len(data.columns) - (1 if irow_header is not None else 0)
+
+    num_header_columns = 2 if irow_header is not None else 1
+
+    TAB = "    "
+    TAB2 = 2 * TAB
+    TAB3 = TAB2 + TAB if irow_header is not None else TAB
+
+    TOTAL_STR = "\\textbf{TOTAL}"
+    # TOTAL_STR = "{\\it TOTAL}"
+
+    def no_border(str_content, align="l"):
+        return rf"\multicolumn{{1}}{{{align}}}{{{str_content}}}"
+
+    fid.write("\\begin{table}[t]\n")
+    fid.write(TAB + "\\centering\n")
+    fid.write(TAB + "\\begin{tabular}{")
+    if num_header_columns == 2:
+        fid.write("".join(["l|l|"] + (["r"] * (num_columns - 2))))
+    elif num_header_columns == 1:
+        fid.write("".join(["l|"] + (["r"] * (num_columns - 1))))
+    else:
+        raise NotImplementedError
+    fid.write("}\n")
+    # Write header
+    fid.write(
+        TAB2
+        + " & ".join(
+            [
+                no_border(f"\\textbf{{{to_latex_str(fieldname)}}}", "l" if i < num_header_columns else "r")
+                for i, fieldname in enumerate(data.columns)
+                if i != irow_header
+            ]
+        )
+        + " \\\\\n"
+    )
+    fid.write(TAB2 + "\\hline\n")
+    previous_header = None
+    previous_name = None
+    for _, row in data.iterrows():
+        if irow_header is not None:
+            header = row[irow_header]
+            if header != previous_header:
+                fid.write(TAB2 + "\\hline\n")
+                if header:
+                    str_content = f"\\textbf{{{use_column_as_header.capitalize()}: {header}}}"
+                else:
+                    str_content = TOTAL_STR
+                fid.write(
+                    TAB2
+                    + (" & " * num_header_columns)
+                    + rf"\multicolumn{{{num_columns - num_header_columns}}}{{c}}{{{str_content}}} \\\\\n"
+                )
+                # fid.write(TAB2 + f"\multicolumn{{{num_columns}}}{{l}}{{{str_content}}} \\\\\n")
+                previous_header = header
+        name = None
+        same_as_previous = False
+        if "name" in data.columns:
+            name = row["name"]
+
+            same_as_previous = name == previous_name
+            if same_as_previous or not header:
+                row["name"] = ""
+            previous_name = name
+
+        row = [to_latex_str(r) if (r or same_as_previous) else TOTAL_STR for i, r in enumerate(row)]
+        fid.write(TAB3 + " & ".join([x for i, x in enumerate(row) if i != irow_header]) + " \\\\\n")
+    # fid.write(TAB2 + "\\hline\n")
+    if label:
+        fid.write(TAB + "\\label{" + label + "}\n")
+    fid.write(TAB + "\\end{tabular}\n")
+    if caption:
+        fid.write(f"\n{TAB2}\\caption{{{caption.rstrip()}\n{TAB2}}}\n\n")
+    fid.write("\\end{table}\n")
+
+    # TODO 1
+    # accumulate TheStack
+
+
+#                TheStack & code & 125.769 & 51.306 & 228.954 & 630.749 \\
+
+# TODO 2
+# Claire fr/en : sort dataset by (source, nb tokens) then language ...
+
+# TODO 3
+# reorder OpenEdition / Pile (subsets)
+
+
+def to_latex_str(value):
+    s = (
+        str(value)
+        .replace("_", "\\_")
+        .replace("&", "\\&")
+        .replace("%", "\\%")
+        .replace("#", "\\#")
+        .replace("$", "\\$")
+        .replace("{", "\\{")
+        .replace("}", "\\}")
+    )
+    return s
 
 
 def add_rowspan_to_table(html):
@@ -531,6 +642,12 @@ if __name__ == "__main__":
         "output_csv",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "metadata", "dataset_composition.csv"),
         help="Output CSV file",
+        nargs="?",
+    )
+    parser.add_argument(
+        "output_tex",
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "metadata", "dataset_composition.tex"),
+        help="Output TeX file",
         nargs="?",
     )
     parser.add_argument(
@@ -615,14 +732,17 @@ if __name__ == "__main__":
             return 1
         if "multilingual" in category.lower():
             return 0
-        num_tokens = df[df["category"] == category]["B tokens"].sum()
         if category.startswith("Legislative"):
             num_tokens = sum(
-                df[df["category"] == subcat]["B tokens"].sum()
+                df[df["category"] == subcat]["B tokens"].astype(float).sum()
                 for subcat in ["Legislative Texts", "Legislative Transcripts", "Legislative"]
             )
         else:
-            num_tokens = df[df["category"] == category]["B tokens"].sum()
+            num_tokens = df[df["category"] == category]["B tokens"].astype(float).sum()
+        if isinstance(num_tokens, str):
+            import pdb
+
+            pdb.set_trace()
         return -num_tokens
 
     def conform_for_csv(row):
@@ -660,8 +780,23 @@ if __name__ == "__main__":
                     new_data.append(conform_for_csv(row))
                     f.write(write_md_table_row(fields, row) + "\n")
 
+    df = pd.DataFrame(new_data)
+
+    categories = list(df["category"].unique())
+
+    # Sort by (1) category and then (2) number of tokens
+    # df = df.sort_values(
+    #     by=["category", "B tokens"],
+    #     ascending=[True, False],
+    # )
+    def my_key(row):
+        return (key_category(row["category"], df), row["category"], -float(row["B tokens"]))
+
+    df["sort_key"] = df.apply(my_key, axis=1)
+    df = df.sort_values(by="sort_key", ascending=True).drop(columns=["sort_key"])
+
     if args.output_csv:
-        pd.DataFrame(new_data).to_csv(args.output_csv, index=False)
+        df.to_csv(args.output_csv, index=False)
 
     if args.output_html:
         assert args.output_md, "Need to generate the markdown table first"
@@ -674,6 +809,44 @@ if __name__ == "__main__":
                 f_out,
                 # headers="h4",
                 headers=args.headers,
+            )
+
+    if args.output_tex:
+        with open(args.output_tex, "w") as f_out:
+            convert_markdown_table_to_tex(
+                df[df["category"] == ""],
+                f_out,
+                label="tab:datasets_by_language",
+                caption="""
+    Composition of the Lucie Training Dataset, broken down by language.
+""",
+            )
+
+            f_out.write("\n\n")
+
+            convert_markdown_table_to_tex(
+                df[df["category"] != ""],
+                f_out,
+                use_column_as_header="category",
+                label="tab:dataset_composition",
+                caption="""
+    Composition of the Lucie Training Dataset, broken down by category, language and original source.
+    All numbers in this table are available in the CSV file at \\url{https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/metadata/dataset_composition.csv}.
+    Token counts are computed using the tokenizer for Lucie-7B.
+""",
+            )
+
+            f_out.write("\n\n")
+
+            convert_markdown_table_to_tex(
+                df[df["category"] == "Programming"],
+                f_out,
+                label="tab:dataset_composition_programming",
+                caption="""
+    Composition of the Lucie Training Dataset, broken down by category, language and original source.
+    All numbers in this table are available in the CSV file at \\url{https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/metadata/dataset_composition.csv}.
+    Token counts are computed using the tokenizer for Lucie-7B.
+""",
             )
 
     if args.output_main:
@@ -745,9 +918,6 @@ if __name__ == "__main__":
         else:
             languages = [k for k in map_colors.keys() if len(k) == 2]
 
-        print(f"NOCOMMIT {languages=}")
-        print(f"NOCOMMIT {categories=}")
-
         # rainbow_colors_1 = rainbow_colors[: len(rainbow_colors) // 2]
         # rainbow_colors_2 = rainbow_colors[len(rainbow_colors) // 2 :]
         # rainbow_colors = [color for pair in zip(rainbow_colors_1, rainbow_colors_2) for color in pair]
@@ -766,7 +936,7 @@ if __name__ == "__main__":
             count_per_language = {}
             for _, row in df.iterrows():
                 category = row["category"]
-                category_raw = row["category_raw"]
+                category_raw = row["category_raw"] if "category_raw" in row else category
                 if category.startswith("Legislative"):
                     category = "Legislative"
                 language_raw = to_generic_language(row["language"], parallel=False)
@@ -779,6 +949,8 @@ if __name__ == "__main__":
                 if subset == "RedPajama":
                     subset += f"-{row['language']}"
                 weight = get_training_weight(category_raw, language_raw)
+                if row[STAT_NAME]:
+                    row[STAT_NAME] = float(row[STAT_NAME])
                 amount_value = weight * row[STAT_NAME]
                 pie_values.append(amount_value)
                 pie_categories.append(category)
@@ -790,8 +962,8 @@ if __name__ == "__main__":
                     else rainbow_colors[categories.index(category)]
                 )
                 pie_hatches.append(map_hatch.get(category if USE_HATCH_FOR_CATEGORIES else language, "") * 2)
-                count_per_category[category] = count_per_category.get(category, 0) + weight * row[STAT_NAME]
-                count_per_language[language] = count_per_language.get(language, 0) + weight * row[STAT_NAME]
+                count_per_category[category] = count_per_category.get(category, 0) + amount_value
+                count_per_language[language] = count_per_language.get(language, 0) + amount_value
                 rec_hatch = plt.Rectangle((0, 0), 1, 1, fc="white", hatch=pie_hatches[-1], edgecolor="black")
                 rec_color = plt.Rectangle((0, 0), 1, 1, fc=pie_colors[-1], hatch="", edgecolor="black")
                 rec_hatch_and_color = plt.Rectangle(
