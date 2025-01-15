@@ -297,7 +297,7 @@ Lucie-7B LLM and its training dataset
 
 ## Acknowledgements
 
-This work was performed using HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
+This work was performed using HPC resources from GENCI–IDRIS (Grant 2024-GC011015444). We gratefully acknowledge support from GENCI and IDRIS and from Pierre-François Lavallée (IDRIS) and Stephane Requena (GENCI) in particular.
 
 Lucie-7B was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order:
 Agustin Martin Picard (IRT),
@@ -319,11 +319,15 @@ Guokan Shang (MBZUAI),
 Ismaïl Harrando (LINAGORA), 
 Joël Gombin (Opsci), 
 Jordan Ricker (Opsci), 
+Julien Tourille (EDF),
+Manuel Faysse (ILLUIN Technology),
 Olivier Ferret (CEA), 
 Pierre-Carl Langlais (OpSci/Pleias), 
 and 
 Rachel Bawden (INRIA),
 for their helpful input.
+
+We also thank the support teams from IDRIS, in particular Myriam Peyrounette and Hatim Bourfoune, and from Hugging Face, in particular Thomas Wolf, Guilherme Penedo, Elie Bakouch, Haojun Zhao, and Lucain Pouget for their technical guidance.
 
 ## Contact
 
