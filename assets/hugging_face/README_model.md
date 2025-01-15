@@ -329,6 +329,8 @@ for their helpful input.
 
 We also thank the support teams from IDRIS, in particular Myriam Peyrounette and Hatim Bourfoune, and from Hugging Face, in particular Thomas Wolf, Guilherme Penedo, Elie Bakouch, Haojun Zhao, and Lucain Pouget for their technical guidance.
 
+Finally, we thank the entire OpenLLM-France community, whose members have helped in diverse ways. 
+
 ## Contact
 
 contact@openllm-france.fr
