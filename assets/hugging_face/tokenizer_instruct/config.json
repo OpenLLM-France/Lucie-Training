@@ -1,5 +1,4 @@
 {
-  "_name_or_path": "/data-server/models/text/llm/multilang/Lucie-7B/instruct/llama_instruct/recipe2_fullpipe/base",
   "architectures": [
     "LlamaForCausalLM"
   ],
