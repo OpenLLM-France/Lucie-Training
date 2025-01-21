@@ -1456,9 +1456,9 @@ Lucie-7B LLM and its training dataset
 
 ## Acknowledgements
 
-The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order: Evan Dufraisse (CEA), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
+The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order: Evan Dufraisse (CEA List), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
 
-We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
+We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA List), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
 
 Data storage and significant parts of the data processing were made possible through the HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
 
