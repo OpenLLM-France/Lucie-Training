@@ -1,25 +1,25 @@
 | [**subset**](#subset) | **language** | **M docs** | **B words** | **B tokens** | **B chars** |  |
 | - | - | - | - | - | - | - |
 | **TOTAL** |  | 2186.562 | 1356.021 | 2314.862 | 8842.200 |  |
-| **TOTAL** | **French (fr)** | 653.812 | 583.687 | 928.618 | 3619.672 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_french_pie.png) |
-| **TOTAL** | **English (en)** | 554.289 | 412.202 | 611.894 | 2553.541 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_english_pie.png) |
-| **TOTAL** | **code** | 125.769 | 51.306 | 228.954 | 630.749 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_code_pie.png) |
-| **TOTAL** | **German (de)** | 165.915 | 105.609 | 206.610 | 764.779 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_german_pie.png) |
-| **TOTAL** | **Spanish (es)** | 171.651 | 123.857 | 200.825 | 759.457 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_spanish_pie.png) |
-| **TOTAL** | **Italian (it)** | 99.440 | 62.051 | 112.031 | 404.454 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_italian_pie.png) |
-| **TOTAL** | **fr-en** | 410.032 | 17.016 | 25.494 | 107.658 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_fr-en_pie.png) |
+| **TOTAL** | **French (fr)** | 653.812 | 583.687 | 928.618 | 3619.672 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_french_pie.png) |
+| **TOTAL** | **English (en)** | 554.289 | 412.202 | 611.894 | 2553.541 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_english_pie.png) |
+| **TOTAL** | **code** | 125.769 | 51.306 | 228.954 | 630.749 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_code_pie.png) |
+| **TOTAL** | **German (de)** | 165.915 | 105.609 | 206.610 | 764.779 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_german_pie.png) |
+| **TOTAL** | **Spanish (es)** | 171.651 | 123.857 | 200.825 | 759.457 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_spanish_pie.png) |
+| **TOTAL** | **Italian (it)** | 99.440 | 62.051 | 112.031 | 404.454 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_italian_pie.png) |
+| **TOTAL** | **fr-en** | 410.032 | 17.016 | 25.494 | 107.658 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_fr-en_pie.png) |
 | **TOTAL** | **it-en** | 1.901 | 0.100 | 0.151 | 0.638 |  |
 | **TOTAL** | **es-en** | 1.961 | 0.103 | 0.143 | 0.631 |  |
 | **TOTAL** | **de-fr** | 1.792 | 0.0908 | 0.141 | 0.621 |  |
 | ***Category: Web*** |||||||
-| [**RedPajama**](#redpajama-v2) | **French (fr)** | 640.770 | 477.758 | 741.023 | 2974.596 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-french_histogram.png) |
-| [**RedPajama**](#redpajama-v2) | **German (de)** | 162.779 | 103.078 | 201.371 | 747.631 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-german_histogram.png) |
-| [**RedPajama**](#redpajama-v2) | **Spanish (es)** | 169.447 | 121.751 | 197.125 | 746.984 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-spanish_histogram.png) |
-| [**RedPajama**](#redpajama-v2) | **Italian (it)** | 97.324 | 60.194 | 108.416 | 393.012 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_redpajama-italian_histogram.png) |
-| [**FineWebEdu**](#finewebedu) | **English (en)** | 421.209 | 327.453 | 467.837 | 2018.215 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_finewebedu-english_histogram.png) |
+| [**RedPajama**](#redpajama-v2) | **French (fr)** | 640.770 | 477.758 | 741.023 | 2974.596 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-french_histogram.png) |
+| [**RedPajama**](#redpajama-v2) | **German (de)** | 162.779 | 103.078 | 201.371 | 747.631 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-german_histogram.png) |
+| [**RedPajama**](#redpajama-v2) | **Spanish (es)** | 169.447 | 121.751 | 197.125 | 746.984 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-spanish_histogram.png) |
+| [**RedPajama**](#redpajama-v2) | **Italian (it)** | 97.324 | 60.194 | 108.416 | 393.012 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_redpajama-italian_histogram.png) |
+| [**FineWebEdu**](#finewebedu) | **English (en)** | 421.209 | 327.453 | 467.837 | 2018.215 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_finewebedu-english_histogram.png) |
 | ***Category: Newspaper*** |||||||
 | [**GallicaPress**](#gallicapress) | **French (fr)** | 3.205 | 67.496 | 121.606 | 408.882 |  |
-| [**AmericanStories**](#americanstories) | **English (en)** | 59.420 | 8.902 | 14.313 | 50.844 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_americanstories-english_histogram.png) |
+| [**AmericanStories**](#americanstories) | **English (en)** | 59.420 | 8.902 | 14.313 | 50.844 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_americanstories-english_histogram.png) |
 | ***Category: Technical*** |||||||
 | [**PeS2o**](#pes2o) | **English (en)** | 38.972 | 42.296 | 65.365 | 268.963 |  |
 | [**HAL**](#hal) | **French (fr)** | 0.349 | 9.356 | 16.224 | 58.308 |  |
@@ -67,11 +67,11 @@
 | [**Pile (StackExchange)**](#pile-uncopyrighted) | **English (en)** | 15.269 | 4.534 | 10.275 | 33.609 |  |
 | [**Pile (Ubuntu_IRC)**](#pile-uncopyrighted) | **English (en)** | 0.0104 | 0.867 | 2.159 | 5.610 |  |
 | ***Category: Dialogue*** |||||||
-| [**Claire**](#claire-french-and-english) | **English (en)** | 0.949 | 0.818 | 1.161 | 4.709 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-english_pie.png) |
-| [**Claire**](#claire-french-and-english) | **French (fr)** | 0.0393 | 0.210 | 0.311 | 1.314 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/fig_distribution_claire-french_pie.png) |
+| [**Claire**](#claire-french-and-english) | **English (en)** | 0.949 | 0.818 | 1.161 | 4.709 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_claire-english_pie.png) |
+| [**Claire**](#claire-french-and-english) | **French (fr)** | 0.0393 | 0.210 | 0.311 | 1.314 | [composition details](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/figures/pie_distribution_claire-french_pie.png) |
 | [**YouTube**](#youtube) | **French (fr)** | 0.0375 | 0.145 | 0.336 | 1.003 |  |
 | [**Stac**](#stac) | **English (en)** | 0.0000450 | 0.0000529 | 0.000121 | 0.000327 |  |
-| ***Category: Multilingual Parallel Corpora*** |||||||
+| ***Category: Multilingual Parallel*** |||||||
 | [**CroissantAligned**](#croissantaligned) | **fr-en** | 408.029 | 16.911 | 25.351 | 107.003 |  |
 | [**EuroparlAligned**](#europarl-monolingual-and-parallel) | **it-en** | 1.901 | 0.100 | 0.151 | 0.638 |  |
 | [**EuroparlAligned**](#europarl-monolingual-and-parallel) | **fr-en** | 2.003 | 0.105 | 0.143 | 0.655 |  |

@@ -32,7 +32,7 @@ def process_results(data):
     out = []
     for benchmark, results in data.items():
         metric = None
-        if ("arc" in benchmark) or ("hellaswag" in benchmark):
+        if ("arc_" in benchmark) or ("hellaswag" in benchmark):
             metric = "acc_norm,none"
         elif (
             ("mmlu" == benchmark)

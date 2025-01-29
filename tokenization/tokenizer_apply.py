@@ -11,7 +11,6 @@ import sys
 import time
 
 import regex as re
-
 from data import decompose_datasets, get_datasets
 
 rootdir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -34,7 +33,7 @@ class Encoder:
         tokenizer = Encoder.tokenizer.tokenizer.backend_tokenizer
         return tokenizer.normalizer.normalize_str(text)
 
-    def encode(self, text, key=None, max_len_at_once=None, use_eod_for_padding=True):
+    def encode(self, text, key=None, max_len_at_once=None, use_eod_for_padding=False):
         pad_to = self.args.pad_to
         if key is None:
             key = self.args.json_keys[0]
@@ -366,6 +365,12 @@ def get_args():
     group.add_argument("--vocab-file", type=str, default=None, help="Path to the vocab file")
     group.add_argument("--vocab-size", default=786, help="size of vocab for use with NullTokenizer")
     group.add_argument("--merge-file", type=str, default=None, help="Path to the BPE merge file (if necessary).")
+    group.add_argument(
+        "--add-bos-token",
+        choices=["True", "False", "None"],
+        default="None",  # Set the default value here
+        help="Set add bos token to True, False, or None",
+    )
     group.add_argument("--append-eod", action="store_true", help="Append an <eod> token to the end of a document.")
     group = parser.add_argument_group(title="output data")
     group.add_argument("--output-folder", type=str, default="tokenized_data", help="Output folder")
@@ -398,6 +403,14 @@ def get_args():
     group.add_argument("--log-interval", type=int, default=1000, help="Interval between progress updates")
     args = parser.parse_args()
 
+    # Convert string to proper type
+    if args.add_bos_token == "True":
+        args.add_bos_token = True
+    elif args.add_bos_token == "False":
+        args.add_bos_token = False
+    elif args.add_bos_token == "None":
+        args.add_bos_token = None
+
     args.keep_empty = False
 
     # some default/dummy values for the tokenizer
@@ -426,6 +439,9 @@ def main():
         import transformers
 
         tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer_name_or_path)
+        if args.add_bos_token is not None:
+            tokenizer.add_bos_token = args.add_bos_token
+            args.tokenizer_name_or_path = tokenizer_folder
         tokenizer.save_pretrained(tokenizer_folder)
 
     args.remove_jsonl = "tmp" in args.jsonl_folder
@@ -437,6 +453,7 @@ def main():
         for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
     )
 
+    print(args)
     task = TokenizationTask(args)
 
     print("=" * 20)
