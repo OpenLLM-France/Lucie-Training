@@ -119,18 +119,11 @@ if __name__ == "__main__":
     df_short = df[["prefix_short", "new_ratio_short"]]
     df_short.columns = ["prefix", "new_ratio"]
 
-    if args.verbose:
-        print(f"Proportion of docs longer than 4k: {df_long['new_ratio'].sum()}")
-
     cat_df = pd.concat([df_long, df_short]).dropna()
-    cat_df = cat_df.sort_values("new_ratio", ascending=False)
+    cat_df = cat_df.sort_values("new_ratio")
 
-    # Remove datasets with number of estimated tokens lower than 32k!
-    cat_df["token_estimation"] = cat_df["new_ratio"].apply(lambda x: x * 5e9)
     if args.verbose:
-        print("\n Datasets with low nnumber of tokens")
-        print(cat_df[cat_df["token_estimation"] < 32000][["prefix", "token_estimation"]])
-    cat_df = cat_df[cat_df["token_estimation"] > 32000]
+        print(f"Prop docs longer than 4k: {df_long['new_ratio'].sum()}")
 
     num_colors = 20
     # chosen_colors = [plt.cm.rainbow(i / num_colors) for i in range(num_colors)]
@@ -163,11 +156,6 @@ if __name__ == "__main__":
     for _, row in cat_df.iterrows():
         prefix = os.path.join(args.start_path, row["prefix"])
         new_ratio = row["new_ratio"]
-        # if 'Claire--fr--ESLO_text_document' in prefix:
-        #     if args.verbose:
-        #         print('\n\nSMALL')
-        #         print(new_ratio)
-        #     break
         ratios[norm_name(prefix)] = float(new_ratio)
         colors[norm_name(prefix)] = color(prefix)
         # Print the weight (expected output)

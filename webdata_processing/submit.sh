@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --hint=nomultithread        
 #SBATCH --account=qgz@cpu
-#SBATCH --time=02:00:00             
-#SBATCH --qos=qos_cpu-dev
+#SBATCH --time=10:00:00             
+#SBATCH --qos=qos_cpu-t3
 
 snapchots=(
     2014-15
@@ -92,27 +92,38 @@ snapchots=(
 
 ###############
 ### BASE PROCESSING
-# ./base.sh 2023-14 fr # for testing
-
-# for snapchot in "${snapchots[@]}"
-# do
-#     ./base.sh $snapchot fr
-# done
-
 # snapchots_tail=("${snapchots[@]: -10}")
 # for snapchot in "${snapchots_tail[@]}"
 # do
+#     ./base.sh $snapchot fr
 #     ./base.sh $snapchot es
 #     ./base.sh $snapchot de
 #     ./base.sh $snapchot it
 # done
 
-# ./base.sh 2022-33 it 
+# snapchots_head=("${snapchots[@]:0:${#snapchots[@]}-10}")
+# for snapchot in "${snapchots_head[@]}"
+# do
+#     ./base.sh $snapchot fr
+# done
+
+###############
+### URL FILTERING & PII
+for snapchot in "${snapchots[@]}"
+do
+    ./domains.sh $snapchot fr
+done
+
+snapchots_tail=("${snapchots[@]: -10}")
+for snapchot in "${snapchots_tail[@]}"
+do
+    ./domains.sh $snapchot es
+    ./domains.sh $snapchot de
+    ./domains.sh $snapchot it
+done
 
 ###############
 ### MINHASH
-# ./minhash.sh 2023-14 fr
-
 # for snapchot in "${snapchots[@]}"
 # do
 #     ./minhash.sh $snapchot fr
@@ -125,26 +136,3 @@ snapchots=(
 #     ./minhash.sh $snapchot de
 #     ./minhash.sh $snapchot it
 # done
-
-
-###############
-### MINHASH Filtering v2
-# ./minhash_filtering.sh 2014-15 fr
-
-# for snapchot in "${snapchots[@]}"
-# do
-#     ./minhash_filtering.sh $snapchot fr
-# done
-
-# snapchots_tail=("${snapchots[@]: -10}")
-# for snapchot in "${snapchots_tail[@]}"
-# do
-#     ./minhash_filtering.sh $snapchot es
-#     ./minhash_filtering.sh $snapchot de
-#     ./minhash_filtering.sh $snapchot it
-# done
-
-###############
-### MINHASH Filtering v2
-bash additional_filtering.sh 2023-14 fr
-

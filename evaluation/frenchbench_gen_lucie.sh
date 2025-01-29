@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Load necessary modules and activate environment
+module purge
+module load arch/h100
+module load anaconda-py3/2024.06
+conda activate $SCRATCH/envs/evaluation
+
 # Paths
 BASE_CHECKPOINT_PATH=$ALL_CCFRSCRATCH/trained_models/Lucie
 BASE_OUTPUT_PATH=out/french_bench_gen/lucie
@@ -32,58 +38,13 @@ run_evaluation() {
 }
 
 # Evaluate the final checkpoint
-# run_evaluation "${BASE_CHECKPOINT_PATH}/pretrained/transformers_checkpoints/global_step753851" \
-#     $BASE_LUCIE_TOKENIZER_PATH "${OUTPUT_PREFIX}753851"
-
-# Evaluate extension checkpoint
-EXTENSION_CHECKPOINT=${BASE_CHECKPOINT_PATH}/extension_rope20M/transformers_checkpoints/global_step1220
-EXTENSION_OUTPUT=__lustre__fsn1__projects__rech__qgz__commun__trained_models__Lucie__extension_rope20M__transformers_checkpoints__global_step1220
-run_evaluation $EXTENSION_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $EXTENSION_OUTPUT
-
+run_evaluation "${BASE_CHECKPOINT_PATH}/pretrained/transformers_checkpoints/global_step753851" \
+    $BASE_LUCIE_TOKENIZER_PATH "${OUTPUT_PREFIX}753851"
 
 # Stage 2
-# for i in {1..4}; do
-#     ANNEALING_CHECKPOINT=${BASE_CHECKPOINT_PATH}/stage2/mix_${i}/transformers_checkpoints/global_step1192
-#     ANNEALING_OUTPUT=__lustre__fsn1__projects__rech__qgz__commun__trained_models__Lucie__stage2__mix_${i}__transformers_checkpoints__global_step1192
-#     run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $ANNEALING_OUTPUT
-# done
-for i in {5..6}; do
-    ANNEALING_CHECKPOINT=${BASE_CHECKPOINT_PATH}/stage2/mix_${i}/transformers_checkpoints/global_step1220
-    ANNEALING_OUTPUT=__lustre__fsn1__projects__rech__qgz__commun__trained_models__Lucie__stage2__mix_${i}__transformers_checkpoints__global_step1220
-    run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $ANNEALING_OUTPUT
-done
-
-# Instruction Assistant only
-INST_LUCIE_TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_instruction_4kpad/tokenizer
-INST_OUTPUT='empty'
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction_assistant_only/mix_1/transformers_checkpoints/global_step208
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction_assistant_only/mix_2/transformers_checkpoints/global_step525
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction_assistant_only/mix_3/transformers_checkpoints/global_step911
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction_assistant_only/mix_4/transformers_checkpoints/global_step317
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction_assistant_only/mix_5/transformers_checkpoints/global_step615
-run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# Instruction
-# INST_LUCIE_TOKENIZER_PATH=/lustre/fsn1/projects/rech/qgz/commun/preprocessed_data/Lucie/lucie_tokens_65k_instruction_4kpad/tokenizer
-# INST_OUTPUT='empty'
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction/mix_1/transformers_checkpoints/global_step209
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction/mix_2/transformers_checkpoints/global_step526
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
-# INST_CHECKPOINT=${BASE_CHECKPOINT_PATH}/instruction/mix_3/transformers_checkpoints/global_step912
-# run_evaluation $INST_CHECKPOINT $INST_LUCIE_TOKENIZER_PATH $INST_OUTPUT
-
+ANNEALING_CHECKPOINT=${BASE_CHECKPOINT_PATH}/stage2/transformers_checkpoints/global_step1192
+ANNEALING_OUTPUT=__lustre__fsn1__projects__rech__qgz__commun__trained_models__Lucie__stage2__transformers_checkpoints__global_step1192
+ANNEALING_OUTPUT='empty'
+run_evaluation $ANNEALING_CHECKPOINT $BASE_LUCIE_TOKENIZER_PATH $ANNEALING_OUTPUT
 
 wait

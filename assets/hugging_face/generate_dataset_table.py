@@ -160,38 +160,14 @@ def plot_extra_distribution(extra, name=None):
     # Clear figure
     plt.clf()
     if graph_type == "histogram":
-        fig, ax = plt.subplots()
         # Histogram of years
-        bars = ax.bar(x=[val for _, _, _, val in extra_list], height=ratios, width=0.8)
+        plt.bar([val for _, _, _, val in extra_list], ratios, width=1)
         plt.ylabel("Percentage")
         if suffix:
-            plt.xlabel(suffix.split()[-1].capitalize())
-
+            plt.xlabel(suffix.split()[-1])
         # Avoid non-integer xticks
         (xvalues, xlabels) = plt.xticks()
         plt.xticks([v for v in xvalues if int(v) == v])
-
-        # Axis formatting.
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
-        ax.spines["bottom"].set_color("#DDDDDD")
-        ax.tick_params(bottom=False, left=False)
-        ax.set_axisbelow(True)
-        ax.yaxis.grid(True, color="#EEEEEE")
-        ax.xaxis.grid(False)
-
-        # Add labels to bars
-        bar_color = bars[0].get_facecolor()
-        for bar in bars:
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + 0.3,
-                round(bar.get_height(), 1),
-                horizontalalignment="center",
-                color=bar_color,
-                weight="bold",
-            )
     else:
         # Pie chart
         labels = [val for _, _, _, val in extra_list]

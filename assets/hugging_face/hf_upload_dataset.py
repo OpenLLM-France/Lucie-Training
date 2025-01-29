@@ -16,11 +16,11 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__f
 sys.path.append(parent_dir)
 sys.path.append(os.path.join(parent_dir, "tokenization"))
 
-from data import decompose_datasets, get_datasets  # noqa: E402
 from tokenizer_apply import dataset_to_key_value  # noqa: E402
 
 from assets.compile_stats import to_language_name_subset  # noqa: E402 Module level import not at top of file
 from assets.hugging_face.hf_upload_model import connect_to_huggingface  # noqa: E402
+from data import decompose_datasets, get_datasets  # noqa: E402
 
 _UNION_KEY = "__UNION__"
 _DEFAULT_VALUE = ""  # Putting None cause some cast issues for datasets without the field
@@ -101,15 +101,27 @@ def to_source_and_id_func(name, **kwargs):
     update_dict_func = None
 
     # Add default id-ing to some datasets that miss "id" field
-    if main in ["Claire", "ValidatedYouTube", "YouTube", "OtherFr", "Europarl", "EuroparlAligned", "Stac"]:
+    _other_fr = ["OtherFr", "LEGI", "AmendementsParlement", "InterventionsParlement", "QuestionsEcritesParlement"]
+    if main in _other_fr + [
+        "Claire",
+        "ValidatedYouTube",
+        "YouTube",
+        "Europarl",
+        "EuroparlAligned",
+        "Stac",
+    ]:
 
         def update_dict_func(x, idx, _):
             out = {}
-            if subset:
+            if subset and main not in _other_fr:
                 out = {
                     "subset": subset,
                 }
-            out["idx_row"] = idx
+            if subset not in ["LEGI", "QuestionsEcritesParlement"] and main not in [
+                "LEGI",
+                "QuestionsEcritesParlement",
+            ]:
+                out["idx_row"] = idx
             return out
 
     if source is None:
@@ -118,13 +130,6 @@ def to_source_and_id_func(name, **kwargs):
             ("Claire", "en"): "Claire",  # "OpenLLM-France/Claire-Dialogue-English-0.1",
             ("ValidatedYouTube", "fr"): "YouTube",  # "LeVoiceLab/YouTube.fr",
         }.get((main, lan))
-    if source is None:
-        source = {
-            ("OtherFr", "questions_ecrites_parlement"): "QuestionsEcritesParlement",
-            ("OtherFr", "interventions_parlement"): "InterventionsParlement",
-            ("OtherFr", "LEGI"): "LEGI",
-            ("OtherFr", "amendements_parlement"): "AmendementsParlement",
-        }.get((main, subset))
     if main == "Wikiother":
         source = subset.split(":")[0]
         source = source[0].upper() + source[1:]

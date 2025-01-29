@@ -4,7 +4,7 @@
         "source": "AmendementsParlement",
         "id": "{\"idx_row\": 0}",
         "date": "2007-08-01 00:00:00",
-        "extra": "{\"texteloi_id\": \"109\", \"sujet\": \"Article 6\", \"sort\": \"Adopté\", \"signataires\": \"le Gouvernement\", \"expose\": \"Suppression du gage.\", \"loi\": \"Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat\", \"subset\": \"amendements_parlement\"}",
+        "extra": "{\"texteloi_id\": \"109\", \"sujet\": \"Article 6\", \"sort\": \"Adopté\", \"signataires\": \"le Gouvernement\", \"expose\": \"Suppression du gage.\", \"loi\": \"Rapport  sur les dispositions restant en discussion chargée de proposer un texte dus dispositions restant en discussion du projet de loi en faveur du travail de l'emploi et du pouvoir d'achat\"}",
         "quality_signals": "{\"character_count\": 37, \"word_count\": 6}"
     },
     "AmericanStories": {
@@ -25,7 +25,8 @@
     "CroissantAligned": {
         "language": "en,fr",
         "source": "CroissantAligned",
-        "id": "{\"id\": \"-8403949827142368011\", \"dataset_id\": \"UnbabelFrEn\"}"
+        "id": "{\"id\": \"-8403949827142368011\", \"dataset_id\": \"UnbabelFrEn\"}",
+        "extra": "{\"text_en\": \"The Panel has decided to request that the federal Minister of the Environment and the BC Minister of Environment amend the Panel's Terms of Reference to extend the date for completion of the Panel review process and for delivery of the Panel's report as follows:\", \"text_fr\": \"La Commission a décidé de demander à la ministre fédérale de l'Environnement et au ministre de l'Environnement de la Colombie-Britannique de modifier son mandat afin que la date de la fin de son processus d'examen soit reportée et que les modalités de dépôt de son rapport prévoient :\"}"
     },
     "DiscoursPublics": {
         "language": "fr",
@@ -45,7 +46,7 @@
         "language": "it,en",
         "source": "EuroparlAligned",
         "id": "{\"idx_row\": 0}",
-        "extra": "{\"subset\": \"-en:0-1parquet\"}"
+        "extra": "{\"text_1\": \"4. Ratifizierung und Umsetzung der aktualisierten IAO-Übereinkommen (Abstimmung)\", \"text_2\": \"4. Ratification et mise en œuvre des conventions de l'OIT mises à jour (vote)\", \"lan_1\": \"de\", \"lan_2\": \"fr\", \"subset\": \"de-fr\"}"
     },
     "Eurovoc": {
         "language": "en",
@@ -97,6 +98,21 @@
         "quality_signals": "{\"character_count\": 5437, \"word_count\": 773, \"ccnet_language_score\": [0.9890000224113464], \"ccnet_perplexity\": [129.3000030517578], \"fasttext_language\": [\"fr\"]}",
         "extra": "{\"path\": \"01/hal-hceres.archives-ouvertes.fr-hceres-02039725-document.txt\"}"
     },
+    "InterventionsParlement" : {
+        "language": "fr",
+        "source": "InterventionsParlement",
+        "id": "{\"idx_row\": 0}",
+        "date": "2007-07-03 00:00:00",
+        "quality_signals": "{\"character_count\": 62, \"word_count\": 10}",
+        "extra": "{\"intervenant\": \"Bernard Accoyer\"}"
+    },
+    "LEGI" : {
+        "language": "fr",
+        "source": "LEGI",
+        "id": "Code de commerce_2000-09-21",
+        "date": "2000-09-21",
+        "quality_signals": "{\"character_count\": 593, \"word_count\": 97}"
+    },
     "MathPile": {
         "language": "en",
         "source": "MathPile",
@@ -130,6 +146,14 @@
         "id": "bavf_0244-7002_1884_num_38_1_14135",
         "date": "1884",
         "quality_signals": "{\"word_count\": 1377, \"character_count\": 8277}"
+    },
+    "QuestionsEcritesParlement" : {
+        "language": "fr",
+        "source": "QuestionsEcritesParlement",
+        "id": "0",
+        "date": "2008-12-23 00:00:00",
+        "quality_signals": "{\"character_count\": 4564, \"word_count\": 668}",
+        "extra": "{\"depute\": \"Richard Mallié\", \"question\": \"M. Richard Mallié attire l'attention de M. le ministre de l'agriculture et de la pêche sur la forte suspicion qui pèse sur la responsabilité des pesticides neurotoxiques systémiques dans l'effondrement du nombre de colonies d'abeilles. L'application du principe de précaution devrait normalement conduire à l'interdiction totale et immédiate de ce type de pesticides, dont fait partie le cruiser, pour lequel une demande de renouvellement provisoire d'autorisation est déposée. En conséquence, il souhaite connaître la position du Gouvernement sur ce sujet, et notamment ce qu'il entend faire concernant le pesticide cruiser.\", \"ministre\": \"Agriculture et pêche / Agriculture et pêche\", \"reponse\": \"Le 14 novembre 2008, l'Agence française de sécurité sanitaire des aliments (AFSSA) a rendu un avis favorable au renouvellement de l'autorisation de la préparation insecticide Cruiser. Conscient toutefois des inquiétudes exprimées par certains apiculteurs face à ce produit, le ministre de l'agriculture et de la pêche a souhaité, avant de prendre une décision, rencontrer les différentes parties concernées : associations de protection de l'environnement, représentants de la profession apicole, organisations professionnelles agricoles, afin de recueillir leurs points de vue sur le dispositif de l'année écoulée. Dans le prolongement de ces rencontres et sur le fondement de l'avis rendu par l'AFSSA, il a décidé le 17 décembre dernier de renouveler l'autorisation pour 2009 de la préparation Cruiser. Cette autorisation est assortie de conditions restrictives et sous réserve d'un renforcement du suivi de son utilisation. Les conditions d'enrobage et d'utilisation sont strictement encadrées. Un arrêté ministériel précisera les contrôles à opérer vis-à-vis du processus d'enrobage des semences (dit « plan poussière »). L'utilisation des semences enrobées avec cette préparation n'est possible sur une même parcelle uniquement qu'une année sur trois. L'autorisation est limitée aux semences de maïs ensilage, grain et porte-graine femelle. Les agriculteurs sont tenus de mettre en place des déflecteurs sur les semoirs afin de limiter les émissions de poussières lors des semis. Les semis des semences enrobées de Cruiser doivent être effectués au plus tard le 15 mai 2009. En tenant compte de l'expérience de 2008, le protocole de suivi de l'autorisation est également renforcé. Le plan de surveillance est étendu à six régions au lieu de trois en 2008. Les ruchers faisant l'objet d'un suivi dans le cadre de ce plan seront installés plus précocement et leur nombre sera augmenté. Le nombre des mesures des poussières émises par extraction d'air suivant le procédé ORAMIP sera également augmenté et la traçabilité des parcelles améliorée. Ce protocole de suivi est une innovation en termes de suivi des effets non intentionnels sur l'environnement d'un produit phytosanitaire. Il s'inscrit dans la logique du plan « Ecophyto 2018 » qui prévoit la détection et l'identification des éventuelles conséquences de l'utilisation des phytosanitaires sur l'environnement. Le pilotage du plan de surveillance sera assuré par un comité placé auprès du cabinet du ministre de l'agriculture et de la pêche, associant toutes les associations qui le souhaiteront dans le cadre d'un suivi régulier et transparent. L'autorisation sera immédiatement suspendue si les éléments de suivi ou toute circonstance particulière le justifiaient. Par ailleurs, il a été décidé de charger la brigade nationale d'enquête vétérinaire, conformément aux préconisations du rapport du député Martial Saddier, de collecter, harmoniser et centraliser toutes les observations permettant de déterminer les raisons de la mortalité de ruchers sur l'ensemble du territoire national ; de demander à l'Institut national de la recherche agronomique de faire le bilan de l'état des recherches sur les méthodes agronomiques alternatives et évaluer les pratiques des autres pays européens pour lutter contre le taupin. Les résultats de cette étude sont attendus d'ici à trois mois. Enfin à l'occasion du renouvellement de son comité d'experts spécialisé sur l'évaluation des produits phytosanitaires, les associations de protection de l'environnement et les représentants de la profession apicole pourront proposer des candidatures d'experts apidologues à l'AFSSA. Les entreprises de phytopharmacie ont été invitées à intensifier leur recherche pour trouver des solutions de substitution afin de sortir de l'impasse technique dans laquelle se trouvent actuellement les agriculteurs qui doivent protéger leurs cultures contres les ravages liés aux insectes du sol dont le taupin.\", \"theme\": \"produits dangereux / insecticides / utilisation. conséquences. apiculture\"}"
     },
     "RedPajama": {
         "language": "fr",

@@ -47,10 +47,6 @@ if __name__ == "__main__":
             input_path = os.path.join(input_folder, file)
             if "AmericanStories" in input_path:
                 output_path = re.sub(r"[\-\d]*\d([a-zA-Z_]+).idx$", r"\1", input_path)
-            elif "Flanv2--en" in input_path:
-                output_path = "Flanv2--en_text_document"
-            elif "MathPile" in input_path:
-                output_path = "MathPile_text_document"
             else:
                 output_path = re.sub(r"\-*\d*\d([a-zA-Z_]+).idx$", r"\1", input_path)
             input_path = os.path.splitext(input_path)[0]
