@@ -1340,10 +1340,24 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 <!-- * <u>Citation</u>: No paper found. -->
 
 #### YouTube
-* <u>Source</u>: Corpus contributed by LINAGORA Labs (OpenLLM-France) and [LeVoiceLab](https://www.levoicelab.org/).
+* <u>Source</u>: Corpus contributed by LINAGORA Labs and [LeVoiceLab](https://www.levoicelab.org/).
 * <u>Extracted from</u>: [YouTube](https://www.youtube.com/). <!-- License: TODO? -->
 * <u>Description</u>: French subtitles from videos published with permissive licenses on YouTube. <!-- TODO -->
-
+* <u>Extraction pipeline description</u>:
+  * **Searching for YouTube videos likely in French:** Based on searches generated automatically from random sequences of words extracted from a corpus of French journalistic articles (initially obtained through a web-crawling tool applied to publicly accessible news and media sites such as Huffington Post, 20 Minutes, Le Parisien, Actu, Numerama, Slate, etc.).  
+  Selection of videos with subtitles labeled as "French," excluding those marked as "automatically generated."  
+  *At this stage: 52,778 videos selected, corresponding to 10,654 hours of audio.*  
+  * **Selection of videos whose subtitle language classification confirms French with a certain confidence index:**  
+  *At this stage: 51,934 videos selected, corresponding to 10,425 hours of audio.*  
+  * **Selection of videos whose subtitles contain uppercase, lowercase, and punctuation marks:**  
+  This step filters out automatically generated subtitles created with speech recognition tools.  
+  *At this stage: 45,488 videos selected, corresponding to 8,904 hours of audio.*  
+  * **Extraction of audio tracks from the selected videos.**  
+  * **Automatic formatting of transcripts obtained from subtitles:** Removal of emojis, sound event annotations in brackets (like "[Music]") and extra text such as "subtitled by XXX."  (on last seconds of the video).
+  * **Selection of videos where an automatic speech recognition tool correctly transcribes the first 30 seconds with a minimum recall and precision rate:**  
+  *At this stage: 37,513 videos selected, corresponding to 7,541 hours of audio.*  
+  * **Realignment of the transcript:** Ensuring accurate timestamps in the transcriptions based on the subtitles and excluding audios where alignment fails.  
+  *At this stage: 36,618 videos selected, corresponding to 6,729 hours of audio.* 
 
 
 ## Example use in Python
@@ -1439,15 +1453,15 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="
 
 When using the Lucie Training Dataset, please cite the following paper:
 
-✍ Olivier Gouvert, Julie Hunter, Jérôme Louradour,
-Evan Dufraisse, Yaya Sy, Pierre-Carl Langlais, Anastasia Stasenko,
-Laura Rivière, Christophe Cerisara, Jean-Pierre Lorré (2025)
-Lucie-7B LLM and its training dataset
+✍ Olivier Gouvert, Julie Hunter, Jérôme Louradour, Christophe Cerisara,
+Evan Dufraisse, Yaya Sy, Laura Rivière, Jean-Pierre Lorré (2025)
+The Lucie-7B LLM and the Lucie Training Dataset:
+      open resources for multilingual language generation
 ```bibtex
 @misc{openllm2023claire,
       title={The Lucie-7B LLM and the Lucie Training Dataset:
       open resources for multilingual language generation}, 
-      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Evan Dufraisse and Yaya Sy and Pierre-Carl Langlais and Anastasia Stasenko and Laura Rivière and Christophe Cerisara and Jean-Pierre Lorré},
+      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Christophe Cérisara and Evan Dufraisse and Yaya Sy and Laura Rivière and Jean-Pierre Lorré},
       year={2025},
       archivePrefix={arXiv},
       primaryClass={cs.CL}
@@ -1456,9 +1470,9 @@ Lucie-7B LLM and its training dataset
 
 ## Acknowledgements
 
-The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) and the [OpenLLM-France](https://www.openllm-france.fr/) community, including in alphabetical order: Evan Dufraisse (CEA List), Olivier Gouvert (LINAGORA), Julie Hunter (LINAGORA), Pierre-Carl Langlais (OpSci/Pleias), Jean-Pierre Lorré (LINAGORA), Jérôme Louradour (LINAGORA), Michel-Marie Maudet (LINAGORA), Laura Rivière (LINAGORA), and Anastasia Stasenko (OpSci/Pleias).
+The Lucie Training Dataset was created by members of [LINAGORA](https://labs.linagora.com/) (Olivier Gouvert, Julie Hunter, Jérôme Louradour, Jean-Pierre Lorré) and the [OpenLLM-France](https://www.openllm-france.fr/) community.
 
-We thank Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Olivier Ferret (CEA List), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
+We thank in particular Rachel Bawden (INRIA), Clément Bénesse (Opsci), Christophe Cérisara (LORIA), Evan Dufraisse (CEA List), Olivier Ferret (CEA List), Joöl Gombin (Opsci), Ismaïl Harrando (LINAGORA), Jordan Ricker (Opsci), Guokan Shang (MBZUAI), and Yaya Sy (LORIA) for their helpful input.
 
 Data storage and significant parts of the data processing were made possible through the HPC resources from GENCI–IDRIS (Grant 2024-GC011015444).
 
