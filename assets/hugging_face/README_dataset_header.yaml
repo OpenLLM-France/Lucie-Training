@@ -349,10 +349,6 @@ configs:
   data_files:
   - path: data/v*/natural/*/PeS2o/*s2orc.parquet
     split: train
-- config_name: Persee
-  data_files:
-  - path: data/v*/natural/*/Persee/*.parquet
-    split: train
 - config_name: Pile
   data_files:
   - path: data/v*/natural/*/Pile/*.parquet
