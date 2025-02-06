@@ -2327,6 +2327,40 @@ class DataIteratorTulu3(DataIterator):
         )
 
 
+class DataIteratorPersonasMath(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"PersonasMath:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "allenai/tulu-3-sft-personas-math",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            filter_fn=lambda x: filter_conversations_by_keyword(x, "messages"),
+            **kwargs,
+        )
+
+
+class DataIteratorPersonasMathGrade(DataIterator):
+    def __init__(self, language="en", streaming=True, **kwargs):
+        name = f"PersonasMathGrade:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "allenai/tulu-3-sft-personas-math-grade",
+                streaming=streaming,
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(data, "messages"),
+            filter_fn=lambda x: filter_conversations_by_keyword(x, "messages"),
+            **kwargs,
+        )
+
+
 def preproc_magpie(data):
     messages = []
     for conv in data["conversations"]:
