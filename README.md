@@ -15,7 +15,7 @@
   * [From Megratron-Deepspeed to transformers](#from-megratron-deepspeed-to-transformers)
   * [From LORA (PEFT) to full weights](#from-lora-peft-to-full-weights)
   * [Quantize models](#quantize-models)
-
+* [Acknowledgment/Support](#acknowledgmentsupport)
 
 ## Setup
 
@@ -250,3 +250,11 @@ python3 convert_hf_to_gguf.py /path/to/model/transformers/ --outfile custom-name
 ./llama-quantize custom-name-f16.gguf custom-name-q4_k_m.gguf q4_k_m
 ```
 
+## Acknowledgment/Support
+
+This repository is maintained by [OpenLLM-France](https://github.com/OpenLLM-France), a group of researchers and engineers working on large language models:
+* [Jérôme Louradour](https://github.com/Jeronymous) -- support him on [Buy Me A Coffee](https://buymeacoffee.com/jeronymous)
+* [Olivier Gouvert](https://github.com/Oligou)
+* [Julie Hunter](https://github.com/jhunter19)
+* [Yaya Sy](https://github.com/yaya-sy)
+* [Christophe Cerisara](https://github.com/cerisara)
