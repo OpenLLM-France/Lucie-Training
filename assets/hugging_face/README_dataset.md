@@ -1458,7 +1458,7 @@ Evan Dufraisse, Yaya Sy, Laura Rivière, Jean-Pierre Lorré (2025)
 The Lucie-7B LLM and the Lucie Training Dataset:
       open resources for multilingual language generation
 ```bibtex
-@misc{openllm2023claire,
+@misc{openllm2025lucie,
       title={The Lucie-7B LLM and the Lucie Training Dataset:
       open resources for multilingual language generation}, 
       author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Christophe Cérisara and Evan Dufraisse and Yaya Sy and Laura Rivière and Jean-Pierre Lorré},
