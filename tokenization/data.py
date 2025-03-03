@@ -2263,7 +2263,7 @@ class DataIteratorHardCoded(DataIterator):
     def __init__(self, language="fr", **kwargs):
         name = f"HardCoded:{language}"
         language_map = {"fr": "french", "en": "english"}
-        dataset_name = f"hard_coded/tulu2_openllm_{language_map[language]}.jsonl"
+        dataset_name = f"hard_coded/openllm_{language_map[language]}.jsonl"
         print(INSTRUCT_DATA_PATH)
         print(dataset_name)
         DataIterator.__init__(
@@ -2359,6 +2359,32 @@ class DataIteratorPersonasMathGrade(DataIterator):
             filter_fn=lambda x: filter_conversations_by_keyword(x, "messages"),
             **kwargs,
         )
+
+
+class DataIteratorOpenHermes(DataIterator):
+    def __init__(self, language="en", **kwargs):
+        name = f"OpenHermes:{language}"
+        DataIterator.__init__(
+            self,
+            datasets.load_dataset(
+                "teknium/OpenHermes-2.5",
+                split="train",
+            ),
+            name=name,
+            preprocess=lambda data: apply_chat_template(
+                DataIteratorOpenHermes.rename_conversations(data), "conversations"
+            ),
+            filter_fn=lambda x: filter_conversations_by_keyword(x, "conversations"),
+            **kwargs,
+        )
+
+    @staticmethod
+    def rename_conversations(data):
+        data["conversations"] = [
+            {"role": "user" if item["from"] == "human" else "assistant", "content": item["value"]}
+            for item in data["conversations"]
+        ]
+        return data
 
 
 def preproc_magpie(data):
