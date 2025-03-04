@@ -7,6 +7,8 @@ digital books, newspapers, and magazines, some of which were processed by Optica
 The Lucie Training Dataset was used to pretrain [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B),
 a foundation LLM with strong capabilities in French and English. Code for data preparation can be found in the [training respository](https://github.com/OpenLLM-France/Lucie-Training/tree/7f1f7efa1288f709662a9067bf2c3db856b850f8) for Lucie-7B. Due to the licenses of a few subcorpora, the Lucie Training Dataset is released under a [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). A subset available for commercial use will be released soon.
 
+We note that one subcorpus used for training could not be released with the Lucie Training Dataset due to copyright conflicts discovered after training had begun. This data came from the [Persée platform](https://www.persee.fr/). The full list of urls used to create the dataset can be recreated from the file [persee_metadata_documents.csv](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/metadata/persee_metadata_documents.csv), where the corresponding url is `https://www.persee.fr/doc/{ID}` for each `ID` in the column `file_id`. The file [persee_metadata_collections.csv](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/blob/main/metadata/persee_metadata_collections.csv) gives statistics on document, word and character counts for the data grouped by collection. In all, the corpus contains a total of 3.25 billion words and 5.75 billion tokens, making up around 0.25% of the raw corpus and 0.37% of the tokens seen during training.
+
 Table of Contents:
 <ul>
   <li><a href="#dataset-description">Dataset Description</a>
