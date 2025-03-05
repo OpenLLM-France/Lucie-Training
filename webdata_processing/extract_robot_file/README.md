@@ -2,14 +2,14 @@
 
 For RedPajama:
 ```
-input_file = path/to/redpajama_all_urls.csv
-output_path = output/for/redpajama
+input_file=path/to/redpajama_all_urls.csv
+output_path=output/for/redpajama
 ```
 
 For FineWeb-Edu:
 ```
-input_file = path/to/fiwebedu_urls.csv
-output_path = output/for/fiwebedu
+input_file=path/to/fiwebedu_urls.csv
+output_path=output/for/fiwebedu
 ```
 
 ## Extract robots.txt
