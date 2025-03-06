@@ -432,10 +432,7 @@ def main():
 
     global all_datas
     all_datas = get_datasets(args.datasets, high_quality=args.high_quality)
-    all_datas = dict(
-        dataset_to_key_value(dataset)
-        for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
-    )
+    all_datas = dict(dataset_to_key_value(dataset) for dataset in decompose_datasets(all_datas))
 
     task = TokenizationTask(args)
 
