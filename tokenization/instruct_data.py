@@ -1,3 +1,4 @@
+import json
 import os
 import random
 import re
@@ -6,23 +7,17 @@ import pandas as pd
 
 from data import (
     DataIterator,
-    DataIteratorConcat,
-    # Overloaded classes
-    DataIteratorCroissantAligned,
     _asset_folder,
-    decompose_datasets,
-    # needed for the main to write parquets
-    get_datasets,
-    set_data_iterator_prefix,
+    decompose_config,
+    norm_config_name,
 )
 
 
 class InstructDataIterator(DataIterator):
     def __init__(self, dataset, data_to_chat_instructions=None, *kargs, **kwargs):
         if isinstance(dataset, DataIterator):
-            # inherit from the dataset
+            # Inherit from the dataset
             self.__dict__ = dataset.__dict__
-            self.name += "_instruct"
         else:
             # Wrapped "HuggingFace" dataset
             DataIterator.__init__(self, dataset, *kargs, **kwargs)
@@ -41,18 +36,6 @@ class InstructDataIterator(DataIterator):
         raise NotImplementedError
 
 
-class InstructDataIteratorConcat(DataIteratorConcat):
-    def __init__(self, datasets, *kargs, **kwargs):
-        DataIteratorConcat.__init__(self, datasets, *kargs, **kwargs)
-        self.datasets = [
-            InstructDataIterator(dataset, *kargs, data_to_chat_instructions=self.data_to_chat_instructions, **kwargs)
-            for dataset in datasets
-        ]
-
-    def data_to_chat_instructions(self, data):
-        raise NotImplementedError
-
-
 ### Implementation of specific datasets
 
 _asset_instruct_translation = {
@@ -63,12 +46,12 @@ _asset_instruct_translation_cont = {
 }
 
 
-class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, InstructDataIteratorConcat):
-    def __init__(self, *kargs, verbose=False, debug=False, **kwargs):
-        DataIteratorCroissantAligned.__init__(self, *kargs, **kwargs)
+class InstructDataIteratorTranslation(InstructDataIterator):
+    def __init__(self, *kargs, verbose=False, **kwargs):
+        self.dataset = DataIterator(*kargs, **kwargs)
 
         # Make that an instruction dataset (composite dataset)
-        InstructDataIteratorConcat.__init__(self, self.datasets, *kargs, name=self.name + "_instruct", **kwargs)
+        InstructDataIterator.__init__(self, self.dataset, *kargs, name=self.dataset.name + "_instruct", **kwargs)
 
         # Languages strings
         self.language_strings = {
@@ -184,17 +167,6 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
 
         self.verbose = verbose
 
-        if debug:
-            for lan in self.instruct_templates:
-                for type in self.instruct_templates[lan]:
-                    instructions = self.instruct_templates[lan][type]
-                    weights = self.intruct_template_probas[lan][type]
-                    assert len(instructions) == len(weights)
-                    max_weight = max(weights)
-                    with open(f"tmp_debug_instructions_{type}_{lan}.txt", "w") as f:
-                        for w, instruction in zip(weights, instructions):
-                            print(f"{w * 100 / max_weight:.2f} {instruction}", file=f)
-
         if verbose:
             for lan in self.instruct_templates:
                 for k in self.instruct_templates[lan]:
@@ -300,9 +272,16 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
         #########################################
         ### Go !
 
+        assert "extra" in data, f"Data does not have 'extra' field: {data}"
+        data = json.loads(data["extra"])
+
         # - load the fields
-        assert "text_fr" in data
-        assert "text_en" in data
+        if "text_fr" not in data:
+            import pdb
+
+            pdb.set_trace()
+        assert "text_fr" in data, f"Data does not have 'text_fr' field: {data}"
+        assert "text_en" in data, f"Data does not have 'text_en' field: {data}"
         text_fr = data["text_fr"]
         text_en = data["text_en"]
 
@@ -422,40 +401,55 @@ class InstructDataIteratorTranslationCroissant(DataIteratorCroissantAligned, Ins
         return turns
 
 
-def main_dump_parquet():
-    set_data_iterator_prefix("InstructDataIterator", scope=globals())
+_instruct_configs = {
+    "croissant_aligned": InstructDataIteratorTranslation,
+}
 
+
+def to_instruct_data(ds, *kargs, **kwargs):
+    name = ds
+    if not isinstance(ds, str):
+        name = ds.name
+    for config, conversion_class in _instruct_configs.items():
+        config = norm_config_name(config)
+        if config in name:
+            return conversion_class(ds, *kargs, **kwargs)
+
+    raise NotImplementedError(f"Dataset {name} not implemented")
+
+
+def main_dump_parquet():
     import argparse
 
+    import tqdm
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("datasets", type=str, default="translation")
+    parser.add_argument("datasets", type=str, default="all", nargs="+", help="Datasets to dump")
     parser.add_argument("--output", type=str, default=".", help="Output directory")
-    parser.add_argument("--high_quality", action="store_true")
+    parser.add_argument(
+        "--low-quality", default=False, action="store_true", help="Use historical data instead of lastly curated data"
+    )
     parser.add_argument("--max_per_parquet", default=None, type=int, help="Maximum number of examples per parquet file")
-    parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
 
-    all_datas = get_datasets(args.datasets, high_quality=args.high_quality, debug=args.debug, verbose=args.debug)
-    all_datas = dict(
-        dataset_to_key_value(dataset)
-        for dataset in decompose_datasets(all_datas, parquet_level=True, return_json_file_if_possible=True)
-    )
+    if args.datasets == ["all"]:
+        args.datasets = list(_instruct_configs.keys())
 
-    if args.debug and not args.max_per_parquet:
-        args.max_per_parquet = 1000
+    datasets = list(decompose_config(args.datasets, high_quality=not args.low_quality))
+    datasets = [to_instruct_data(dataset) for dataset in datasets]
+    all_datas = dict(dataset_to_key_value(dataset) for dataset in datasets)
 
     random.seed(1969)
     for k, data_iterator in all_datas.items():
         output_filename = os.path.join(args.output, k + ".parquet")
         print(f"Generating {output_filename}")
         datas = []
-        for i, messages in enumerate(data_iterator):
+        iterator = data_iterator if not args.max_per_parquet else tqdm.tqdm(data_iterator, total=args.max_per_parquet)
+        for i, messages in enumerate(iterator):
             if args.max_per_parquet and i >= args.max_per_parquet:
                 break
             datas.append(messages)
         pd.DataFrame({"messages": datas}).to_parquet(output_filename)
-        if args.debug:
-            break
 
 
 def dataset_to_key_value(dataset):
@@ -467,6 +461,3 @@ def dataset_to_key_value(dataset):
 
 if __name__ == "__main__":
     main_dump_parquet()
-
-    # set_data_iterator_prefix("InstructDataIterator", scope=globals())
-    # main()

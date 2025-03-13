@@ -3,6 +3,7 @@ import json
 import os
 import re
 import time
+from collections.abc import Generator
 
 import datasets
 import tqdm
@@ -11,89 +12,121 @@ _folder = os.path.dirname(os.path.realpath(__file__))
 _asset_folder = os.path.join(os.path.dirname(_folder), "assets")
 
 
+########################################
+# Main functions to import
+
+
 def get_datasets(config_names=None, high_quality=False, streaming=True, **kwargs):
     if config_names in [None, "all"]:
         config_names = get_all_config_names()
+
     if isinstance(config_names, str):
         config_names = [config_names]
 
+    config_names = [norm_config_name(c) for c in config_names]
+
     for config_name in config_names:
-        dataset = DataIterator(config_name, high_quality=high_quality, streaming=streaming, **kwargs)
-        yield from decompose_datasets(dataset)
+        yield from decompose_datasets(config_name, high_quality=high_quality, streaming=streaming, **kwargs)
 
 
-def decompose_datasets(dataset, max_samples=None):
-    num_samples = 0
-    num_chars = 0
-    for sample in dataset:
-        print("NOCOMMIT", sample)
-        if num_samples >= 100:
-            break
-        assert isinstance(sample, str), f"Invalid type for {sample}"
-        num_samples += 1
-        num_chars += len(sample)
-    avg_num_chars = num_chars / num_samples
-
-    if max_samples is None:
-        max_samples = 2_000_000_000 / avg_num_chars
-
-    print(f"Decomposing dataset {dataset.name} with {max_samples} samples")
-
-    ds = dataset.hf_dataset
-    previous_sample = None
-    while True:
-        new_ds = ds.take(max_samples)
-        ds = ds.skip(max_samples)
-        print("Finished one dataset")
-        yield DataIterator(new_ds, streaming=dataset.streaming)
-        new_sample = None
-        try:
-            for x in ds:
-                new_sample = x
-                break
-        except ValueError:
-            break
-        if new_sample == previous_sample and new_sample is not None:
-            break
-        previous_sample = new_sample
-        ds = new_ds
-
-
-def get_subsets(hf_dataset):
-    subsets = set()
-    for sample in hf_dataset:
-        subset = _get_field(sample, "subset")
-        if subset:
-            subsets.add(subset)
-    return sorted(subsets)
-
-
-def _get_field(sample, field, in_="extra"):
-    if in_:
-        sample = sample[in_]
-    if isinstance(sample, str):
-        try:
-            sample = json.loads(sample)
-        except json.JSONDecodeError:
-            return None
-    assert isinstance(sample, dict), f"Invalid type for {sample} ({type(sample)})"
-    return sample.get(field)
-
-
-def _filter_sample_by_subset(subset, sample):
-    return _get_field(sample, "subset") == subset
-
-
-def _filter_sample_by_index_range(index_min, index_max, index):
-    return index_min <= index <= index_max
+def decompose_datasets(dataset, **kwargs):
+    if isinstance(dataset, str):
+        config_name = dataset
+    elif isinstance(dataset, Generator) or isinstance(dataset, list):
+        for it in dataset:
+            yield from decompose_datasets(it, **kwargs)  # Recursion
+        return
+    else:
+        config_name = norm_config_name(dataset.config_name)
+    yield from decompose_config(config_name, **kwargs)
 
 
 def tokenizer_datasets(train=True, factor=1):
-    raise NotImplementedError("Not re-implemented since refactoring yet")
+    raise NotImplementedError("Not re-implemented since refactoring")
 
 
-def get_all_config_names():
-    config_names = list(datasets.load_dataset_builder("OpenLLM-France/Lucie-Training-Dataset").builder_configs)
+########################################
+# Helpers
+
+
+def is_default(name):
+    return name.lower() == "default"
+
+
+def norm_config_name(name):
+    if is_default(name):
+        return "default"
+
+    _languages = ["en", "fr", "es", "de", "it"]
+    if not any(char in name for char in ["/", "_", "-"]) and name[0].isupper():
+        # Already normalized (ex: "CroissantAligned")
+        nname = name
+    elif any(name.startswith(lan + "/") for lan in _languages):
+        # Already normalized (ex: "fr/Claire")
+        nname = name
+    else:
+        nname = name.replace("_", "-")
+        f = nname.split("-")
+        # "Claire-fr" -> "fr/Claire"
+        if any(nname.endswith("-" + lan) for lan in _languages):
+            nname = f[-1] + "/" + norm_config_name("-".join(f[:-1]))
+        else:
+            # Convert to CamelCase (ex: "croissant-aligned" -> "CroissantAligned")
+            nname = "".join([field.capitalize() for field in f])
+
+    return nname
+
+
+def decompose_config(config_names=None, streaming=True, high_quality=False, **kwargs):
+    config = datasets.load_dataset_builder("OpenLLM-France/Lucie-Training-Dataset")
+    parquet_files = config.config.data_files["train"]
+
+    if config_names is None:
+        config_names = get_all_config_names(allow_subset=False)
+    elif isinstance(config_names, str):
+        config_names = [config_names]
+
+    all_parquets_v1 = []
+    all_parquets_latest = []
+    for c in config_names:
+        c = norm_config_name(c)
+        has_found_parquet = False
+        for parquet_file in sorted(parquet_files):
+            if "/" + c + "/" in parquet_file:
+                has_found_parquet = True
+                if "v1.1" in parquet_file:
+                    assert parquet_file not in all_parquets_v1, f"Multiple config for {parquet_file}"
+                    all_parquets_v1.append(parquet_file)
+                else:
+                    assert parquet_file not in all_parquets_latest, f"Multiple config for {parquet_file}"
+                    all_parquets_latest.append(parquet_file)
+        if high_quality and len(all_parquets_latest) > 0:
+            all_parquets = all_parquets_latest
+        else:
+            all_parquets = all_parquets_v1
+        print(f"Found {len(all_parquets)} parquets for config '{c}' ({high_quality=})")
+        assert has_found_parquet, f"Cannot find parquet for config '{c}' (parquet_files={parquet_files[:5]})"
+
+    for parquet_files in sorted(all_parquets):
+        if isinstance(parquet_files, str):
+            parquet_files = [parquet_files]
+        for parquet_file in parquet_files:
+            name, _ = os.path.splitext(parquet_file)
+            name = "--".join(name.split("/")[-5:])
+            # Change from           hf://datasets/OpenLLM-France/Lucie-Training-Dataset@f3dff6f941eecc0c0a57dc0579610355a98d7c9c/data/XXX
+            # to  https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/resolve/f3dff6f941eecc0c0a57dc0579610355a98d7c9c/data/XXX
+            parquet_file = parquet_file.replace("hf://", "https://huggingface.co/").replace("@", "/resolve/")
+            print(f"Loading {parquet_file} -> '{name}'")
+            yield DataIterator(
+                datasets.load_dataset("parquet", data_files=parquet_file, streaming=streaming, split="train", **kwargs),
+                name=name,
+            )
+
+
+def get_all_config_names(allow_subset=False):
+    config = datasets.load_dataset_builder("OpenLLM-France/Lucie-Training-Dataset")
+
+    config_names = list(config.builder_configs)
 
     def include_config_name(all_names, name):
         _languages = ["fr", "en", "de", "es", "it"]
@@ -104,7 +137,7 @@ def get_all_config_names():
         ]
 
         # Try to deliver subsets if possible
-        if name in [
+        if allow_subset and name in [
             "default",
             "natural",
             "code",
@@ -128,11 +161,14 @@ def get_all_config_names():
 
 
 class DataIterator:
-    def __init__(self, config_name="default", high_quality=False, streaming=True, **kwargs):
+    def __init__(self, obj="default", high_quality=False, streaming=True, name=None, **kwargs):
         revision = "v1.2" if high_quality else "v1.1"
 
+        config_name = obj
+
         if isinstance(config_name, str):
-            hf_dataset = datasets.load_dataset(
+            # Load dataset
+            self.hf_dataset = datasets.load_dataset(
                 "OpenLLM-France/Lucie-Training-Dataset",
                 config_name,
                 revision=revision,
@@ -140,29 +176,36 @@ class DataIterator:
                 split="train",
                 **kwargs,
             )
-        else:
-            hf_dataset = config_name
+            self.config_name = config_name
 
-        self.hf_dataset = hf_dataset
-        self.dataset_iter = hf_dataset.__iter__()
+        elif isinstance(obj, DataIterator):
+            # Copy
+            self.__dict__ = obj.__dict__
+
+        else:  # Dataset already loaded
+            assert name
+            self.hf_dataset = obj
+            self.config_name = name
+
+        self.dataset_iter = self.hf_dataset.__iter__()
         self.streaming = streaming
+        self.given_name = name
+        self.key = "text"
 
     def __iter__(self):
         return self
 
     def __next__(self):
         sample = next(self.dataset_iter)
-        return sample["text"]
-
-    def __len__(self):
-        try:
-            return len(self.hf_dataset)
-        except TypeError:
-            return 0
+        if isinstance(self.key, str):
+            return sample[self.key]
+        return self.key(sample)
 
     @property
-    def name(self) -> dict:
-        return self.hf_dataset.config_name
+    def name(self) -> str:
+        if self.given_name:
+            return self.given_name
+        return self.config_name
 
 
 ########################################
@@ -183,12 +226,11 @@ def main():
         default=["all"],
         help="Which dataset to test",
     )
-    parser.add_argument("--high-quality", default=False, action="store_true", help="Use high quality data only")
+    parser.add_argument("--high-quality", default=False, action="store_true", help="Use lastly curated data")
     parser.add_argument(
         "--folder",
         type=str,
         default=os.path.join(_asset_folder, "stats_raw"),
-        # default=None,
         help="Folder to dump some example data into",
     )
     parser.add_argument(
@@ -237,12 +279,12 @@ def main():
                 global_stats[k] = 0
             global_stats[k] += v
 
+    # Data loading
     all_datasets = [get_datasets(name, high_quality=args.high_quality) for name in args.dataset]
-    print(all_datasets[0])
-    all_datasets = [list(decompose_datasets(it)) for sublist in all_datasets for it in sublist]
-    print(all_datasets[0])
+    # Split: dataset -> (parquet) subsets
+    all_datasets = [list(decompose_datasets(ds)) for ds in all_datasets]
+    # Flatten
     all_datasets = [it for sublist in all_datasets for it in sublist]
-    print(all_datasets[0])  # NOCOMMIT
 
     # Early checks to avoid failure in the middle
     for it in all_datasets:
@@ -258,8 +300,6 @@ def main():
             stats = json.load(open(main_stat_filename, encoding="utf8"))
             num_billion_words = stats["num words"] / 1_000_000_000
             main_prefix_example_files = f"{num_billion_words:06.3f}B_{name_slug}"
-        # elif args.only_dump_examples:
-        #     raise RuntimeError(f"Missing main stat file {main_stat_filename}")
 
         its = [it]
         global_stats = None
