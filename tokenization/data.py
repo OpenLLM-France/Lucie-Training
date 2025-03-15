@@ -383,12 +383,6 @@ def test_iterator(
                 if ignore_if_exists and not only_dump_examples:
                     print(f"Skipping {name_slug} (already computed)")
                     return stats
-                # num_billion_words = stats["num words"] / 1_000_000_000
-                # to_insert = f"{num_billion_words:06.3f}B"
-                # if "--" in prefix_example_files:
-                #     prefix_example_files = prefix_example_files.replace("--", "--" + to_insert + "_", 1)
-                # else:
-                #     prefix_example_files += "--" + to_insert
         elif ignore_if_exists:
             # Create an empty file to avoid recomputing
             json.dump({}, open(stat_filename, "w", encoding="utf8"))
