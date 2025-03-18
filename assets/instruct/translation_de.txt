@@ -1,0 +1,108 @@
+Kann ich eine Übersetzung dieses Abschnitts von <language_from> nach <language_to> erhalten?  
+Kann ich diesen Text übersetzt von <language_from> nach <language_to> bekommen?  
+Kannst du diese Daten von <language_from> nach <language_to> umwandeln?  
+Kannst du das für mich von <language_from> nach <language_to> umwandeln?  
+Kannst du diesen Abschnitt, der in <language_from> geschrieben ist, nach <language_to> übersetzen?  
+Kannst du helfen, diesen Text von <language_from> nach <language_to> zu übersetzen?  
+Kannst du helfen, dieses Dokument von <language_from> nach <language_to> zu übersetzen?  
+Kannst du helfen, das zu übersetzen?  
+Könntest du bitte diesen Text von <language_from> nach <language_to> umwandeln?  
+Kannst du das in <language_to> machen?  
+Kannst du das in <language_to> ändern?  
+Kannst du den folgenden Text von <language_from> nach <language_to> übersetzen?  
+Kannst du diesen Absatz von <language_from> nach <language_to> übersetzen?  
+Kannst du dieses Phrasenbuch nach <language_to> übersetzen?  
+Kannst du das übersetzen?  
+Bitte ändere diesen Text von <language_from> nach <language_to>.
+Ändere das in <language_to>.
+Ändere das in meine Sprache, bitte.
+Wärst du so freundlich, das in <language_to> zu ändern?  
+Könntest du eine Übersetzung dieses Textes in <language_to> anfertigen?  
+Könntest du mir helfen, das in <language_to> zu ändern?  
+Könntest du mir helfen, diesen Text von <language_from> nach <language_to> zu übersetzen?  
+Könntest du mir helfen und das in <language_to> übersetzen?  
+Könntest du dieses Dokument, das ursprünglich in <language_from> verfasst wurde, nach <language_to> übersetzen?  
+Könntest du helfen, diesen Text, der ursprünglich in <language_from> geschrieben wurde, nach <language_to> zu übersetzen?  
+Könntest du dieses Dokument in <language_to> übersetzen?  
+Könntest du diese Reiseroute in <language_to> ändern?  
+Könntest du den angegebenen Text von <language_from> nach <language_to> übersetzen?  
+Könntest du diesen Text von <language_from> nach <language_to> zu akademischen Zwecken übersetzen?  
+Könntest du diesen Text von <language_from> nach <language_to> übersetzen?  
+Könntest du das bitte übersetzen?  
+Lieber/Liebe, könntest du das für mich in <language_to> übersetzen?  
+Tu mir einen Gefallen und wandle diesen Text in <language_to> um.
+Von <language_from> nach <language_to>, bitte übersetze diesen Text.
+Setze das so schnell wie möglich in <language_to>.
+Übersetze das in <language_to>.
+Hilf mir, das zu übersetzen.
+Hilf mir, das zu übersetzen.
+Hey Bruder, übersetze das in <language_to>.
+Hey Freund, übersetze das in <language_to>.
+Hey Kollege, übersetze das in <language_to>.
+Hallo, könntest du das in <language_to> übersetzen?  
+Hallo, kannst du das für mich in <language_to> übersetzen?  
+Hallo, ändere das in <language_to>.
+Hallo, wandle das in <language_to> um.
+Hallo, setze das in <language_to>.
+Hallo, mache diesen Text zu <language_to>.
+Hallo, ändere das in <language_to>.
+Hallo, übersetze diese Karte in <language_to>.
+Ich brauche eine Übersetzung von <language_from> nach <language_to> für diesen Text.
+Ich brauche eine Übersetzung dieses Textes von <language_from> nach <language_to>, bitte.
+Ich brauche eine Übersetzung.
+Ich brauche diese Anweisungen in <language_to>.
+Ich brauche das umgewandelt von <language_from> nach <language_to>.
+Ich brauche dieses Dokument übersetzt von <language_from> nach <language_to>.
+Ich brauche dieses Dokument, das in <language_from> geschrieben ist, in <language_to> übersetzt, bitte.
+Ich brauche das in <language_to>, wenn es dir nichts ausmacht.
+Ich brauche das in <language_to>, bitte.
+Ich brauche das jetzt in <language_to>.
+Ich brauche das in <language_to>.
+Ich brauche das in meiner Sprache.
+Ich brauche dieses Manuskript in <language_to> übersetzt.
+Ich brauche dieses Gedicht in <language_to> übersetzt.
+Ich brauche das in <language_to>.
+Ich brauche diesen Bericht in <language_to>.
+Ich brauche diesen Text schnell in <language_to>.
+Ich brauche diesen Text übersetzt von <language_from> nach <language_to>.
+Ich brauche, dass dieser Text übersetzt wird.
+Ich brauche, dass dieser Text, der in <language_from> geschrieben ist, nach <language_to> übersetzt wird.
+Ich brauche, dass das übersetzt wird, danke.
+Ich benötige eine Übersetzung dieses Textes in <language_to>.
+Ich würde eine Übersetzung dieses Textes von <language_from> nach <language_to> schätzen.
+Ich wäre dankbar, wenn du diesen Text von <language_from> nach <language_to> übersetzen könntest.
+Ich wäre dankbar, wenn du diesen Text nach <language_to> übersetzen könntest.
+Ich wäre dir dankbar, wenn du diesen Text von <language_from> nach <language_to> übersetzen könntest.
+Ich hätte gerne, dass dieser Text von <language_from> nach <language_to> übersetzt wird.
+Es wäre großartig, wenn du diesen Text von <language_from> nach <language_to> umwandeln könntest.
+Bitte ändere diesen Text von seiner Originalsprache, <language_from>, nach <language_to>.
+Bitte wandle diesen akademischen Text von <language_from> nach <language_to> um.
+Bitte wandle diesen Geschäftsplan in <language_to> um.
+Bitte erleichtere die Übersetzung dieses Abschnitts in <language_to>.
+Bitte übersetze den folgenden Text von <language_from> nach <language_to>.
+Bitte übersetze diesen Abschnitt in <language_to>.
+Wandle diesen Text von <language_from> nach <language_to> um.
+Mache das sofort in <language_to>.
+Mache diesen Text zu <language_to>.
+Könntest du diesen Text, der in <language_from> geschrieben ist, nach <language_to> übersetzen?  
+Könnte ich eine Übersetzung dieses Textes nach <language_to> anfordern?  
+Bitte ändere diesen Text von <language_from> nach <language_to>.
+Bitte ändere diesen Text, der ursprünglich in <language_from> geschrieben wurde, nach <language_to>.
+Bitte wandle diesen Text von <language_from> nach <language_to> um.
+Bitte wandle diesen Text, der in <language_from> geschrieben ist, nach <language_to> um.
+Bitte wandle diesen Reiseführer in <language_to> um.
+Bitte hilf bei der Übersetzung dieses Dokuments von <language_from> nach <language_to>.
+Bitte hilf mir, das in <language_to> umzuwandeln.
+Bitte hilf, das zu übersetzen.
+Bitte stelle eine Übersetzung dieses Textes nach <language_to> bereit.
+Bitte stelle eine Übersetzung dieses Textes, der in <language_from> geschrieben ist, nach <language_to> bereit.
+Bitte stelle eine Übersetzung dieses Dokuments von <language_from> nach <language_to> bereit.
+Bitte stelle eine Übersetzung dieses Textes von <language_from> nach <language_to> bereit.
+Bitte stelle eine akademische Übersetzung dieses Dokuments in <language_to> bereit.
+Bitte wandle dieses Dokument in <language_to> um.
+Bitte übersetze Folgendes von <language_from> nach <language_to>.
+Bitte übersetze diesen Vertrag in <language_to>.
+Bitte übersetze dieses Dokument von seiner Originalsprache, <language_from>, nach <language_to>.
+Bitte übersetze diesen Abschnitt, der in <language_from> geschrieben ist, nach <language_to>.
+Bitte übersetze diesen Text, der ursprünglich in <language_from> verfasst wurde, nach <language_to>.
+Bitte übersetze das.

@@ -1,0 +1,52 @@
+E ora in <language_to>.
+Puoi cambiare ciò che hai appena detto in <language_to>?
+Puoi convertire questo messaggio in <language_to>?
+Puoi esprimere la tua risposta in <language_to>?
+Puoi darmi la versione in <language_to> di questo testo?
+Puoi darmi la versione in <language_to> di ciò che hai appena detto?
+Puoi darmi la traduzione di questo messaggio in <language_to>?
+Puoi fornire la traduzione di questa frase in <language_to>?
+Puoi fornire la traduzione della tua risposta in <language_to>?
+Puoi riformulare quello in <language_to>?
+Puoi riformulare il tuo ultimo messaggio in <language_to>?
+Puoi riformulare il tuo messaggio in <language_to>?
+Puoi riformulare questa frase in <language_to>?
+Puoi dirlo in <language_to>?
+Puoi tradurlo per me in <language_to>, per favore?
+Puoi tradurre questa frase in <language_to>?
+Puoi tradurre ciò che hai appena detto in <language_to>?
+Puoi tradurre il tuo ultimo messaggio in <language_to>?
+Puoi tradurre la tua risposta precedente in <language_to>?
+Puoi scrivere la tua ultima risposta in <language_to>?
+Potresti cambiare questa frase in <language_to>?
+Potresti cambiare la tua risposta in <language_to>?
+Potresti convertire ciò che hai appena detto in <language_to>?
+Potresti rifarlo per me in <language_to>?
+Potresti darmi la versione in <language_to> della tua risposta?
+Potresti formulare questa frase in <language_to>?
+Potresti tradurre questa frase in <language_to>, per favore?
+Potresti fornire una traduzione di questo in <language_to>?
+Potresti mettere quella risposta in <language_to>?
+Potresti riformulare questo testo in <language_to>, per favore?
+Potresti riformulare la tua risposta in <language_to>?
+Potresti dire questa risposta in <language_to>?
+Potresti tradurre questo in <language_to>, per favore?
+Potresti tradurre questo messaggio in <language_to>, per favore?
+Potresti tradurre questo messaggio in <language_to>?
+Potresti tradurre questa risposta in <language_to>?
+Potresti tradurre questa frase in <language_to>?
+Potresti scriverlo in <language_to>, per favore?
+Potresti scrivere la tua risposta in <language_to>, per favore?
+Che ne dici in <language_to>?
+Come sarebbe in <language_to>?
+In <language_to>, per favore.
+In <language_to>?
+Ora in <language_to>, per favore.
+Ora in <language_to>, per piacere.
+OK, che ne dici in <language_to>?
+OK, in <language_to>?
+Oh, fantastico. Puoi tradurlo in <language_to>?
+Per favore, traduci la tua ultima risposta in <language_to>.
+Per favore, traduci la tua ultima frase in <language_to>.
+Com’è in <language_to>?
+Sarebbe possibile riformulare questo messaggio in <language_to>?

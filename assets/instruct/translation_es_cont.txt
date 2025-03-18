@@ -1,0 +1,52 @@
+Y ahora en <language_to>.
+¿Puedes cambiar lo que acabas de decir a <language_to>?
+¿Puedes convertir este mensaje en <language_to>?
+¿Puedes expresar tu respuesta en <language_to>?
+¿Puedes darme la versión en <language_to> de este texto?
+¿Puedes darme la versión en <language_to> de lo que acabas de decir?
+¿Puedes darme la traducción de este mensaje en <language_to>?
+¿Puedes proporcionar la traducción de esta oración en <language_to>?
+¿Puedes proporcionar la traducción de tu respuesta en <language_to>?
+¿Puedes reformular eso en <language_to>?
+¿Puedes reformular tu último mensaje en <language_to>?
+¿Puedes reformular tu mensaje en <language_to>?
+¿Puedes reescribir esta oración en <language_to>?
+¿Puedes decir eso en <language_to>?
+¿Puedes traducirme esto a <language_to>, por favor?
+¿Puedes traducir esta oración a <language_to>?
+¿Puedes traducir lo que acabas de decir a <language_to>?
+¿Puedes traducir tu último mensaje a <language_to>?
+¿Puedes traducir tu respuesta anterior a <language_to>?
+¿Puedes escribir tu última respuesta en <language_to>?
+¿Podrías cambiar esta oración a <language_to>?
+¿Podrías cambiar tu respuesta a <language_to>?
+¿Podrías convertir lo que acabas de decir en <language_to>?
+¿Podrías hacer eso otra vez para mí en <language_to>?
+¿Podrías darme la versión en <language_to> de tu respuesta?
+¿Podrías expresar esto en <language_to>?
+¿Podrías traducir esta oración a <language_to>, por favor?
+¿Podrías proporcionar una traducción de esto en <language_to>?
+¿Podrías poner esa respuesta en <language_to>?
+¿Podrías reformular este texto en <language_to>, por favor?
+¿Podrías reformular tu respuesta en <language_to>?
+¿Podrías decir esta respuesta en <language_to>?
+¿Podrías traducir esto a <language_to>, por favor?
+¿Podrías traducir este mensaje a <language_to>, por favor?
+¿Podrías traducir este mensaje a <language_to>?
+¿Podrías traducir esta respuesta a <language_to>?
+¿Podrías traducir esta oración a <language_to>?
+¿Podrías escribir esto en <language_to>, por favor?
+¿Podrías escribir tu respuesta en <language_to>, por favor?
+¿Qué tal en <language_to>?
+¿Cómo se vería eso en <language_to>?
+En <language_to>, por favor.
+¿En <language_to>?
+Ahora en <language_to>, por favor.
+Ahora en <language_to>, por favorcito.
+OK, ¿qué tal en <language_to>?
+OK, ¿en <language_to>?
+Oh, genial. ¿Puedes traducir eso a <language_to>?
+Por favor, traduce tu última respuesta a <language_to>.
+Por favor, traduce tu última oración a <language_to>.
+¿Cómo es eso en <language_to>?
+¿Sería posible reformular este mensaje en <language_to>?

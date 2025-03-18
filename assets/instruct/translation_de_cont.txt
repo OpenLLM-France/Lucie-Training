@@ -1,0 +1,52 @@
+Und jetzt auf <language_to>.
+Kannst du das, was du gerade gesagt hast, in <language_to> ändern?
+Kannst du diese Nachricht in <language_to> umwandeln?
+Kannst du deine Antwort auf <language_to> ausdrücken?
+Kannst du mir die <language_to>-Version dieses Textes geben?
+Kannst du mir die <language_to>-Version von dem, was du gerade gesagt hast, geben?
+Kannst du mir die Übersetzung dieser Nachricht in <language_to> geben?
+Kannst du die Übersetzung dieses Satzes in <language_to> bereitstellen?
+Kannst du die Übersetzung deiner Antwort in <language_to> bereitstellen?
+Kannst du das in <language_to> umformulieren?
+Kannst du deine letzte Nachricht in <language_to> umformulieren?
+Kannst du deine Nachricht in <language_to> umformulieren?
+Kannst du diesen Satz in <language_to> umformulieren?
+Kannst du das auf <language_to> sagen?
+Kannst du das bitte für mich in <language_to> übersetzen?
+Kannst du diesen Satz in <language_to> übersetzen?
+Kannst du das, was du gerade gesagt hast, in <language_to> übersetzen?
+Kannst du deine letzte Nachricht in <language_to> übersetzen?
+Kannst du deine vorherige Antwort in <language_to> übersetzen?
+Kannst du deine letzte Antwort in <language_to> schreiben?
+Könntest du diesen Satz in <language_to> ändern?
+Könntest du deine Antwort in <language_to> ändern?
+Könntest du das, was du gerade gesagt hast, in <language_to> umwandeln?
+Könntest du das noch einmal für mich in <language_to> tun?
+Könntest du mir die <language_to>-Version deiner Antwort geben?
+Könntest du das auf <language_to> formulieren?
+Könntest du diesen Satz bitte in <language_to> übersetzen?
+Könntest du eine Übersetzung davon in <language_to> bereitstellen?
+Könntest du diese Antwort in <language_to> formulieren?
+Könntest du diesen Text bitte in <language_to> umformulieren?
+Könntest du deine Antwort in <language_to> umformulieren?
+Könntest du diese Antwort auf <language_to> sagen?
+Könntest du das bitte in <language_to> übersetzen?
+Könntest du diese Nachricht bitte in <language_to> übersetzen?
+Könntest du diese Nachricht in <language_to> übersetzen?
+Könntest du diese Antwort in <language_to> übersetzen?
+Könntest du diesen Satz in <language_to> übersetzen?
+Könntest du das bitte in <language_to> schreiben?
+Könntest du deine Antwort bitte in <language_to> schreiben?
+Wie wäre es mit <language_to>?
+Wie sieht das in <language_to> aus?
+Auf <language_to>, bitte.
+Auf <language_to>?
+Jetzt auf <language_to>, bitte.
+Jetzt auf <language_to>, bitte, bitte.
+OK, wie wäre es mit <language_to>?
+OK, auf <language_to>?
+Oh, großartig. Kannst du das in <language_to> übersetzen?
+Bitte übersetze deine letzte Antwort in <language_to>.
+Bitte übersetze deinen letzten Satz in <language_to>.
+Wie heißt das auf <language_to>?
+Wäre es möglich, diese Nachricht in <language_to> umzuformulieren?

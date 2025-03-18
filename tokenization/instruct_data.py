@@ -38,11 +38,49 @@ class InstructDataIterator(DataIterator):
 
 ### Implementation of specific datasets
 
+_language_dict = {
+    "fr": {
+        "fr": "français",
+        "en": "anglais",
+        "es": "espagnol",
+        "de": "allemand",
+        "it": "italien",
+    },
+    "en": {
+        "fr": "French",
+        "en": "English",
+        "es": "Spanish",
+        "de": "German",
+        "it": "Italian",
+    },
+    "es": {
+        "fr": "francés",
+        "en": "inglés",
+        "es": "español",
+        "de": "alemán",
+        "it": "italiano",
+    },
+    "de": {
+        "fr": "Französisch",
+        "en": "Englisch",
+        "es": "Spanisch",
+        "de": "Deutsch",
+        "it": "Italienisch",
+    },
+    "it": {
+        "fr": "francese",
+        "en": "inglese",
+        "es": "spagnolo",
+        "de": "tedesco",
+        "it": "italiano",
+    },
+}
+
 _asset_instruct_translation = {
-    lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}.txt") for lan in ["fr", "en"]
+    lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}.txt") for lan in _language_dict
 }
 _asset_instruct_translation_cont = {
-    lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}_cont.txt") for lan in ["fr", "en"]
+    lan: os.path.join(_asset_folder, "instruct", f"translation_{lan}_cont.txt") for lan in _language_dict
 }
 
 
@@ -53,18 +91,6 @@ class InstructDataIteratorTranslation(InstructDataIterator):
         # Make that an instruction dataset (composite dataset)
         InstructDataIterator.__init__(self, self.dataset, *kargs, name=self.dataset.name + "_instruct", **kwargs)
 
-        # Languages strings
-        self.language_strings = {
-            "fr": {
-                "fr": ("français", "francais"),
-                "en": "anglais",
-            },
-            "en": {
-                "fr": "French",
-                "en": "English",
-            },
-        }
-
         # Tricks to remove tags from input instructions (to make more instructions)
         patterns_to_remove_from_tag = {
             # FRENCH
@@ -74,13 +100,28 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             # ENGLISH
             "en": [(", which is in <language_from>,", "")]
             + [(rf"(, | )?{determinant} <language_from>,?", "") for determinant in ["from", "in"]]
-            + [(rf"<language_from> ({word})\b", r"\1") for word in ["text"]],
+            + [("<language_from> ({word})\b", r"\1") for word in ["text"]],
+            # SPANISH
+            "es": [(", escrito en <language_from>,", "")]
+            + [(rf"(, | )?{determinant} <language_from>,?", "") for determinant in ["de"]],
+            # GERMAN
+            "de": [(", der in <language_from> geschrieben ist,", "")]
+            + [(rf"(, | )?{determinant} <language_from>,?", "") for determinant in ["von"]],
+            # ITALIAN
+            "it": [(", scritto in <language_from>,", "")]
+            + [(rf"(, | )?{determinant} <language_from>,?", "") for determinant in ["da"]],
         }
         patterns_to_remove_to_tag = {
             # FRENCH
             "fr": [(r"(, | )?(en|vers de|vers du) <language_to>,?", "")],
             # ENGLISH
             "en": [(r"(, | )?(in)?to <language_to>,?", "")],
+            # SPANISH
+            "es": [(r"(, | )?a <language_to>,?", "")],
+            # GERMAN
+            "de": [(r"(, | )?nach <language_to>,?", "")],
+            # ITALIAN
+            "it": [(r"(, | )?in <language_to>,?", "")],
         }
 
         self.regex_to_remove_from_tag = {
@@ -98,14 +139,14 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             new_text = None
             for regex, to in list_of_regex:
                 if regex.search(text):
-                    new_text = regex.sub(to, text)
+                    new_text = regex.sub(to, text).strip()
                     break
             return new_text if new_text != text else None
 
         # Load instruction templates, and sort them by whether they have <language_from> and/or <language_to>
         self.instruct_templates = {
             lan: {k: [] for k in ["no_lang", "no_lang_with_context", "to", "to_with_context", "from_and_to"]}
-            for lan in self.language_strings
+            for lan in _language_dict
         }
 
         for lan, filename in _asset_instruct_translation.items():
@@ -147,12 +188,21 @@ class InstructDataIteratorTranslation(InstructDataIterator):
 
         # Check that each set of instruction is not empty and remove duplicates
         for lan in self.instruct_templates:
-            for k in self.instruct_templates[lan]:
-                assert self.instruct_templates[lan][k], f"No instruction template found for {k}"
+            found = []
+            for k in list(self.instruct_templates[lan].keys()):
+                if not self.instruct_templates[lan][k]:
+                    print(f"WARNING: No instruction template found for {lan=} / {k}")
+                    self.instruct_templates[lan].pop(k)
+                    continue
+                found.append(k)
                 self.instruct_templates[lan][k] = sorted(set(self.instruct_templates[lan][k]))
+            if not found:
+                raise RuntimeError(f"No template found for {lan=}")
 
         # Set probabilities inversely proportional to the square of the number of characters
         def compute_weights(instructions):
+            if not len(instructions):
+                return []
             lengths = [len(instruction) for instruction in instructions]
             assert min(lengths) > 0
             weights = [1 / numchar**2 for numchar in lengths]
@@ -206,12 +256,14 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             "from_and_to": 1.0 / 3,
         }
 
+        random.seed(1234)
+
     def data_to_chat_instructions(self, data):
         #########################################
         ### Randomly choose some parameters
 
         # - choose the input/output languages
-        bool_french_first = random.random() < self.proba_french_to_english
+        bool_lan_order = random.random() < self.proba_french_to_english
         # - whether the instruction (to translate) comes after the text to translate
         bool_put_instruction_after_text = random.random() < self.proba_instruction_after_text
         # - whether the text to translate comes from the chat history
@@ -219,7 +271,7 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             bool_put_instruction_after_text and random.random() < self.proba_text_to_translate_from_previous_instruct
         )
         # - whether the user speaks the same language as the text to translate
-        bool_same_input_and_chat_language = random.random() < self.proba_same_language
+        bool_same_input_and_instruct_language = random.random() < self.proba_same_language
         # - whether to mistake about French/french and français/Français
         bool_wrong_case_for_language = random.random() < self.proba_wrong_case_for_language
         # - opening and ending quotes
@@ -246,7 +298,7 @@ class InstructDataIteratorTranslation(InstructDataIterator):
         # - choose whether to mention input/output languages in the instruction or not
         proba_by_languages_mentioned = (
             self.proba_by_languages_mentioned_if_same_as_instruct
-            if bool_same_input_and_chat_language
+            if bool_same_input_and_instruct_language
             else self.proba_by_languages_mentioned_if_different_from_instruct
         ).copy()
         # - sometimes use a specific instruction type when there is context before
@@ -254,20 +306,9 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             proba_by_languages_mentioned["to_with_context"] = proba_by_languages_mentioned.pop("to")
             if "no_lang" in proba_by_languages_mentioned:
                 proba_by_languages_mentioned["no_lang_with_context"] = proba_by_languages_mentioned.pop("no_lang")
-        type = random.choices(
-            list(proba_by_languages_mentioned.keys()), weights=list(proba_by_languages_mentioned.values())
-        )[0]
         # - sometimes use lower / upper case only
         case_instruct = random.choices(["lower", "upper", "normal"], weights=[0.18, 0.02, 0.8])[0]
         case_text = random.choices([case_instruct, "normal"], weights=[0.2, 0.8])[0]
-        # - choose the instruction template among available ones
-        language_input = "fr" if bool_french_first else "en"
-        language_output = "en" if bool_french_first else "fr"
-        language_instruction = language_input if bool_same_input_and_chat_language else language_output
-        instruction = random.choices(
-            self.instruct_templates[language_instruction][type],
-            weights=self.intruct_template_probas[language_instruction][type],
-        )[0]
 
         #########################################
         ### Go !
@@ -276,28 +317,62 @@ class InstructDataIteratorTranslation(InstructDataIterator):
         data = json.loads(data["extra"])
 
         # - load the fields
-        if "text_fr" not in data:
-            import pdb
+        if "text_1" in data:
+            for k in (
+                "text_2",
+                "lan_1",
+                "lan_2",
+            ):
+                assert k in data, f"Data does not have '{k}' field: {data}"
+            text_1 = data["text_1"]
+            text_2 = data["text_2"]
+            lan_1 = data["lan_1"]
+            lan_2 = data["lan_2"]
 
-            pdb.set_trace()
-        assert "text_fr" in data, f"Data does not have 'text_fr' field: {data}"
-        assert "text_en" in data, f"Data does not have 'text_en' field: {data}"
-        text_fr = data["text_fr"]
-        text_en = data["text_en"]
+        elif "text_fr" in data:
+            assert "text_en" in data, f"Data does not have 'text_en' field: {data}"
+            text_1 = data["text_fr"]
+            text_2 = data["text_en"]
+            lan_1 = "fr"
+            lan_2 = "en"
 
-        text_input = text_fr if bool_french_first else text_en
-        text_translated = text_en if bool_french_first else text_fr
+        else:
+            raise RuntimeError(f"Unexpected data {data}")
+
+        if lan_1 == "en":
+            text_1 = normalize_text(text_1, "en")
+        if lan_2 == "en":
+            text_2 = normalize_text(text_2, "en")
+
+        text_input = text_1 if bool_lan_order else text_2
+        text_translated = text_2 if bool_lan_order else text_1
+
+        language_input = lan_1 if bool_lan_order else lan_2
+        language_output = lan_2 if bool_lan_order else lan_1
+        language_instruction = language_input if bool_same_input_and_instruct_language else language_output
+
+        type = None
+        while type not in self.instruct_templates[language_instruction]:
+            type = random.choices(
+                list(proba_by_languages_mentioned.keys()), weights=list(proba_by_languages_mentioned.values())
+            )[0]
+
+        # - choose the instruction template among available ones
+        instruction = random.choices(
+            self.instruct_templates[language_instruction][type],
+            weights=self.intruct_template_probas[language_instruction][type],
+        )[0]
 
         # Get the language names, and noise them a bit
-        language_input_str = self.language_strings[language_instruction][language_input]
-        language_output_str = self.language_strings[language_instruction][language_output]
+        language_input_str = _language_dict[language_instruction][language_input]
+        language_output_str = _language_dict[language_instruction][language_output]
         # - Sometimes there are several options (["français",  "francais"] -> random choice)
         if not isinstance(language_input_str, str):
             language_input_str = random.choice(language_input_str)
         if not isinstance(language_output_str, str):
             language_output_str = random.choice(language_output_str)
         # - Capitalize (or not) the language
-        should_capitalize = language_instruction == "en"
+        should_capitalize = _language_dict[language_instruction]["fr"][0].isupper()
         if bool_wrong_case_for_language:
             do_capitalize = not should_capitalize
             language_input_str = language_input_str.capitalize() if do_capitalize else language_input_str.lower()
@@ -311,8 +386,9 @@ class InstructDataIteratorTranslation(InstructDataIterator):
                 instruction = re.sub(r"\b([Dd])e <language_from>", r"\1'" + language_input_str, instruction)
                 instruction = re.sub(r"\b([Dd])u <language_from>", r"\1e l'" + language_input_str, instruction)
             # Sometimes remove space before question mark in French
-            if instruction.endswith("?") and random.random() < self.proba_wrong_question_mark_fr:
-                instruction = instruction[:-1].rstrip() + "?"
+            if random.random() < self.proba_wrong_question_mark_fr:
+                if instruction.endswith("?"):
+                    instruction = instruction[:-1].rstrip() + "?"
             # Contractions needed (au -> à l', du -> de l')
             if language_output_str[0] in "aeiouyAEIOUY":  # only when the word starts with a vowel
                 instruction = re.sub(r"\bau <language_to>", r"à l'" + language_output_str, instruction)
@@ -320,6 +396,7 @@ class InstructDataIteratorTranslation(InstructDataIterator):
             # Feminine words ("version française / anglaise")
             instruction = re.sub(r"\b(version) <language_to>", r"\1 " + language_output_str + "e", instruction)
             instruction = re.sub(r"\b(version) <language_from>", r"\1 " + language_input_str + "e", instruction)
+
         # - Then the general substitutions
         instruction = re.sub("<language_from>", language_input_str, instruction)
         instruction = re.sub("<language_to>", language_output_str, instruction)
@@ -403,6 +480,7 @@ class InstructDataIteratorTranslation(InstructDataIterator):
 
 _instruct_configs = {
     "croissant_aligned": InstructDataIteratorTranslation,
+    "europarl_aligned": InstructDataIteratorTranslation,
 }
 
 
@@ -416,6 +494,14 @@ def to_instruct_data(ds, *kargs, **kwargs):
             return conversion_class(ds, *kargs, **kwargs)
 
     raise NotImplementedError(f"Dataset {name} not implemented")
+
+
+def normalize_text(text, lan):
+    if lan == "en":
+        text = re.sub(r" ?'s ?", "'s", text)
+    else:
+        raise NotImplementedError(f"Normalization for {lan} not implemented")
+    return text
 
 
 def main_dump_parquet():
@@ -439,7 +525,7 @@ def main_dump_parquet():
     datasets = [to_instruct_data(dataset) for dataset in datasets]
     all_datas = dict(dataset_to_key_value(dataset) for dataset in datasets)
 
-    random.seed(1969)
+    random.seed(1234)
     for k, data_iterator in all_datas.items():
         output_filename = os.path.join(args.output, k + ".parquet")
         print(f"Generating {output_filename}")
@@ -449,6 +535,7 @@ def main_dump_parquet():
             if args.max_per_parquet and i >= args.max_per_parquet:
                 break
             datas.append(messages)
+        os.makedirs(args.output, exist_ok=True)
         pd.DataFrame({"messages": datas}).to_parquet(output_filename)
 
 
