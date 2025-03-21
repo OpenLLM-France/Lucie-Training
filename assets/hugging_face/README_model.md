@@ -280,17 +280,19 @@ Lucie-7B is a language model trained solely to predict the most probable next wo
 When using the Lucie-7B model, please cite the following paper:
 
 ✍ Olivier Gouvert, Julie Hunter, Jérôme Louradour,
-Evan Dufraisse, Yaya Sy, Pierre-Carl Langlais, Anastasia Stasenko,
-Laura Rivière, Christophe Cerisara, Jean-Pierre Lorré (2025)
-Lucie-7B LLM and its training dataset
+Christophe Cérisara, Evan Dufraisse, Yaya Sy,
+Laura Rivière, Jean-Pierre Lorré (2025).
+[The Lucie-7B LLM and the Lucie Training Dataset: 
+      Open resources for multilingual language generation](https://arxiv.org/abs/2503.12294). arxiv:2503.12294.
 ```bibtex
 @misc{openllm2025lucie,
-      title={The Lucie-7B LLM and the Lucie Training Dataset:
-      open resources for multilingual language generation}, 
-      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Evan Dufraisse and Yaya Sy and Pierre-Carl Langlais and Anastasia Stasenko and Laura Rivière and Christophe Cerisara and Jean-Pierre Lorré},
+      title={The Lucie-7B LLM and the Lucie Training Dataset: Open resources for multilingual language generation}, 
+      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Christophe Cerisara and Evan Dufraisse and Yaya Sy and Laura Rivière and Jean-Pierre Lorré and OpenLLM-France community},
       year={2025},
+      eprint={2503.12294},
       archivePrefix={arXiv},
-      primaryClass={cs.CL}
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2503.12294}, 
 }
 ```
 
