@@ -1455,18 +1455,20 @@ dataset = load_dataset("OpenLLM-France/Lucie-Training-Dataset", name, revision="
 
 When using the Lucie Training Dataset, please cite the following paper:
 
-✍ Olivier Gouvert, Julie Hunter, Jérôme Louradour, Christophe Cerisara,
-Evan Dufraisse, Yaya Sy, Laura Rivière, Jean-Pierre Lorré (2025)
-The Lucie-7B LLM and the Lucie Training Dataset:
-      open resources for multilingual language generation
+✍ Olivier Gouvert, Julie Hunter, Jérôme Louradour,
+Christophe Cérisara, Evan Dufraisse, Yaya Sy,
+Laura Rivière, Jean-Pierre Lorré (2025).
+[The Lucie-7B LLM and the Lucie Training Dataset: 
+      Open resources for multilingual language generation](https://arxiv.org/abs/2503.12294). arxiv:2503.12294.
 ```bibtex
 @misc{openllm2025lucie,
-      title={The Lucie-7B LLM and the Lucie Training Dataset:
-      open resources for multilingual language generation}, 
-      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Christophe Cérisara and Evan Dufraisse and Yaya Sy and Laura Rivière and Jean-Pierre Lorré},
+      title={The Lucie-7B LLM and the Lucie Training Dataset: Open resources for multilingual language generation}, 
+      author={Olivier Gouvert and Julie Hunter and Jérôme Louradour and Christophe Cerisara and Evan Dufraisse and Yaya Sy and Laura Rivière and Jean-Pierre Lorré and OpenLLM-France community},
       year={2025},
+      eprint={2503.12294},
       archivePrefix={arXiv},
-      primaryClass={cs.CL}
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2503.12294}, 
 }
 ```
 
