@@ -41,8 +41,38 @@ def decompose_datasets(dataset, **kwargs):
     yield from decompose_config(config_name, **kwargs)
 
 
-def tokenizer_datasets(train=True, factor=1):
-    raise NotImplementedError("Not re-implemented since refactoring")
+def tokenizer_dataset(
+    train=True,
+    factor=1,
+    streaming=True,
+):
+    iterators = []
+    for language, num_words in [
+        ("fra_Latn", 244_541_319_983),
+        ("ita_Latn", 128_812_336_382),
+        ("deu_Latn", 234_845_525_340),
+        ("spa_Latn", 244_541_319_983),
+    ]:
+        iterators.append(
+            DataIterator(
+                language + ("" if train else "_removed"),
+                repo="HuggingFaceFW/fineweb-2",
+                max_num_words=1_000_000_000 * factor,
+                num_words=num_words,
+                streaming=streaming,
+            )
+        )
+    # English
+    iterators.append(
+        DataIterator(
+            "CC-MAIN-2024-38" if train else "CC-MAIN-2024-46",
+            repo="HuggingFaceFW/fineweb",
+            max_num_words=1_000_000_000 * factor,
+            num_words=500_000_000_000,
+            streaming=streaming,
+        )
+    )
+    return DataIteratorFromList(iterators, name="fineweb-2")
 
 
 ########################################
@@ -161,15 +191,25 @@ def get_all_config_names(allow_subset=False):
 
 
 class DataIterator:
-    def __init__(self, obj="default", high_quality=False, streaming=True, name=None, **kwargs):
-        revision = "v1.2" if high_quality else "v1.1"
+    def __init__(
+        self,
+        obj="default",
+        repo="OpenLLM-France/Lucie-Training-Dataset",
+        high_quality=False,
+        max_num_words=None,
+        num_words=None,
+        streaming=True,
+        name=None,
+        **kwargs,
+    ):
+        revision = "v1.2" if high_quality else None  # "v1.1"
 
         config_name = obj
 
         if isinstance(config_name, str):
             # Load dataset
             self.hf_dataset = datasets.load_dataset(
-                "OpenLLM-France/Lucie-Training-Dataset",
+                repo,
                 config_name,
                 revision=revision,
                 streaming=streaming,
@@ -188,17 +228,25 @@ class DataIterator:
             self.config_name = name
 
         self.dataset_iter = self.hf_dataset.__iter__()
+        self.max_num_words = max_num_words
+        self.skip_number = (int(num_words / max_num_words) - 1) if num_words and max_num_words else 0
         self.streaming = streaming
         self.given_name = name
         self.key = "text"
 
     def __iter__(self):
+        self.num_words_passed = 0
         return self
 
     def __next__(self):
-        sample = next(self.dataset_iter)
+        for _ in range(self.skip_number + 1):
+            sample = next(self.dataset_iter)
         if isinstance(self.key, str):
-            return sample[self.key]
+            text = sample[self.key]
+            self.num_words_passed += len(text.split())
+            if self.max_num_words and self.num_words_passed > self.max_num_words:
+                raise StopIteration
+            return text
         return self.key(sample)
 
     @property
@@ -206,6 +254,27 @@ class DataIterator:
         if self.given_name:
             return self.given_name
         return self.config_name
+
+
+class DataIteratorFromList:
+    def __init__(self, list_of_iterators, name):
+        self.list_of_iterators = list_of_iterators
+        self.name = name
+
+    def __iter__(self):
+        self.current = 0
+        self.current_iter = self.list_of_iterators[0].__iter__()
+        return self
+
+    def __next__(self):
+        try:
+            return next(self.current_iter)
+        except StopIteration:
+            self.current += 1
+            if self.current >= len(self.list_of_iterators):
+                raise StopIteration from None
+            self.current_iter = self.list_of_iterators[self.current].__iter__()
+            return self.__next__()
 
 
 ########################################

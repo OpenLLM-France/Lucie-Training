@@ -153,7 +153,7 @@ def build_tokenizer(
                 (
                     [
                         tokenizers.pre_tokenizers.Metaspace(
-                            replacement=_space_internal, add_prefix_space=add_prefix_space
+                            replacement=_space_internal, prepend_scheme="first" if add_prefix_space else "never"
                         ),
                     ]
                 )
@@ -179,7 +179,9 @@ def build_tokenizer(
             # tokenizers.decoders.Replace("▁", " "),
             # tokenizers.decoders.ByteFallback(),
             tokenizers.decoders.ByteFallback(),
-            tokenizers.decoders.Metaspace(replacement=_space_internal, add_prefix_space=add_prefix_space),
+            tokenizers.decoders.Metaspace(
+                replacement=_space_internal, prepend_scheme="first" if add_prefix_space else "never"
+            ),
             tokenizers.decoders.Fuse(),
         ]
         + (
@@ -584,7 +586,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--space_behaviour",
-        default="prefix_all",
+        default="prefix_sos",
         choices=["prefix_all", "prefix_sos", "split"],
         help="How to deal with whitespaces",
     )
@@ -841,36 +843,37 @@ if __name__ == "__main__":
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
 
-    # Launch evaluation
-    if not args.debug:
-        for dataset in [
-            "Wikipedia:fr",
-            "Wikipedia:en",
-            "Wikipedia:de",
-            "Wikipedia:es",
-            "Wikipedia:it",
-            "Europarl",
-            "Gutenberg",
-            "TheStack",
-            "Persee",
-            "Gallica",
-        ]:
-            os.system(
-                f"""\
-{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} --regex {dataset} &
-"""
-            )
+# TODO ?
+#     # Launch evaluation
+#     if not args.debug:
+#         for dataset in [
+#             "Wikipedia:fr",
+#             "Wikipedia:en",
+#             "Wikipedia:de",
+#             "Wikipedia:es",
+#             "Wikipedia:it",
+#             "Europarl",
+#             "Gutenberg",
+#             "TheStack",
+#             "Persee",
+#             "Gallica",
+#         ]:
+#             os.system(
+#                 f"""\
+# {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} --regex {dataset} &
+# """
+#             )
 
-    else:
-        for sentence in example_training_sentences:
-            tokens, decoded = test_tokenizer(tokenizer, sentence)
-            print("* Input:  ", sentence.replace("\n", "\\n"))
-            print("* Tokens: ", tokens)
-            print("* Decoded:", decoded.replace("\n", "\\n"))
-            print()
+#     else:
+#         for sentence in example_training_sentences:
+#             tokens, decoded = test_tokenizer(tokenizer, sentence)
+#             print("* Input:  ", sentence.replace("\n", "\\n"))
+#             print("* Tokens: ", tokens)
+#             print("* Decoded:", decoded.replace("\n", "\\n"))
+#             print()
 
-        os.system(
-            f"""\
-{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}
-"""
-        )
+#         os.system(
+#             f"""\
+# {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}
+# """
+#         )
