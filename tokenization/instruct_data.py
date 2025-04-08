@@ -528,6 +528,9 @@ def main_dump_parquet():
     random.seed(1234)
     for k, data_iterator in all_datas.items():
         output_filename = os.path.join(args.output, k + ".parquet")
+        if os.path.exists(output_filename):
+            print(f"File {output_filename} already exists, skipping")
+            continue
         print(f"Generating {output_filename}")
         datas = []
         iterator = data_iterator if not args.max_per_parquet else tqdm.tqdm(data_iterator, total=args.max_per_parquet)
