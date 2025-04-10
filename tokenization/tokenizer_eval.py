@@ -9,7 +9,24 @@ import pandas as pd
 import transformers
 from tokenizer_train import set_infinite_length
 
-from data import decompose_datasets, tokenizer_dataset
+from data import DataIterator
+
+evaluation_datasets = {}
+for language in ["en", "fr", "de", "es", "it"]:
+    evaluation_datasets[f"Wikipedia:{language}"] = {
+        "config": f"Wikipedia-{language}",
+        "max_num_words": 500_000_000,
+    }
+for language in ["en", "fr", "de", "es"]:
+    evaluation_datasets[f"Europarl:{language}"] = {
+        "config": f"Europarl-{language}",
+        "max_num_words": 500_000_000,
+    }
+for programming_language in ["python", "c++", "tex", "javascript"]:
+    evaluation_datasets[f"code:{programming_language}"] = {
+        "config": f"code-{programming_language}",
+        "max_num_words": 50_000_000,
+    }
 
 if __name__ == "__main__":
     import argparse
@@ -81,7 +98,7 @@ if __name__ == "__main__":
         args.output = args.tokenizer
     os.makedirs(args.output, exist_ok=True)
 
-    output_file = f"{args.output}/eval_transformers_2.csv"
+    output_file = f"{args.output}/eval.csv"
 
     already_computed = []
     eval_data = []
@@ -91,10 +108,7 @@ if __name__ == "__main__":
         already_computed = [d[0] for d in eval_data]
 
     # EVALUATION
-    for dataset in tqdm.tqdm(
-        list(decompose_datasets(tokenizer_dataset(train=False, factor=1))), desc="Evaluating datasets"
-    ):
-        name = dataset.name
+    for name, dataset_kwargs in tqdm.tqdm(evaluation_datasets.items()):
         if args.regex is not None and not re.match(re.escape(args.regex), name, re.IGNORECASE):
             print(f"Skipping eval of {args.tokenizer} on {name} (regex mismatch)")
             continue
@@ -102,6 +116,8 @@ if __name__ == "__main__":
             print(f"Skipping eval of {args.tokenizer} on {name} (already computed)")
             continue
         print(f"Evaluate {args.tokenizer} on {name}...")
+
+        dataset = DataIterator(**dataset_kwargs)
 
         total_num_pages = 0
         total_num_paragraph = 0
@@ -177,7 +193,7 @@ if __name__ == "__main__":
 
         processing_time = 0
         batch = []
-        for text in tqdm.tqdm(dataset, total=len(dataset), desc=f"Evaluating {name}"):
+        for text in tqdm.tqdm(dataset, desc=f"Evaluating {name}"):
             batch.append(text)
             if len(batch) == update_each:
                 process_batch(batch)

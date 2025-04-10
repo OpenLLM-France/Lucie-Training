@@ -41,40 +41,6 @@ def decompose_datasets(dataset, **kwargs):
     yield from decompose_config(config_name, **kwargs)
 
 
-def tokenizer_dataset(
-    train=True,
-    factor=1,
-    streaming=True,
-):
-    iterators = []
-    for language, num_words in [
-        ("fra_Latn", 244_541_319_983),
-        ("ita_Latn", 128_812_336_382),
-        ("deu_Latn", 234_845_525_340),
-        ("spa_Latn", 244_541_319_983),
-    ]:
-        iterators.append(
-            DataIterator(
-                language + ("" if train else "_removed"),
-                repo="HuggingFaceFW/fineweb-2",
-                max_num_words=1_000_000_000 * factor,
-                num_words=num_words,
-                streaming=streaming,
-            )
-        )
-    # English
-    iterators.append(
-        DataIterator(
-            "CC-MAIN-2024-38" if train else "CC-MAIN-2024-46",
-            repo="HuggingFaceFW/fineweb",
-            max_num_words=1_000_000_000 * factor,
-            num_words=500_000_000_000,
-            streaming=streaming,
-        )
-    )
-    return DataIteratorFromList(iterators, name="fineweb-2")
-
-
 ########################################
 # Helpers
 
@@ -193,7 +159,7 @@ def get_all_config_names(allow_subset=False):
 class DataIterator:
     def __init__(
         self,
-        obj="default",
+        config="default",
         repo="OpenLLM-France/Lucie-Training-Dataset",
         high_quality=False,
         max_num_words=None,
@@ -204,7 +170,7 @@ class DataIterator:
     ):
         revision = "v1.2" if high_quality else None  # "v1.1"
 
-        config_name = obj
+        config_name = config
 
         if isinstance(config_name, str):
             # Load dataset
@@ -218,13 +184,13 @@ class DataIterator:
             )
             self.config_name = config_name
 
-        elif isinstance(obj, DataIterator):
+        elif isinstance(config, DataIterator):
             # Copy
-            self.__dict__ = obj.__dict__
+            self.__dict__ = config.__dict__
 
         else:  # Dataset already loaded
             assert name
-            self.hf_dataset = obj
+            self.hf_dataset = config
             self.config_name = name
 
         self.dataset_iter = self.hf_dataset.__iter__()

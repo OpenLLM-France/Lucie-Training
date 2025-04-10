@@ -9,7 +9,7 @@ from typing import Optional
 import tokenizers
 import transformers
 
-from data import tokenizer_dataset
+from data import DataIterator
 
 _special_tokens_map = {
     "bos_token": {
@@ -143,6 +143,16 @@ def build_tokenizer(
         )
     ) + [
         tokenizers.pre_tokenizers.Digits(individual_digits=individual_digits),
+        # # TODO: should we do like Llama3: numbers up to 3 digits, and contractions
+        # # Split by R2L digits
+        # tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"\d{1,3}(?=(\d{3})*\b)"),
+        #     behavior="isolated", invert = False),
+        # # Below: Existing steps from Llama 3's tokenizer
+        # tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"(?i:'s|'t|'re|'ve|'m|'ll|'d|j'|l'|d'|t'|s')\
+        # |[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"),
+        #     behavior="isolated", invert=False),
+        # # TODO: try again Byte-Level pre-encoding ?
+        # tokenizers.pre_tokenizers.ByteLevel(add_prefix_space=False, trim_offsets=True, use_regex=False)
     ]
 
     if not do_not_split_spaces:
@@ -399,6 +409,7 @@ def set_infinite_length(tokenizer):
         10**30,
         1,
         1,
+        "right",
     )
     return tokenizer
 
@@ -470,9 +481,13 @@ def add_consecutive_spaces(
     )
     if has_metaspace:
         add_prefix_space = (
-            [p["add_prefix_space"] for p in pre_tokenizer["pretokenizers"] if p["type"] == "Metaspace"][0]
+            [
+                p["prepend_scheme"] in ["first", "always"]
+                for p in pre_tokenizer["pretokenizers"]
+                if p["type"] == "Metaspace"
+            ][0]
             if isseq_pre_tokenizer
-            else pre_tokenizer["add_prefix_space"]
+            else pre_tokenizer["prepend_scheme"] in ["first", "always"]
         )
 
         # Add Replace in the normalizer
@@ -549,6 +564,7 @@ if __name__ == "__main__":
         description="Train a tokenizer.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    parser.add_argument("parquet_file", nargs="+", help="Parquet files")
     parser.add_argument(
         "--vocab_size",
         type=int,
@@ -661,10 +677,8 @@ if __name__ == "__main__":
 
         trainset = debug_texts_iterator()
     else:
-        trainset = tokenizer_dataset(
-            train=True,
-            streaming=True,
-        )
+        trainset = DataIterator("default", "parquet", data_files=args.parquet_file, name="custom")
+
         name_dataset = trainset.name
 
     if not args.output:
@@ -843,37 +857,33 @@ if __name__ == "__main__":
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
 
-# TODO ?
-#     # Launch evaluation
-#     if not args.debug:
-#         for dataset in [
-#             "Wikipedia:fr",
-#             "Wikipedia:en",
-#             "Wikipedia:de",
-#             "Wikipedia:es",
-#             "Wikipedia:it",
-#             "Europarl",
-#             "Gutenberg",
-#             "TheStack",
-#             "Persee",
-#             "Gallica",
-#         ]:
-#             os.system(
-#                 f"""\
-# {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} --regex {dataset} &
-# """
-#             )
+    # Launch evaluation
+    if not args.debug:
+        for dataset in [
+            "Wikipedia:fr",
+            "Wikipedia:en",
+            "Wikipedia:de",
+            "Wikipedia:es",
+            "Wikipedia:it",
+            "Europarl",
+            "code",
+        ]:
+            os.system(
+                f"""\
+{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_eval.py {args.output} --regex {dataset} &
+"""
+            )
 
-#     else:
-#         for sentence in example_training_sentences:
-#             tokens, decoded = test_tokenizer(tokenizer, sentence)
-#             print("* Input:  ", sentence.replace("\n", "\\n"))
-#             print("* Tokens: ", tokens)
-#             print("* Decoded:", decoded.replace("\n", "\\n"))
-#             print()
+    else:
+        for sentence in example_training_sentences:
+            tokens, decoded = test_tokenizer(tokenizer, sentence)
+            print("* Input:  ", sentence.replace("\n", "\\n"))
+            print("* Tokens: ", tokens)
+            print("* Decoded:", decoded.replace("\n", "\\n"))
+            print()
 
-#         os.system(
-#             f"""\
-# {sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}
-# """
-#         )
+        os.system(
+            f"""\
+{sys.executable} {os.path.dirname(os.path.realpath(__file__))}/tokenizer_quicktest.py {args.output}
+"""
+        )
