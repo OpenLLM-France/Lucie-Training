@@ -148,7 +148,7 @@ def build_tokenizer(
         # tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"\d{1,3}(?=(\d{3})*\b)"),
         #     behavior="isolated", invert = False),
         # # Below: Existing steps from Llama 3's tokenizer
-        # tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"(?i:'s|'t|'re|'ve|'m|'ll|'d|j'|l'|d'|t'|s')\
+        # tokenizers.pre_tokenizers.Split(tokenizers.Regex(r"(?i:'s|'t|'re|'ve|'m|'ll|'d|j'|l'|d'|t'|s'|qu')\
         # |[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"),
         #     behavior="isolated", invert=False),
         # # TODO: try again Byte-Level pre-encoding ?
@@ -423,6 +423,8 @@ def add_consecutive_spaces(
     tokenizer = json.load(open(tokenizer_file, encoding="utf8"))
     tokens = tokenizer["model"]["vocab"]
 
+    merges_as_list = isinstance(tokenizer["model"]["merges"][0], list)
+
     # Add consecutive spaces in the vocabulary
     # n = 2
     # assert n <= max_length
@@ -451,9 +453,9 @@ def add_consecutive_spaces(
 
         # Check that all the spaces are in the tokens
         for s in all_spaces:
-            assert s in tokens, f"{s} not in tokens"
-        assert (char * n) in tokens, f"{char * n} not in tokens"
-        assert (char * (n + 1)) not in tokens, f"{char * (n+1)} in tokens"
+            assert s in tokens, f"'{s}' not in tokens"
+        assert (char * n) in tokens, f"'{char * n}' not in tokens"
+        assert (char * (n + 1)) not in tokens, f"'{char}' * {n+1} in tokens"
 
         # Safety (make sure all merges produce valid tokens)
         all_spaces = [s for s in all_spaces if s in tokens]
@@ -463,11 +465,15 @@ def add_consecutive_spaces(
 
         all_pairs = list(itertools.product(all_spaces, repeat=2))
         new_merges = sorted(
-            [f"{a} {b}" for a, b in all_pairs],
-            # key=len
-            key=lambda x: (-len(x.split(" ")[0]), -len(x.split(" ")[1])),
+            [[a, b] if merges_as_list else f"{a} {b}" for a, b in all_pairs],
+            key=(lambda x: (-len(x[0]), -len(x[1])))
+            if merges_as_list
+            else (lambda x: (-len(x.split(" ")[0]), -len(x.split(" ")[1]))),
         )
-        new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
+        if merges_as_list:
+            new_merges = [m for m in new_merges if m[0] + m[1] in all_spaces]
+        else:
+            new_merges = [m for m in new_merges if m.replace(" ", "") in all_spaces]
         merges = tokenizer["model"]["merges"]
         tokenizer["model"]["merges"] = [m for m in merges if m not in new_merges] + new_merges
 
@@ -677,7 +683,14 @@ if __name__ == "__main__":
 
         trainset = debug_texts_iterator()
     else:
-        trainset = DataIterator("default", "parquet", data_files=args.parquet_file, name="custom")
+        path_components = os.path.commonprefix(args.parquet_file).split("/")
+
+        if len(args.parquet_file) == 1 or len(path_components) < 2:
+            name = path_components[-1]
+        else:
+            name = path_components[-2]
+
+        trainset = DataIterator("default", "parquet", data_files=args.parquet_file, name=name)
 
         name_dataset = trainset.name
 
@@ -856,6 +869,8 @@ if __name__ == "__main__":
     )
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(args.output)
+
+    # tokenizer.save_pretrained(args.output + "_check")
 
     # Launch evaluation
     if not args.debug:
