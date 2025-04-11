@@ -70,10 +70,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.tokenizer.lower() in ["gpt-4"]:
+    if args.tokenizer.lower().startswith("gpt"):
         import tiktoken
 
-        tokenizer = tiktoken.encoding_for_model("gpt-4")
+        tokenizer = tiktoken.encoding_for_model(args.tokenizer)
         all_byte_tokens = []
 
     else:
@@ -167,8 +167,12 @@ if __name__ == "__main__":
             total_num_tokens += len(tokens)
             if hasattr(tokenizer, "convert_ids_to_tokens"):
                 token_str = tokenizer.convert_ids_to_tokens(tokens)
-            else:
+            elif hasattr(tokenizer, "decode_batch"):
                 token_str = tokenizer.decode_batch([[t] for t in tokens])
+            elif hasattr(tokenizer, "decode"):
+                token_str = tokenizer.decode(tokens)
+            else:
+                raise ValueError(f"Cannot detect Tokenizer decoding method (available methods: {dir(tokenizer)})")
             total_num_tokens_space += sum(not t.strip(" ▁") for t in token_str)
             total_num_tokens_linebreak += sum(not t.strip("\n") for t in token_str)
             total_num_tokens_tab += sum(not t.strip("\t") for t in token_str)
