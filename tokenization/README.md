@@ -9,7 +9,7 @@ The tokenizer is saved to disk and can be loaded and applied to new data.
 To train a tokenizer, run the following command:
 
 ```bash
-python tokenizer_train.py [options]
+python tokenizer_train.py [options] data1.parquet [data2.parquet ...]
 ```
 
 ## Tokenize data
