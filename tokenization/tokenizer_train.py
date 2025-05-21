@@ -608,7 +608,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--space_behaviour",
-        default="prefix_sos",
+        default="prefix_all",
         choices=["prefix_all", "prefix_sos", "split"],
         help="How to deal with whitespaces",
     )
