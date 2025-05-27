@@ -1084,8 +1084,8 @@ The dataset is also  available in the following versions:
 - **v1.1** / [**main**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/main/data) (default): 
   The data used for the first (main) pretraining phase of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B), which contains approximately 2.3T tokens. The statistics above apply to this version.
 - [**v1.2**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2/data): An improved version of the main dataset, where 
-  - GallicaMonographies and GallicaPress have been fltered aggressively to remove documents with low OCR quality.
-  - The `Ubuntu_IRC` and `PhilPapers` subsets of Pile have been refined by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian.
+  - GallicaMonographies and GallicaPress have been filtered aggressively to remove documents with low OCR quality. After filtering, GallicaMonographies contains around 220,000 documents and 20.131 billion tokens. For GallicaPress, we first selected a subset of the original corpus that contained only html documents (as opposed to documents in .txt format). This subset contained 1,747,600 documents and 74 billion tokens. After filtering, this subset contains roughly 989,100 documents and 45.7 billion tokens.
+  - The `Ubuntu_IRC` and `PhilPapers` subsets of the Pile have been refined by fixing encoding issues and removing documents in languages other than English, French, Spanish, German and Italian. After filtering, Ubuntu_IRC contains about 9,000 documents and 1.745 billion tokens. PhilPapers contains around 28,000 million documents and 502 million tokens.
 - [**v1.2-recent-web**](https://huggingface.co/datasets/OpenLLM-France/Lucie-Training-Dataset/tree/v1.2-recent-web/data) : The data used for the second pretraining phase (context extension) of [Lucie-7B](https://huggingface.co/OpenLLM-France/Lucie-7B#2-context-extension).
   This version is identical to `v1.2` with the exception that older snapshots of web data (before 2023 for RedPajama and before 2024 for FineWebEdu) have been excluded.
   All data from `v1.1` that were not filtered out remain unchanged in `v1.2` and `v1.2-recent-web`.
@@ -1159,7 +1159,7 @@ The <a href="#example-use-in-python">Example use in Python</a> section contains 
 * <u>Pre-processing</u>:
   * <u>Filtering</u>:
   To filter out documents with excessive OCR errors, the dataset was refined by discarding texts with a perplexity higher than 1500,
-  measured using a CCNET model in English (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1590)).
+  measured using a CCNET model on the target language (see [code details](https://github.com/OpenLLM-France/Lucie-Training/blob/7f1f7efa1288f709662a9067bf2c3db856b850f8/tokenization/data.py#L1590)).
   The code to compute CCNET perplexity, parallelizing on parquet files, is [available here](https://github.com/OpenLLM-France/Lucie-dataset-filtering).
   * <u>Text cleaning</u>:
   Mentions of Credit Institutions Directives (CID) that appears in the raw texts such as `(cid:146)` were removed.
