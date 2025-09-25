@@ -236,7 +236,8 @@ Install [llama.cpp](https://github.com/ggerganov/llama.cpp):
 ```bash
 git clone https://github.com/ggerganov/llama.cpp
 cd llama.cpp
-make
+cmake -B build
+cmake --build build --config Release
 python3 -m pip install -r requirements.txt
 ```
 
