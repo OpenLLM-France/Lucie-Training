@@ -12,7 +12,7 @@ from collections import Counter
 import regex as re
 
 # TODO: Add this to the data, and remove from here ?
-_folder = os.path.dirname(os.path.realpath(__file__))
+_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 _asset_folder = os.path.join(os.path.dirname(_folder), "assets")
 _pile_phil_languages_filename = os.path.join(_asset_folder, "PilePhil_lang_detect.txt")
 assert os.path.isfile(_pile_phil_languages_filename)
